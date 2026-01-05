@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: Usability & Accessibility
+# ================================================================
+# Defines user experience principles and accessibility requirements
+# for the Medication Adherence system.
+# ================================================================
+
+id: bundle:usability-accessibility
+type: concern
+version: "0.1.0"
+title: "Medication Adherence System - Usability & Accessibility Bundle"
+description: >
+  Usability and accessibility concern bundle defining UX principles,
+  WCAG compliance, and error handling for the Medication Adherence system.
+  Focuses on elderly users and users with visual impairments.
+
+imports: []
+
+scds:
+  - scd:project:ux-principles
+  - scd:project:accessibility-compliance
+  - scd:project:error-handling-ux
+
+provenance:
+  created_by: "ux-team@medtech.com"
+  created_at: "2025-11-01T11:00:00Z"
+  updated_by: "emily.rodriguez@medtech.com"
+  updated_at: "2025-11-16T13:00:00Z"
+  rationale: "Usability & accessibility bundle v1.0.0 - WCAG 2.1 AA compliance, large touch targets"

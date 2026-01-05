@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ohana-scs.org/schema/scd.standards.schema.json",
+  "title": "SCS Standards-Tier SCD",
+  "description": "Schema for Standards-Tier Structured Context Documents (SCDs).",
+  "type": "object",
+  "required": ["id", "type", "title", "version", "description", "content", "provenance"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^scd:standards:[a-zA-Z0-9._-]+$"
+    },
+    "type": {
+      "type": "string",
+      "const": "standards"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content": {
+      "type": "object",
+      "required": ["standard_name"],
+      "properties": {
+        "standard_name": {
+          "type": "string"
+        },
+        "standard_version": {
+          "type": "string"
+        },
+        "authority": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "sections": {
+          "type": "array",
+          "description": "Individual clauses, controls, or requirements.",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "description"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "requirement_type": {
+                "type": "string"
+              },
+              "obligations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "related_controls": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "notes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "mappings": {
+          "type": "array",
+          "description": "Cross-standard mappings.",
+          "items": {
+            "type": "object",
+            "required": ["source", "target"],
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "relationship": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "rules": {
+          "type": "object",
+          "description": "References to external rule sets stored in Rules Database",
+          "properties": {
+            "rule_set_id": {
+              "type": "string",
+              "description": "Reference to rule set in Rules Database (e.g., 'pa-drugs-v2.3')",
+              "pattern": "^[a-zA-Z0-9._-]+$"
+            },
+            "rule_set_type": {
+              "type": "string",
+              "description": "Type of rules (e.g., 'prior-auth', 'approval', 'security')"
+            },
+            "schema_version": {
+              "type": "string",
+              "description": "Version of rule schema this SCD expects"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of how these rules are used"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "target"],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["created_by", "created_at"],
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_by": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_documents": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

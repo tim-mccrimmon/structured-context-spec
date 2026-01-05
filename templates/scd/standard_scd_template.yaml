@@ -1,0 +1,62 @@
+# Standards-Tier SCD Template
+# Purpose: Represent external standards, regulatory frameworks, or policies.
+# Usage: Copy this file, rename it (e.g., scd_standards_hipaa.yaml), and fill in.
+
+id: scd:standards:<name>      # e.g., scd:standards:hipaa-security
+type: standards               # MUST be "standards"
+title: "<Standard / Framework Name>"
+version: "0.1.0"
+description: >
+  Summary of the standard or policy represented by this SCD.
+  For example: "HIPAA Security Rule representation for PHI systems."
+
+content:
+  standard_name: "<Canonical name of the standard>"   # e.g., "HIPAA Security Rule"
+  standard_version: "<upstream version or revision>"  # e.g., "45 CFR Part 164"
+  authority: "<issuing body>"                         # e.g., "HHS", "NIST", "ISO"
+  scope: >
+    Brief description of what part of the standard is covered by this SCD
+    (full standard, a subset, a specific section, etc.).
+
+  sections:
+    # Each section represents a requirement, control, clause, or obligation.
+    # The naming here is generic enough to apply to many frameworks.
+    - id: <standard-id>        # e.g., hipaa:164.308(a)(1)(i)
+      title: "<Section or control title>"
+      description: >
+        Textual description or summary of the section/requirement.
+      category: "<category>"    # e.g., "Administrative Safeguard", "Access Control"
+      requirement_type: "<type>" # e.g., "Required", "Addressable", "Recommended"
+      obligations:
+        - "<Explicit obligation 1>"
+        - "<Explicit obligation 2>"
+      related_controls:
+        - "<id from another standard>"   # e.g., soc2:cc1.1
+        - "<id from another standard>"   # e.g., nist800-53:RA-3
+      notes:
+        - "<Implementation note or interpretation>"
+
+  # Optional cross-standard mappings at the top level
+  mappings:
+    - source: <section-id>          # e.g., hipaa:164.308(a)(1)(i)
+      target: "<other-standard-id>" # e.g., soc2:cc2.1
+      relationship: "<type>"        # e.g., overlaps-with | refines | equivalent-to
+      description: >
+        Explanation of how this standard section relates to the target control.
+
+relationships:
+  # Optional relationships to meta/project SCDs or other standards SCDs.
+  - type: "<relationship-type>"     # e.g., aligns-with | informs
+    target: scd:<tier>:<id>         # e.g., scd:meta:security-concerns
+    description: >
+      Explanation of how this standard SCD interacts with other context.
+
+provenance:
+  created_by: "<name or agent id>"
+  created_at: "<ISO8601 timestamp>"
+  updated_by: "<name or agent id>"
+  updated_at: "<ISO8601 timestamp>"
+  source_documents:
+    - "<Reference URL or citation for the standard text>"
+  rationale: >
+    Why this standard was modeled as an SCD and how it is intended to be used.

@@ -1,0 +1,309 @@
+# Bundle Validation Rules v0.3.0
+#
+# Defines bundle organization and type-specific validation rules
+# Based on SCS 0.3 specification with five bundle types
+
+version: "0.3.0"
+description: "Bundle organization validation rules for SCS v0.3 - Multi-domain architecture"
+
+# Core Architectural Rule: XOR Constraint
+xor_constraint:
+  enabled: true
+  description: "Bundles MUST contain imports OR scds, but NOT both"
+  rule: "(imports AND NOT scds) OR (scds AND NOT imports)"
+  severity: "error"
+  rationale: "Clear separation between aggregators (imports) and containers (scds)"
+
+  validation:
+    - check: "has_imports_and_scds"
+      condition: "len(imports) > 0 AND len(scds) > 0"
+      message: "Bundle cannot have both imports and scds (XOR constraint)"
+    - check: "has_neither"
+      condition: "len(imports) == 0 AND len(scds) == 0"
+      message: "Bundle must have either imports or scds (cannot be empty)"
+
+# Bundle ID Pattern Rules
+id_pattern:
+  pattern: "^bundle:[a-zA-Z0-9._-]+$"
+  description: "Bundle IDs must follow pattern bundle:<name>"
+  severity: "error"
+  examples:
+    valid:
+      - "bundle:medication-adherence"
+      - "bundle:architecture"
+      - "bundle:software-development"
+      - "bundle:standards:hipaa"
+    invalid:
+      - "project-bundle"  # Missing bundle: prefix
+      - "bundle:my bundle"  # Spaces not allowed
+
+# Bundle Version Pattern
+version_pattern:
+  pattern: "^(\\d+\\.\\d+\\.\\d+|DRAFT)$"
+  description: "Version must be DRAFT or semantic version X.Y.Z"
+  severity: "error"
+
+# Import Pattern Rules
+import_pattern:
+  pattern: "^bundle:[a-zA-Z0-9._-]+(:\\d+\\.\\d+\\.\\d+)?$"
+  description: "Import references must be bundle:<name> or bundle:<name>:<version>"
+  severity: "error"
+  examples:
+    valid:
+      - "bundle:meta:0.3.0"
+      - "bundle:architecture:1.0.0"
+      - "bundle:software-development:1.0.0"
+      - "bundle:standards"  # Without version (will check if required)
+    invalid:
+      - "meta:0.3.0"  # Missing bundle: prefix
+      - "bundle:meta:v0.3.0"  # No 'v' prefix in version
+      - "bundle:meta:0.x"  # No version ranges
+
+# SCD Reference Pattern
+scd_reference_pattern:
+  pattern: "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+  description: "SCD references in bundle must match SCD ID pattern"
+  severity: "error"
+
+# Bundle Type-Specific Rules (SCS 0.3 - Five Bundle Types)
+bundle_types:
+  project:
+    description: "Top-level project bundle - aggregator only"
+    type_name: "project"
+
+    imports:
+      min: 1
+      max: null  # No limit
+      required: true
+      message: "Project bundles MUST import at least one bundle"
+
+      required_imports:
+        - pattern: "^bundle:meta:"
+          message: "Project bundles MUST import meta bundle"
+          severity: "error"
+
+    scds:
+      min: 0
+      max: 0  # Must be empty
+      required: false
+      message: "Project bundles MUST have empty scds array (imports only)"
+
+    role: "branch"  # Aggregator
+    xor_expectation: "imports_only"
+
+    rationale: "Project bundles orchestrate complete context by importing meta, standards, and domain bundles"
+
+  meta:
+    description: "Meta-tier vocabulary bundle - container only"
+    type_name: "meta"
+
+    imports:
+      min: 0
+      max: 0  # Must be empty
+      required: false
+      message: "Meta bundles MUST NOT import other bundles"
+
+    scds:
+      min: 1
+      max: null
+      required: true
+      message: "Meta bundles MUST contain at least one meta-tier SCD"
+      tier_constraint: "meta"  # All SCDs must be meta-tier
+
+    role: "leaf"  # Container
+    xor_expectation: "scds_only"
+
+    rationale: "Meta bundles provide universal vocabulary and are the foundation (no imports)"
+
+  standards:
+    description: "Standards/compliance bundle - can be aggregator or container"
+    type_name: "standards"
+
+    # Standards bundles follow XOR rule but can be either type
+    imports:
+      min: 0
+      max: null
+      required: false
+      message_if_has_scds: "Standards bundles with SCDs MUST NOT have imports (XOR)"
+
+    scds:
+      min: 0
+      max: null
+      required: false
+      tier_constraint: "standards"  # If has SCDs, must be standards-tier
+      message_if_has_imports: "Standards bundles with imports MUST NOT have SCDs (XOR)"
+
+    role: "flexible"  # Can be branch or leaf
+    xor_expectation: "either"
+
+    rationale: "Standards bundles can aggregate other standards or contain standards SCDs"
+
+  concern:
+    description: "Concern bundle - functional area or cross-cutting concern within a domain"
+    type_name: "concern"
+
+    imports:
+      min: 0
+      max: 0  # MUST be empty
+      required: false
+      message: "Concern bundles MUST NOT import other bundles (imports array must be empty)"
+
+    scds:
+      min: 1
+      max: null
+      required: true
+      message: "Concern bundles MUST contain at least one project-tier SCD"
+      tier_constraint: "project"  # All SCDs must be project-tier
+
+    role: "leaf"  # Container
+    xor_expectation: "scds_only"
+
+    rationale: "Concern bundles organize functional areas (Architecture, Security, etc.) and are reusable across domains. They contain SCDs directly and do not import other bundles."
+
+  domain:
+    description: "Domain bundle - organizational aggregator for concern bundles"
+    type_name: "domain"
+
+    imports:
+      min: 1  # MUST import at least one concern bundle
+      max: null
+      required: true
+      message: "Domain bundles MUST import at least one concern bundle"
+
+    scds:
+      min: 0
+      max: 0  # MUST be empty
+      required: false
+      message: "Domain bundles MUST have empty scds array (imports only - they import concern bundles)"
+
+    role: "branch"  # Aggregator
+    xor_expectation: "imports_only"
+
+    rationale: "Domain bundles aggregate concern bundles for organizational units. The reference implementation uses industry verticals (Software Development, Legal, Clinical), but implementations may use domain bundles to represent companies, business units, product lines, or other organizational scopes. The validator enforces only structural rules (imports concerns, no direct SCDs), not semantic meaning."
+
+# Bundle Required Fields
+required_fields:
+  all_bundles:
+    - id
+    - type
+    - version
+    - title
+    - description
+    - imports
+    - scds
+    - provenance
+
+  provenance:
+    required:
+      - created_by
+      - created_at
+    optional:
+      - updated_by
+      - updated_at
+      - rationale
+
+# SCD Uniqueness Rules
+scd_uniqueness:
+  scope: "global"  # Across entire loaded bundle set
+  description: "SCD IDs must be unique across all loaded bundles"
+  severity: "error"
+  check_within: "project_bundle_and_all_imports"
+
+# Cross-Bundle Relationship Rules
+cross_bundle_relationships:
+  allowed: true
+  description: "SCDs in concern bundles can reference SCDs in other bundles"
+
+  validation_context:
+    standalone_bundle:
+      severity: "warning"
+      message: "Relationship target not found in this bundle (may be in another bundle)"
+
+    complete_project:
+      severity: "error"
+      message: "Relationship target not found in any loaded bundle"
+
+# Meta Bundle Special Rules
+meta_bundle_requirements:
+  version_alignment:
+    enabled: true
+    description: "Meta bundle version should align with SCS spec version"
+    pattern: "^\\d+\\.\\d+\\.\\d+$"  # No DRAFT for meta bundle
+    severity: "warning"
+
+  version_pinning:
+    enabled: true
+    description: "Project bundles must pin specific meta bundle version"
+    require_version_in_import: true
+    pattern: "^bundle:meta:\\d+\\.\\d+\\.\\d+$"
+    severity: "error"
+    message: "Meta bundle import must include specific version (e.g., bundle:meta:0.3.0)"
+
+# Validation Level 5: Bundle Completeness
+bundle_validation:
+  type_specific_constraints:
+    enabled: true
+    description: "Enforce type-specific constraints from bundle_types"
+
+  xor_constraint:
+    enabled: true
+    reference: "xor_constraint"
+
+  import_resolution:
+    enabled: true
+    description: "All imported bundles must be resolvable"
+    severity: "error"
+
+  scd_resolution:
+    enabled: true
+    description: "All referenced SCDs must exist in loaded bundles"
+    severity: "error"
+
+  scd_tier_matching:
+    enabled: true
+    description: "SCDs in bundle must match tier constraints"
+    severity: "error"
+
+# Error Messages
+error_messages:
+  xor_violation_both:
+    "Bundle '{}' violates XOR constraint: has both imports ({}) and scds ({}). Bundles must contain imports OR scds, not both."
+
+  xor_violation_neither:
+    "Bundle '{}' violates XOR constraint: has neither imports nor scds. Bundles must contain either imports or scds."
+
+  project_bundle_has_scds:
+    "Project bundle '{}' must have empty scds array. Found {} SCDs. Project bundles are aggregators (imports only)."
+
+  concern_bundle_has_imports:
+    "Concern bundle '{}' must have empty imports array. Found {} imports. Concern bundles are containers (scds only) and cannot import other bundles."
+
+  domain_bundle_has_scds:
+    "Domain bundle '{}' must have empty scds array. Found {} SCDs. Domain bundles import concern bundles and do not contain SCDs directly."
+
+  domain_bundle_missing_imports:
+    "Domain bundle '{}' must import at least one concern bundle. Found {} imports. Domain bundles aggregate concerns."
+
+  meta_bundle_missing_version:
+    "Meta bundle import '{}' must specify explicit version (e.g., bundle:meta:0.3.0). Version pinning required for meta bundles."
+
+  scd_tier_mismatch:
+    "SCD '{}' in {} bundle has tier '{}' but bundle requires tier '{}'."
+
+  insufficient_scds:
+    "{} bundle '{}' must contain at least {} SCD(s). Found {}."
+
+  xor_violation:
+    "Bundle '{bundle_id}' (type: {bundle_type}) violates XOR constraint: has {imports_count} imports and {scds_count} SCDs. Bundles must contain imports OR scds, not both."
+
+  insufficient_items:
+    "Bundle (type: {bundle_type}) field '{field}' has {actual} items but requires at least {required}."
+
+  excessive_items:
+    "Bundle (type: {bundle_type}) field '{field}' has {actual} items but allows maximum {allowed}."
+
+  required_field_empty:
+    "Bundle (type: {bundle_type}) required field '{field}' is empty."
+
+  invalid_meta_version:
+    "Meta bundle version '{version}' does not match required pattern '{pattern}'. Meta bundles should align with SCS spec version."

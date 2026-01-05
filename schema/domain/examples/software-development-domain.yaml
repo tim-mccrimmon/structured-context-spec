@@ -1,0 +1,61 @@
+domain:
+  id: "domain:software-development"
+  name: "Software Development"
+  version: "1.0.0"
+  description: "Structured context for software development projects, including architecture, requirements, components, and technical decisions"
+  author: "SCS Core Team"
+  license: "open"
+  homepage: "https://ohana-scs.org/domains/software-development"
+
+  schemas:
+    meta:
+      content_schema: "../../scd/meta-scd-content-schema.json"
+      template: "../../scd/meta-scd-template.json"
+
+    standards:
+      content_schema: "../../scd/standards-scd-content-schema.json"
+      template: "../../scd/standards-scd-template.json"
+
+    project:
+      content_schema: "../../scd/project-scd-content-schema.json"
+      template: "../../scd/project-scd-template.json"
+
+  validation:
+    rules: "./validation/software-dev-rules.json"
+
+  templates:
+    bundle_templates:
+      - name: "web-application"
+        description: "Template for web application projects"
+        path: "./templates/bundles/web-app-bundle.yaml"
+
+      - name: "microservices"
+        description: "Template for microservices architecture"
+        path: "./templates/bundles/microservices-bundle.yaml"
+
+      - name: "mobile-app"
+        description: "Template for mobile application projects"
+        path: "./templates/bundles/mobile-app-bundle.yaml"
+
+  examples:
+    - "../../../examples/medication-adherence/bundle.yaml"
+    - "../../../examples/simple-web-app/bundle.yaml"
+
+  metadata:
+    tags:
+      - "software"
+      - "development"
+      - "engineering"
+      - "architecture"
+
+    industry:
+      - "Technology"
+      - "Software"
+
+    use_cases:
+      - "Web application development"
+      - "Mobile app development"
+      - "Microservices architecture"
+      - "API development"
+      - "Cloud-native applications"
+      - "Enterprise software"

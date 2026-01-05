@@ -1,0 +1,103 @@
+# Project-Tier SCD Template
+# Purpose: Describe the actual system being built — architecture, flows, constraints, mappings.
+# Usage: Copy this file, rename it (e.g., scd_project_architecture.yaml), and fill in.
+
+id: scd:project:<name>        # e.g., scd:project:architecture
+type: project                 # MUST be "project"
+title: "<Human-readable project SCD title>"
+version: "0.1.0"
+description: >
+  Short summary of the system aspect this SCD describes.
+  For example: "High-level architecture for the SCS-enabled care management platform."
+
+content:
+  # Select and adapt the sections that are relevant to this SCD.
+  # You can split these into multiple SCDs (e.g., one for architecture, one for security, etc.).
+
+  architecture:
+    # Optional: use this block if this SCD covers architecture.
+    architecture_style: "<style>"    # e.g., "modular-service", "monolith", "event-driven"
+    components:
+      - id: component:<id>           # e.g., component:ingestion-service
+        name: "<Component name>"
+        description: >
+          Purpose and behavior of this component.
+        responsibilities:
+          - "<Responsibility 1>"
+          - "<Responsibility 2>"
+        interfaces:
+          inputs:
+            - "<Input form / API / event>"
+          outputs:
+            - "<Output form / API / event>"
+        runtime_env: "<env>"         # e.g., "Kubernetes", "Azure App Service" (optional)
+
+  capabilities:
+    # Optional: link projects to capabilities defined at meta-tier.
+    - capability_id: capability:<id>
+      implemented_by:
+        - component:<id>
+      related_roles:
+        - role:<id>
+      description: >
+        How this project-specific implementation realizes the capability.
+
+  requirements:
+    # Functional & non-functional requirements.
+    - id: req:<id>
+      type: "<fr|nfr|compliance|security|performance>"
+      description: "<Requirement description>"
+      metric: "<metric name or key>"   # e.g., "latency", "availability"
+      constraint: "<constraint expression>"  # e.g., "<= 200ms"
+      related_components:
+        - component:<id>
+      related_standards:
+        - scd:standards:<id>          # optional, links to standards
+
+  data_flows:
+    # Optional structured data flow descriptions.
+    - id: flow:<id>
+      description: "<Data flow description>"
+      path:
+        - component:<id>
+        - component:<id>
+      data_classification: "<e.g., PHI, PII, internal-only>"
+
+  security:
+    # Optional security posture and controls.
+    security_controls:
+      - id: sec:<id>
+        name: "<Control name>"
+        description: "<What this control does and why>"
+        method: "<Implementation method>"         # e.g., "OAuth2", "mTLS"
+        requirement_level: "<Required|Recommended|Optional>"
+        maps_to:
+          - scd:standards:<id>                    # e.g., scd:standards:hipaa-164.312(d)
+
+  decisions:
+    # Optional architectural/governance decisions for this SCD’s scope.
+    - id: decision:<id>
+      title: "<Decision title>"
+      rationale: >
+        Why this decision was made; tradeoffs considered.
+      status: "<accepted|deprecated|rejected>"
+      date: "<ISO8601 date>"
+      related_components:
+        - component:<id>
+      related_requirements:
+        - req:<id>
+
+relationships:
+  # Relationships to other SCDs (meta, standards, project).
+  - type: "<relationship-type>"       # e.g., depends-on | satisfies | refines
+    target: scd:<tier>:<id>           # e.g., scd:meta:roles or scd:standards:hipaa
+    description: >
+      Explanation of how this project SCD connects to the target.
+
+provenance:
+  created_by: "<name or agent id>"
+  created_at: "<ISO8601 timestamp>"
+  updated_by: "<name or agent id>"
+  updated_at: "<ISO8601 timestamp>"
+  rationale: >
+    Why this SCD exists and what system decisions it is intended to capture.

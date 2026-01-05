@@ -1,0 +1,76 @@
+# Meta-Tier SCD Template
+# Purpose: Define shared semantics — roles, domains, capabilities, concerns, etc.
+# Usage: Copy this file, rename it (e.g., scd_meta_roles.yaml), and fill in the fields.
+
+id: scd:meta:<name>          # e.g., scd:meta:roles
+type: meta                   # MUST be "meta"
+title: "<Human-readable title>"
+version: "0.1.0"
+description: >
+  Short summary of what this meta SCD defines. For example:
+  "Defines the primary roles and cross-cutting concerns for the system."
+
+content:
+  # Choose one or more sections below as appropriate. Delete what you don't need.
+
+  roles:
+    # System-wide human or system roles.
+    # Remove this block if not applicable.
+    - id: role:<id>          # e.g., role:patient
+      name: "<Role name>"
+      description: >
+        Description of this role and its responsibilities.
+      responsibilities:
+        - "<Responsibility 1>"
+        - "<Responsibility 2>"
+      trust_level: "<optional trust level>"   # e.g., "high", "medium", "low"
+
+  capabilities:
+    # High-level system capabilities, independent of implementation.
+    # Remove this block if not applicable.
+    - id: capability:<id>    # e.g., capability:care-plan-management
+      name: "<Capability name>"
+      description: >
+        What this capability represents at a conceptual level.
+      related_domains:
+        - domain:<id>        # e.g., domain:clinical
+      primary_roles:
+        - role:<id>          # e.g., role:clinician
+
+  domains:
+    # Conceptual domains relevant to the system.
+    # Remove this block if not applicable.
+    - id: domain:<id>        # e.g., domain:clinical
+      name: "<Domain name>"
+      description: >
+        What this domain covers and why it exists.
+      examples:
+        - "<Example 1>"
+        - "<Example 2>"
+
+  concerns:
+    # Cross-cutting concerns like security, observability, privacy, etc.
+    # Remove this block if not applicable.
+    - id: concern:<id>       # e.g., concern:security
+      name: "<Concern name>"
+      description: >
+        Description of this concern and where it applies.
+      applies_to:
+        - capability:<id>
+        - domain:<id>
+
+relationships:
+  # Optional list of relationships to other SCDs.
+  # Each item should include at least type + target.
+  - type: "<relationship-type>"   # e.g., extends | informs | aligns-with
+    target: scd:<tier>:<id>       # e.g., scd:meta:core-concepts
+    description: >
+      Optional description of how this SCD relates to the target.
+
+provenance:
+  created_by: "<name or agent id>"
+  created_at: "<ISO8601 timestamp>"
+  updated_by: "<name or agent id>"
+  updated_at: "<ISO8601 timestamp>"
+  rationale: >
+    Brief explanation of why this SCD exists and what decisions shaped it.

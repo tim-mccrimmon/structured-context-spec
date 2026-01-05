@@ -1,0 +1,318 @@
+# ================================================================
+# META SCD: DOMAIN-META
+# ================================================================
+# Defines industry domains and the Software Development domain
+# as a reference implementation with 11 concern bundles.
+# ================================================================
+
+id: scd:meta:domain-meta
+type: meta
+title: "Domain and Concern Organization"
+version: "0.3.0"
+description: >
+  Defines the concept of domains (industry verticals) and concerns
+  (functional areas) in SCS. Describes the Software Development domain
+  as a reference implementation with 11 concern bundles, and how domain
+  experts can create domains for their professions.
+
+content:
+  definitions:
+    domain:
+      what: >
+        A domain is an industry vertical or professional practice area for which
+        SCS provides structured context support. Examples: Software Development,
+        Legal, Clinical, Financial, Trading, Sales.
+      purpose: >
+        Domains enable professionals across all industries to create structured
+        context frameworks tailored to their field's vocabulary, concerns, and
+        compliance requirements.
+      domain_bundles: >
+        Each domain is represented by a domain bundle (type: domain) that imports
+        concern bundles relevant to that industry. Domain bundles do NOT contain
+        SCDs directly - they organize concerns.
+      creation: >
+        Domains are created by domain experts in their respective fields, not by
+        SCS maintainers. SCS provides the platform; domain experts provide the
+        expertise.
+
+    concern:
+      what: >
+        A concern is a functional area or cross-cutting aspect of work within a domain.
+        Examples: Architecture, Security (software); Case Management (legal);
+        Treatment Planning (clinical).
+      purpose: >
+        Concerns organize project-tier SCDs by functional area, enabling focused
+        work streams and parallel development.
+      concern_bundles: >
+        Each concern is represented by a concern bundle (type: concern) containing
+        1+ project-tier SCDs. Concern bundles MUST NOT import other bundles.
+      reusability: >
+        Concerns can be reused across multiple domains. For example, Security concerns
+        are relevant to Software Development, Legal, and Clinical domains.
+
+  software_development_domain:
+    description: >
+      The Software Development domain is the reference implementation for SCS 0.3.
+      It demonstrates how to structure a domain with concern bundles. Other professional
+      domains (Legal, Clinical, Financial) will be created by domain experts.
+    bundle_id: "bundle:software-development"
+    type: "domain"
+    concerns:
+    - id: concern:business-context
+      name: "Business Context"
+      bundle_id: "bundle:business-context"
+      description: >
+        Foundational business and product context including problem definition,
+        stakeholders, business objectives, opportunity analysis, constraints,
+        and success criteria. Provides the "what/why/who" foundation that all
+        other domains depend on. This domain should be completed first as it
+        establishes the business rationale and context for technical decisions.
+      typical_scds:
+        - "Problem definition and root cause analysis"
+        - "Stakeholder analysis and needs"
+        - "Business objectives and KPIs"
+        - "Opportunity analysis and market context"
+        - "Constraints and assumptions"
+        - "Success criteria and metrics"
+      key_concerns:
+        - "Problem definition"
+        - "Stakeholder needs"
+        - "Business objectives"
+        - "Value proposition"
+        - "Success criteria"
+
+    - id: concern:architecture
+      name: "Architecture"
+      description: >
+        System structure, components, boundaries, and technical design.
+        Covers overall system organization and how pieces fit together.
+      typical_scds:
+        - "System context and boundaries"
+        - "Technology stack"
+        - "Component model"
+        - "Integration map"
+      key_concerns:
+        - "System boundaries"
+        - "Component relationships"
+        - "Technology choices"
+        - "Integration patterns"
+
+    - id: concern:security
+      name: "Security"
+      description: >
+        Security architecture, threat models, authentication, authorization,
+        data protection, and vulnerability management.
+      typical_scds:
+        - "Authentication and authorization"
+        - "Data protection"
+        - "Threat model"
+        - "Security controls"
+      key_concerns:
+        - "Authentication/Authorization"
+        - "Data encryption"
+        - "Threat mitigation"
+        - "Access control"
+
+    - id: concern:performance-reliability
+      name: "Performance & Reliability"
+      description: >
+        Performance requirements, reliability targets, scalability, availability,
+        disaster recovery, and system resilience.
+      typical_scds:
+        - "Performance requirements"
+        - "Scalability approach"
+        - "Availability targets"
+        - "Disaster recovery plan"
+      key_concerns:
+        - "Response times"
+        - "Throughput"
+        - "Uptime targets"
+        - "Fault tolerance"
+
+    - id: concern:usability-accessibility
+      name: "Usability & Accessibility"
+      description: >
+        User experience, interface design, accessibility requirements,
+        and human-computer interaction patterns.
+      typical_scds:
+        - "User experience approach"
+        - "Accessibility requirements"
+        - "Interface patterns"
+        - "User workflows"
+      key_concerns:
+        - "User experience"
+        - "Accessibility standards"
+        - "Inclusive design"
+        - "Usability testing"
+
+    - id: concern:compliance-governance
+      name: "Compliance & Governance"
+      description: >
+        Regulatory compliance, audit requirements, governance policies,
+        and how standards are satisfied in the implementation.
+      typical_scds:
+        - "Compliance mapping"
+        - "Audit requirements"
+        - "Governance policies"
+        - "Evidence collection"
+      key_concerns:
+        - "Regulatory compliance"
+        - "Audit trails"
+        - "Policy enforcement"
+        - "Standards satisfaction"
+
+    - id: concern:data-provenance
+      name: "Data & Provenance"
+      description: >
+        Data models, data flow, data governance, provenance tracking,
+        and data lifecycle management.
+      typical_scds:
+        - "Data model"
+        - "Data flow"
+        - "Data governance"
+        - "Provenance tracking"
+      key_concerns:
+        - "Data models"
+        - "Data lineage"
+        - "Data quality"
+        - "Provenance"
+
+    - id: concern:testing-validation
+      name: "Testing & Validation"
+      description: >
+        Testing strategy, validation approach, quality assurance,
+        and verification methods.
+      typical_scds:
+        - "Testing strategy"
+        - "Test coverage requirements"
+        - "Validation approach"
+        - "QA processes"
+      key_concerns:
+        - "Test coverage"
+        - "Validation methods"
+        - "Quality gates"
+        - "CI/CD testing"
+
+    - id: concern:deployment-operations
+      name: "Deployment & Operations"
+      description: >
+        Deployment strategy, operational procedures, monitoring,
+        incident response, and maintenance.
+      typical_scds:
+        - "Deployment strategy"
+        - "Monitoring approach"
+        - "Incident response"
+        - "Operations runbook"
+      key_concerns:
+        - "Deployment pipeline"
+        - "Monitoring"
+        - "Incident management"
+        - "Operational excellence"
+
+    - id: concern:safety-risk
+      name: "Safety & Risk"
+      description: >
+        Safety requirements, risk assessment, hazard analysis,
+        and risk mitigation strategies.
+      typical_scds:
+        - "Risk assessment"
+        - "Safety requirements"
+        - "Hazard analysis"
+        - "Risk mitigation"
+      key_concerns:
+        - "Safety-critical functions"
+        - "Risk assessment"
+        - "Hazard mitigation"
+        - "Safety validation"
+
+    - id: concern:ethics-ai-accountability
+      name: "Ethics & AI Accountability"
+      description: >
+        Ethical considerations, AI/ML governance, bias mitigation,
+        explainability, and accountability mechanisms.
+      typical_scds:
+        - "AI ethics framework"
+        - "Bias mitigation"
+        - "Explainability approach"
+        - "Accountability mechanisms"
+      key_concerns:
+        - "Ethical AI use"
+        - "Bias detection/mitigation"
+        - "Explainability"
+        - "Human oversight"
+
+  future_domains:
+    description: >
+      SCS 0.3 is a multi-domain platform. The Software Development domain is the
+      reference implementation. Future domains will be created by domain experts.
+    examples:
+      legal:
+        name: "Legal Practice Domain"
+        bundle_id: "bundle:legal"
+        typical_concerns:
+          - "Case Management"
+          - "Legal Research"
+          - "Document Drafting"
+          - "Client Communication"
+          - "Compliance Tracking"
+      clinical:
+        name: "Clinical Practice Domain"
+        bundle_id: "bundle:clinical"
+        typical_concerns:
+          - "Patient Care Workflows"
+          - "Treatment Planning"
+          - "Clinical Decision Support"
+          - "Medical Documentation"
+          - "HIPAA Compliance"
+      financial:
+        name: "Financial Services Domain"
+        bundle_id: "bundle:financial"
+        typical_concerns:
+          - "Portfolio Management"
+          - "Risk Assessment"
+          - "Regulatory Compliance"
+          - "Trading Systems"
+          - "Financial Reporting"
+    platform_model: >
+      SCS provides the architecture; domain experts create domains for their
+      professions. Domains are defined using domain manifests that specify
+      concerns, content schemas, templates, and validation rules.
+
+  bundle_rules:
+    domain_bundles:
+      type: "domain"
+      import_constraint: "MUST import at least 1 concern bundle"
+      scd_constraint: "MUST NOT contain SCDs directly (scds: [])"
+      location: "bundles/domains/"
+      example: "bundle:software-development"
+    concern_bundles:
+      type: "concern"
+      import_constraint: "MUST NOT import other bundles (imports: [])"
+      scd_constraint: "MUST contain at least 1 project-tier SCD"
+      location: "bundles/concerns/"
+      versioning: "Concern bundles MAY version independently"
+      example: "bundle:architecture"
+
+  organization:
+    hierarchy: "Project → Domains → Concerns → SCDs"
+    parallel_development: "Concern teams can work independently and version separately"
+    domain_reuse: "Projects can import multiple domains (e.g., software-development + clinical)"
+    concern_reuse: "Concerns can be shared across domains (e.g., Security)"
+
+relationships:
+  - type: extends
+    target: scd:meta:bundle-meta
+    description: "Domains are organized using domain bundles defined in BUNDLE-META"
+
+provenance:
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-23T10:00:00Z"
+  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_at: "2025-12-15T10:00:00Z"
+  rationale: >
+    Foundational META SCD defining domains (industry verticals) and concerns
+    (functional areas) in SCS 0.3. Updated from 0.2 model where "domain" meant
+    functional areas. Now "domain" = industry vertical (Software Development,
+    Legal, Clinical), and "concern" = functional area (Architecture, Security).
+    Software Development domain serves as reference implementation with 11 concerns.
+    This multi-domain architecture enables SCS to support all professional fields.

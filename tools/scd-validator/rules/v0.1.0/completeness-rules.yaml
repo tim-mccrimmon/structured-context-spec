@@ -1,0 +1,441 @@
+# Completeness Validation Rules v0.2.0
+#
+# Default strict completeness rules for production projects
+# Projects can customize by creating .scs/completeness-rules.yaml
+# Based on decisions documented in docs/scs-v0.1-design-decisions.md
+
+version: "0.2.0"
+description: "Default strict completeness rules for production SCS projects"
+profile: "comprehensive"  # Requires all 11 prescribed domains
+
+# Validation Level 6: Completeness/Compliance
+level: 6
+severity: "error"  # Strict by default (can be overridden to "warning" in custom rules)
+
+# Required Bundle Types
+required_bundles:
+  - type: "meta"
+    count: 1
+    message: "Project must import exactly 1 meta bundle"
+
+  - type: "standards"
+    count: 1
+    message: "Project must import at least 1 standards bundle"
+    min: 1  # At least 1, but can have more
+
+  - type: "domain"
+    count: 11
+    message: "Project must have exactly 11 domain bundles (prescribed domains)"
+    required_domains:  # The 11 prescribed domains
+      - business-context
+      - architecture
+      - security
+      - performance-reliability
+      - usability-accessibility
+      - compliance-governance
+      - data-provenance
+      - testing-validation
+      - deployment-operations
+      - safety-risk
+      - ethics-ai-accountability
+
+# The 11 Prescribed Domains (detailed)
+required_domains:
+  - id: "business-context"
+    name: "Business Context"
+    description: "Foundational business and product context (problem, stakeholders, objectives, opportunity)"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "problem|problem-definition|root-cause"
+        name: "Problem definition"
+        description: "Core problem, affected populations, pain points, root causes"
+        severity: "warning"
+
+      - pattern: "stakeholder|stakeholders"
+        name: "Stakeholder analysis"
+        description: "Stakeholder groups, roles, needs, goals, constraints"
+        severity: "warning"
+
+      - pattern: "business-objective|objectives|goals"
+        name: "Business objectives"
+        description: "Strategic objectives, measurable outcomes, KPIs"
+        severity: "warning"
+
+      - pattern: "opportunity|market|opportunity-analysis"
+        name: "Opportunity analysis"
+        description: "Market context, competitive landscape, why now"
+        severity: "warning"
+
+      - pattern: "constraint|assumptions|constraints-and-assumptions"
+        name: "Constraints and assumptions"
+        description: "Non-technical constraints, organizational boundaries, key assumptions"
+        severity: "warning"
+
+      - pattern: "success|kpi|metrics|success-criteria"
+        name: "Success criteria"
+        description: "Measurable success indicators and KPIs"
+        severity: "warning"
+
+    key_concerns:
+      - "Problem definition"
+      - "Stakeholder alignment"
+      - "Business value"
+      - "Success measurement"
+
+  - id: "architecture"
+    name: "Architecture"
+    description: "System structure, components, boundaries, and technical design"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "system-context|system-boundary|context"
+        name: "System context and boundaries"
+        description: "Defines system boundaries and external integrations"
+        severity: "warning"
+
+      - pattern: "tech-stack|technology|stack"
+        name: "Technology stack"
+        description: "Technologies, frameworks, and platforms used"
+        severity: "warning"
+
+      - pattern: "component|architecture-model|components"
+        name: "Component model"
+        description: "System components and their relationships"
+        severity: "warning"
+
+      - pattern: "integration|external-systems|integrations"
+        name: "Integration map"
+        description: "External system integrations and APIs"
+        severity: "warning"
+
+    key_concerns:
+      - "System boundaries"
+      - "Component relationships"
+      - "Technology choices"
+      - "Integration patterns"
+
+  - id: "security"
+    name: "Security"
+    description: "Security architecture, threat models, authentication, authorization, data protection"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "auth|authn|authz|authentication|authorization|access-control"
+        name: "Authentication and authorization"
+        description: "How users are authenticated and authorized"
+        severity: "warning"
+
+      - pattern: "data-protection|encryption|data-security"
+        name: "Data protection"
+        description: "How sensitive data is protected"
+        severity: "warning"
+
+      - pattern: "threat|security-risks|threat-model"
+        name: "Threat model"
+        description: "Identified threats and mitigation strategies"
+        severity: "warning"
+
+    key_concerns:
+      - "Authentication/Authorization"
+      - "Data encryption"
+      - "Threat mitigation"
+      - "Access control"
+
+  - id: "performance-reliability"
+    name: "Performance & Reliability"
+    description: "Performance requirements, reliability targets, scalability, availability"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "performance|perf-requirements"
+        name: "Performance requirements"
+        description: "Response time, throughput, and resource usage targets"
+        severity: "warning"
+
+      - pattern: "scalability|scaling"
+        name: "Scalability approach"
+        description: "How system scales to handle load"
+        severity: "warning"
+
+      - pattern: "availability|uptime|sla"
+        name: "Availability targets"
+        description: "Uptime requirements and SLA commitments"
+        severity: "warning"
+
+    key_concerns:
+      - "Response times"
+      - "Throughput"
+      - "Uptime targets"
+      - "Fault tolerance"
+
+  - id: "usability-accessibility"
+    name: "Usability & Accessibility"
+    description: "User experience, interface design, accessibility requirements"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "ux|user-experience|usability"
+        name: "User experience approach"
+        description: "UX principles and design philosophy"
+        severity: "warning"
+
+      - pattern: "accessibility|a11y|wcag"
+        name: "Accessibility requirements"
+        description: "Accessibility standards and compliance (WCAG, etc.)"
+        severity: "warning"
+
+    key_concerns:
+      - "User experience"
+      - "Accessibility standards"
+      - "Inclusive design"
+      - "Usability testing"
+
+  - id: "compliance-governance"
+    name: "Compliance & Governance"
+    description: "Regulatory compliance, audit requirements, governance policies"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "compliance|regulatory|compliance-mapping"
+        name: "Compliance mapping"
+        description: "How project satisfies regulatory requirements"
+        severity: "warning"
+
+      - pattern: "audit|audit-requirements"
+        name: "Audit requirements"
+        description: "Audit trail and evidence collection"
+        severity: "warning"
+
+      - pattern: "governance|policies"
+        name: "Governance policies"
+        description: "Governance framework and decision-making"
+        severity: "warning"
+
+    key_concerns:
+      - "Regulatory compliance"
+      - "Audit trails"
+      - "Policy enforcement"
+      - "Standards satisfaction"
+
+  - id: "data-provenance"
+    name: "Data & Provenance"
+    description: "Data models, data flow, data governance, provenance tracking"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "data-model|data-models|schema"
+        name: "Data model"
+        description: "Core data structures and relationships"
+        severity: "warning"
+
+      - pattern: "data-flow|data-pipeline"
+        name: "Data flow"
+        description: "How data moves through the system"
+        severity: "warning"
+
+      - pattern: "data-governance|data-quality"
+        name: "Data governance"
+        description: "Data ownership, quality, and lifecycle"
+        severity: "warning"
+
+    key_concerns:
+      - "Data models"
+      - "Data lineage"
+      - "Data quality"
+      - "Provenance"
+
+  - id: "testing-validation"
+    name: "Testing & Validation"
+    description: "Testing strategy, validation approach, quality assurance"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "testing|test-strategy"
+        name: "Testing strategy"
+        description: "Overall testing approach and methodology"
+        severity: "warning"
+
+      - pattern: "test-coverage|coverage"
+        name: "Test coverage requirements"
+        description: "Required test coverage levels"
+        severity: "warning"
+
+      - pattern: "validation|qa"
+        name: "Validation approach"
+        description: "How correctness is validated"
+        severity: "warning"
+
+    key_concerns:
+      - "Test coverage"
+      - "Validation methods"
+      - "Quality gates"
+      - "CI/CD testing"
+
+  - id: "deployment-operations"
+    name: "Deployment & Operations"
+    description: "Deployment strategy, operational procedures, monitoring, incident response"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "deployment|deploy-strategy|cicd"
+        name: "Deployment strategy"
+        description: "How software is deployed to environments"
+        severity: "warning"
+
+      - pattern: "monitoring|observability"
+        name: "Monitoring approach"
+        description: "System monitoring and observability"
+        severity: "warning"
+
+      - pattern: "incident|incident-response"
+        name: "Incident response"
+        description: "How incidents are handled and resolved"
+        severity: "warning"
+
+    key_concerns:
+      - "Deployment pipeline"
+      - "Monitoring"
+      - "Incident management"
+      - "Operational excellence"
+
+  - id: "safety-risk"
+    name: "Safety & Risk"
+    description: "Safety requirements, risk assessment, hazard analysis"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "risk|risk-assessment"
+        name: "Risk assessment"
+        description: "Identified risks and mitigation strategies"
+        severity: "warning"
+
+      - pattern: "safety|safety-requirements"
+        name: "Safety requirements"
+        description: "Safety-critical requirements and controls"
+        severity: "warning"
+
+    key_concerns:
+      - "Safety-critical functions"
+      - "Risk assessment"
+      - "Hazard mitigation"
+      - "Safety validation"
+
+  - id: "ethics-ai-accountability"
+    name: "Ethics & AI Accountability"
+    description: "Ethical considerations, AI/ML governance, bias mitigation, explainability"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "ethics|ai-ethics|ethical"
+        name: "AI ethics framework"
+        description: "Ethical principles for AI/ML usage"
+        severity: "warning"
+
+      - pattern: "bias|bias-mitigation|fairness"
+        name: "Bias mitigation"
+        description: "How bias is detected and mitigated"
+        severity: "warning"
+
+      - pattern: "explainability|interpretability|xai"
+        name: "Explainability approach"
+        description: "How AI decisions are made explainable"
+        severity: "warning"
+
+    key_concerns:
+      - "Ethical AI use"
+      - "Bias detection/mitigation"
+      - "Explainability"
+      - "Human oversight"
+
+# Stub Detection Configuration
+stub_detection:
+  enabled: true
+  description: "Detect placeholder/stub SCDs that lack real content"
+
+  indicators:
+    - check: "short_description"
+      threshold: 50  # Characters
+      message: "SCD description is very short (< 50 chars)"
+
+    - check: "minimal_content"
+      threshold: 2  # Fields
+      message: "SCD content has fewer than 2 fields"
+
+    - check: "generic_title"
+      patterns: ["tbd", "todo", "placeholder", "stub", "example", "template"]
+      message: "SCD title appears to be a placeholder"
+
+    - check: "no_relationships"
+      message: "SCD has no relationships defined"
+
+  stub_threshold: 2  # If 2+ indicators trigger, warn about stub
+  severity: "warning"
+
+  warning_message: >
+    SCD '{scd_id}' appears to be a stub or placeholder.
+    Consider adding more detailed content before versioning.
+
+# Compliance Validation
+compliance_validation:
+  enabled: true
+  severity: "error"  # Can be overridden to "warning" in custom rules
+
+  checks:
+    - check: "standards_bundle_present"
+      description: "Project must import at least one standards bundle"
+      severity: "error"
+
+    - check: "standards_satisfied"
+      description: "All standards SCDs should be satisfied by project SCDs"
+      severity: "warning"  # Warning, not error (some standards may not require satisfaction)
+      relationship_type: "satisfies"
+
+# Customization Guidance
+customization:
+  description: "Projects can customize these rules by creating .scs/completeness-rules.yaml"
+
+  common_customizations:
+    - scenario: "Early-stage project / POC"
+      suggestion: "Reduce required_domains to 3-5 key domains"
+      example_domains: ["architecture", "security", "testing-validation"]
+
+    - scenario: "Non-UI system"
+      suggestion: "Remove usability-accessibility from required domains"
+
+    - scenario: "Non-AI system"
+      suggestion: "Remove ethics-ai-accountability from required domains"
+
+    - scenario: "Internal tool"
+      suggestion: "Set compliance_validation severity to 'warning'"
+
+  override_location: ".scs/completeness-rules.yaml"
+
+  priority:
+    - "1. Explicit --completeness-rules flag (highest)"
+    - "2. Project .scs/completeness-rules.yaml"
+    - "3. This default file (fallback)"
+
+# Error Messages
+error_messages:
+  missing_domain:
+    "Required domain '{domain}' not found in project. Expected domain bundle: bundle:{domain}"
+
+  insufficient_scds_in_domain:
+    "Domain '{domain}' bundle has {actual} SCD(s) but requires at least {required}"
+
+  missing_recommended_scd:
+    "Domain '{domain}' is missing recommended SCD matching pattern '{pattern}': {name}"
+
+  no_standards_bundle:
+    "Project must import at least one standards bundle for compliance tracking"
+
+  stub_detected:
+    "SCD '{scd_id}' appears to be a stub. {indicators}"
+
+# Reporting
+reporting:
+  summary_format: "text"  # or "json"
+  show_recommendations: true
+  show_satisfied_domains: true
+  show_missing_recommended: true

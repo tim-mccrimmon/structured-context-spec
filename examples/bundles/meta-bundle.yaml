@@ -1,0 +1,38 @@
+# ================================================================
+# SCS Bundle: Meta-Tier Bundle
+# ================================================================
+# Standard meta-tier bundle provided by SCS specification.
+# Contains foundational META SCDs that define the SCS specification
+# language itself (SCDs, bundles, domains, validation).
+# ================================================================
+
+id: bundle:meta
+type: meta
+version: "0.2.0"
+title: "SCS Meta-Tier Standard Bundle"
+description: >
+  Standard meta-tier bundle containing foundational META SCDs that define
+  the SCS specification language itself. All SCS projects import this bundle
+  to ensure consistent understanding of SCDs, bundles, domains, and validation.
+
+# No imports - meta is the foundation
+imports: []
+
+# META SCDs that define the SCS specification language
+scds:
+  - scd:meta:scd-meta
+  - scd:meta:bundle-meta
+  - scd:meta:domain-meta
+  - scd:meta:validator-meta
+
+provenance:
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-23T10:00:00Z"
+  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_at: "2025-01-26T10:00:00Z"
+  rationale: >
+    SCS 0.2.0 standard meta-tier bundle - defines the foundational language
+    of the SCS specification itself. Updated to v0.2.0 with addition of
+    business-context as 11th prescribed domain in domain-meta. These META SCDs
+    are self-describing and enable all other SCDs and bundles to be understood
+    and validated.

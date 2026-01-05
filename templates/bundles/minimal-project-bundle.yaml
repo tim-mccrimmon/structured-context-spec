@@ -1,0 +1,99 @@
+# ---------------------------------------------------------------------------
+# SCD Bundle Template (Project-Level)
+# ---------------------------------------------------------------------------
+# Purpose:
+#   Defines the complete set of Structured Context Documents (SCDs)
+#   that describe, constrain, and govern a specific project.
+#
+# Usage:
+#   Copy this file into a new project repository and rename it to:
+#       bundle.yaml
+#   Then update the metadata and list of SCDs.
+#
+# Notes:
+#   - The bundle is the authoritative source of truth for the system.
+#   - All SCDs referenced here MUST be present in the repo.
+#   - SCDs may be organized in /scd/meta, /scd/standards, /scd/project.
+#   - This template is aligned with SCS Version 0.1.
+# ---------------------------------------------------------------------------
+
+id: bundle:<project-name>         # e.g., bundle:cair-platform
+version: "0.1.0"                  # Bundle version (not SCS version)
+title: "<Human-Readable Bundle Title>"
+description: >
+  Short summary describing what this bundle represents.
+  Example:
+  "The complete Structured Context Bundle for the Care Management Platform."
+
+# ---------------------------------------------------------------------------
+# Imports (Optional)
+# ---------------------------------------------------------------------------
+# Use this to bring in external bundles—such as organizational meta libraries
+# or standardized regulatory bundles.
+#
+# Example:
+#   imports:
+#     - bundle:ohana:base-meta:1.0
+#     - bundle:scs:healthcare-standards:0.1
+#
+# For now, leave empty unless you intentionally import external bundles.
+# ---------------------------------------------------------------------------
+
+imports: []
+
+# ---------------------------------------------------------------------------
+# SCDs
+# ---------------------------------------------------------------------------
+# List each SCD required for this project.
+# Use scd:<tier>:<id> format.
+#
+# Examples:
+#   - scd:meta:roles
+#   - scd:standards:hipaa
+#   - scd:project:architecture
+#
+# Note:
+#   - You do not need file paths here.
+#   - Tools will resolve file paths based on ID conventions.
+# ---------------------------------------------------------------------------
+
+scds:
+  # -------------------------
+  # Meta-Tier SCDs (Required)
+  # -------------------------
+  # These define system-wide definitions and conceptual models.
+  - scd:meta:<meta-scd-name-1>
+  - scd:meta:<meta-scd-name-2>
+
+  # ------------------------------
+  # Standards-Tier SCDs (Optional)
+  # ------------------------------
+  # These represent external regulatory, interoperability,
+  # certification, or policy standards.
+  - scd:standards:<standard-scd-name-1>
+  # - scd:standards:<standard-scd-name-2>
+
+  # -----------------------------
+  # Project-Tier SCDs (Required)
+  # -----------------------------
+  # These define the specific system being built.
+  - scd:project:<project-scd-name-architecture>
+  - scd:project:<project-scd-name-security>
+  # - scd:project:<project-scd-name-capabilities>
+  # - scd:project:<project-scd-name-data-flow>
+
+# ---------------------------------------------------------------------------
+# Provenance
+# ---------------------------------------------------------------------------
+# This section documents the creation or update of the bundle.
+# Tools should preserve this metadata and update timestamps automatically.
+# ---------------------------------------------------------------------------
+
+provenance:
+  created_by: "<name or agent>"
+  created_at: "<ISO8601 timestamp>"
+  updated_by: "<name or agent>"
+  updated_at: "<ISO8601 timestamp>"
+  rationale: >
+    Brief explanation of why this bundle was created,
+    what stage the project is in, and any important context.

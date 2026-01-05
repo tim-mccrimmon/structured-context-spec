@@ -1,0 +1,96 @@
+domain:
+  id: "domain:healthcare"
+  name: "Healthcare"
+  version: "1.0.0"
+  description: "Structured context for healthcare systems, clinical workflows, patient care pathways, and medical data governance"
+  author: "SCS Commercial"
+  license: "commercial"
+  license_url: "https://scs-commercial.com/licenses/healthcare-domain"
+  homepage: "https://scs-commercial.com/domains/healthcare"
+
+  schemas:
+    meta:
+      content_schema: "./healthcare/meta-content-schema.json"
+      template: "./healthcare/templates/meta-template.json"
+
+    standards:
+      content_schema: "./healthcare/standards-content-schema.json"
+      template: "./healthcare/templates/standards-template.json"
+
+    project:
+      content_schema: "./healthcare/project-content-schema.json"
+      template: "./healthcare/templates/project-template.json"
+
+  validation:
+    rules: "./healthcare/validation/healthcare-rules.json"
+    custom_validators:
+      - "./healthcare/validators/hipaa-validator.js"
+      - "./healthcare/validators/clinical-workflow-validator.js"
+
+  templates:
+    bundle_templates:
+      - name: "ehr-system"
+        description: "Template for Electronic Health Record systems"
+        path: "./healthcare/templates/bundles/ehr-system.yaml"
+
+      - name: "patient-portal"
+        description: "Template for patient portal applications"
+        path: "./healthcare/templates/bundles/patient-portal.yaml"
+
+      - name: "clinical-decision-support"
+        description: "Template for clinical decision support systems"
+        path: "./healthcare/templates/bundles/cds-system.yaml"
+
+      - name: "telehealth-platform"
+        description: "Template for telehealth/telemedicine platforms"
+        path: "./healthcare/templates/bundles/telehealth.yaml"
+
+  examples:
+    - "./healthcare/examples/chronic-care-management.yaml"
+    - "./healthcare/examples/patient-engagement.yaml"
+
+  metadata:
+    tags:
+      - "healthcare"
+      - "medical"
+      - "clinical"
+      - "hipaa"
+      - "ehr"
+      - "patient-care"
+
+    industry:
+      - "Healthcare"
+      - "Medical"
+      - "Life Sciences"
+
+    use_cases:
+      - "Electronic Health Records (EHR)"
+      - "Patient portals"
+      - "Clinical decision support"
+      - "Telehealth platforms"
+      - "Care coordination systems"
+      - "Population health management"
+      - "Clinical research platforms"
+      - "Medical device integration"
+      - "Healthcare analytics"
+
+# Domain-specific content structure preview:
+#
+# Meta-tier content (roles, concepts, capabilities):
+#   - clinical_roles: [physician, nurse, care_coordinator, ...]
+#   - patient_populations: [chronic_care, acute_care, preventive_care, ...]
+#   - care_domains: [cardiology, oncology, primary_care, ...]
+#   - data_classifications: [phi, pii, clinical, administrative, ...]
+#
+# Standards-tier content (regulations, compliance):
+#   - hipaa_requirements: [...]
+#   - hl7_fhir_compliance: [...]
+#   - clinical_protocols: [...]
+#   - quality_measures: [...]
+#
+# Project-tier content (implementation):
+#   - clinical_workflows: [patient_intake, diagnosis, treatment, ...]
+#   - care_pathways: [chronic_disease_mgmt, preventive_screening, ...]
+#   - data_flows: [patient_registration, lab_orders, medication_admin, ...]
+#   - integration_points: [ehr_systems, labs, pharmacies, payers, ...]
+#   - security_controls: [access_controls, audit_logging, encryption, ...]

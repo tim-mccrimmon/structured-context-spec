@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ohana-scs.org/schema/scd.meta.schema.json",
+  "title": "SCS Meta-Tier SCD",
+  "description": "Schema for Meta-Tier Structured Context Documents (SCDs).",
+  "type": "object",
+  "required": ["id", "type", "title", "version", "description", "content", "provenance"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^scd:meta:[a-zA-Z0-9._-]+$"
+    },
+    "type": {
+      "type": "string",
+      "const": "meta"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content": {
+      "type": "object",
+      "description": "Meta-level definitions: roles, capabilities, domains, concerns, etc.",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^role:[a-zA-Z0-9._-]+$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "responsibilities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "trust_level": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^capability:[a-zA-Z0-9._-]+$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "related_domains": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^domain:[a-zA-Z0-9._-]+$"
+                }
+              },
+              "primary_roles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^role:[a-zA-Z0-9._-]+$"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^domain:[a-zA-Z0-9._-]+$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "examples": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "concerns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^concern:[a-zA-Z0-9._-]+$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "applies_to": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "rules": {
+          "type": "object",
+          "description": "References to external rule sets stored in Rules Database",
+          "properties": {
+            "rule_set_id": {
+              "type": "string",
+              "description": "Reference to rule set in Rules Database (e.g., 'pa-drugs-v2.3')",
+              "pattern": "^[a-zA-Z0-9._-]+$"
+            },
+            "rule_set_type": {
+              "type": "string",
+              "description": "Type of rules (e.g., 'prior-auth', 'approval', 'security')"
+            },
+            "schema_version": {
+              "type": "string",
+              "description": "Version of rule schema this SCD expects"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of how these rules are used"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Optional relationships to other SCDs.",
+      "items": {
+        "type": "object",
+        "required": ["type", "target"],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["created_by", "created_at"],
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_by": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

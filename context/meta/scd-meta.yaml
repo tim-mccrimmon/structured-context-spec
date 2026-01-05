@@ -1,0 +1,161 @@
+# ================================================================
+# META SCD: SCD-META
+# ================================================================
+# Defines the structure, semantics, and properties of Structured
+# Context Documents (SCDs) in the SCS specification.
+# ================================================================
+
+id: scd:meta:scd-meta
+type: meta
+title: "SCD Structure and Semantics"
+version: "0.1.0"
+description: >
+  Defines what a Structured Context Document (SCD) is, its structure,
+  required properties, the three tiers (meta, standards, project),
+  and how SCDs enable structured, versionable, and governable context.
+
+content:
+  definition:
+    what: >
+      A Structured Context Document (SCD) is the atomic unit of structured context.
+      SCDs provide machine-readable, versionable, and governable representations
+      of system context across conceptual, standards, and implementation tiers.
+    purpose: >
+      SCDs make implicit knowledge explicit, enabling AI agents and tools to
+      reason about systems consistently, trace requirements to implementations,
+      and support autonomic governance.
+    characteristics:
+      - "Modular: Each SCD addresses a specific concern"
+      - "Hierarchical: SCDs belong to tiers (meta, standards, project)"
+      - "Versionable: Each SCD has independent version history"
+      - "Relational: SCDs link to other SCDs via typed relationships"
+      - "Traceable: Provenance tracks authorship and decisions"
+      - "Governable: Supports validation and compliance checking"
+
+  tiers:
+    - id: tier:meta
+      name: "Meta-Tier"
+      description: >
+        Defines the conceptual foundation and semantic vocabulary of systems.
+        Meta-tier SCDs establish the language used to describe systems.
+      id_pattern: "scd:meta:*"
+      type_value: "meta"
+      scope: "System-wide conceptual structures, not implementation details"
+      examples:
+        - "SCD-META: Defines SCD structure"
+        - "BUNDLE-META: Defines bundle organization"
+        - "DOMAIN-META: Defines prescribed domains"
+
+    - id: tier:standards
+      name: "Standards-Tier"
+      description: >
+        Represents external standards, regulations, and compliance frameworks.
+        Standards-tier SCDs import obligations that projects must satisfy.
+      id_pattern: "scd:standards:*"
+      type_value: "standards"
+      scope: "Regulatory requirements, certifications, organizational policies"
+      examples:
+        - "HIPAA Privacy Rule requirements"
+        - "SOC2 Type II controls"
+        - "ISO 27001 requirements"
+
+    - id: tier:project
+      name: "Project-Tier"
+      description: >
+        Defines the specific system being built. Project-tier SCDs describe
+        architecture, components, features, and how standards are satisfied.
+      id_pattern: "scd:project:*"
+      type_value: "project"
+      scope: "Specific system architecture, modules, quality attributes"
+      examples:
+        - "System context and boundaries"
+        - "Technology stack and components"
+        - "Security architecture"
+
+  required_properties:
+    - name: "id"
+      type: "string"
+      pattern: "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+      required: true
+      description: "Unique, stable identifier for the SCD"
+      examples:
+        - "scd:meta:scd-meta"
+        - "scd:standards:hipaa-privacy-rule"
+        - "scd:project:system-context"
+
+    - name: "type"
+      type: "string"
+      enum: ["meta", "standards", "project"]
+      required: true
+      description: "SCD tier - must match tier in ID"
+
+    - name: "title"
+      type: "string"
+      required: true
+      description: "Human-readable title"
+
+    - name: "version"
+      type: "string"
+      required: true
+      description: "SCD version following semantic versioning or DRAFT"
+      format: "semver (1.0.0) or DRAFT"
+
+    - name: "description"
+      type: "string"
+      required: true
+      description: "Summary of purpose and scope"
+
+    - name: "content"
+      type: "object"
+      required: true
+      description: "Structured fields defined by the SCD schema for this tier"
+
+    - name: "relationships"
+      type: "array"
+      required: false
+      description: "Optional typed references to other SCDs"
+
+    - name: "provenance"
+      type: "object"
+      required: true
+      description: "Metadata on authorship, dates, and decisions"
+
+  structure:
+    format: "YAML or JSON"
+    description: "SCDs follow a common top-level structure regardless of tier"
+    encoding: "UTF-8"
+    extension: ".yaml (preferred) or .json"
+
+  versioning:
+    scheme: "Semantic Versioning (major.minor.patch)"
+    independence: "Each SCD versions independently of other SCDs and bundles"
+    draft_state: "Use version 'DRAFT' during active development"
+    immutability: "Once versioned (e.g., 1.0.0), SCD content becomes immutable"
+
+  relationship_types:
+    - type: "depends-on"
+      description: "This SCD requires another SCD"
+    - type: "satisfies"
+      description: "This SCD fulfills requirements from another SCD"
+    - type: "constrains"
+      description: "This SCD imposes constraints on another SCD"
+    - type: "refines"
+      description: "This SCD provides more detail for another SCD"
+    - type: "extends"
+      description: "This SCD builds upon another SCD"
+    - type: "conflicts-with"
+      description: "This SCD has conflicts with another SCD"
+    - type: "implements"
+      description: "This SCD implements specifications from another SCD"
+
+relationships: []
+
+provenance:
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-23T10:00:00Z"
+  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_at: "2025-01-23T10:00:00Z"
+  rationale: >
+    Foundational META SCD defining the structure and semantics of all SCDs
+    in the SCS specification. This SCD is self-describing - it follows the
+    structure it defines.

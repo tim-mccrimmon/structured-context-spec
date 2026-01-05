@@ -1,0 +1,10 @@
+id: scd:meta:roles
+type: project  # Wrong type - should be 'meta'
+title: "System Roles"
+version: "not-a-semver"  # Invalid semver
+description: "Defines the core roles within the system"
+content:
+  roles: []
+provenance:
+  created_by: "test@example.com"
+  # missing created_at

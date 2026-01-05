@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ohana-scs.org/schema/scd.project.schema.json",
+  "title": "SCS Project-Tier SCD",
+  "description": "Schema for Project-Tier Structured Context Documents (SCDs).",
+  "type": "object",
+  "required": ["id", "type", "title", "version", "description", "content", "provenance"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^scd:project:[a-zA-Z0-9._-]+$"
+    },
+    "type": {
+      "type": "string",
+      "const": "project"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content": {
+      "type": "object",
+      "description": "Project-specific system context: architecture, requirements, flows, etc.",
+      "properties": {
+        "architecture": {
+          "type": "object",
+          "properties": {
+            "architecture_style": {
+              "type": "string"
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "name", "description"],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^component:[a-zA-Z0-9._-]+$"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "responsibilities": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "interfaces": {
+                    "type": "object",
+                    "properties": {
+                      "inputs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "outputs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  "runtime_env": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          "additionalProperties": true
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["capability_id"],
+            "properties": {
+              "capability_id": {
+                "type": "string",
+                "pattern": "^capability:[a-zA-Z0-9._-]+$"
+              },
+              "implemented_by": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^component:[a-zA-Z0-9._-]+$"
+                }
+              },
+              "related_roles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^role:[a-zA-Z0-9._-]+$"
+                }
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^req:[a-zA-Z0-9._-]+$"
+              },
+              "type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "metric": {
+                "type": "string"
+              },
+              "constraint": {
+                "type": "string"
+              },
+              "related_components": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^component:[a-zA-Z0-9._-]+$"
+                }
+              },
+              "related_standards": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^scd:standards:[a-zA-Z0-9._-]+$"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "data_flows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "description", "path"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^flow:[a-zA-Z0-9._-]+$"
+              },
+              "description": {
+                "type": "string"
+              },
+              "path": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^component:[a-zA-Z0-9._-]+$"
+                }
+              },
+              "data_classification": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "security_controls": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "name", "description"],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^sec:[a-zA-Z0-9._-]+$"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "method": {
+                    "type": "string"
+                  },
+                  "requirement_level": {
+                    "type": "string"
+                  },
+                  "maps_to": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^scd:standards:[a-zA-Z0-9._-]+$"
+                    }
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          "additionalProperties": true
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "rationale"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^decision:[a-zA-Z0-9._-]+$"
+              },
+              "title": {
+                "type": "string"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "related_components": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^component:[a-zA-Z0-9._-]+$"
+                }
+              },
+              "related_requirements": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^req:[a-zA-Z0-9._-]+$"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "rules": {
+          "type": "object",
+          "description": "References to external rule sets stored in Rules Database",
+          "properties": {
+            "rule_set_id": {
+              "type": "string",
+              "description": "Reference to rule set in Rules Database (e.g., 'pa-drugs-v2.3')",
+              "pattern": "^[a-zA-Z0-9._-]+$"
+            },
+            "rule_set_type": {
+              "type": "string",
+              "description": "Type of rules (e.g., 'prior-auth', 'approval', 'security')"
+            },
+            "schema_version": {
+              "type": "string",
+              "description": "Version of rule schema this SCD expects"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of how these rules are used"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "target"],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["created_by", "created_at"],
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_by": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

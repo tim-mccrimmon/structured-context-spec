@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: Security
+# ================================================================
+# Defines security controls, data protection, and threat management
+# for the Medication Adherence system.
+# ================================================================
+
+id: bundle:security
+type: concern
+version: "0.1.0"
+title: "Medication Adherence System - Security Bundle"
+description: >
+  Security concern bundle defining authentication, authorization, encryption,
+  data protection, and threat modeling for the Medication Adherence system.
+
+imports: []
+
+scds:
+  - scd:project:authn-authz
+  - scd:project:data-protection
+  - scd:project:data-handling
+  - scd:project:threat-model
+
+provenance:
+  created_by: "security-team@medtech.com"
+  created_at: "2025-11-01T10:15:00Z"
+  updated_by: "rachel.kim@medtech.com"
+  updated_at: "2025-11-19T09:45:00Z"
+  rationale: "Security bundle v1.0.0 - PHI protection and HIPAA security controls defined"

@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: Ethics & AI Accountability
+# ================================================================
+# Defines responsible AI use, accountability, and ethical guidelines
+# for the Medication Adherence system.
+# ================================================================
+
+id: bundle:ethics-ai-accountability
+type: concern
+version: "0.1.0"
+title: "Medication Adherence System - Ethics & AI Accountability Bundle"
+description: >
+  Ethics and AI accountability concern bundle defining AI usage policies,
+  audit trails, and bias mitigation for the Medication Adherence system.
+  AI used for adherence prediction and reminder optimization.
+
+imports: []
+
+scds:
+  - scd:project:ai-usage-policy
+  - scd:project:audit-trail
+  - scd:project:model-bias
+
+provenance:
+  created_by: "ai-ethics-team@medtech.com"
+  created_at: "2025-11-01T14:00:00Z"
+  updated_by: "dr.james.wilson@medtech.com"
+  updated_at: "2025-11-19T11:00:00Z"
+  rationale: "Ethics & AI accountability bundle v1.0.0 - AI predictions must be explainable to patients"

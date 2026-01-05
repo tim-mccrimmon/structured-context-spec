@@ -1,0 +1,30 @@
+# ================================================================
+# Concern Bundle: Performance & Reliability
+# ================================================================
+# Defines performance requirements, reliability targets, and resilience
+# patterns for the Medication Adherence system.
+# ================================================================
+
+id: bundle:performance-reliability
+type: concern
+version: "0.1.0"
+title: "Medication Adherence System - Performance & Reliability Bundle"
+description: >
+  Performance and reliability concern bundle defining response time targets,
+  availability requirements, fault tolerance, and scalability for the
+  Medication Adherence system.
+
+imports: []
+
+scds:
+  - scd:project:response-time
+  - scd:project:availability
+  - scd:project:fault-tolerance
+  - scd:project:scalability
+
+provenance:
+  created_by: "platform-team@medtech.com"
+  created_at: "2025-11-01T10:30:00Z"
+  updated_by: "david.williams@medtech.com"
+  updated_at: "2025-11-17T14:20:00Z"
+  rationale: "Performance & reliability bundle v1.0.0 - 99.9% uptime target, <200ms response time"

@@ -1,0 +1,40 @@
+# ================================================================
+# Domain Bundle: Software Development
+# ================================================================
+# Software Development domain bundle that imports all concern bundles
+# relevant to software engineering practices.
+# ================================================================
+
+id: bundle:software-development
+type: domain
+version: "0.1.0"
+title: "Software Development Domain"
+description: >
+  Software Development domain bundle importing all concern bundles
+  relevant to software engineering: architecture, security, performance,
+  testing, deployment, data provenance, compliance, usability, safety,
+  ethics, and business context.
+
+# Domain bundles import concern bundles
+imports:
+  - bundle:architecture:0.1.0
+  - bundle:security:0.1.0
+  - bundle:performance-reliability:0.1.0
+  - bundle:usability-accessibility:0.1.0
+  - bundle:compliance-governance:0.1.0
+  - bundle:data-provenance:0.1.0
+  - bundle:testing-validation:0.1.0
+  - bundle:deployment-operations:0.1.0
+  - bundle:safety-risk:0.1.0
+  - bundle:ethics-ai-accountability:0.1.0
+  - bundle:business-context:0.1.0
+
+# Domain bundles don't contain SCDs directly - they import concerns
+scds: []
+
+provenance:
+  created_by: "scs-maintainers@ohana-scs.org"
+  created_at: "2025-11-01T09:00:00Z"
+  updated_by: "scs-maintainers@ohana-scs.org"
+  updated_at: "2025-12-15T12:00:00Z"
+  rationale: "Software Development domain v0.1.0 - reference implementation for SCS 0.3"

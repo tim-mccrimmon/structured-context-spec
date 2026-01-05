@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: Data & Provenance
+# ================================================================
+# Defines data models, lineage tracking, and retention policies
+# for the Medication Adherence system.
+# ================================================================
+
+id: bundle:data-provenance
+type: concern
+version: "0.1.0"
+title: "Medication Adherence System - Data & Provenance Bundle"
+description: >
+  Data and provenance concern bundle defining data models, lineage tracking,
+  and retention policies for the Medication Adherence system. Includes
+  patient data, medication schedules, and adherence metrics.
+
+imports: []
+
+scds:
+  - scd:project:data-model
+  - scd:project:provenance-tracking
+  - scd:project:retention-policy
+
+provenance:
+  created_by: "data-team@medtech.com"
+  created_at: "2025-11-01T12:00:00Z"
+  updated_by: "alex.patel@medtech.com"
+  updated_at: "2025-11-18T10:15:00Z"
+  rationale: "Data & provenance bundle v1.0.0 - PHI retention per HIPAA requirements"

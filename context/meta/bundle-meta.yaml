@@ -1,0 +1,268 @@
+# ================================================================
+# META SCD: BUNDLE-META
+# ================================================================
+# Defines the structure, types, hierarchy, and lifecycle of SCS
+# bundles - the manifest documents that organize SCDs.
+# ================================================================
+
+id: scd:meta:bundle-meta
+type: meta
+title: "Bundle Structure and Organization"
+version: "0.3.0"
+description: >
+  Defines what an SCS Bundle is, the five bundle types (project, meta,
+  standards, concern, domain), bundle hierarchy, import rules, versioning, and
+  lifecycle management.
+
+content:
+  definition:
+    what: >
+      An SCS Bundle is a manifest document that organizes and references
+      Structured Context Documents (SCDs). Bundles are NOT SCDs themselves—
+      they are container documents similar to Docker manifests or Kubernetes
+      pod specifications.
+    purpose: >
+      Bundles provide the organizational structure for SCDs, defining what
+      context is active for a project, managing imports and dependencies,
+      and serving as immutable contracts for development and governance.
+    key_principle: "Bundles are manifests. SCDs are content. They are separate document types."
+    analogy:
+      docker_k8s: "Bundles are like Docker manifests; SCDs are like layers"
+      description: >
+        Just as Docker manifests organize layers without being layers themselves,
+        SCS bundles organize SCDs without being SCDs.
+
+  bundle_types:
+    - id: type:project
+      name: "Project Bundle"
+      type_value: "project"
+      purpose: "Top-level orchestrator bundle for a complete project"
+      cardinality: "1 per project"
+      imports: "MUST import meta, standards, and domain bundles"
+      scds: "Typically empty (all context in imported bundles)"
+      example_id: "bundle:medication-adherence"
+
+    - id: type:meta
+      name: "Meta Bundle"
+      type_value: "meta"
+      purpose: "Standard vocabulary and semantic foundations provided by SCS-Spec"
+      cardinality: "1 per project (imported from SCS specification)"
+      imports: "None (meta is the foundation)"
+      scds: "Meta-tier SCDs only (SCD-META, BUNDLE-META, DOMAIN-META, VALIDATOR-META)"
+      example_id: "bundle:meta"
+
+    - id: type:standards
+      name: "Standards Bundle"
+      type_value: "standards"
+      purpose: "Compliance and regulatory requirements"
+      cardinality: "1+ per project (as needed for compliance)"
+      imports: "MAY import other standards bundles"
+      scds: "Standards-tier SCDs only"
+      example_id: "bundle:standards"
+
+    - id: type:concern
+      name: "Concern Bundle"
+      type_value: "concern"
+      purpose: "Functional area or cross-cutting aspect within a domain"
+      cardinality: "Variable (depends on domain - Software Development has 11)"
+      imports: "MUST NOT import other bundles (imports: [])"
+      scds: "MUST contain at least 1 project-tier SCD"
+      reusability: "Concerns are reusable across multiple domains"
+      example_id: "bundle:architecture"
+      examples:
+        - "bundle:architecture (Software Development)"
+        - "bundle:security (Software Development, Legal, Clinical)"
+        - "bundle:case-management (Legal)"
+        - "bundle:treatment-planning (Clinical)"
+
+    - id: type:domain
+      name: "Domain Bundle"
+      type_value: "domain"
+      purpose: "Industry vertical or professional practice area"
+      cardinality: "1+ per project (typically 1-3 domains)"
+      imports: "MUST import at least 1 concern bundle"
+      scds: "MUST NOT contain SCDs directly (scds: [])"
+      example_id: "bundle:software-development"
+      examples:
+        - "bundle:software-development (imports 11 concerns)"
+        - "bundle:legal (imports legal concerns)"
+        - "bundle:clinical (imports healthcare concerns)"
+
+  hierarchy:
+    description: "Bundles form a four-level hierarchy"
+    structure: |
+      Project Bundle (top-level)
+      ├── Meta Bundle (foundation)
+      ├── Standards Bundle (compliance)
+      └── Domain Bundles (industry verticals)
+          └── Concern Bundles (functional areas)
+              └── SCDs (project-tier content)
+    summary: "Project → Domains → Concerns → SCDs"
+    rules:
+      - "Project bundle imports meta, standards, and domain bundles"
+      - "Meta bundle imports nothing (it's the foundation)"
+      - "Standards bundle may import other standards bundles"
+      - "Domain bundles MUST import concern bundles (no direct SCDs)"
+      - "Concern bundles MUST NOT import other bundles (contain only SCDs)"
+
+  required_properties:
+    - name: "id"
+      type: "string"
+      pattern: "^bundle:[a-zA-Z0-9._-]+$"
+      required: true
+      description: "Unique bundle identifier"
+      examples:
+        - "bundle:medication-adherence"
+        - "bundle:meta"
+        - "bundle:architecture"
+
+    - name: "type"
+      type: "string"
+      enum: ["project", "meta", "standards", "concern", "domain"]
+      required: true
+      description: "Bundle type - determines validation rules and structural constraints"
+
+    - name: "version"
+      type: "string"
+      required: true
+      description: "Semantic version (1.0.0) or DRAFT"
+      format: "semver or DRAFT"
+
+    - name: "title"
+      type: "string"
+      required: true
+      description: "Human-readable bundle title"
+
+    - name: "description"
+      type: "string"
+      required: true
+      description: "Summary of what this bundle represents"
+
+    - name: "imports"
+      type: "array"
+      required: true
+      description: "List of bundle references with versions"
+      format: "bundle:<name>:<version>"
+      examples:
+        - "bundle:meta:1.0.0"
+        - "bundle:architecture:1.0.0"
+
+    - name: "scds"
+      type: "array"
+      required: true
+      description: "List of SCD references included in this bundle"
+      format: "scd:<tier>:<name>"
+      examples:
+        - "scd:meta:scd-meta"
+        - "scd:project:system-context"
+
+    - name: "provenance"
+      type: "object"
+      required: true
+      description: "Authorship and change history"
+
+  versioning:
+    scheme: "Semantic Versioning (major.minor.patch) or DRAFT"
+    draft_state:
+      version: "DRAFT"
+      mutability: "Mutable (can be changed)"
+      validation: "Warnings instead of errors"
+      usage: "Active development"
+    versioned_state:
+      version: "1.0.0 (semver)"
+      mutability: "Immutable (cannot be changed)"
+      validation: "Strict (all errors must be fixed)"
+      usage: "Binding contract"
+    independence: "Concern bundles and domain bundles MAY version independently of each other"
+
+  lifecycle:
+    stages:
+      - stage: "Create"
+        description: "Create bundle in DRAFT state"
+      - stage: "Iterate"
+        description: "Add SCDs, refine content in DRAFT mode"
+      - stage: "Validate"
+        description: "Validate bundle completeness"
+      - stage: "Lock"
+        description: "Version bundle (e.g., 1.0.0) - becomes immutable"
+      - stage: "Evolve"
+        description: "Future changes create new versions (e.g., 1.1.0)"
+
+  validation_rules:
+    schema_validation:
+      - "Bundle conforms to JSON schema"
+      - "All required fields present"
+      - "Field types and patterns correct"
+      - "Conditional rules satisfied (concern bundles: no imports, domain bundles: no SCDs)"
+    reference_resolution:
+      - "All SCD references resolve to actual SCD files"
+      - "All bundle imports resolve to actual bundle files"
+      - "No circular imports"
+      - "SCD identifiers are unique within bundle"
+    type_consistency:
+      - "Bundle type matches usage pattern"
+      - "Concern bundles MUST have empty imports array"
+      - "Concern bundles MUST contain at least one SCD"
+      - "Domain bundles MUST import at least one concern bundle"
+      - "Domain bundles MUST have empty scds array"
+      - "Meta bundles contain only meta-tier SCDs"
+      - "Standards bundles contain only standards-tier SCDs"
+    version_consistency:
+      - "Version follows semantic versioning or DRAFT"
+      - "Imported bundle versions exist"
+      - "No conflicting version requirements"
+
+  typical_bundle_structure:
+    description: "Typical production projects include"
+    bundles:
+      - "1 Project Bundle (top-level orchestrator)"
+      - "1 Meta Bundle (imported from SCS - universal vocabulary)"
+      - "1+ Standards Bundles (compliance requirements as needed)"
+      - "1+ Domain Bundles (Software Development for software projects)"
+      - "Variable Concern Bundles (imported via domains - e.g., 11 for Software Development)"
+    note: "No universally prescribed bundles - structure depends on domain(s)"
+    examples:
+      software_only:
+        description: "Pure software development project"
+        bundles:
+          - "bundle:project"
+          - "bundle:meta"
+          - "bundle:standards (if needed)"
+          - "bundle:software-development (imports 11 concerns)"
+      multi_domain:
+        description: "Healthcare software project"
+        bundles:
+          - "bundle:project"
+          - "bundle:meta"
+          - "bundle:standards (HIPAA, SOC2)"
+          - "bundle:software-development (software concerns)"
+          - "bundle:clinical (healthcare concerns)"
+
+  reference_formats:
+    bundle_reference:
+      format: "bundle:<name>:<version>"
+      examples:
+        - "bundle:meta:1.0.0"
+        - "bundle:architecture:1.0.0"
+        - "bundle:standards:soc2-type2:2023.1"
+    scd_reference:
+      format: "scd:<tier>:<name>"
+      examples:
+        - "scd:meta:scd-meta"
+        - "scd:standards:hipaa-privacy-rule"
+        - "scd:project:system-context"
+
+relationships:
+  - type: extends
+    target: scd:meta:scd-meta
+    description: "Bundles organize SCDs defined in SCD-META"
+
+provenance:
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-23T10:00:00Z"
+  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_at: "2025-01-23T10:00:00Z"
+  rationale: >
+    Foundational META SCD defining the structure and organization of bundles.
+    Bundles are the container mechanism that organizes SCDs into coherent,
+    versionable, and governable units.

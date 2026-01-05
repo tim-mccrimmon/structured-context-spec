@@ -1,0 +1,24 @@
+id: scd:meta:roles
+type: meta
+title: "System Roles"
+version: "1.0.0"
+description: "Defines the core roles within the system"
+content:
+  roles:
+    - id: role:admin
+      name: "Administrator"
+      description: "System administrator with full access"
+      responsibilities:
+        - "Manage system configuration"
+        - "Manage user accounts"
+      trust_level: "high"
+    - id: role:user
+      name: "Standard User"
+      description: "Regular system user"
+      responsibilities:
+        - "Access permitted resources"
+      trust_level: "standard"
+provenance:
+  created_by: "test@example.com"
+  created_at: "2025-11-20T10:00:00Z"
+  rationale: "Initial system roles definition"

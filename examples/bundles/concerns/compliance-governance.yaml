@@ -1,0 +1,30 @@
+# ================================================================
+# Concern Bundle: Compliance & Governance
+# ================================================================
+# Maps system to regulatory requirements and defines governance processes
+# for the Medication Adherence system.
+# ================================================================
+
+id: bundle:compliance-governance
+type: concern
+version: "0.1.0"
+title: "Medication Adherence System - Compliance & Governance Bundle"
+description: >
+  Compliance and governance concern bundle mapping system controls to
+  HIPAA, SOC2, and other regulatory requirements for the Medication
+  Adherence system.
+
+imports: []
+
+scds:
+  - scd:project:hipaa-compliance
+  - scd:project:soc2-controls
+  - scd:project:audit-requirements
+  - scd:project:policy-enforcement
+
+provenance:
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-11-01T11:30:00Z"
+  updated_by: "jessica.martinez@medtech.com"
+  updated_at: "2025-11-19T15:30:00Z"
+  rationale: "Compliance & governance bundle v1.0.0 - HIPAA technical safeguards mapped"

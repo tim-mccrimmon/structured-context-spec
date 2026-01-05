@@ -1,0 +1,234 @@
+# ================================================================
+# META SCD: VALIDATOR-META
+# ================================================================
+# Defines the 6 validation levels, validation rules, workflow, and
+# best practices for ensuring SCD and bundle quality.
+# ================================================================
+
+id: scd:meta:validator-meta
+type: meta
+title: "Validation Levels and Rules"
+version: "0.1.0"
+description: >
+  Defines the six levels of validation for SCDs and bundles, validation
+  workflow, common errors, and best practices for ensuring context quality
+  and enabling autonomic governance.
+
+content:
+  definition:
+    what: >
+      Validation ensures that SCDs and bundles are syntactically correct,
+      schema compliant, semantically consistent, complete, and governable.
+    purpose: >
+      Validation provides confidence that structured context is well-formed,
+      enabling tools and AI agents to operate safely and enabling autonomic
+      governance.
+    validation_philosophy: >
+      Validation happens at multiple levels, from basic syntax to sophisticated
+      compliance checking, creating a defense-in-depth approach to context quality.
+
+  validation_levels:
+    - id: level:syntactic
+      level: 1
+      name: "Syntactic Validation"
+      description: "Is the file valid YAML or JSON?"
+      checks:
+        - "No syntax errors"
+        - "Proper indentation"
+        - "Valid data types"
+        - "Quotes balanced"
+      tools:
+        - "yamllint for YAML files"
+        - "jsonlint for JSON files"
+        - "IDE/editor linters"
+      when_to_run: "During editing, before commit"
+      severity: "ERROR - must pass before proceeding"
+
+    - id: level:schema
+      level: 2
+      name: "Schema Validation"
+      description: "Does the SCD match the required schema?"
+      checks:
+        - "All required fields present"
+        - "Field types match schema"
+        - "ID patterns correct"
+        - "Enums contain valid values"
+      tools:
+        - "JSON Schema validators"
+        - "SCS validator tool"
+      when_to_run: "After writing SCD, before adding to bundle"
+      severity: "ERROR - must pass for valid SCD"
+
+    - id: level:semantic
+      level: 3
+      name: "Semantic Validation"
+      description: "Do the contents make logical sense?"
+      checks:
+        - "ID patterns match tier (scd:meta:*, scd:project:*, etc.)"
+        - "Type field matches tier in ID"
+        - "Versions follow semver or DRAFT"
+        - "No internal inconsistencies"
+      tools:
+        - "SCS validator tool"
+      when_to_run: "With schema validation"
+      severity: "ERROR - semantic errors indicate design problems"
+
+    - id: level:relationship
+      level: 4
+      name: "Relationship Validation"
+      description: "Are relationships valid and do targets exist?"
+      checks:
+        - "Relationship targets exist in bundle"
+        - "Relationship types are valid"
+        - "No orphaned references"
+        - "Dependency graph is acyclic (for depends-on)"
+      tools:
+        - "SCS validator tool with --check-relationships"
+      when_to_run: "After updating bundle, before commit"
+      severity: "ERROR - broken relationships break traceability"
+
+    - id: level:bundle
+      level: 5
+      name: "Bundle Validation"
+      description: "Is the bundle complete and consistent?"
+      checks:
+        - "All SCDs listed in bundle exist"
+        - "No duplicate SCD IDs"
+        - "Bundle type constraints satisfied"
+        - "All relationship targets exist within bundle"
+        - "Import references are valid"
+        - "Version consistency across bundle"
+      tools:
+        - "SCS validator tool with --bundle flag"
+      when_to_run: "Before pull request, in CI/CD"
+      severity: "ERROR - incomplete bundles cannot be used"
+
+    - id: level:compliance
+      level: 6
+      name: "Compliance Validation"
+      description: "Does the bundle satisfy compliance requirements?"
+      checks:
+        - "All standards-tier requirements have satisfies relationships"
+        - "Required controls are implemented"
+        - "No unsatisfied obligations"
+        - "Coverage gaps identified"
+      tools:
+        - "SCS validator tool with --check-compliance"
+        - "Governance agents"
+      when_to_run: "Before release, in governance reviews"
+      severity: "WARNING/ERROR - depends on project policy"
+
+  validation_workflow:
+    during_development:
+      - step: "Write SCD"
+      - step: "Validate syntax (Level 1)"
+      - step: "Validate schema (Level 2)"
+      - step: "Fix errors and iterate"
+      - step: "Add to bundle"
+      - step: "Validate bundle (Level 5)"
+      - step: "Commit when valid"
+
+    before_pull_request:
+      - step: "Run full validation (Levels 1-5)"
+      - step: "Check relationships (Level 4)"
+      - step: "Validate bundle completeness (Level 5)"
+      - step: "Update provenance"
+      - step: "Generate validation report"
+
+    in_ci_cd:
+      - step: "Syntax validation (fail fast)"
+      - step: "Schema validation"
+      - step: "Relationship validation"
+      - step: "Bundle completeness check"
+      - step: "Generate validation report artifact"
+      - step: "Optional: Compliance validation"
+
+  validation_states:
+    - state: "DRAFT"
+      validation_mode: "Permissive"
+      description: "Warnings instead of errors, allows incomplete SCDs"
+      use_case: "Active development, iteration"
+
+    - state: "VERSIONED"
+      validation_mode: "Strict"
+      description: "All errors must be fixed, no incomplete SCDs"
+      use_case: "Locked bundles, production use"
+
+  common_validation_errors:
+    - error: "Missing required field"
+      cause: "Required field not present in SCD"
+      fix: "Add the missing field with appropriate value"
+      example: "Missing 'version' field"
+
+    - error: "Invalid ID pattern"
+      cause: "ID doesn't follow scd:<tier>:<name> pattern"
+      fix: "Correct ID to match pattern"
+      example: "meta:roles should be scd:meta:roles"
+
+    - error: "Type mismatch"
+      cause: "Type field doesn't match tier in ID"
+      fix: "Make type consistent with ID tier"
+      example: "ID scd:meta:roles with type: project"
+
+    - error: "Orphaned relationship"
+      cause: "Relationship references non-existent SCD"
+      fix: "Add missing SCD to bundle or remove relationship"
+      example: "References scd:standards:hipaa but not in bundle"
+
+    - error: "Duplicate SCD ID"
+      cause: "Two SCDs have same ID in bundle"
+      fix: "Make IDs unique"
+      example: "Two SCDs both have id: scd:project:auth"
+
+    - error: "Invalid semver"
+      cause: "Version doesn't follow semantic versioning"
+      fix: "Use proper semver format (major.minor.patch)"
+      example: "version: v1.0 should be version: 1.0.0"
+
+    - error: "Circular dependency"
+      cause: "SCDs depend on each other in a cycle"
+      fix: "Restructure dependencies to break cycle"
+      example: "A depends on B, B depends on A"
+
+  validation_tools:
+    scs_validator:
+      status: "Phase 1 complete (individual SCD validation)"
+      commands:
+        - "scs-validate <file.yaml> - Validate single SCD"
+        - "scs-validate --bundle <bundle.yaml> - Validate entire bundle"
+        - "scs-validate --strict - Fail on warnings"
+        - "scs-validate --check-relationships - Relationship validation"
+        - "scs-validate --check-compliance - Compliance validation"
+        - "scs-validate --output json - JSON output for tooling"
+
+    external_tools:
+      - "yamllint - YAML syntax validation"
+      - "jsonschema - Python JSON Schema validator"
+      - "ajv - Node.js JSON Schema validator"
+      - "IDE extensions - Real-time validation"
+
+  validation_best_practices:
+    - "Validate early and often (after every SCD change)"
+    - "Automate validation in pre-commit hooks"
+    - "Use strict mode in CI/CD pipelines"
+    - "Treat warnings seriously (fix before they become errors)"
+    - "Generate validation reports for governance"
+    - "Validate relationships explicitly"
+
+relationships:
+  - type: depends-on
+    target: scd:meta:scd-meta
+    description: "Validation rules depend on SCD structure definitions"
+  - type: depends-on
+    target: scd:meta:bundle-meta
+    description: "Bundle validation depends on bundle structure definitions"
+
+provenance:
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-23T10:00:00Z"
+  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_at: "2025-01-23T10:00:00Z"
+  rationale: >
+    Foundational META SCD defining the validation framework for SCDs and bundles.
+    The six-level validation approach provides defense-in-depth for context quality,
+    from basic syntax to sophisticated compliance checking.

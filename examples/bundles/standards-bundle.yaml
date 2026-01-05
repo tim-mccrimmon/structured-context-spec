@@ -1,0 +1,37 @@
+# ================================================================
+# SCS Bundle: Standards Bundle - Medication Adherence System
+# ================================================================
+# Contains compliance and regulatory standards applicable to this project.
+# Imports SOC2 standard bundle and includes HIPAA-specific SCDs.
+# Standards may be imported from external sources or defined locally.
+# ================================================================
+
+id: bundle:standards
+type: standards
+version: "0.1.0"
+title: "Medication Adherence System - Standards Bundle"
+description: >
+  Standards and compliance requirements bundle for the Medication Adherence system.
+  Includes SOC2 Trust Services Criteria (imported bundle) and HIPAA requirements
+  (project-specific interpretations and mappings).
+
+# Import standard bundles from external sources
+imports:
+  # SOC2 Type II Trust Services Criteria
+  - bundle:standards:soc2-type2:2023.1
+
+  # Note: In production, this might reference a registry:
+  # - registry://standards.ohana.ai/bundles/soc2-type2:2023.1
+
+# HIPAA-specific SCDs (project interpretations and mappings)
+scds:
+  - scd:standards:hipaa-privacy-rule
+  - scd:standards:hipaa-security-rule
+  - scd:standards:hipaa-breach-notification
+
+provenance:
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-11-01T09:30:00Z"
+  updated_by: "compliance-team@medtech.com"
+  updated_at: "2025-11-15T16:00:00Z"
+  rationale: "Standards bundle for healthcare compliance - SOC2 + HIPAA requirements"

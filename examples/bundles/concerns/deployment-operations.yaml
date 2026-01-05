@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: Deployment & Operations
+# ================================================================
+# Defines infrastructure, deployment processes, and operational practices
+# for the Medication Adherence system.
+# ================================================================
+
+id: bundle:deployment-operations
+type: concern
+version: "0.1.0"
+title: "Medication Adherence System - Deployment & Operations Bundle"
+description: >
+  Deployment and operations concern bundle defining infrastructure,
+  observability, and incident response for the Medication Adherence system.
+  Deployed on AWS with multi-region failover.
+
+imports: []
+
+scds:
+  - scd:project:infrastructure-definition
+  - scd:project:observability
+  - scd:project:incident-response
+
+provenance:
+  created_by: "devops-team@medtech.com"
+  created_at: "2025-11-01T13:00:00Z"
+  updated_by: "jennifer.lee@medtech.com"
+  updated_at: "2025-11-19T08:30:00Z"
+  rationale: "Deployment & operations bundle v1.0.0 - AWS ECS deployment, CloudWatch monitoring"
