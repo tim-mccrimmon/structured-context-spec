@@ -138,7 +138,6 @@ This repository contains the **complete SCS 0.3 specification**:
 ✅ **YAML Templates** ([templates/](templates/)) - Quick-start files
 ✅ **Educational guides** ([docs/](docs/)) - Documentation and guides
 ✅ **Validation tools** ([tools/](tools/)) - Domain-aware SCD validator
-✅ **Governance model** ([GOVERNANCE.md](GOVERNANCE.md)) - RFC process, versioning
 ✅ **Example implementations** ([examples/](examples/)) - Software Development domain reference
 
 ---
@@ -160,7 +159,7 @@ scs-commercial/
 │   ├── scd/                   # SCD templates by tier
 │   └── bundles/               # Bundle templates by type
 ├── docs/                      # Documentation and guides
-│   ├── design/                # Architecture decision records
+│   ├── concern-docs/          # Concern-specific templates and examples
 │   └── ...
 ├── tools/                     # Validation and tooling
 │   └── scd-validator/         # Domain-aware SCD and bundle validator
@@ -171,11 +170,8 @@ scs-commercial/
 │       └── ...                # Meta, standards, project bundles
 ├── context/                   # Working context files
 ├── rfcs/                      # RFC process for major changes
-├── VISION.md                  # Complete vision and value proposition
-├── GOVERNANCE.md              # Governance model and RFC process
 ├── CONTRIBUTING.md            # How to contribute
-├── CODE_OF_CONDUCT.md         # Community standards
-└── LICENSE.md                 # Apache 2.0 license
+└── LICENSE                    # Apache 2.0 license
 ```
 
 ---
@@ -192,7 +188,7 @@ cd scs-spec
 ### 2. Explore the Documentation
 
 **New to SCS? Start with:**
-1. [VISION.md](VISION.md) - Why SCS matters and the complete value proposition
+1. [spec/0.3/overview.md](spec/0.3/overview.md) - Why SCS matters and the complete vision
 2. [docs/quick-start-guide.md](docs/quick-start-guide.md) - Build your first bundle in 30 minutes
 3. [docs/FAQ.md](docs/FAQ.md) - Common questions answered
 4. [docs/scd-guide.md](docs/scd-guide.md) - Complete SCD reference
@@ -352,7 +348,7 @@ SCS is the specification layer within a larger ecosystem:
 - **Minor changes** (typos, examples, clarifications): Submit a PR directly
 - **Major changes** (new concepts, breaking changes): [Open a discussion](https://github.com/tim-mccrimmon/scs-spec/discussions) first, then submit an RFC
 
-See [GOVERNANCE.md](GOVERNANCE.md) for the complete RFC process.
+See [rfcs/README.md](rfcs/README.md) for the RFC process.
 
 ### Contribute
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for:
@@ -373,10 +369,8 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for:
 SCS follows a **Benevolent Maintainer** model during v0.x:
 - **Tim McCrimmon** serves as primary maintainer
 - Community input welcomed via issues, discussions, and RFCs
-- Major changes require formal RFC (Request for Comments) process
+- Major changes require formal RFC (Request for Comments) process (see [rfcs/README.md](rfcs/README.md))
 - Transition to community governance planned for v1.0
-
-**Code of Conduct**: All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
@@ -384,23 +378,19 @@ SCS follows a **Benevolent Maintainer** model during v0.x:
 
 **Apache License 2.0**
 
-Copyright © 2025 Timothy McCrimmon and Contributors
+Copyright © 2026 Tim McCrimmon / Ohana Consulting LLC
 
-See [LICENSE.md](LICENSE.md) for complete terms.
-
-**Trademarks**: "SCS" is a trademark of Ohana Consulting LLC.
-See [GOVERNANCE.md](GOVERNANCE.md) for trademark usage guidelines.
+See [LICENSE](LICENSE) for complete terms.
 
 ---
 
 ## Learn More
 
-- **Vision & Value Proposition**: [VISION.md](VISION.md)
-- **Specification Documents**: [spec/0.3/](spec/0.3/) - Multi-domain architecture
+- **Specification Documents**: [spec/0.3/](spec/0.3/) - Multi-domain architecture and vision
 - **Domain Manifest Schema**: [schema/domain/](schema/domain/) - How to create domains
 - **Example Domain**: [examples/bundles/](examples/bundles/) - Software Development reference
-- **Governance & RFC Process**: [GOVERNANCE.md](GOVERNANCE.md)
-- **Design Decisions**: [docs/design/](docs/design/) - Architecture decision records
+- **RFC Process**: [rfcs/README.md](rfcs/README.md) - How to propose major changes
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 
 ---
 
