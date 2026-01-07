@@ -1,8 +1,10 @@
 # Structured Context Specification (SCS)
 
-**If you are using AI and not using Structured Context - you are doing it wrong.**
+A community-driven specification for representing **AI runtime context** as **structured, versioned artifacts**.
 
-**A universal, domain-agnostic platform for reliable AI-assisted professional work across all industries.**
+SCS exists to explore a practical question:
+
+> If model weights are static and behavior is shaped at runtime — **what should “context” be**, how should it be structured, and how should it be composed?
 
 ![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![License](https://img.shields.io/badge/license-Apache_2.0-green)
@@ -10,400 +12,185 @@
 
 ---
 
-## The Problem
+## What This Project Is (and Is Not)
 
-AI is transforming professional work across all domains — legal, clinical, financial, software development, and more. But without structured context, AI assistance creates critical challenges:
+### SCS **is**
+- A draft spec for **structured context documents** and **bundles** (YAML/JSON, git-native)
+- A place to **define boundaries** between *prompts*, *RAG*, *memory*, *tools*, and *context*
+- A discussion space to refine what “context engineering” means in practice
+- A set of schemas + examples you can use to build and validate structured context
 
-- **No provenance**: Can't prove what context AI used when generating deliverables (code, contracts, treatment plans, financial models)
-- **No compliance proof**: Can't demonstrate adherence to regulations (HIPAA, Bar standards, clinical guidelines, SOC2)
-- **Conflicting outputs**: Multiple AI tools lack coordination and shared context
-- **No audit trail**: Can't trace professional decisions back to human approval
-- **Legal liability**: AI-generated work product is indefensible in regulated professional environments
+### SCS **is not**
+- A prompt engineering framework
+- A RAG implementation
+- An agent framework or orchestration runtime
+- A governance / compliance product
+- A finished standard
 
-**Across regulated professions (healthcare, legal, finance, software), these limitations make AI assistance unreliable for production work.**
-
----
-
-## The Solution
-
-**SCS provides a machine-readable framework for structured context** that is:
-
-- **Human-readable** and reviewable
-- **Machine-readable** for AI and automation
-- **Version-controlled** in git
-- **Enforceable** through validation
-- **Governable** through autonomic agents
-- **Legally defensible** with complete provenance
-
-SCS makes **context a first-class, version-controlled artifact** — not ephemeral input that disappears after use.
+**Disagreement is expected.** If you think the framing below is wrong, that’s exactly the kind of contribution we want.
 
 ---
 
-## Why This Matters
+## Why SCS
 
-### Legal Protection & Indemnification
-**Without SCS**: "The AI generated it. We don't know what context it used."
-**With SCS**: "The AI operated within documented constraints, satisfied compliance requirements, and was validated by [human]. Here's the provenance."
+Teams using LLMs keep rebuilding the same brittle structures:
+- long prompts that quietly drift
+- scattered “context” across code, docs, wikis, tickets, and embeddings
+- unclear provenance (“what did the model actually see?”)
+- hard-to-debug behavior (“why did it answer like that?”)
 
-### Compliance on Launch Day
-**Traditional**: Ship → Retrofit compliance (6-12 months) → Maybe certify
-**With SCS**: Continuous validation → **Certified on launch day**
-**Impact**: Saves millions in post-facto compliance work and delayed market entry
+SCS is an attempt to make *context*:
+- **explicit** (not implicit glue code)
+- **structured** (not just prose)
+- **versioned** (reviewable and reproducible)
+- **composable** (reusable across projects and tools)
+- **validatable** (machine-checkable)
 
-### Multi-AI Coordination
-As teams add AI assistants (dev, security, architecture, compliance), coordination becomes chaos without shared context.
+---
 
-**SCS provides**: A single source of truth that all AI tools consume, preventing conflicts and ensuring alignment.
+## A Useful Working Distinction (Open to Debate)
 
-### Autonomic Governance
-Governance agents operating over SCD bundles can:
-- Continuously validate compliance with standards
-- Detect architectural drift and missing mappings
-- Answer "Are we HIPAA compliant?" in real-time
-- Perform impact analysis ("What breaks if we change this?")
-- Generate audit reports automatically
+People use “context” to mean many things. SCS starts with a *proposal*:
 
-### Transparency by Design
-Every SCD includes provenance:
-```yaml
-provenance:
-  created_by: tim@company.com
-  created_at: 2025-12-09T10:00:00Z
-  rationale: "Changed encryption to AES-256 per CSO requirement for HIPAA"
+- **Prompts**: instructions and coordination (“how to behave / what to do”)
+- **RAG**: retrieval of reference material (“what to know”)
+- **Memory**: durable personalization and state (“what to remember”)
+- **Tools**: executable capabilities and contracts (“what can be done”)
+- **Structured Context (SCS)**: the **operating envelope** and **declared assumptions** the system is allowed to use (“what is in-bounds”)
+
+If you disagree with this breakdown, please jump into Discussions and tell us why.
+
+---
+
+## Open Questions
+
+This repo is intentionally a **working space**. Some of the questions we want help answering:
+
+- What information must be **explicit** for reliable AI behavior?
+- Where does “context” end and “memory” begin?
+- What belongs in a **spec** vs an **implementation detail**?
+- Should context be immutable per run? per task? per user session?
+- How do we represent **scope**, **constraints**, and **provenance** without over-engineering?
+- What is the minimal “Core” that most teams could agree on?
+
+See: **OPEN_QUESTIONS.md** (coming / evolving) — and feel free to propose additions.
+
+---
+
+## Core Concepts (Current Draft)
+
+SCS 0.3 introduces a multi-domain model (still evolving) built around:
+
+### Structured Context Documents (SCDs)
+SCDs are the building blocks. They are:
+- human-readable
+- machine-readable
+- versionable in git
+- linkable (references, dependencies, provenance)
+
+### A Three-Tier Model (Current)
+- **Meta**: universal vocabulary and cross-cutting concerns
+- **Standards**: external obligations and imported requirements (optional; evolving)
+- **Project**: the work-specific context you want AI systems to operate within
+
+### Bundles
+Bundles are manifests that compose SCDs (and other bundles) into usable context sets.
+
+> The structure above is not “final truth” — it’s the current best attempt.  
+> The goal is to refine it with real counterexamples.
+
+---
+
+## How to Engage (Best Path)
+
+We’re optimizing for **thoughtful critique** and **practical examples**.
+
+1. **Start with Discussions**
+   - “What is context?” debates
+   - boundary arguments (prompt vs context vs RAG vs memory)
+   - minimal-core proposals
+   - counterexamples that break the model
+
+2. **Use Issues for concrete changes**
+   - schema problems
+   - unclear terminology
+   - missing examples
+   - validation gaps
+
+3. **Use RFCs for major changes**
+   If a change is breaking or introduces a new foundational concept, propose it via an RFC.
+   See: `rfcs/README.md`
+
+---
+
+## Quick Start
+
+### 1) Clone
+
+```bash
+git clone https://github.com/tim-mccrimmon/structured-context-spec.git
+cd structured-context-spec
 ```
 
----
+### 2) Read the spec entry points
 
-## Core Concepts
+- `spec/0.3/overview.md`
+- `spec/0.3/terminology.md`
+- `spec/0.3/bundle-format.md`
 
-SCS 0.3 introduces a **multi-domain platform** supporting professional work across all industries.
+### 3) Create and validate an SCD
 
-### Three-Tier SCD Model
-
-**Structured Context Documents (SCDs)** are organized into three tiers:
-
-#### Meta-Tier: Universal Semantic Foundation
-Defines universal concepts across all domains:
-- Roles and capabilities
-- Domain concepts
-- Cross-cutting concerns
-- Architectural patterns
-
-#### Standards-Tier: External Obligations
-Represents compliance frameworks as importable contracts:
-- HIPAA, SOC2, GDPR, ISO standards (software)
-- Bar association rules (legal)
-- Clinical practice guidelines (healthcare)
-- Financial regulations (finance)
-
-#### Project-Tier: Your Actual Work
-Describes the specific work being done:
-- System architecture (software)
-- Case strategy (legal)
-- Treatment protocols (clinical)
-- Risk models (financial)
-
-### Five Bundle Types
-
-**Bundles** are manifest documents that organize SCDs and other bundles:
-
-1. **Project Bundle** - Top-level orchestrator for complete project context
-2. **Meta Bundle** - Universal vocabulary
-3. **Standards Bundle** - Compliance requirements
-4. **Concern Bundle** - Functional area (Architecture, Security, Case Management, Treatment Planning)
-5. **Domain Bundle** - Industry vertical (Software Development, Legal, Clinical, Financial)
-
-**Hierarchy**: Project → Domains → Concerns → SCDs
-
-### Multi-Domain Platform
-
-SCS 0.3 supports multiple professional domains:
-- **Software Development** (reference implementation) - 11 software engineering concerns
-- **Legal** (future) - Case management, legal research, document drafting
-- **Clinical** (future) - Patient care, treatment protocols, clinical decision support
-- **Financial** (future) - Portfolio management, risk assessment
-- **And more...** - Domain experts create domains for their professions
-
-**Platform Model**: SCS provides the architecture; domain experts create domain-specific concerns and content schemas.
-
----
-
-## What's in This Repository
-
-This repository contains the **complete SCS 0.3 specification**:
-
-✅ **Normative specification** ([spec/0.3/](spec/0.3/)) - Core specification documents
-✅ **Domain manifests** ([schema/domain/](schema/domain/)) - Domain definition schemas
-✅ **JSON Schemas** ([schema/](schema/)) - Bundle and SCD validation schemas
-✅ **YAML Templates** ([templates/](templates/)) - Quick-start files
-✅ **Educational guides** ([docs/](docs/)) - Documentation and guides
-✅ **Validation tools** ([tools/](tools/)) - Domain-aware SCD validator
-✅ **Example implementations** ([examples/](examples/)) - Software Development domain reference
+```bash
+cp templates/scd/project_scd_template.yaml my-first-scd.yaml
+cd tools/scd-validator
+python validate.py ../../my-first-scd.yaml
+```
 
 ---
 
 ## Repository Structure
 
 ```
-scs-commercial/
-├── spec/0.3/                  # Normative specification (0.3 multi-domain release)
-│   ├── overview.md            # Multi-domain vision and platform model
-│   ├── terminology.md         # Domains, concerns, and bundle types
-│   ├── bundle-format.md       # 5 bundle types and validation rules
-│   └── ...
-├── schema/                    # JSON Schemas for validation
-│   ├── domain/                # Domain manifest schema
-│   ├── bundles/               # Bundle schema (5 types)
-│   └── scd/                   # Meta, project, standards SCD schemas
-├── templates/                 # YAML starter files
-│   ├── scd/                   # SCD templates by tier
-│   └── bundles/               # Bundle templates by type
-├── docs/                      # Documentation and guides
-│   ├── concern-docs/          # Concern-specific templates and examples
-│   └── ...
-├── tools/                     # Validation and tooling
-│   └── scd-validator/         # Domain-aware SCD and bundle validator
-├── examples/                  # Complete example bundles
-│   └── bundles/
-│       ├── concerns/          # Software Development concern bundles (11)
-│       ├── domains/           # Domain bundles (software-development)
-│       └── ...                # Meta, standards, project bundles
-├── context/                   # Working context files
+structured-context-spec/
+├── spec/0.3/                  # Normative spec (0.3)
+├── schema/                    # JSON Schemas (bundles, domains, SCD tiers)
+├── templates/                 # YAML starters
+├── docs/                      # Guides & explainers
+├── tools/                     # Validation & tooling
+├── examples/                  # Example bundles & domains
 ├── rfcs/                      # RFC process for major changes
-├── CONTRIBUTING.md            # How to contribute
-└── LICENSE                    # Apache 2.0 license
+├── CONTRIBUTING.md
+└── LICENSE
 ```
 
 ---
 
-## Quick Start
+## Roadmap (Community-First)
 
-### 1. Clone the Repository
+Near-term goals:
+- clarify definitions (prompt vs context vs RAG vs memory)
+- stabilize a **Core** subset suitable for broad adoption
+- improve examples and counterexamples
+- tighten schemas + validation based on real usage
 
-```bash
-git clone https://github.com/tim-mccrimmon/scs-spec.git
-cd scs-spec
-```
-
-### 2. Explore the Documentation
-
-**New to SCS? Start with:**
-1. [spec/0.3/overview.md](spec/0.3/overview.md) - Why SCS matters and the complete vision
-2. [docs/quick-start-guide.md](docs/quick-start-guide.md) - Build your first bundle in 30 minutes
-3. [docs/FAQ.md](docs/FAQ.md) - Common questions answered
-4. [docs/scd-guide.md](docs/scd-guide.md) - Complete SCD reference
-
-**Understanding the system?**
-1. [spec/0.3/overview.md](spec/0.3/overview.md) - Multi-domain vision and platform model
-2. [spec/0.3/terminology.md](spec/0.3/terminology.md) - Domains, concerns, and bundle types
-3. [spec/0.3/bundle-format.md](spec/0.3/bundle-format.md) - 5 bundle types and validation
-
-**Building tools or creating domains?**
-1. [schema/domain/](schema/domain/) - Domain manifest schema
-2. [schema/bundles/](schema/bundles/) - Bundle schemas
-3. [examples/bundles/domains/](examples/bundles/domains/) - Software Development domain reference
-4. [tools/scd-validator/](tools/scd-validator/) - Domain-aware validation
-
-### 3. Create Your First SCD
-
-```bash
-# Copy a template
-cp templates/scd/project_scd_template.yaml my-first-scd.yaml
-
-# Edit it following the specification
-# See docs/ for guidance
-
-# Validate it
-cd tools/scd-validator
-python validate.py ../../my-first-scd.yaml
-```
-
-### 4. Build a Bundle
-
-```bash
-# Copy a bundle template
-cp templates/bundles/minimal-project-bundle.yaml my-bundle.yaml
-
-# Reference your SCDs in the bundle
-# Validate the bundle
-cd tools/scd-validator
-python validate.py --bundle ../../my-bundle.yaml
-```
-
----
-
-## Who Should Use SCS?
-
-### Professional Domains
-
-**Software Development:**
-- Development teams using AI code assistants
-- CTOs integrating AI safely without regulatory risk
-- Chief Architects maintaining architectural integrity
-- DevOps teams managing complex systems
-
-**Legal:**
-- Law firms using AI for case research and document drafting
-- Compliance officers tracking regulatory adherence
-- Legal operations managers coordinating casework
-
-**Clinical/Healthcare:**
-- Clinicians using AI for diagnosis and treatment planning
-- Healthcare administrators ensuring HIPAA compliance
-- Clinical decision support system developers
-
-**Financial:**
-- Financial analysts using AI for portfolio management
-- Risk officers assessing and modeling risk
-- Compliance teams tracking financial regulations
-
-**Cross-Domain:**
-- **Domain experts** creating new domains for their professions
-- **Governance officers** enforcing standards and compliance
-- **Auditors** validating and tracing professional decisions
-- **Tool builders** creating domain-aware AI assistants
-
-### Use Cases
-- **AI-assisted professional work** - Using AI assistants across any domain
-- **Regulated professions** - Where compliance and accountability are mandatory
-- **Complex decision-making** - Need clear context and governance
-- **Multi-team coordination** - Alignment across teams and AI tools
-- **Domain creation** - Building structured context frameworks for new industries
-
----
-
-## Key Features
-
-### Three-Tier Architecture
-Separates universal semantics (meta), external obligations (standards), and project specifics (project)
-
-### Knowledge Graph
-SCDs form relationships enabling impact analysis, compliance checking, and dependency tracking
-
-### Git-Native
-YAML/JSON formats integrate seamlessly with version control, enabling full change history and provenance
-
-### Autonomic Governance
-AI agents operate over bundles to continuously validate compliance and detect issues
-
-### Shared Standards Registry
-Import standards-tier SCDs from scs-registry instead of reinventing compliance
-
-### Schema-Driven Validation
-JSON Schemas enable validation, IDE integration, and automated governance tooling
-
-### Provenance by Default
-Every SCD tracks who, when, and why for complete accountability and legal defensibility
-
----
-
-## Part of the SCS Ecosystem
-
-SCS is the specification layer within a larger ecosystem:
-
-- **scs-spec** (this repo) - The specification itself
-- **scs-registry** - Shared standards-tier SCDs (HIPAA, SOC2, ISO, etc.)
-- **scs-tools** - Validators, editors, governance agents
-- **scs-reference-implementation** - Healthcare example demonstrating SCS
-
----
-
-## Current Status
-
-**Version**: 0.3.0 (Multi-Domain Release)
-**Status**: Active development
-**Stability**: Suitable for experimentation, early adoption, and feedback
-
-### Completed in 0.3 ✅
-- **Multi-domain architecture** - Platform supporting all professional domains
-- **Five bundle types** - Project, Meta, Standards, Concern, Domain
-- **Domain manifest specification** - How domains are defined and structured
-- **Software Development domain** - Reference implementation with 11 concerns
-- **Updated JSON Schemas** - Bundle and domain validation
-- **Domain-aware validator** - Validates new bundle type rules
-- **Updated documentation** - Spec, examples, and guides for 0.3
-
-### Completed Previously ✅
-- Core specification documents
-- JSON Schemas for three SCD tiers
-- YAML templates for SCDs and bundles
-- Educational guides and documentation
-- Governance model with RFC process
-
-### Roadmap
-- **Domain creation** - Legal, Clinical, Financial domains by domain experts
-- **Domain registry** - Marketplace for domains and compliance standards
-- **Enhanced tooling** - IDE integrations, domain-aware AI assistants
-- **Real-world validation** - Production use cases across multiple domains
-- **Public working group** - Community governance for v1.0
-
----
-
-## Getting Involved
-
-### Report Issues or Request Features
-[Open an issue](https://github.com/tim-mccrimmon/scs-spec/issues/new/choose) for bugs, suggestions, or questions
-
-### Propose Changes
-- **Minor changes** (typos, examples, clarifications): Submit a PR directly
-- **Major changes** (new concepts, breaking changes): [Open a discussion](https://github.com/tim-mccrimmon/scs-spec/discussions) first, then submit an RFC
-
-See [rfcs/README.md](rfcs/README.md) for the RFC process.
-
-### Contribute
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for:
-- Contribution guidelines
-- Development standards
-- PR process and review criteria
-- Branch naming conventions
-
-### Join the Community
-- **GitHub Discussions**: Ask questions, share ideas, propose features
-- **Issues**: Report bugs, request enhancements
-- **RFCs**: Propose major specification changes ([rfcs/](rfcs/))
+Longer-term:
+- domain work streams (by domain experts)
+- optional standards imports and registries
+- editor/IDE integrations
 
 ---
 
 ## Governance
 
-SCS follows a **Benevolent Maintainer** model during v0.x:
-- **Tim McCrimmon** serves as primary maintainer
-- Community input welcomed via issues, discussions, and RFCs
-- Major changes require formal RFC (Request for Comments) process (see [rfcs/README.md](rfcs/README.md))
-- Transition to community governance planned for v1.0
+During v0.x, SCS uses a **benevolent maintainer** model:
+- Maintainer: **Tim McCrimmon**
+- Major changes via RFC
+- Goal: transition to broader community governance for v1.0
 
 ---
 
 ## License
 
-**Apache License 2.0**
+Apache License 2.0
 
 Copyright © 2026 Tim McCrimmon / Ohana Consulting LLC
-
-See [LICENSE](LICENSE) for complete terms.
-
----
-
-## Learn More
-
-- **Specification Documents**: [spec/0.3/](spec/0.3/) - Multi-domain architecture and vision
-- **Domain Manifest Schema**: [schema/domain/](schema/domain/) - How to create domains
-- **Example Domain**: [examples/bundles/](examples/bundles/) - Software Development reference
-- **RFC Process**: [rfcs/README.md](rfcs/README.md) - How to propose major changes
-- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-
----
-
-## Why Now?
-
-AI is transforming professional work across all domains — but without structured context, professionals and organizations face increased risks in governance, liability, and compliance management.
-
-As AI adoption spreads across legal, clinical, financial, and software domains, the need for **structured, auditable, version-controlled context** becomes critical — especially in regulated professions where accountability and traceability are mandatory.
-
-**SCS provides the universal infrastructure for trustworthy, governable, AI-assisted professional work across all industries.**
-
-We welcome contributions from domain experts to create new domains and expand the SCS platform.
-
----
-
-**Questions?** [Open an issue](https://github.com/tim-mccrimmon/scs-spec/issues/new/choose) or [start a discussion](https://github.com/tim-mccrimmon/scs-spec/discussions).
