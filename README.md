@@ -1,10 +1,6 @@
 # Structured Context Specification (SCS)
 
-A community-driven specification for representing **AI runtime context** as **structured, versioned artifacts**.
-
-SCS exists to explore a practical question:
-
-> If model weights are static and behavior is shaped at runtime — **what should “context” be**, how should it be structured, and how should it be composed?
+A community-driven specification for creating, validating, and versioning structured context for AI systems.
 
 ![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![License](https://img.shields.io/badge/license-Apache_2.0-green)
@@ -12,53 +8,90 @@ SCS exists to explore a practical question:
 
 ---
 
+## The Problem
+
+If you're building with AI, you know this struggle:
+
+Your agents need clear guidance on how to behave, what rules to follow, and what boundaries to respect. But that "context" ends up scattered across prompts, docs, code comments, wikis, and tribal knowledge. It drifts. It conflicts. It's impossible to validate or version properly.
+
+**You need a better way to manage context.**
+
+---
+
+## What SCS Provides
+
+SCS is a specification (and tooling) for representing agent context as **structured, versioned artifacts** that are:
+
+- **Concise** — focused, atomic definitions (not walls of text)
+- **Precise** — structured YAML/JSON (not ambiguous prose)
+- **Non-conflicting** — explicitly composed and validated (not scattered)
+- **Versionable** — git-native, reviewable, auditable (not lost in chat history)
+- **Reusable** — composable bundles (standards, domains, projects)
+
+**Use SCS to:**
+- Define agent behavior boundaries and rules
+- Package compliance requirements (HIPAA, SOC2, industry standards)
+- Structure domain knowledge and constraints
+- Version context alongside code
+- Validate context before deployment
+
+### Who Uses SCS?
+
+**Development teams** — structure architecture rules, coding conventions, domain concepts
+**Standards organizations** — package compliance requirements (HIPAA, SOC2, PCI-DSS) for agent consumption
+**Enterprises** — version agent governance policies alongside code
+**Anyone building with AI** — create concise, precise, non-conflicting context
+
+**Any industry:** Healthcare, finance, legal, education, government, software development
+
+---
+
 ## What This Project Is (and Is Not)
 
 ### SCS **is**
-- A draft spec for **structured context documents** and **bundles** (YAML/JSON, git-native)
-- A place to **define boundaries** between *prompts*, *RAG*, *memory*, *tools*, and *context*
-- A discussion space to refine what “context engineering” means in practice
-- A set of schemas + examples you can use to build and validate structured context
+- A spec for **Structured Context Documents (SCDs)** and **Bundles**
+- Schemas, validation tools, and examples you can use today
+- A community space to refine context engineering practices
+- Designed for broad adoption (any industry, any use case)
 
 ### SCS **is not**
 - A prompt engineering framework
-- A RAG implementation
-- An agent framework or orchestration runtime
-- A governance / compliance product
-- A finished standard
+- A RAG system or vector database
+- An agent orchestration runtime
+- A finished standard (it's v0.3, actively evolving)
 
-**Disagreement is expected.** If you think the framing below is wrong, that’s exactly the kind of contribution we want.
-
----
-
-## Why SCS
-
-Teams using LLMs keep rebuilding the same brittle structures:
-- long prompts that quietly drift
-- scattered “context” across code, docs, wikis, tickets, and embeddings
-- unclear provenance (“what did the model actually see?”)
-- hard-to-debug behavior (“why did it answer like that?”)
-
-SCS is an attempt to make *context*:
-- **explicit** (not implicit glue code)
-- **structured** (not just prose)
-- **versioned** (reviewable and reproducible)
-- **composable** (reusable across projects and tools)
-- **validatable** (machine-checkable)
+**This is spec work.** If you disagree with our framing or have better ideas, that's exactly what we need. Open an issue or discussion.
 
 ---
 
-## A Useful Working Distinction (Open to Debate)
+## Core Concepts
 
-People use “context” to mean many things. SCS starts with a *proposal*:
+### Structured Context Documents (SCDs)
 
-- **Prompts**: instructions and coordination (“how to behave / what to do”)
-- **RAG**: retrieval of reference material (“what to know”)
-- **Memory**: durable personalization and state (“what to remember”)
-- **Tools**: executable capabilities and contracts (“what can be done”)
-- **Structured Context (SCS)**: the **operating envelope** and **declared assumptions** the system is allowed to use (“what is in-bounds”)
+SCDs are the atomic building blocks — single, focused definitions of:
+- Rules and boundaries
+- Constraints and requirements
+- Domain concepts and terminology
+- Compliance obligations
 
-If you disagree with this breakdown, please jump into Discussions and tell us why.
+Each SCD is versioned, validated, and composable.
+
+### Bundles
+
+Bundles are manifests that assemble SCDs into coherent context sets:
+
+- **Meta Bundle** — SCS vocabulary and foundations (provided by spec)
+- **Standards Bundle** — regulatory/compliance requirements (HIPAA, SOC2, etc.)
+- **Domain Bundle** — concern-specific context (architecture, security, etc.)
+- **Project Bundle** — top-level orchestrator (imports all relevant bundles)
+
+### The Three-Tier Model
+
+- **Meta tier** — universal SCS concepts (what is an SCD, a bundle, validation)
+- **Standards tier** — external requirements and obligations (optional)
+- **Project tier** — your specific context (rules, boundaries, domain knowledge)
+
+This structure is evolving. See `/spec/0.3/` for current details.
 
 ---
 
@@ -77,31 +110,7 @@ See: **OPEN_QUESTIONS.md** (coming / evolving) — and feel free to propose addi
 
 ---
 
-## Core Concepts (Current Draft)
-
-SCS 0.3 introduces a multi-domain model (still evolving) built around:
-
-### Structured Context Documents (SCDs)
-SCDs are the building blocks. They are:
-- human-readable
-- machine-readable
-- versionable in git
-- linkable (references, dependencies, provenance)
-
-### A Three-Tier Model (Current)
-- **Meta**: universal vocabulary and cross-cutting concerns
-- **Standards**: external obligations and imported requirements (optional; evolving)
-- **Project**: the work-specific context you want AI systems to operate within
-
-### Bundles
-Bundles are manifests that compose SCDs (and other bundles) into usable context sets.
-
-> The structure above is not “final truth” — it’s the current best attempt.  
-> The goal is to refine it with real counterexamples.
-
----
-
-## How to Engage (Best Path)
+## How to Engage
 
 We’re optimizing for **thoughtful critique** and **practical examples**.
 
@@ -138,13 +147,38 @@ cd structured-context-spec
 - `spec/0.3/terminology.md`
 - `spec/0.3/bundle-format.md`
 
-### 3) Create and validate an SCD
+### 3) Explore examples
 
 ```bash
+# See real working examples
+ls examples/bundles/
+
+# View a complete project bundle
+cat examples/bundles/project-bundle.yaml
+
+# View concern-specific bundles
+ls examples/bundles/concerns/
+```
+
+### 4) Create and validate your own SCD
+
+```bash
+# Copy a template
 cp templates/scd/project_scd_template.yaml my-first-scd.yaml
+
+# Edit it (add your rules, boundaries, domain concepts)
+# Then validate
 cd tools/scd-validator
 python validate.py ../../my-first-scd.yaml
 ```
+
+### 5) Join the discussion
+
+- **GitHub Discussions** — share your use case, ask questions
+- **Issues** — report problems or suggest improvements
+- **RFCs** — propose significant changes to the spec
+
+See `docs/quick-start-guide.md` for a detailed walkthrough.
 
 ---
 
