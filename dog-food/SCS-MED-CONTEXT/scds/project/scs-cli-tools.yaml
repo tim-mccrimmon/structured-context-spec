@@ -1,0 +1,253 @@
+---
+id: scd:project:scs-cli-tools
+tier: project
+version: "1.0.0"
+title: "SCS CLI Tools"
+description: "Command-line tools for creating, validating, and managing SCS bundles"
+
+provenance:
+  created_by: "Tim McCrimmon"
+  created_at: "2026-01-10T00:00:00Z"
+  rationale: "Document CLI tools available for working with SCS"
+
+content:
+  cli_package:
+    name: "scs-tools"
+    installation: "pip install scs-tools"
+    source: "Python package"
+    status: "Operational (v0.3)"
+
+  commands:
+    init:
+      command: "scs init"
+      purpose: "Initialize SCS in an existing project"
+      what_it_does:
+        - "Creates /bundles/ directory"
+        - "Creates /scds/ directory with tier subdirectories (meta, standards, project)"
+        - "Creates initial .scsconfig file (if applicable)"
+      example: |
+        cd my-project
+        scs init
+        # Creates directory structure
+
+    new:
+      command: "scs new <project-name>"
+      purpose: "Create new project with SCS scaffolding"
+      options:
+        - "--type <template>"
+        - "Templates: healthcare, fintech, saas, government, minimal, standard"
+      what_it_does:
+        - "Creates new project directory"
+        - "Initializes SCS structure"
+        - "Creates template bundles for chosen type"
+      example: |
+        scs new my-healthcare-app --type healthcare
+        # Creates project with healthcare templates
+
+    bundle_create:
+      command: "scs bundle create"
+      purpose: "Create a new bundle manifest"
+      interactive: true
+      prompts:
+        - "Bundle ID (e.g., bundle:my-project)"
+        - "Bundle type (meta, standards, domain, concern, project)"
+        - "Version (DRAFT or X.Y.Z)"
+        - "Title"
+        - "Description"
+      creates: "Bundle YAML file in /bundles/"
+      example: |
+        scs bundle create
+        # Interactive prompts guide bundle creation
+
+    validate:
+      command: "scs validate <path>"
+      purpose: "Validate bundle or SCD structure"
+      modes:
+        loose:
+          description: "Default mode for Phase 1 (DRAFT)"
+          validates:
+            - "YAML structure"
+            - "Required fields"
+            - "Tier organization"
+          does_not_validate:
+            - "Content completeness"
+            - "Strict constraints"
+
+        strict:
+          description: "Future mode for Phase 2 (versioned bundles)"
+          validates:
+            - "All loose checks"
+            - "Import graph validity"
+            - "Version format"
+            - "Bundle type constraints"
+            - "No circular dependencies"
+
+      examples: |
+        # Validate single bundle
+        scs validate bundles/my-project.yaml
+
+        # Validate all bundles
+        scs validate bundles/*.yaml
+
+        # Validate SCD
+        scs validate scds/project/architecture.yaml
+
+    bundle_version:
+      command: "scs bundle version <path> --version <X.Y.Z>"
+      purpose: "Lock bundle with semantic version (makes immutable)"
+      status: "Future (Phase 2)"
+      what_it_does:
+        - "Runs strict validation"
+        - "Updates version field from DRAFT to X.Y.Z"
+        - "Marks bundle as immutable"
+        - "Creates git tag (optional)"
+      example: |
+        scs bundle version bundles/my-project.yaml --version 1.0.0
+        # Locks bundle at version 1.0.0
+
+  typical_workflows:
+    create_project_bundle:
+      description: "Create a bundle for your project from scratch"
+      steps:
+        - step: "Install CLI"
+          command: "pip install scs-tools"
+
+        - step: "Initialize in project"
+          command: "cd my-project && scs init"
+
+        - step: "Create bundle"
+          command: "scs bundle create"
+          interaction: "Answer prompts (ID, type, title, description)"
+
+        - step: "Create SCDs"
+          action: "Manually create YAML files in scds/project/"
+          example: "scds/project/architecture.yaml"
+
+        - step: "Reference SCDs in bundle"
+          action: "Edit bundle manifest, add SCD IDs to scds array"
+
+        - step: "Validate"
+          command: "scs validate bundles/my-project.yaml"
+
+        - step: "Commit to git"
+          command: "git add bundles/ scds/ && git commit -m 'Add SCS context'"
+
+    use_with_ai:
+      description: "Load bundle into AI coding assistant"
+      steps:
+        - step: "View bundle content"
+          command: "cat bundles/my-project.yaml"
+
+        - step: "View SCDs"
+          command: "cat scds/project/*.yaml"
+
+        - step: "Copy to clipboard (macOS)"
+          command: "cat bundles/my-project.yaml scds/project/*.yaml | pbcopy"
+
+        - step: "Paste into AI"
+          action: "Provide context at start of session"
+
+    team_collaboration:
+      description: "Share bundles across team"
+      steps:
+        - step: "Tech lead creates bundle"
+          command: "scs init && scs bundle create"
+
+        - step: "Commit to repo"
+          command: "git add bundles/ scds/ && git commit && git push"
+
+        - step: "Team members pull"
+          command: "git pull"
+
+        - step: "Everyone uses same context"
+          action: "Load bundle into their AI tool of choice"
+
+  integration_with_git:
+    recommended_workflow:
+      - "Keep bundles and SCDs in version control"
+      - "Use branches for major context changes"
+      - "Pull requests for context updates"
+      - "Code review for context changes (like code)"
+      - "Git history shows context evolution"
+
+    gitignore:
+      recommendation: "Do NOT gitignore bundles/ or scds/ - they should be versioned"
+
+  future_commands:
+    description: "Planned for future releases"
+    commands:
+      - command: "scs bundle publish"
+        purpose: "Publish bundle to registry (OICP)"
+
+      - command: "scs bundle import <bundle-id>"
+        purpose: "Import community bundle"
+
+      - command: "scs docs generate"
+        purpose: "Auto-generate markdown docs from bundles"
+
+      - command: "scs validate --strict"
+        purpose: "Run strict validation (Phase 2)"
+
+  configuration:
+    config_file: ".scsconfig (optional)"
+    purpose: "Project-level SCS configuration"
+    example_config:
+      yaml: |
+        ---
+        validation:
+          mode: loose  # or strict
+        bundles:
+          default_type: project
+        output:
+          format: yaml  # or json
+
+  ci_cd_integration:
+    github_actions:
+      description: "Validate bundles on every PR"
+      example_workflow:
+        yaml: |
+          name: Validate SCS Bundles
+          on: [pull_request]
+          jobs:
+            validate:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v2
+                - name: Install SCS CLI
+                  run: pip install scs-tools
+                - name: Validate all bundles
+                  run: scs validate bundles/*.yaml
+
+  common_tasks:
+    add_new_scd:
+      - "Create YAML file in scds/<tier>/"
+      - "Define id, tier, version, title, description, content"
+      - "Add SCD ID to bundle's scds array"
+      - "Validate bundle"
+      - "Commit to git"
+
+    update_existing_scd:
+      - "Edit SCD YAML file"
+      - "Increment version if published"
+      - "Validate bundle"
+      - "Commit to git"
+
+    import_another_bundle:
+      - "Add bundle ID to imports array"
+      - "Validate (checks import exists)"
+      - "Commit to git"
+
+    share_bundle_with_team:
+      - "Commit bundle and SCDs to git"
+      - "Push to remote"
+      - "Team members git pull"
+      - "Team loads same context into their AI"
+
+  tips_and_best_practices:
+    - tip: "Start with DRAFT version, iterate quickly"
+    - tip: "Keep SCDs focused and atomic (one concept per SCD)"
+    - tip: "Use descriptive IDs (scd:project:react-conventions, not scd:project:misc)"
+    - tip: "Validate frequently during development"
+    - tip: "Commit bundles alongside code (they evolve together)"
+    - tip: "Use git branches for major context restructuring"
+    - tip: "Code review context changes like you code review code"

@@ -1,0 +1,230 @@
+---
+id: scd:project:scs-launch-strategy
+tier: project
+version: "1.0.0"
+title: "SCS Launch Strategy"
+description: "Target audience, positioning, differentiation, and launch approach"
+
+provenance:
+  created_by: "Tim McCrimmon"
+  created_at: "2026-01-10T00:00:00Z"
+  rationale: "Document SCS positioning and launch strategy"
+
+content:
+  launch_timeline:
+    target: "Q1 2026 (Week of Jan 13-17)"
+    approach: "Soft launch with community building"
+    status: "Pre-launch (materials ready)"
+
+  target_audience:
+    primary:
+      description: "Individual developers using AI coding assistants daily"
+      characteristics:
+        - "Software engineers (junior to senior)"
+        - "Using Claude Code, GitHub Copilot, ChatGPT, Cursor"
+        - "Projects with meaningful complexity (>1,000 LOC)"
+        - "Frustrated by re-teaching AI, inconsistent responses"
+        - "Early adopters, active on GitHub, HN, Reddit"
+
+    secondary:
+      description: "Development teams (2-15 people)"
+      needs:
+        - "Consistency across team members"
+        - "Standardize context without losing tool choice"
+        - "Version context with code"
+
+    tertiary:
+      description: "Open source maintainers"
+      needs:
+        - "Onboard contributors quickly"
+        - "Improve AI-generated PR quality"
+
+  positioning:
+    primary_tagline: "Stop Re-Teaching Your AI Every Day"
+    alternative_tagline: "Structured Context for AI Systems"
+    one_liner: "Package.json for AI context"
+
+    elevator_pitch: |
+      SCS is an open source specification for managing AI context. Instead of re-explaining
+      your project to Claude every day, you create structured context bundles—YAML files
+      with your architecture, conventions, and domain knowledge. Load them into any AI
+      (Claude, ChatGPT, Copilot) and your AI operates within your actual boundaries.
+      Version with git, share with your team. Free and open source. We use it to build
+      SCS itself.
+
+  core_messages:
+    problem:
+      statement: |
+        CLAUDE.md isn't enough. Either it's too vague (AI guesses) or too detailed
+        (burns tokens, accumulates conflicts). Both cause architectural drift.
+
+    insight:
+      statement: |
+        AI doesn't need to be smarter. It needs to be bounded. Without explicit context,
+        AI invents reality instead of operating within your constraints.
+
+    solution:
+      statement: |
+        SCS lets you define structured context bundles—architecture, conventions,
+        constraints—in YAML. Version with git, load into any AI, never re-explain.
+
+    credibility:
+      statement: |
+        We built SCS to solve our own problem. We use SCS to manage SCS development.
+        If it works for us, it'll work for you.
+
+    freedom:
+      statement: |
+        MIT licensed. No cloud service, no vendor lock-in. Your context lives in your
+        git repo. Works with any AI tool.
+
+  differentiation:
+    vs_claude_md:
+      problem: "Unstructured prose, token-heavy, conflicting details"
+      scs: "Structured YAML, composable bundles, clear precedence"
+      summary: "Think package.json vs. a README"
+
+    vs_rag:
+      rag: "Retrieves information on-demand (good for knowledge bases)"
+      scs: "Explicit, always-present context (good for architecture, rules, constraints)"
+      relationship: "Complementary - RAG for facts, SCS for boundaries"
+
+    vs_prompt_engineering:
+      problem: "Ad-hoc context management disguised as technique"
+      scs: "Versioned, governed context as infrastructure"
+
+    vs_fine_tuning:
+      problem: "Bakes knowledge into model, expensive, slow to update"
+      scs: "External context, instant updates, version controlled"
+
+  distribution_channels:
+    primary:
+      - name: "GitHub"
+        purpose: "Primary home, social proof via stars"
+
+      - name: "Hacker News"
+        purpose: "Show HN launch, technical community"
+        timing: "Thursday Jan 16, 8-10am PST"
+
+      - name: "Dev.to"
+        purpose: "Developer blog, good SEO"
+
+      - name: "Reddit"
+        subreddits: ["r/ClaudeAI", "r/LocalLLaMA", "r/programming"]
+
+      - name: "Twitter/X"
+        purpose: "Developer community, early adopters"
+
+    secondary:
+      - name: "LinkedIn"
+        audience: "Tech leads, CTOs"
+
+      - name: "Medium"
+        purpose: "Cross-post for broader reach"
+
+      - name: "YouTube"
+        purpose: "Tutorial videos, demos"
+
+  launch_week_schedule:
+    monday_jan_13:
+      - "LinkedIn post (problem + launch announcement)"
+      - "Twitter thread (problem → solution)"
+      - "Connect with 20 AI/dev people on LinkedIn"
+
+    tuesday_jan_14:
+      - "Reddit post (r/ClaudeAI)"
+      - "Twitter post #2 (problem deep-dive)"
+
+    wednesday_jan_15:
+      - "LinkedIn post #2 (dogfooding story)"
+      - "Twitter post #3 (Martians analogy)"
+      - "Final GitHub polish"
+
+    thursday_jan_16:
+      - "🚀 Hacker News Show HN (8-10am PST)"
+      - "Share HN link on Twitter/LinkedIn"
+      - "Reddit post (r/LocalLLaMA)"
+      - "Respond to ALL comments"
+
+    friday_jan_17:
+      - "Continue HN engagement"
+      - "Dev.to article"
+      - "LinkedIn post #3 (launch recap)"
+      - "Plan Week 2"
+
+  success_metrics:
+    week_1:
+      - "HN upvotes: 50+"
+      - "GitHub stars: 20+"
+      - "LinkedIn impressions: 2,000+"
+      - "Twitter impressions: 5,000+"
+      - "Reddit upvotes: 100+ (combined)"
+      - "Interested collaborators: 5+"
+      - "CLI downloads: 50+"
+
+    month_6:
+      - "GitHub stars: 2,000"
+      - "CLI downloads: 10,000"
+      - "Community bundles: 50"
+      - "OICP pilot conversions: 3"
+
+  open_source_strategy:
+    license: "MIT (maximizes adoption, friendly to commercial use)"
+    repository: "github.com/tim-mccrimmon/structured-context-spec"
+
+    why_open_source:
+      - "Context management is fundamental infrastructure"
+      - "Need transparency into how context is structured"
+      - "Freedom from vendor lock-in"
+      - "Enable ecosystem-wide tooling and templates"
+      - "Community contributions improve the specification"
+
+  relationship_to_oicp:
+    strategy: "SCS establishes mindshare, validates structured context concept"
+
+    funnel: |
+      SCS users who outgrow git-based workflow upgrade to OICP for runtime streaming,
+      governance, and scale.
+
+    trigger_points:
+      - "Runtime Context: Need AI agents in production to consume context"
+      - "Multi-Agent Coordination: 10+ agents need synchronized updates"
+      - "Real-Time Updates: Policy changes must propagate in seconds"
+      - "Enterprise Governance: Audit trails, compliance tracking"
+      - "Team Scale: 50+ developers, coordination overhead unmanageable"
+
+    transition_message: |
+      SCS is perfect for dev-time AI and small teams. When you need runtime context
+      streaming, governance, and scale—that's OICP.
+
+  community_building:
+    activities:
+      - "Respond to every GitHub issue within 24 hours"
+      - "Feature community bundles"
+      - "Create starter templates (React, Django, etc.)"
+      - "Launch awesome-scs-bundles repo"
+      - "Monthly spotlight on contributors"
+
+    goal: "Build ecosystem of shared bundles and contributors"
+
+  content_themes:
+    - theme: "The Problem"
+      angle: "Your CLAUDE.md isn't enough—here's why"
+
+    - theme: "The Insight"
+      angle: "AI doesn't need to be smarter. It needs to be bounded."
+
+    - theme: "The Solution"
+      angle: "Package.json for AI context"
+
+    - theme: "The Proof"
+      angle: "How we use SCS to build SCS"
+
+    - theme: "The Ecosystem"
+      angle: "Community bundles for React, Django, and more"
+
+  focus:
+    dev_time: "Dev-time AI focus (not runtime agents)"
+    tools: "Works with Claude, Copilot, ChatGPT, Cursor"
+    infrastructure: "Git-native, no cloud service required"
+    simplicity: "Start simple, graduate to SCS when you need it"
