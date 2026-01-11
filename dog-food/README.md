@@ -1,5 +1,7 @@
 # Dogfooding: Using SCS to Build SCS
 
+**SCS Medium Detail Context**
+
 This directory contains structured context bundles that document SCS itself—built using the SCS specification.
 
 **"If SCS can't manage SCS, why would anyone use it?"**
