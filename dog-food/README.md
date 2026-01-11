@@ -89,5 +89,20 @@ Use these SCDs as examples when creating your own:
 
 ---
 
-**Last Updated:** 2026-01-10
+## Cross-Model Validation
+
+Want to see if SCS really works across different AI models?
+
+Check out the **[Cross-Model Validation Example](../examples/cross-model-validation/)** where we tested these same dog food files on:
+- ✅ Google Gemini (validated Jan 11, 2026)
+- Claude Sonnet/Opus (coming soon)
+- GPT-4 (coming soon)
+
+**Key Finding**: Gemini caught specification violations and generated spec-compliant artifacts using only this structured context. No training required.
+
+This proves SCS's core claim: **LLM-agnostic, governed AI behavior.**
+
+---
+
+**Last Updated:** 2026-01-11
 **Status:** DRAFT (will version to 1.0.0 post-launch)

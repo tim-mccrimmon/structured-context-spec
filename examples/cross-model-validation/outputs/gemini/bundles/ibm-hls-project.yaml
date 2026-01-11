@@ -1,0 +1,26 @@
+---
+id: bundle:ibm-hls-project
+type: project
+version: "DRAFT"
+title: "IBM Health and Life Sciences Project Context"
+description: "Structured context for understanding IBM's offerings in the Health and Life Sciences industries."
+
+scds:
+  - scd:project:ibm-hls-ai
+  - scd:project:ibm-hls-cloud-security
+
+imports: []
+
+provenance:
+  created_by: "Gemini"
+  created_at: "2026-01-11T00:00:00Z"
+  rationale: "Project bundle created based on user request and information from https://www.ibm.com/industries/healthcare"
+
+metadata:
+  target_audience:
+    - "AI systems helping with Health and Life Sciences projects"
+    - "Developers building solutions for the healthcare industry"
+  use_cases:
+    - "Answering questions about IBM's healthcare offerings"
+    - "Understanding how AI is used in healthcare"
+    - "Learning about IBM's cloud and security solutions for healthcare"

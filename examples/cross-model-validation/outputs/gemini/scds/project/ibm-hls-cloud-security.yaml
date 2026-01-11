@@ -1,0 +1,29 @@
+---
+id: scd:project:ibm-hls-cloud-security
+tier: project
+version: "1.0.0"
+title: "IBM Hybrid Cloud and Security in Health and Life Sciences"
+description: "IBM's solutions for hybrid cloud and cybersecurity for healthcare data."
+
+provenance:
+  created_by: "Gemini"
+  created_at: "2026-01-11T00:00:00Z"
+  rationale: "SCD created based on user request and information from https://www.ibm.com/industries/healthcare"
+
+content:
+  hybrid_cloud:
+    name: "IBM Hybrid Cloud"
+    description: "Offers operational efficiency and seamless workload management with a secure platform for cloud-based and on-prem IT environments."
+    case_study:
+      client: "Pfizer"
+      use_case: "Use of hybrid cloud IT architecture with SAP S/4HANA®."
+      
+  security:
+    name: "IBM Security"
+    description: "Provides AI cybersecurity solutions to protect healthcare data, patient data, and business processes, improving the speed, accuracy, and productivity of security teams."
+  
+  trends_and_insights:
+    - title: "Delivering responsible AI in healthcare"
+      type: "Article"
+    - title: "Mastering healthcare data governance with data lineage"
+      type: "Article"

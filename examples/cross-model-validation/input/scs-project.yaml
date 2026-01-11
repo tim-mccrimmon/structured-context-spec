@@ -1,0 +1,46 @@
+---
+id: bundle:scs-project
+type: project
+version: "DRAFT"
+title: "SCS (Structured Context Specification) Project Context"
+description: "Structured context for understanding and working with SCS"
+
+scds:
+  - scd:project:scs-overview
+  - scd:project:scs-specification
+  - scd:project:scs-cli-tools
+  - scd:project:scs-launch-strategy
+
+imports: []
+
+provenance:
+  created_by: "Tim McCrimmon"
+  created_at: "2026-01-10T00:00:00Z"
+  rationale: |
+    Dogfooding SCS - creating structured context for SCS itself.
+    This bundle provides AI systems with comprehensive understanding of what SCS is,
+    the specification format, CLI tools, and launch strategy.
+
+metadata:
+  target_audience:
+    - "AI systems helping with SCS development"
+    - "Developers learning about SCS"
+    - "Contributors to the SCS project"
+    - "Potential users evaluating SCS"
+
+  use_cases:
+    - "Answer questions about SCS specification"
+    - "Understand the problem SCS solves"
+    - "Learn CLI commands and workflows"
+    - "Understand SCS positioning and target audience"
+    - "Differentiate SCS from alternatives (RAG, fine-tuning, etc.)"
+
+  coverage_level: "Medium"
+  detail_level: "Comprehensive but concise"
+
+  update_frequency: "As needed when SCS spec or strategy changes"
+
+  version_history:
+    - version: "DRAFT"
+      date: "2026-01-10"
+      changes: "Initial creation - pre-launch status (v0.3)"

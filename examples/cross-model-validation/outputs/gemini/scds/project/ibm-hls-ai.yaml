@@ -1,0 +1,33 @@
+---
+id: scd:project:ibm-hls-ai
+tier: project
+version: "1.0.0"
+title: "IBM AI in Health and Life Sciences"
+description: "How IBM is leveraging AI to address challenges in the healthcare and life sciences industries."
+
+provenance:
+  created_by: "Gemini"
+  created_at: "2026-01-11T00:00:00Z"
+  rationale: "SCD created based on user request and information from https://www.ibm.com/industries/healthcare"
+
+content:
+  overview: |
+    In the AI era, healthcare is turning to AI to address rising costs, growing demand, staffing shortages, and treatment complexity. IBM offers solutions to help life sciences and healthcare organizations foster innovation and boost productivity across priority workflows.
+  
+  solutions:
+    - name: "IBM watsonx"
+      description: "Helps life sciences and healthcare organizations foster innovation and boost productivity across priority workflows, with consulting and an ecosystem of AI solution providers."
+    
+    - name: "Data for AI"
+      description: "Optimizes data storage, governance, and protection with AI functions, providing an integrated data fabric for AI-ready data and accurate insights."
+      
+    - name: "IT Automation Solutions"
+      description: "AI-powered automation to redefine productivity, improve resilience, and accelerate growth across applications and infrastructure for healthcare systems."
+
+  case_studies:
+    - client: "Moderna"
+      use_case: "Working with IBM Quantum for mRNA development."
+    - client: "University Hospitals Coventry and Warwickshire NHS Trust"
+      use_case: "Serving additional patients with IBM watsonx.ai."
+    - client: "Humana"
+      use_case: "Reducing pre-service calls with conversational AI."

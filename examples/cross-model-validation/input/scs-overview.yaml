@@ -1,0 +1,218 @@
+---
+id: scd:project:scs-overview
+tier: project
+version: "1.0.0"
+title: "SCS (Structured Context Specification) Overview"
+description: "What SCS is, the problem it solves, and core value proposition"
+
+provenance:
+  created_by: "Tim McCrimmon"
+  created_at: "2026-01-10T00:00:00Z"
+  rationale: "Dogfooding SCS - creating structured context for SCS itself"
+
+content:
+  what_is_scs:
+    full_name: "Structured Context Specification"
+    tagline: "Stop Re-Teaching Your AI Every Day"
+    description: |
+      SCS is an open source specification for defining structured, versioned, composable
+      context that AI systems can operate within. It enables developers to define context
+      once as machine-readable artifacts, version it with git, and reuse it across any
+      AI tool—Claude, ChatGPT, Copilot, or custom implementations.
+
+  the_problem:
+    current_state: "Developers use CLAUDE.md (or similar) to give AI context, but it's insufficient"
+
+    the_dilemma:
+      too_vague:
+        - "High-level guidance without critical details"
+        - "AI fills gaps by improvising"
+        - "Architectural drift accumulates"
+        - "Inconsistent responses across developers"
+
+      too_detailed:
+        - "Monolithic documents that burn tokens on every request"
+        - "Information accumulates and conflicts over time"
+        - "Hard to maintain, harder to validate"
+        - "Still unstructured - AI can't reason about precedence"
+
+    outcome: |
+      Both paths lead to the same result: AI that invents its own reality instead of
+      operating within your actual constraints.
+
+  the_insight:
+    core_truth: "AI doesn't need to be smarter. It needs to be bounded."
+
+    explanation: |
+      The issue isn't that AI forgets—it's that AI was never given a world to operate in.
+
+      Think about explaining a project to someone who doesn't understand how your
+      organization works, what architectural decisions you made, or which patterns you
+      follow. AI systems don't interpret against a shared reality—they invent one that
+      fits the prompt.
+
+      That's not hallucination. That's working without boundaries.
+
+    the_scope_problem: |
+      Context isn't a prompt problem or a memory problem—it's a scope problem. AI needs
+      explicit, versioned context defining the operating environment: architecture patterns,
+      conventions, constraints, domain knowledge.
+
+  the_martians_analogy:
+    setup: |
+      Working with AI is like working with Martians—enormously intelligent beings who can
+      build almost anything, but with absolutely no understanding of how Earth works.
+
+      No shared assumptions. No cultural context. No intuition about organizations.
+
+      Worse, in their culture, asking clarifying questions is discouraged. If you ask for
+      something, they'll build exactly what they think you meant—confidently and efficiently.
+
+    the_problem: |
+      Humans miscommunicate because we interpret things differently. AI misbehaves because
+      it has nothing to interpret against.
+
+    the_inversion: |
+      While rich, structured context can feel heavy to humans, it's actually the easiest
+      thing for machines to work with. What feels like bureaucracy to people is clarity
+      to an AI system.
+
+    the_goal: |
+      The goal isn't to make AI smarter. It's to make AI bounded. Once an AI system has
+      a world, intelligence becomes useful. Without one, even the smartest system is just
+      improvising.
+
+  the_solution:
+    description: |
+      SCS provides a specification for defining structured context documents (SCDs) and
+      bundles that give AI systems persistent, versioned understanding of their operating
+      environment.
+
+    key_capabilities:
+      - name: "Structured"
+        detail: "Machine-readable YAML format (not prose)"
+
+      - name: "Versioned"
+        detail: "Git-native, semantic versioning"
+
+      - name: "Composable"
+        detail: "Import and extend shared bundles"
+
+      - name: "LLM-agnostic"
+        detail: "Works with Claude, ChatGPT, Copilot, or custom implementations"
+
+      - name: "Infrastructure-free"
+        detail: "Files in git, no cloud service required"
+
+  what_scs_is:
+    - "A specification for structured context bundles"
+    - "LLM-agnostic (works with any AI system)"
+    - "Git-native (standard version control workflows)"
+    - "Open source (MIT license)"
+
+  what_scs_is_not:
+    - "Not a model, platform, or hosted service"
+    - "Not a replacement for RAG or fine-tuning"
+    - "Not vendor-specific or cloud-dependent"
+    - "Not focused on runtime agents (dev-time AI focus)"
+
+  target_audience:
+    primary:
+      description: "Individual developers using AI coding assistants daily"
+      characteristics:
+        - "Software engineers (junior to senior)"
+        - "Using Claude Code, GitHub Copilot, ChatGPT, Cursor"
+        - "Working on projects with meaningful complexity (>1,000 LOC)"
+        - "Frustrated by re-teaching AI, inconsistent responses, architectural drift"
+        - "Early adopters, active on GitHub, HN, Reddit"
+
+    secondary:
+      description: "Development teams (2-15 people)"
+      needs:
+        - "Consistency across team members' AI usage"
+        - "Standardize context without losing tool choice"
+        - "Version context with code"
+
+    tertiary:
+      description: "Open source maintainers"
+      needs:
+        - "Onboard contributors quickly"
+        - "AI-generated PRs follow project patterns"
+        - "Reduce PR review overhead"
+
+  use_cases:
+    solo_developer:
+      problem: "I waste 30 minutes every morning re-teaching Claude my project structure"
+      solution: |
+        Create project bundle with architecture, conventions, constraints. Version in git.
+        Load into Claude once per project. Update bundle when architecture changes.
+      benefit: "Define context once, reuse everywhere. Never re-explain your project."
+
+    development_team:
+      problem: "Each dev on my team has different context. Code inconsistency is getting worse."
+      solution: |
+        Tech lead creates shared bundle with team conventions. Bundle versioned in git.
+        When architecture changes, update bundle and commit. All team members get updated
+        context via git pull.
+      benefit: "Consistent code across team. Faster code reviews. Seamless onboarding."
+
+    open_source_project:
+      problem: "New contributors use AI to generate PRs but AI doesn't know our architecture."
+      solution: |
+        Publish project bundle in repo. CONTRIBUTING.md says "Load this bundle into your AI".
+        Contributors get correct context immediately.
+      benefit: "Onboard contributors in minutes, not weeks. Better PRs from day 1."
+
+  differentiation:
+    vs_claude_md:
+      problem: "Unstructured prose, token-heavy, conflicting details"
+      scs: "Structured YAML, composable bundles, clear precedence"
+      analogy: "Think package.json vs. a long README"
+
+    vs_rag:
+      rag: "Retrieves information on-demand from knowledge bases"
+      scs: "Explicit, always-present context that defines operating boundaries"
+      relationship: "They complement each other—RAG for facts, SCS for boundaries"
+
+    vs_prompt_engineering:
+      problem: "Ad-hoc context management per request, no versioning, no team sharing"
+      scs: "Versioned infrastructure, team shared, validated"
+
+    vs_fine_tuning:
+      problem: "Bakes knowledge into model, expensive, slow to update"
+      scs: "External context, free, instant updates"
+
+  the_dogfooding_story:
+    test: "If SCS can't manage SCS, why would anyone use it?"
+
+    the_problem_we_faced: |
+      After 5 weeks of rapid development on OICP, our documentation was chaos:
+      - Random markdown files scattered across directories
+      - Context drift between development sessions
+      - Every morning: 30+ minutes re-teaching Claude our architecture
+      - Conflicts and contradictions accumulating
+
+    the_solution_we_built: |
+      We created SCS bundles for the SCS project itself. Now contributors can clone the
+      repo, load our bundles, and understand SCS architecture in minutes instead of hours.
+
+    before_after:
+      before: "30-60 min/day re-teaching context"
+      after: "5 min one-time bundle load"
+
+    credibility: "The meta part works. Which means it'll work for your projects too."
+
+  relationship_to_oicp:
+    scs_scope: "Open source specification for structured context, git-based, dev-time focused"
+    oicp_scope: "Commercial platform that implements SCS, adds runtime streaming, governance"
+
+    connection: |
+      SCS is the open specification. OICP is the commercial implementation that adds
+      enterprise features: runtime context streaming, multi-agent coordination, perfect
+      audit trails, governance.
+
+    funnel: "SCS users who need runtime deployment, governance, and scale → OICP"
+
+  license: "MIT (open source, free forever)"
+
+  status: "v0.3, pre-launch (launching Q1 2026)"
