@@ -1,0 +1,18 @@
+id: bundle:performance-reliability
+type: concern
+version: "1.0.0"
+title: "Performance & Reliability Concern Bundle"
+description: "Performance requirements, reliability targets, and resilience patterns for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:response-time
+  - scd:project:availability
+  - scd:project:fault-tolerance
+  - scd:project:scalability
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Performance & Reliability concern bundle for {{ project_name }}"

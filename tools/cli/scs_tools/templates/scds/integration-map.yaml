@@ -1,0 +1,50 @@
+id: scd:project:integration-map
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Integration Map"
+description: "External system interfaces, API protocols, and data exchange patterns"
+
+domain: architecture
+concerns:
+  - external-integrations
+  - api-contracts
+
+content:
+  integrations:
+    - name: "[Integration name]"
+      external_system: "[External system name]"
+      direction: "[inbound|outbound|bidirectional]"
+      protocol: "[REST|GraphQL|gRPC|SOAP|etc]"
+      authentication: "[OAuth2|API Key|JWT|etc]"
+      data_format: "[JSON|XML|Protobuf|etc]"
+      endpoints:
+        - path: "[Endpoint path]"
+          method: "[GET|POST|PUT|DELETE]"
+          purpose: "[What this endpoint does]"
+      error_handling:
+        retry_policy: "[Retry strategy]"
+        fallback: "[Fallback behavior]"
+      rate_limits:
+        requests_per_second: "[Number or N/A]"
+        burst_limit: "[Number or N/A]"
+
+  api_contracts:
+    - name: "[Contract/API name]"
+      version: "[Version]"
+      spec_location: "[Path to OpenAPI/etc spec]"
+      breaking_change_policy: "[How breaking changes are handled]"
+
+  dependencies:
+    upstream:
+      - system: "[System name]"
+        criticality: "[critical|high|medium|low]"
+        sla: "[SLA requirements]"
+    downstream:
+      - system: "[System name]"
+        our_sla: "[SLA we provide]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Integration map for {{ project_name }}"

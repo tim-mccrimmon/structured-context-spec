@@ -1,0 +1,48 @@
+id: scd:project:component-model
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Component Model"
+description: "Logical and physical components, responsibilities, and communication patterns"
+
+domain: architecture
+concerns:
+  - component-structure
+  - separation-of-concerns
+
+content:
+  logical_components:
+    - name: "[Component name]"
+      type: "[service|library|module|layer]"
+      responsibility: "[What this component is responsible for]"
+      dependencies:
+        - "[Other component it depends on]"
+      interfaces:
+        - "[Interface it exposes]"
+
+  physical_components:
+    - name: "[Deployment unit name]"
+      type: "[container|lambda|vm|etc]"
+      contains:
+        - "[Logical component 1]"
+        - "[Logical component 2]"
+      deployment_location: "[Where it runs]"
+      scaling_strategy: "[How it scales]"
+
+  communication_patterns:
+    - from: "[Component A]"
+      to: "[Component B]"
+      pattern: "[synchronous|asynchronous|event-driven|etc]"
+      protocol: "[HTTP|gRPC|Message Queue|etc]"
+      data_format: "[JSON|Protobuf|etc]"
+
+  boundaries:
+    - name: "[Boundary name]"
+      type: "[network|process|data|trust]"
+      description: "[What this boundary protects/separates]"
+      crossing_mechanism: "[How components cross this boundary]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Component model for {{ project_name }}"

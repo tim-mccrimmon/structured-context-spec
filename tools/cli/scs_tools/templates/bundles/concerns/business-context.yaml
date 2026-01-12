@@ -1,0 +1,20 @@
+id: bundle:business-context
+type: concern
+version: "1.0.0"
+title: "Business Context Concern Bundle"
+description: "Business problem, opportunity, stakeholders, and objectives for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:problem-definition
+  - scd:project:stakeholders
+  - scd:project:business-objectives
+  - scd:project:opportunity-analysis
+  - scd:project:constraints-and-assumptions
+  - scd:project:success-criteria
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Business context concern bundle for {{ project_name }}"

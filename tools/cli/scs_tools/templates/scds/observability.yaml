@@ -1,0 +1,91 @@
+id: scd:project:observability
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Observability"
+description: "Logging strategy, metrics collection, distributed tracing, and alerting"
+
+domain: deployment-operations
+concerns:
+  - logging
+  - metrics
+  - tracing
+  - alerting
+
+content:
+  logging:
+    strategy: "[Structured logging approach]"
+    log_levels:
+      - level: "ERROR"
+        when_used: "[When to use ERROR level]"
+      - level: "WARN"
+        when_used: "[When to use WARN level]"
+      - level: "INFO"
+        when_used: "[When to use INFO level]"
+      - level: "DEBUG"
+        when_used: "[Development/troubleshooting]"
+    structured_fields:
+      - "[timestamp]"
+      - "[level]"
+      - "[service_name]"
+      - "[trace_id]"
+      - "[user_id]"
+      - "[request_id]"
+      - "[message]"
+    log_aggregation:
+      tool: "[ELK Stack|Splunk|CloudWatch|etc]"
+      retention: "[Retention period]"
+      search_capability: "[yes|no]"
+
+  metrics:
+    collection_tool: "[Prometheus|Datadog|CloudWatch|etc]"
+    key_metrics:
+      - metric: "[Metric name]"
+        type: "[Counter|Gauge|Histogram|etc]"
+        purpose: "[What it measures]"
+        alert_threshold: "[When to alert]"
+    dashboards:
+      - dashboard: "[Dashboard name]"
+        purpose: "[What it shows]"
+        audience: "[Who uses it]"
+        metrics_included:
+          - "[Metric 1]"
+
+  distributed_tracing:
+    enabled: "[yes|no]"
+    tool: "[Jaeger|Zipkin|X-Ray|etc]"
+    sampling_rate: "[100%|10%|etc]"
+    trace_context_propagation: "[How context is propagated]"
+    what_is_traced:
+      - "[HTTP requests]"
+      - "[Database queries]"
+      - "[External API calls]"
+
+  alerting:
+    alerting_tool: "[PagerDuty|Opsgenie|CloudWatch Alarms|etc]"
+    alert_rules:
+      - alert: "[Alert name]"
+        condition: "[When to trigger]"
+        severity: "[Critical|High|Medium|Low]"
+        notification:
+          channels:
+            - "[Slack|Email|PagerDuty|etc]"
+          recipients:
+            - "[Team/person notified]"
+        runbook: "[Link to runbook]"
+    on_call_rotation:
+      tool: "[Tool for managing on-call]"
+      rotation_schedule: "[Weekly|etc]"
+
+  health_checks:
+    - endpoint: "[Health check endpoint]"
+      checks:
+        - "[Database connectivity]"
+        - "[External service reachability]"
+      frequency: "[How often checked]"
+      timeout: "[Health check timeout]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Observability strategy for {{ project_name }}"

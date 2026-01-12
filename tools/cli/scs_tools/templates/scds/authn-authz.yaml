@@ -1,0 +1,57 @@
+id: scd:project:authn-authz
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Authentication & Authorization"
+description: "Identity management, authentication mechanisms, and authorization policies"
+
+domain: security
+concerns:
+  - authentication
+  - authorization
+  - access-control
+
+content:
+  identity_model:
+    user_types:
+      - type: "[User type]"
+        description: "[Description]"
+        authentication_method: "[Password|SSO|MFA|etc]"
+
+  authentication:
+    methods:
+      - type: "[Password|OAuth2|SAML|etc]"
+        use_case: "[When this is used]"
+        implementation: "[How it's implemented]"
+    mfa_required: "[yes|no|conditional]"
+    mfa_methods:
+      - "[TOTP|SMS|Biometric|etc]"
+    session_management:
+      timeout: "[Timeout duration]"
+      renewal: "[How sessions are renewed]"
+      revocation: "[How sessions are revoked]"
+
+  authorization:
+    model: "[RBAC|ABAC|ACL|etc]"
+    roles:
+      - name: "[Role name]"
+        description: "[Role description]"
+        permissions:
+          - "[Permission 1]"
+          - "[Permission 2]"
+    policies:
+      - name: "[Policy name]"
+        description: "[Policy description]"
+        rules:
+          - "[Rule 1]"
+
+  access_control:
+    resource_protection:
+      - resource: "[Resource type]"
+        access_check: "[How access is checked]"
+        denied_action: "[What happens on denial]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Authentication and authorization model for {{ project_name }}"

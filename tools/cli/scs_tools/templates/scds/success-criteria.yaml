@@ -1,0 +1,47 @@
+id: scd:project:success-criteria
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Success Criteria"
+description: "Measurable success indicators and performance metrics"
+
+domain: business-context
+concerns:
+  - success-measurement
+  - performance-indicators
+
+content:
+  definition_of_success: |
+    [What does success look like for this project]
+
+  clinical_metrics:
+    - metric: "[Clinical outcome metric]"
+      baseline: "[Current state]"
+      target: "[Target state]"
+      measurement_method: "[How it will be measured]"
+      timeframe: "[When this should be achieved]"
+
+  operational_metrics:
+    - metric: "[Operational efficiency metric]"
+      baseline: "[Current state]"
+      target: "[Target state]"
+      measurement_method: "[How it will be measured]"
+
+  product_metrics:
+    - metric: "[Product performance metric]"
+      target: "[Target value]"
+      measurement_method: "[How it will be measured]"
+
+  experience_metrics:
+    - metric: "[User experience metric]"
+      target: "[Target value]"
+      measurement_method: "[How it will be measured]"
+
+  acceptance_criteria:
+    - criteria: "[Must-have criteria for launch]"
+      validation: "[How this will be validated]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Success criteria for {{ project_name }}"

@@ -1,0 +1,52 @@
+id: scd:project:fault-tolerance
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Fault Tolerance"
+description: "Error handling strategy, resilience patterns, and graceful degradation"
+
+domain: performance-reliability
+concerns:
+  - resilience
+  - error-handling
+  - graceful-degradation
+
+content:
+  error_handling_strategy:
+    philosophy: "[Fail fast|Graceful degradation|etc]"
+    error_propagation: "[How errors propagate through system]"
+    user_impact: "[How errors are communicated to users]"
+
+  resilience_patterns:
+    circuit_breaker:
+      enabled: "[yes|no]"
+      failure_threshold: "[Number of failures before opening]"
+      timeout: "[Timeout duration]"
+      half_open_requests: "[Number of test requests]"
+    retry:
+      strategy: "[Exponential backoff|Linear|Fixed]"
+      max_attempts: "[Maximum retry attempts]"
+      backoff_multiplier: "[Backoff multiplier]"
+    timeout:
+      - operation: "[Operation name]"
+        timeout: "[Timeout duration]"
+        fallback: "[Fallback behavior]"
+    bulkhead:
+      enabled: "[yes|no]"
+      pool_size: "[Thread/connection pool size]"
+
+  graceful_degradation:
+    - feature: "[Feature name]"
+      degradation_trigger: "[What triggers degradation]"
+      degraded_behavior: "[How feature behaves when degraded]"
+      monitoring: "[How degradation is monitored]"
+
+  fault_injection_testing:
+    enabled: "[yes|no]"
+    scenarios:
+      - "[Chaos testing scenario 1]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Fault tolerance strategy for {{ project_name }}"

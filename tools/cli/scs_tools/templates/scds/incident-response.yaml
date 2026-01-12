@@ -1,0 +1,96 @@
+id: scd:project:incident-response
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Incident Response"
+description: "Runbooks, severity levels, on-call procedures, and post-incident review"
+
+domain: deployment-operations
+concerns:
+  - incident-management
+  - on-call
+  - post-mortems
+
+content:
+  incident_severity_levels:
+    - severity: "SEV1 - Critical"
+      definition: "[System down|Data breach|Major outage]"
+      response_time: "[Immediate]"
+      notification: "[All hands|Executive team]"
+      communication_frequency: "[Every 15 minutes]"
+    - severity: "SEV2 - High"
+      definition: "[Major feature degraded|Performance issues]"
+      response_time: "[< 1 hour]"
+      notification: "[Engineering team|Product team]"
+      communication_frequency: "[Every hour]"
+    - severity: "SEV3 - Medium"
+      definition: "[Minor feature issue|Non-critical bug]"
+      response_time: "[< 4 hours]"
+      notification: "[Engineering team]"
+    - severity: "SEV4 - Low"
+      definition: "[Cosmetic issue|Enhancement]"
+      response_time: "[Next business day]"
+      notification: "[Ticket created]"
+
+  on_call_procedures:
+    on_call_tool: "[PagerDuty|Opsgenie|etc]"
+    rotation:
+      schedule: "[Weekly|Bi-weekly|etc]"
+      handoff_process: "[How handoff occurs]"
+    escalation_path:
+      - level: 1
+        role: "[On-call engineer]"
+        escalate_after: "[30 minutes]"
+      - level: 2
+        role: "[Team lead]"
+        escalate_after: "[1 hour]"
+      - level: 3
+        role: "[Engineering manager]"
+        escalate_after: "[2 hours]"
+    on_call_compensation: "[Paid|Time off|etc]"
+
+  runbooks:
+    location: "[Where runbooks are stored]"
+    format: "[Markdown|Wiki|etc]"
+    examples:
+      - runbook: "[Service X is down]"
+        steps:
+          - "[Check service health]"
+          - "[Check dependencies]"
+          - "[Restart if needed]"
+          - "[Check logs]"
+        link: "[Link to detailed runbook]"
+
+  incident_communication:
+    internal:
+      channel: "[Slack channel|etc]"
+      stakeholders:
+        - "[Engineering team]"
+        - "[Product team]"
+        - "[Customer support]"
+    external:
+      status_page: "[Status page URL]"
+      update_frequency: "[How often status is updated]"
+      customer_notification: "[Email|In-app|etc]"
+
+  post_incident_review:
+    required_for: "[SEV1|SEV2 and above]"
+    timeline: "[Within 48 hours of resolution]"
+    participants:
+      - "[Incident commander]"
+      - "[Affected team members]"
+      - "[Product owner]"
+    blameless_culture: "[yes|no]"
+    documentation:
+      - "[Timeline of events]"
+      - "[Root cause analysis]"
+      - "[Action items]"
+      - "[Lessons learned]"
+    follow_up:
+      action_item_tracking: "[How action items are tracked]"
+      review_frequency: "[How often past incidents are reviewed]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Incident response procedures for {{ project_name }}"

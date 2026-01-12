@@ -1,0 +1,41 @@
+id: scd:project:response-time
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Response Time Requirements"
+description: "Latency targets, throughput requirements, and performance budgets"
+
+domain: performance-reliability
+concerns:
+  - latency
+  - throughput
+  - performance
+
+content:
+  latency_targets:
+    - operation: "[Operation name]"
+      target_p50: "[50th percentile target in ms]"
+      target_p95: "[95th percentile target in ms]"
+      target_p99: "[99th percentile target in ms]"
+      rationale: "[Why these targets]"
+
+  throughput_requirements:
+    - endpoint: "[Endpoint/operation]"
+      requests_per_second: "[Target RPS]"
+      concurrent_users: "[Expected concurrent users]"
+      peak_multiplier: "[Peak vs average traffic]"
+
+  performance_budgets:
+    - component: "[Component name]"
+      budget: "[Time budget in ms]"
+      measured_at: "[Where measurement is taken]"
+
+  acceptable_degradation:
+    - scenario: "[Degradation scenario]"
+      acceptable_impact: "[What level of degradation is acceptable]"
+      recovery_time: "[How quickly to recover]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Response time requirements for {{ project_name }}"

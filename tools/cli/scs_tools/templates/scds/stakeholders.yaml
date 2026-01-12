@@ -1,0 +1,45 @@
+id: scd:project:stakeholders
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Stakeholders"
+description: "Stakeholder groups, roles, needs, and goals"
+
+domain: business-context
+concerns:
+  - stakeholder-analysis
+  - user-needs
+
+content:
+  primary_users:
+    - name: "[User persona/group name]"
+      description: "[Description of this user group]"
+      needs:
+        - "[Key need]"
+      goals:
+        - "[What they want to achieve]"
+      constraints:
+        - "[Limitations or restrictions]"
+
+  secondary_users:
+    - name: "[Secondary user group]"
+      description: "[Description]"
+      needs:
+        - "[Key need]"
+
+  internal_stakeholders:
+    - role: "[Role or department]"
+      interest: "[Why they care about this project]"
+      requirements:
+        - "[Specific requirement from this stakeholder]"
+
+  external_stakeholders:
+    - name: "[Partner, regulator, or external entity]"
+      relationship: "[Nature of the relationship]"
+      expectations:
+        - "[What they expect from the system]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Stakeholder analysis for {{ project_name }}"

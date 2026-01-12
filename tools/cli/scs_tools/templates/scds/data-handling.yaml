@@ -1,0 +1,59 @@
+id: scd:project:data-handling
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Data Handling"
+description: "Data classification, retention, deletion, and privacy controls"
+
+domain: security
+concerns:
+  - data-classification
+  - privacy
+  - data-lifecycle
+
+content:
+  data_classification:
+    levels:
+      - level: "[Public|Internal|Confidential|Restricted]"
+        description: "[What falls into this category]"
+        handling_requirements:
+          - "[Handling requirement 1]"
+          - "[Handling requirement 2]"
+
+  retention_policies:
+    - data_type: "[Data type]"
+      classification: "[Classification level]"
+      retention_period: "[Period]"
+      rationale: "[Legal/business reason]"
+      deletion_method: "[How it's deleted]"
+
+  data_minimization:
+    principles:
+      - "[Collect only what's needed]"
+      - "[Don't store if not required]"
+    enforcement:
+      - "[How minimization is enforced]"
+
+  privacy_controls:
+    pii_handling:
+      - field: "[PII field name]"
+        protection: "[Encryption|Hashing|Tokenization|etc]"
+        access_logging: "[yes|no]"
+    anonymization:
+      methods:
+        - "[Anonymization method]"
+      use_cases:
+        - "[When anonymization is used]"
+    consent_management:
+      mechanism: "[How consent is captured]"
+      granularity: "[Level of consent granularity]"
+
+  data_disposal:
+    secure_deletion:
+      method: "[Overwrite|Crypto-erase|Physical destruction|etc]"
+      verification: "[How deletion is verified]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data handling policies for {{ project_name }}"

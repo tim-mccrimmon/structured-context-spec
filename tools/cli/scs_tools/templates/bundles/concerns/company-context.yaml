@@ -1,0 +1,61 @@
+# Concern Bundle Template: Company Context
+# Type: concern
+# Owner: CEO
+# Purpose: Company-specific context that doesn't fit in other concerns
+#
+# This concern bundle contains company overview, values, stakeholders, and
+# business model information. It's imported by the company's Domain Bundle.
+#
+# BUNDLE TYPE RULES FOR CONCERNS:
+# - MUST have at least one SCD in the 'scds' array
+# - MUST have empty 'imports' array (concerns are leaf nodes, don't import)
+# - All SCDs should be project-tier (scd:project:*)
+
+id: bundle:[company-name]-company-context
+type: concern
+version: "DRAFT"
+title: "[Company Name] - Company Context"
+description: >
+  Company-specific context for [Company Name] including mission, vision,
+  values, stakeholders, and business model. This concern provides business
+  and organizational context that doesn't fit in technical concerns
+  (Architecture, Security, etc.).
+
+# SCDs contained in this bundle
+# At minimum, include company-overview
+# Optionally split into multiple SCDs for granular control
+scds:
+  - scd:project:company-overview
+  # Optional: Add more SCDs if you split company context into multiple files
+  # - scd:project:company-values
+  # - scd:project:stakeholders
+  # - scd:project:business-model
+
+# Imports: MUST be empty for concern bundles
+# Concerns are leaf nodes in the bundle hierarchy
+imports: []
+
+provenance:
+  created_by: "[CEO name/email]"
+  created_at: "[ISO 8601 timestamp: YYYY-MM-DDTHH:MM:SSZ]"
+  rationale: >
+    Company-context concern bundle for [Company Name]. This bundle is
+    imported by the [Company Name] domain bundle to provide company-specific
+    context to all projects within the organization.
+
+# Usage Notes:
+# 1. Replace [company-name] and [Company Name] throughout
+# 2. Start with DRAFT version during development
+# 3. Create at least one company-overview SCD
+# 4. Validate with: scs validate [this-file].yaml
+# 5. When ready, version with: scs bundle version [this-file].yaml --version 1.0.0
+# 6. Deploy with: scs deploy [versioned-bundle].yaml --to [mcp-server]
+#
+# Design Decisions:
+# - Single SCD (company-overview): Simpler, atomic versioning
+# - Multiple SCDs: Granular control, independent versioning, selective sharing
+# - Recommendation: Start with single SCD, split later if needed
+#
+# This bundle will be imported by:
+# - Your company's Domain Bundle (bundle:[company-name])
+# - Which is imported by your Project Bundles

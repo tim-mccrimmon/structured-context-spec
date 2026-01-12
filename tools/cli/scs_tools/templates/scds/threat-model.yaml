@@ -1,0 +1,60 @@
+id: scd:project:threat-model
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Threat Model"
+description: "Identified threats, attack vectors, mitigations, and security assumptions"
+
+domain: security
+concerns:
+  - threat-identification
+  - risk-mitigation
+  - security-assumptions
+
+content:
+  threat_modeling_methodology: "[STRIDE|PASTA|Attack Trees|etc]"
+
+  identified_threats:
+    - id: "THREAT-001"
+      category: "[Spoofing|Tampering|Repudiation|Information Disclosure|DoS|Elevation of Privilege]"
+      description: "[Threat description]"
+      affected_components:
+        - "[Component 1]"
+      likelihood: "[low|medium|high]"
+      impact: "[low|medium|high|critical]"
+      mitigation:
+        status: "[mitigated|partially-mitigated|accepted|todo]"
+        controls:
+          - "[Mitigation control 1]"
+      residual_risk: "[low|medium|high]"
+
+  attack_surfaces:
+    - name: "[Attack surface name]"
+      description: "[Description]"
+      exposure: "[public|authenticated|internal]"
+      protection:
+        - "[Protection mechanism 1]"
+
+  trust_boundaries:
+    - name: "[Boundary name]"
+      description: "[What the boundary separates]"
+      crossing_points:
+        - "[Where/how the boundary is crossed]"
+      validation:
+        - "[Input validation at boundary]"
+
+  security_assumptions:
+    - assumption: "[Security assumption]"
+      rationale: "[Why this assumption is made]"
+      validation: "[How assumption is validated]"
+      risk_if_violated: "[What happens if assumption is wrong]"
+
+  residual_risks:
+    - risk: "[Risk description]"
+      rationale: "[Why this risk is accepted]"
+      monitoring: "[How this risk is monitored]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Threat model for {{ project_name }}"

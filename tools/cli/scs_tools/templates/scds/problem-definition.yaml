@@ -1,0 +1,40 @@
+id: scd:project:problem-definition
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Problem Definition"
+description: "Core problem, affected populations, and root causes"
+
+domain: business-context
+concerns:
+  - problem-analysis
+  - user-impact
+
+content:
+  problem_statement: |
+    [Concise statement of the core problem being solved]
+
+  problem_context:
+    impact: "[Scope and scale of the problem]"
+    affected_populations:
+      - name: "[User group name]"
+        size: "[Approximate number/percentage]"
+        pain_points:
+          - "[Specific pain point]"
+    consequences_of_inaction:
+      - "[What happens if this problem is not solved]"
+
+  root_causes:
+    - cause: "[Root cause description]"
+      evidence: "[Supporting data or observations]"
+
+  current_state:
+    existing_solutions: |
+      [Description of current workarounds or competing solutions]
+    gaps: |
+      [What existing solutions fail to address]
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Problem definition for {{ project_name }}"

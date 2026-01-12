@@ -1,0 +1,16 @@
+id: bundle:safety-risk
+type: concern
+version: "1.0.0"
+title: "Safety & Risk Concern Bundle"
+description: "Risk identification and management, safety concerns for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:risk-assessment
+  - scd:project:safety-checklist
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Safety & Risk concern bundle for {{ project_name }}"

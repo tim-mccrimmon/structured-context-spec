@@ -1,0 +1,67 @@
+id: scd:project:hipaa-compliance
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "HIPAA Compliance"
+description: "HIPAA applicability, safeguards implementation, and mapped controls"
+
+domain: compliance-governance
+concerns:
+  - healthcare-compliance
+  - phi-protection
+  - regulatory-adherence
+
+content:
+  hipaa_applicability:
+    entity_type: "[Covered Entity|Business Associate|Neither]"
+    phi_handled: "[yes|no]"
+    scope: "[What parts of system handle PHI]"
+
+  technical_safeguards:
+    access_control:
+      - requirement: "§164.312(a)(1)"
+        implementation: "[How access control is implemented]"
+    audit_controls:
+      - requirement: "§164.312(b)"
+        implementation: "[How audit logging is implemented]"
+    integrity:
+      - requirement: "§164.312(c)(1)"
+        implementation: "[How data integrity is ensured]"
+    transmission_security:
+      - requirement: "§164.312(e)(1)"
+        implementation: "[How transmission is secured]"
+
+  administrative_safeguards:
+    security_management:
+      - requirement: "§164.308(a)(1)"
+        implementation: "[Risk analysis and management process]"
+    workforce_security:
+      - requirement: "§164.308(a)(3)"
+        implementation: "[Workforce authorization and supervision]"
+    information_access_management:
+      - requirement: "§164.308(a)(4)"
+        implementation: "[Access authorization and review]"
+    security_awareness:
+      - requirement: "§164.308(a)(5)"
+        implementation: "[Security training program]"
+
+  physical_safeguards:
+    facility_access:
+      - requirement: "§164.310(a)(1)"
+        implementation: "[Physical access controls]"
+    workstation_security:
+      - requirement: "§164.310(c)"
+        implementation: "[Workstation security measures]"
+    device_controls:
+      - requirement: "§164.310(d)(1)"
+        implementation: "[Device inventory and media disposal]"
+
+  breach_notification:
+    detection: "[How breaches are detected]"
+    notification_timeline: "[Timeline for notification]"
+    responsible_party: "[Who is responsible]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "HIPAA compliance for {{ project_name }}"

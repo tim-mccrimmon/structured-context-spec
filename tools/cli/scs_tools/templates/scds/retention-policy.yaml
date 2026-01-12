@@ -1,0 +1,61 @@
+id: scd:project:retention-policy
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Retention Policy"
+description: "Data retention periods, archival strategy, and deletion rules"
+
+domain: data-provenance
+concerns:
+  - data-retention
+  - data-lifecycle
+  - compliance
+
+content:
+  retention_schedule:
+    - data_type: "[Data type]"
+      classification: "[Public|Internal|Confidential|Restricted]"
+      active_retention: "[Period in active storage]"
+      archive_retention: "[Period in archive storage]"
+      total_retention: "[Total retention period]"
+      rationale: "[Legal/regulatory/business reason]"
+      deletion_trigger: "[What triggers deletion]"
+
+  archival_strategy:
+    archive_location: "[Cold storage|Tape|etc]"
+    archive_format: "[Format for archived data]"
+    retrieval_process: "[How to retrieve archived data]"
+    retrieval_sla: "[How long retrieval takes]"
+
+  deletion_rules:
+    - data_type: "[Data type]"
+      deletion_method: "[Soft delete|Hard delete|Anonymization]"
+      deletion_verification: "[How deletion is verified]"
+      exceptions:
+        - scenario: "[Legal hold|Ongoing investigation|etc]"
+          handling: "[How exceptions are handled]"
+
+  backup_retention:
+    backup_frequency: "[Frequency]"
+    backup_retention_period: "[Period]"
+    backup_location: "[Where backups are stored]"
+    restoration_testing: "[How often tested]"
+
+  compliance_requirements:
+    - regulation: "[GDPR|HIPAA|etc]"
+      requirement: "[Specific retention requirement]"
+      how_met: "[How this system meets the requirement]"
+
+  data_subject_rights:
+    right_to_erasure:
+      supported: "[yes|no]"
+      process: "[How requests are handled]"
+      timeline: "[Response timeline]"
+    right_to_portability:
+      supported: "[yes|no]"
+      format: "[Export format]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Retention policy for {{ project_name }}"

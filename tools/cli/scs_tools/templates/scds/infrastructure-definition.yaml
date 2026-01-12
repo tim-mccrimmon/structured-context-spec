@@ -1,0 +1,78 @@
+id: scd:project:infrastructure-definition
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Infrastructure Definition"
+description: "Environment definitions, infrastructure patterns, and IaC approach"
+
+domain: deployment-operations
+concerns:
+  - infrastructure
+  - environments
+  - infrastructure-as-code
+
+content:
+  environments:
+    - name: "development"
+      purpose: "[Local development and unit testing]"
+      infrastructure:
+        compute: "[Local|Docker|Cloud VM|etc]"
+        data_stores: "[Local databases|etc]"
+        external_services: "[Mocked|Stubbed|Real|etc]"
+      configuration_source: "[Where config is stored]"
+    - name: "staging"
+      purpose: "[Integration testing and validation]"
+      infrastructure:
+        compute: "[Infrastructure type]"
+        data_stores: "[Database type and size]"
+        networking: "[Network topology]"
+      parity_with_production: "[High|Medium|Low]"
+    - name: "production"
+      purpose: "[Live user-facing environment]"
+      infrastructure:
+        compute: "[Infrastructure type]"
+        data_stores: "[Database type and configuration]"
+        networking: "[Network topology]"
+        redundancy: "[Multi-AZ|Multi-region|etc]"
+
+  infrastructure_patterns:
+    architecture_pattern: "[Microservices|Monolith|Serverless|etc]"
+    deployment_topology: "[How services are deployed]"
+    networking:
+      vpc_design: "[VPC/network design]"
+      subnets: "[Public|Private subnet strategy]"
+      load_balancing: "[Load balancer configuration]"
+    security:
+      network_segmentation: "[How network is segmented]"
+      firewall_rules: "[Firewall approach]"
+
+  infrastructure_as_code:
+    tool: "[Terraform|CloudFormation|Pulumi|etc]"
+    repository: "[Where IaC code is stored]"
+    state_management: "[How state is managed]"
+    change_process:
+      - "[How infrastructure changes are made]"
+    testing:
+      approach: "[How IaC is tested]"
+      tools: "[Testing tools]"
+
+  cloud_resources:
+    provider: "[AWS|Azure|GCP|Multi-cloud|On-prem]"
+    regions:
+      primary: "[Primary region]"
+      secondary: "[DR region if applicable]"
+    key_services:
+      - service: "[Service name]"
+        purpose: "[What it's used for]"
+        configuration: "[Key configuration details]"
+
+  cost_management:
+    budget: "[Monthly budget if applicable]"
+    cost_monitoring: "[How costs are monitored]"
+    cost_optimization:
+      - "[Optimization strategy 1]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Infrastructure definition for {{ project_name }}"

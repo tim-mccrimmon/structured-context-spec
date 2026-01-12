@@ -1,0 +1,67 @@
+id: scd:project:test-coverage
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Test Coverage"
+description: "Coverage targets, critical path identification, and test metrics"
+
+domain: testing-validation
+concerns:
+  - test-coverage
+  - quality-metrics
+  - critical-paths
+
+content:
+  coverage_targets:
+    unit_tests:
+      target: "[80%|90%|etc]"
+      measurement: "[Line|Branch|Function coverage]"
+      exclusions:
+        - "[Generated code|etc]"
+    integration_tests:
+      target: "[70%|80%|etc]"
+      scope: "[What integration tests cover]"
+    end_to_end_tests:
+      target: "[Critical paths|All user flows|etc]"
+      scope: "[What e2e tests cover]"
+
+  critical_paths:
+    - path: "[Critical path name]"
+      description: "[What this path does]"
+      business_impact: "[Impact if this fails]"
+      test_coverage:
+        unit: "[yes|no]"
+        integration: "[yes|no]"
+        e2e: "[yes|no]"
+      test_frequency: "[Every commit|Daily|etc]"
+
+  test_metrics:
+    tracked_metrics:
+      - metric: "[Code coverage %]"
+        target: "[Target value]"
+        current: "[Current value if known]"
+      - metric: "[Test execution time]"
+        target: "[Target value]"
+      - metric: "[Test flakiness rate]"
+        target: "[< 1%|etc]"
+    reporting:
+      frequency: "[Per commit|Daily|Weekly]"
+      dashboard: "[Dashboard location if applicable]"
+
+  coverage_gates:
+    pull_request:
+      minimum_coverage: "[Coverage threshold]"
+      decrease_allowed: "[No|< 1%|etc]"
+    release:
+      minimum_coverage: "[Coverage threshold for release]"
+      critical_path_coverage: "[100%|etc]"
+
+  testing_tools:
+    unit_testing: "[Jest|pytest|JUnit|etc]"
+    coverage_tool: "[Coverage.py|Istanbul|JaCoCo|etc]"
+    e2e_testing: "[Selenium|Cypress|Playwright|etc]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Test coverage requirements for {{ project_name }}"

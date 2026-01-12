@@ -1,0 +1,23 @@
+id: bundle:meta
+type: meta
+version: "1.0.0"
+title: "SCS Meta Vocabulary Bundle"
+description: "Core SCS vocabulary, domains, roles, and capabilities"
+
+# This bundle would typically be imported from the SCS specification repository
+# For now, it serves as a placeholder for meta-tier SCDs
+
+imports: []
+
+scds:
+  - scd:meta:vocabulary
+  - scd:meta:domains
+  - scd:meta:roles
+  - scd:meta:capabilities
+  - scd:meta:concerns
+
+provenance:
+  created_by: "scs-spec"
+  created_at: "{{ created_at }}"
+  rationale: "Meta vocabulary from SCS specification v0.1"
+  source: "https://github.com/tim-mccrimmon/scs-spec"

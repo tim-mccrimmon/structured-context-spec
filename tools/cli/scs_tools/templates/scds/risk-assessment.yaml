@@ -1,0 +1,81 @@
+id: scd:project:risk-assessment
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Risk Assessment"
+description: "Identified risks, likelihood and impact assessment, and mitigation strategies"
+
+domain: safety-risk
+concerns:
+  - risk-identification
+  - risk-mitigation
+  - risk-monitoring
+
+content:
+  risk_assessment_methodology: "[Qualitative|Quantitative|Both]"
+
+  identified_risks:
+    - risk_id: "RISK-001"
+      category: "[Technical|Security|Business|Operational|Compliance]"
+      description: "[Risk description]"
+      likelihood:
+        rating: "[rare|unlikely|possible|likely|almost-certain]"
+        rationale: "[Why this likelihood]"
+      impact:
+        rating: "[negligible|minor|moderate|major|catastrophic]"
+        affected_areas:
+          - "[Affected area 1]"
+      risk_score: "[Calculated risk score]"
+      current_controls:
+        - "[Existing control 1]"
+      mitigation_strategy:
+        status: "[mitigated|in-progress|planned|accepted]"
+        actions:
+          - action: "[Mitigation action]"
+            owner: "[Responsible party]"
+            target_date: "[Target completion]"
+      residual_risk: "[low|medium|high]"
+
+  risk_matrix:
+    likelihood_scale:
+      - level: "Rare"
+        description: "[< 1% chance]"
+      - level: "Unlikely"
+        description: "[1-10% chance]"
+      - level: "Possible"
+        description: "[10-50% chance]"
+      - level: "Likely"
+        description: "[50-90% chance]"
+      - level: "Almost Certain"
+        description: "[> 90% chance]"
+    impact_scale:
+      - level: "Negligible"
+        description: "[Minimal impact]"
+      - level: "Minor"
+        description: "[Some impact, easily recovered]"
+      - level: "Moderate"
+        description: "[Noticeable impact, recoverable with effort]"
+      - level: "Major"
+        description: "[Significant impact, difficult recovery]"
+      - level: "Catastrophic"
+        description: "[Severe impact, may not recover]"
+
+  risk_monitoring:
+    review_frequency: "[Monthly|Quarterly|etc]"
+    triggers_for_reassessment:
+      - "[Major system changes]"
+      - "[Security incidents]"
+      - "[Regulatory changes]"
+    risk_register_location: "[Where risk register is maintained]"
+    responsible_party: "[Who owns risk management]"
+
+  risk_appetite:
+    statement: "[Organization's risk tolerance statement]"
+    acceptable_risk_levels:
+      - risk_type: "[Risk type]"
+        maximum_acceptable: "[low|medium|high]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Risk assessment for {{ project_name }}"

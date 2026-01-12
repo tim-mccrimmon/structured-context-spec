@@ -1,0 +1,69 @@
+id: scd:project:ai-usage-policy
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "AI Usage Policy"
+description: "Where and how AI is used, constraints, and transparency requirements"
+
+domain: ethics-ai-accountability
+concerns:
+  - ai-usage
+  - ai-transparency
+  - human-oversight
+
+content:
+  ai_systems_inventory:
+    - system: "[AI system name]"
+      purpose: "[What it does]"
+      type: "[ML model|LLM|Rule-based|etc]"
+      decision_impact: "[Advisory|Automated|Human-in-loop]"
+      data_used:
+        - "[Data type 1]"
+      model_details:
+        vendor: "[OpenAI|Anthropic|Internal|etc]"
+        model: "[GPT-4|Claude|Custom|etc]"
+        version: "[Version]"
+
+  ai_usage_constraints:
+    prohibited_uses:
+      - "[Use case that is prohibited]"
+    required_human_oversight:
+      - use_case: "[Use case requiring human oversight]"
+        oversight_type: "[Review|Approval|Monitoring]"
+        who: "[Role responsible]"
+    data_restrictions:
+      - "[PII must be redacted]"
+      - "[Sensitive data cannot be sent to external APIs]"
+
+  human_in_the_loop:
+    - decision_type: "[Decision type]"
+      ai_role: "[Recommendation|Automation|Augmentation]"
+      human_role: "[Final decision|Review|Override]"
+      escalation_triggers:
+        - "[When to escalate to human]"
+
+  transparency_requirements:
+    user_notification:
+      required: "[yes|no]"
+      method: "[How users are notified about AI use]"
+      content: "[What users are told]"
+    explainability:
+      required: "[yes|no]"
+      approach: "[How AI decisions are explained]"
+      detail_level: "[High-level|Detailed|Technical]"
+
+  model_governance:
+    approval_process: "[How new AI models are approved]"
+    change_management: "[How model changes are managed]"
+    version_control: "[How model versions are tracked]"
+    deprecation_policy: "[How old models are retired]"
+
+  ai_safety_measures:
+    - measure: "[Safety measure]"
+      purpose: "[What it protects against]"
+      implementation: "[How implemented]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "AI usage policy for {{ project_name }}"

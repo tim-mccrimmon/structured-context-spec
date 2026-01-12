@@ -1,0 +1,51 @@
+id: scd:project:ux-principles
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "UX Principles"
+description: "User experience principles, personas, and design patterns"
+
+domain: usability-accessibility
+concerns:
+  - user-experience
+  - design-patterns
+
+content:
+  target_users:
+    personas:
+      - name: "[Persona name]"
+        description: "[Description]"
+        goals:
+          - "[Goal 1]"
+        pain_points:
+          - "[Pain point 1]"
+        tech_proficiency: "[low|medium|high]"
+
+  ux_principles:
+    - principle: "[Principle name]"
+      description: "[What this principle means]"
+      application: "[How it's applied in the system]"
+
+  key_user_journeys:
+    - journey: "[Journey name]"
+      steps:
+        - "[Step 1]"
+        - "[Step 2]"
+      success_criteria: "[How success is measured]"
+      pain_points:
+        - "[Known pain point]"
+
+  design_patterns:
+    - pattern: "[Pattern name]"
+      use_case: "[When to use this pattern]"
+      implementation: "[How it's implemented]"
+
+  design_conventions:
+    navigation: "[Navigation approach]"
+    feedback: "[How user feedback is provided]"
+    consistency: "[Consistency guidelines]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "UX principles for {{ project_name }}"

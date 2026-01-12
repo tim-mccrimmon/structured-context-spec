@@ -1,0 +1,62 @@
+id: scd:project:accessibility-compliance
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Accessibility Compliance"
+description: "Accessibility standards, assistive technology support, and testing requirements"
+
+domain: usability-accessibility
+concerns:
+  - accessibility
+  - compliance
+  - assistive-technology
+
+content:
+  accessibility_standards:
+    target: "[WCAG 2.1 Level AA|WCAG 2.2 Level AA|Section 508|etc]"
+    scope: "[Which parts of the system]"
+    rationale: "[Why this standard]"
+
+  wcag_compliance:
+    perceivable:
+      - "[Text alternatives for non-text content]"
+      - "[Captions and alternatives for multimedia]"
+      - "[Content adaptable and distinguishable]"
+    operable:
+      - "[Keyboard accessible]"
+      - "[Enough time for interaction]"
+      - "[Avoid seizure-inducing content]"
+      - "[Navigable]"
+    understandable:
+      - "[Readable]"
+      - "[Predictable]"
+      - "[Input assistance]"
+    robust:
+      - "[Compatible with assistive technologies]"
+
+  supported_assistive_technologies:
+    screen_readers:
+      - "[JAWS|NVDA|VoiceOver|etc]"
+    keyboard_navigation:
+      support: "full"
+      shortcuts:
+        - "[Shortcut 1]"
+    voice_control:
+      - "[Dragon|Voice Control|etc]"
+
+  accessibility_testing:
+    automated:
+      tools:
+        - "[axe|Wave|Lighthouse|etc]"
+      frequency: "[Every build|Weekly|etc]"
+    manual:
+      approach: "[How manual testing is done]"
+      frequency: "[Before each release|etc]"
+    user_testing:
+      with_disabilities: "[yes|no]"
+      frequency: "[Quarterly|etc]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Accessibility compliance for {{ project_name }}"

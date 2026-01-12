@@ -1,0 +1,27 @@
+id: bundle:software-development
+type: domain
+version: "1.0.0"
+title: "Software Development Domain"
+description: "Software Development domain for {{ project_name }}, importing all software engineering concern bundles"
+
+# Domain bundles import concern bundles
+imports:
+  - bundle:architecture:1.0.0
+  - bundle:security:1.0.0
+  - bundle:performance-reliability:1.0.0
+  - bundle:usability-accessibility:1.0.0
+  - bundle:compliance-governance:1.0.0
+  - bundle:data-provenance:1.0.0
+  - bundle:testing-validation:1.0.0
+  - bundle:deployment-operations:1.0.0
+  - bundle:safety-risk:1.0.0
+  - bundle:ethics-ai-accountability:1.0.0
+  - bundle:business-context:1.0.0
+
+# Domain bundles don't contain SCDs directly - they import concerns
+scds: []
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Software Development domain bundle for {{ project_name }}"

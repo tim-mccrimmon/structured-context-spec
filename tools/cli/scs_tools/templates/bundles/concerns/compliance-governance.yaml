@@ -1,0 +1,24 @@
+id: bundle:compliance-governance
+type: concern
+version: "1.0.0"
+title: "Compliance & Governance Concern Bundle"
+description: "Regulatory requirements and governance processes for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:soc2-controls
+  {% if 'hipaa-compliance' not in config.exclude_scds -%}
+  - scd:project:hipaa-compliance
+  {% endif -%}
+  {% if 'chai-adherence' not in config.exclude_scds -%}
+  - scd:project:chai-adherence
+  {% endif -%}
+  {% if 'tefca-participation' not in config.exclude_scds -%}
+  - scd:project:tefca-participation
+  {% endif %}
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Compliance & Governance concern bundle for {{ project_name }}"

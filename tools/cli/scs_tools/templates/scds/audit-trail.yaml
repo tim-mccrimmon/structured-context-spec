@@ -1,0 +1,100 @@
+id: scd:project:audit-trail
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Audit Trail"
+description: "Decision logging, data access logging, and audit log retention"
+
+domain: ethics-ai-accountability
+concerns:
+  - audit-logging
+  - accountability
+  - traceability
+
+content:
+  what_is_audited:
+    decisions:
+      - decision_type: "[Decision type]"
+        what_is_logged:
+          - "[Decision input]"
+          - "[Decision output]"
+          - "[Decision maker (human or AI)]"
+          - "[Timestamp]"
+          - "[Context/metadata]"
+        log_location: "[Where logged]"
+    data_access:
+      - data_type: "[PII|PHI|Financial|etc]"
+        access_events:
+          - "[Read]"
+          - "[Write]"
+          - "[Delete]"
+          - "[Export]"
+        logged_fields:
+          - "[User ID]"
+          - "[Timestamp]"
+          - "[Record ID]"
+          - "[Action]"
+          - "[Purpose/reason (if provided)]"
+          - "[IP address]"
+    ai_ml_calls:
+      - model: "[Model name]"
+        what_is_logged:
+          - "[Input prompt/data]"
+          - "[Model response]"
+          - "[Model version]"
+          - "[Timestamp]"
+          - "[User/session ID]"
+          - "[Latency]"
+        pii_handling: "[Redacted|Hashed|Logged|etc]"
+
+  audit_log_format:
+    structure: "[JSON|CSV|Structured logs|etc]"
+    required_fields:
+      - field: "timestamp"
+        format: "[ISO 8601]"
+      - field: "actor"
+        description: "[User or system that performed action]"
+      - field: "action"
+        description: "[What was done]"
+      - field: "resource"
+        description: "[What was affected]"
+      - field: "outcome"
+        description: "[Success|Failure]"
+      - field: "metadata"
+        description: "[Additional context]"
+
+  audit_log_storage:
+    storage_location: "[Database|S3|CloudWatch|etc]"
+    encryption: "[Encrypted at rest|etc]"
+    access_control: "[Who can access audit logs]"
+    immutability: "[Logs are append-only|etc]"
+
+  audit_log_retention:
+    retention_period: "[7 years|etc]"
+    rationale: "[Regulatory requirement|etc]"
+    archival_strategy: "[How old logs are archived]"
+    deletion_policy: "[When/how logs are deleted]"
+
+  audit_log_monitoring:
+    automated_analysis:
+      - analysis_type: "[Anomaly detection|etc]"
+        tool: "[SIEM|Custom|etc]"
+        alerts:
+          - trigger: "[Suspicious pattern]"
+            action: "[Alert security team]"
+    manual_review:
+      frequency: "[Weekly|Monthly|etc]"
+      reviewer: "[Compliance team|Security team]"
+      focus_areas:
+        - "[High-privilege access]"
+        - "[Unusual patterns]"
+
+  compliance_requirements:
+    - regulation: "[HIPAA|GDPR|SOX|etc]"
+      requirement: "[Specific audit logging requirement]"
+      how_met: "[How system meets requirement]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Audit trail requirements for {{ project_name }}"

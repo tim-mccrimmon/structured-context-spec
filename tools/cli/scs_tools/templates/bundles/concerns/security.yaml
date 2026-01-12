@@ -1,0 +1,18 @@
+id: bundle:security
+type: concern
+version: "1.0.0"
+title: "Security Concern Bundle"
+description: "Security controls, data protection, and threat management for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:authn-authz
+  - scd:project:data-protection
+  - scd:project:data-handling
+  - scd:project:threat-model
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Security concern bundle for {{ project_name }}"

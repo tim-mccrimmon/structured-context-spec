@@ -1,0 +1,17 @@
+id: bundle:usability-accessibility
+type: concern
+version: "1.0.0"
+title: "Usability & Accessibility Concern Bundle"
+description: "User experience principles and accessibility requirements for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:ux-principles
+  - scd:project:accessibility-compliance
+  - scd:project:error-handling-ux
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Usability & Accessibility concern bundle for {{ project_name }}"

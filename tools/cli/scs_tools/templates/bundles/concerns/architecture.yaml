@@ -1,0 +1,18 @@
+id: bundle:architecture
+type: concern
+version: "1.0.0"
+title: "Architecture Concern Bundle"
+description: "System architecture, components, and technical design for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:system-context
+  - scd:project:tech-stack
+  - scd:project:integration-map
+  - scd:project:component-model
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Architecture concern bundle for {{ project_name }}"

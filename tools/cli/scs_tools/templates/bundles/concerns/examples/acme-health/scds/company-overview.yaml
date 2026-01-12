@@ -1,0 +1,75 @@
+id: scd:project:company-overview
+type: project
+title: "Acme Health Corp - Company Overview"
+version: "0.1.0"
+description: >
+  Company overview including mission, vision, business model, and strategic context
+
+content:
+  company_info:
+    name: "Acme Health Corp"
+    founded: "2018"
+    headquarters: "San Francisco, CA"
+    industry: "Healthcare Technology"
+    size: "250 employees"
+    focus: "AI-powered patient engagement and adherence solutions"
+
+  mission: >
+    Improve patient health outcomes by making healthcare more accessible,
+    understandable, and actionable through intelligent technology.
+
+  vision: >
+    A world where every patient has personalized support to manage their
+    health effectively.
+
+  core_values:
+    - value: "Patient-First"
+      description: "Every decision starts with patient impact"
+    - value: "Evidence-Based"
+      description: "Ground all solutions in clinical evidence"
+    - value: "Transparency"
+      description: "Clear, honest communication with patients and providers"
+    - value: "Innovation"
+      description: "Continuously improve through technology"
+    - value: "Equity"
+      description: "Ensure solutions work for all populations"
+
+  key_stakeholders:
+    - role: "CEO"
+      name: "Dr. Sarah Chen"
+      background: "Physician background, healthcare innovation expert"
+    - role: "CTO"
+      name: "Michael Torres"
+      background: "15 years healthcare tech, AI/ML focus"
+    - role: "CISO"
+      name: "James Wilson"
+      background: "Healthcare security specialist, HIPAA expert"
+    - role: "CMO"
+      name: "Dr. Patricia Lee"
+      background: "Chief Medical Officer, clinical validation"
+    - role: "Chief Architect"
+      name: "Robert Kim"
+      background: "System design, scalable healthcare platforms"
+
+  business_model:
+    model_type: "B2B SaaS"
+    target_customers: "Health systems and payers"
+    pricing: "Per-patient-per-month pricing model"
+    delivery: "White-label solutions for enterprise customers"
+    services: "Professional services for implementation and integration"
+
+  strategic_priorities_2024:
+    - "Expand medication adherence platform to 5M patients"
+    - "Launch prior authorization automation solution"
+    - "Achieve HITRUST certification"
+    - "Expand into European markets"
+
+provenance:
+  created_by: "Dr. Sarah Chen (CEO) <sarah.chen@acmehealth.com>"
+  created_at: "2025-12-26T10:00:00Z"
+  source_documents:
+    - "Acme Health internal company documentation"
+    - "Strategic planning documents"
+  rationale: >
+    Company-overview SCD for Acme Health Corp to provide business and
+    organizational context to AI services working on Acme projects.

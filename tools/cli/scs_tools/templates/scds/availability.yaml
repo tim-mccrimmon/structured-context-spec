@@ -1,0 +1,44 @@
+id: scd:project:availability
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Availability Requirements"
+description: "Uptime targets, redundancy strategy, and disaster recovery"
+
+domain: performance-reliability
+concerns:
+  - availability
+  - redundancy
+  - disaster-recovery
+
+content:
+  uptime_targets:
+    sla: "[99.9%|99.95%|99.99%|etc]"
+    max_downtime_per_month: "[Calculated allowable downtime]"
+    measurement_window: "[How uptime is measured]"
+    exclusions:
+      - "[Planned maintenance windows]"
+      - "[Upstream dependency failures]"
+
+  redundancy_strategy:
+    data_redundancy:
+      replication: "[Synchronous|Asynchronous|Multi-region]"
+      backup_frequency: "[Frequency]"
+      backup_retention: "[Retention period]"
+    service_redundancy:
+      instances: "[Minimum number of instances]"
+      zones: "[Multi-AZ|Multi-region]"
+      failover_time: "[Target failover time]"
+
+  disaster_recovery:
+    rpo: "[Recovery Point Objective in time]"
+    rto: "[Recovery Time Objective in time]"
+    backup_strategy: "[Backup approach]"
+    recovery_procedures:
+      - "[Recovery procedure 1]"
+    testing_frequency: "[How often DR is tested]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Availability requirements for {{ project_name }}"

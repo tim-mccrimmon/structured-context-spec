@@ -1,0 +1,70 @@
+id: scd:project:provenance-tracking
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Provenance Tracking"
+description: "Data origin tracking, lineage, transformation tracking, and audit trails"
+
+domain: data-provenance
+concerns:
+  - data-lineage
+  - audit-trail
+  - data-origin
+
+content:
+  provenance_model:
+    approach: "[W3C PROV|Custom|etc]"
+    granularity: "[Record-level|Field-level|Aggregate]"
+    storage: "[Where provenance data is stored]"
+
+  origin_tracking:
+    - data_type: "[Data type]"
+      source_system: "[Source system]"
+      ingestion_method: "[API|Batch|Stream|etc]"
+      tracking_fields:
+        - field: "source_system"
+          description: "Originating system"
+        - field: "ingested_at"
+          description: "Timestamp of ingestion"
+        - field: "source_id"
+          description: "Original record ID"
+
+  lineage_tracking:
+    transformations:
+      - transformation: "[Transformation name]"
+        input: "[Input data]"
+        output: "[Output data]"
+        logic: "[Transformation logic description]"
+        tracked_metadata:
+          - "[Metadata field 1]"
+
+  audit_trail:
+    what_is_logged:
+      - "[Create operations]"
+      - "[Update operations]"
+      - "[Delete operations]"
+      - "[Access/read operations]"
+    log_fields:
+      - field: "actor"
+        description: "Who performed the action"
+      - field: "action"
+        description: "What action was performed"
+      - field: "timestamp"
+        description: "When it occurred"
+      - field: "changed_fields"
+        description: "What changed"
+      - field: "reason"
+        description: "Why (if provided)"
+    retention: "[Audit log retention period]"
+
+  versioning:
+    approach: "[Temporal tables|Event sourcing|Snapshot|None]"
+    what_is_versioned:
+      - "[Data type 1]"
+    access_to_history:
+      - "[Who can access historical data]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Provenance tracking for {{ project_name }}"

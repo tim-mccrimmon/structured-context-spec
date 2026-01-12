@@ -1,0 +1,59 @@
+id: scd:project:chai-adherence
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "CHAI Adherence"
+description: "Coalition for Health AI (CHAI) criteria applicability and validation"
+
+domain: compliance-governance
+concerns:
+  - healthcare-ai
+  - responsible-ai
+  - assurance
+
+content:
+  chai_applicability:
+    ai_enabled: "[yes|no]"
+    clinical_context: "[yes|no]"
+    scope: "[Which components use AI for health]"
+
+  chai_principles:
+    - principle: "Safety & Effectiveness"
+      implementation: "[How ensured]"
+      validation: "[How validated]"
+    - principle: "Equity & Fairness"
+      implementation: "[How ensured]"
+      validation: "[How validated]"
+    - principle: "Transparency & Explainability"
+      implementation: "[How ensured]"
+      validation: "[How validated]"
+    - principle: "Privacy & Security"
+      implementation: "[How ensured]"
+      validation: "[How validated]"
+    - principle: "Accountability"
+      implementation: "[How ensured]"
+      validation: "[How validated]"
+
+  traceability_hooks:
+    - component: "[Component name]"
+      what_is_traced: "[What is logged/tracked]"
+      storage: "[Where trace data is stored]"
+
+  evidence_collection:
+    - evidence_type: "[Evidence type]"
+      collection_method: "[How collected]"
+      storage_location: "[Where stored]"
+
+  validation_strategy:
+    clinical_validation:
+      approach: "[Validation approach]"
+      frequency: "[How often validated]"
+    technical_validation:
+      approach: "[Testing approach]"
+      metrics:
+        - "[Validation metric 1]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "CHAI adherence for {{ project_name }}"

@@ -1,0 +1,17 @@
+id: bundle:deployment-operations
+type: concern
+version: "1.0.0"
+title: "Deployment & Operations Concern Bundle"
+description: "Infrastructure, deployment processes, and operational practices for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:infrastructure-definition
+  - scd:project:observability
+  - scd:project:incident-response
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Deployment & Operations concern bundle for {{ project_name }}"

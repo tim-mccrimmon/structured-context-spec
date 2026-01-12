@@ -1,0 +1,40 @@
+id: scd:project:business-objectives
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Business Objectives"
+description: "Strategic objectives, measurable outcomes, and guiding principles"
+
+domain: business-context
+concerns:
+  - strategic-alignment
+  - success-metrics
+
+content:
+  vision: |
+    [Overall vision for the product/system]
+
+  strategic_objectives:
+    - objective: "[Strategic objective]"
+      rationale: "[Why this objective matters]"
+      alignment: "[How this aligns with broader org goals]"
+
+  desired_outcomes:
+    - outcome: "[Desired business outcome]"
+      measurement: "[How this will be measured]"
+      target: "[Specific target or goal]"
+
+  guiding_principles:
+    - principle: "[Guiding principle]"
+      description: "[What this means in practice]"
+
+  key_performance_indicators:
+    - name: "[KPI name]"
+      metric: "[How it's measured]"
+      target: "[Target value]"
+      rationale: "[Why this KPI matters]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Business objectives for {{ project_name }}"

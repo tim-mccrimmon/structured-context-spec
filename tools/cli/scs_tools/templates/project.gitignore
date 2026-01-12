@@ -1,0 +1,46 @@
+# SCS Project .gitignore
+
+# Environment-specific configurations
+.env
+.env.local
+.env.*.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+tmp/
+
+# Build outputs
+dist/
+build/
+*.pyc
+__pycache__/
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# SCS working files (optional - uncomment if you don't want to track these)
+# .scs/cache/
+# .scs/validation/
+
+# Sensitive data (never commit these!)
+secrets/
+*.key
+*.pem
+credentials.json
+.credentials/
+
+# OS files
+Thumbs.db
+.DS_Store

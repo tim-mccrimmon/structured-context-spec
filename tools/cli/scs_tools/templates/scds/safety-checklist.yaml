@@ -1,0 +1,93 @@
+id: scd:project:safety-checklist
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Safety Checklist"
+description: "Safety limits, guardrails, pre-release checks, and safety incident response"
+
+domain: safety-risk
+concerns:
+  - safety
+  - guardrails
+  - safety-critical-systems
+
+content:
+  safety_critical_components:
+    - component: "[Component name]"
+      why_critical: "[Why this is safety-critical]"
+      failure_impact: "[Impact if this component fails]"
+      safeguards:
+        - "[Safeguard 1]"
+      testing_requirements:
+        - "[Special testing required]"
+
+  safety_limits:
+    - limit_type: "[Rate limit|Resource limit|Data limit|etc]"
+      value: "[Limit value]"
+      enforcement: "[How enforced]"
+      rationale: "[Why this limit exists]"
+      exceeded_action: "[What happens if exceeded]"
+
+  guardrails:
+    - guardrail: "[Guardrail name]"
+      description: "[What this prevents]"
+      implementation: "[How implemented]"
+      testing: "[How tested]"
+
+  pre_release_safety_checks:
+    required_checks:
+      - check: "[Security scan completed]"
+        responsible: "[Security team]"
+        blocker: "[yes|no]"
+      - check: "[Data validation rules verified]"
+        responsible: "[QA team]"
+        blocker: "[yes|no]"
+      - check: "[Rate limits tested]"
+        responsible: "[Engineering team]"
+        blocker: "[yes|no]"
+      - check: "[Rollback plan prepared]"
+        responsible: "[DevOps team]"
+        blocker: "[yes|no]"
+    sign_off_required:
+      - "[Tech lead]"
+      - "[Security lead]"
+      - "[Product owner]"
+
+  safety_incident_response:
+    definition: "[What constitutes a safety incident]"
+    immediate_actions:
+      - "[Action 1: Stop the system if needed]"
+      - "[Action 2: Notify stakeholders]"
+      - "[Action 3: Investigate]"
+    notification:
+      internal:
+        - "[Engineering leadership]"
+        - "[Legal team]"
+      external:
+        - "[Users if affected]"
+        - "[Regulatory bodies if required]"
+    investigation:
+      process: "[How incidents are investigated]"
+      documentation: "[What must be documented]"
+      timeline: "[Investigation timeline]"
+
+  safety_monitoring:
+    automated_checks:
+      - check: "[Check name]"
+        frequency: "[Continuous|Hourly|Daily|etc]"
+        alert_on: "[Alert condition]"
+    manual_reviews:
+      - review: "[Review name]"
+        frequency: "[Weekly|Monthly|etc]"
+        reviewer: "[Who performs review]"
+
+  fail_safe_mechanisms:
+    - mechanism: "[Mechanism name]"
+      trigger: "[What triggers fail-safe]"
+      behavior: "[Safe state behavior]"
+      recovery: "[How to recover]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Safety checklist for {{ project_name }}"

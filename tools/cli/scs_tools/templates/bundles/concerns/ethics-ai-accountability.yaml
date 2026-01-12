@@ -1,0 +1,17 @@
+id: bundle:ethics-ai-accountability
+type: concern
+version: "1.0.0"
+title: "Ethics & AI Accountability Concern Bundle"
+description: "Responsible AI use, accountability, and ethical guidelines for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:ai-usage-policy
+  - scd:project:audit-trail
+  - scd:project:model-bias
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Ethics & AI Accountability concern bundle for {{ project_name }}"

@@ -1,0 +1,82 @@
+id: scd:project:qa-procedures
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "QA Procedures"
+description: "Manual QA processes, acceptance criteria, and quality gates"
+
+domain: testing-validation
+concerns:
+  - quality-assurance
+  - acceptance-testing
+  - bug-management
+
+content:
+  manual_qa_process:
+    testing_approach: "[Exploratory|Scripted|Both]"
+    test_case_management:
+      tool: "[Test case management tool]"
+      documentation: "[Where test cases are documented]"
+    testing_phases:
+      - phase: "[Phase name]"
+        timing: "[When this happens]"
+        scope: "[What is tested]"
+        responsible: "[Who performs testing]"
+
+  acceptance_criteria:
+    definition_of_done:
+      - "[Code review completed]"
+      - "[Tests pass]"
+      - "[Documentation updated]"
+      - "[QA sign-off]"
+    feature_acceptance:
+      - "[Meets requirements]"
+      - "[No critical/high bugs]"
+      - "[Performance acceptable]"
+      - "[Accessibility requirements met]"
+
+  bug_management:
+    bug_tracking_tool: "[Jira|GitHub Issues|etc]"
+    severity_levels:
+      - level: "Critical"
+        definition: "[System unusable|Data loss|Security issue]"
+        sla: "[Fix within 24 hours|etc]"
+      - level: "High"
+        definition: "[Major functionality broken]"
+        sla: "[Fix within 3 days|etc]"
+      - level: "Medium"
+        definition: "[Minor functionality issue]"
+        sla: "[Fix in next sprint|etc]"
+      - level: "Low"
+        definition: "[Cosmetic|Enhancement]"
+        sla: "[Backlog|etc]"
+    triage_process:
+      frequency: "[Daily|Weekly]"
+      participants:
+        - "[Product owner]"
+        - "[Tech lead]"
+        - "[QA lead]"
+
+  quality_gates:
+    - gate: "[Code freeze]"
+      criteria:
+        - "[No open critical bugs]"
+        - "[< 5 high severity bugs]"
+      timing: "[When this gate is checked]"
+    - gate: "[Release approval]"
+      criteria:
+        - "[All acceptance criteria met]"
+        - "[Regression tests pass]"
+        - "[Stakeholder sign-off]"
+      timing: "[Before release to production]"
+
+  exploratory_testing:
+    frequency: "[Weekly|Per feature|etc]"
+    focus_areas:
+      - "[Area to explore]"
+    time_boxed: "[Duration per session]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "QA procedures for {{ project_name }}"

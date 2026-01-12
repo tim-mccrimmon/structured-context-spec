@@ -1,0 +1,57 @@
+id: scd:project:data-protection
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Data Protection"
+description: "Encryption, key management, and cryptographic standards"
+
+domain: security
+concerns:
+  - encryption
+  - key-management
+  - data-security
+
+content:
+  encryption_at_rest:
+    enabled: true
+    algorithm: "[AES-256|etc]"
+    key_management: "[How keys are managed]"
+    scope:
+      - "[Database]"
+      - "[File storage]"
+      - "[Backups]"
+
+  encryption_in_transit:
+    enabled: true
+    protocol: "[TLS 1.3|TLS 1.2]"
+    certificate_management:
+      provider: "[Let's Encrypt|Internal CA|etc]"
+      renewal: "[Automated|Manual]"
+      rotation_period: "[Period]"
+    scope:
+      - "[External APIs]"
+      - "[Internal services]"
+      - "[Database connections]"
+
+  key_management:
+    storage: "[AWS KMS|HashiCorp Vault|etc]"
+    rotation_policy: "[Rotation period and triggers]"
+    access_control: "[Who can access keys]"
+    backup: "[How keys are backed up]"
+
+  secrets_management:
+    tool: "[Tool name]"
+    storage_location: "[Where secrets are stored]"
+    access_pattern: "[How apps access secrets]"
+    rotation: "[How secrets are rotated]"
+
+  cryptographic_standards:
+    - algorithm: "[Algorithm name]"
+      use_case: "[What it's used for]"
+      key_length: "[Key length]"
+      rationale: "[Why this algorithm]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data protection strategy for {{ project_name }}"

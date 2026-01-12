@@ -1,0 +1,23 @@
+id: bundle:standards
+type: standards
+version: "1.0.0"
+title: "Compliance Standards Bundle"
+description: "Regulatory and industry standards for {{ project_name }}"
+
+imports: []
+
+scds:
+  # Standards-tier SCDs would be imported from standards organizations
+  # or created as team interpretations of regulatory requirements
+  {% if config.compliance_bundles %}
+  {% for compliance in config.compliance_bundles -%}
+  - scd:standards:{{ compliance }}
+  {% endfor %}
+  {% else -%}
+  - scd:standards:soc2
+  {% endif %}
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Standards bundle for {{ project_type }} project type"

@@ -1,0 +1,22 @@
+id: bundle:{{ project_name }}
+type: project
+version: "1.0.0"
+title: "{{ project_name }} Complete Context Bundle"
+description: "Complete structured context for {{ project_name }}"
+
+imports:
+  # Foundation bundles
+  - bundle:meta:1.0.0
+  - bundle:standards:1.0.0
+
+  # Domain bundles
+  {% for bundle in bundles -%}
+  - bundle:{{ bundle }}:1.0.0
+  {% endfor %}
+
+scds: []  # All SCDs are in imported bundles
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Initial project bundle for {{ project_name }} development"

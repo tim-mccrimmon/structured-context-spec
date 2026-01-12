@@ -1,0 +1,104 @@
+id: scd:project:model-bias
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Model Bias Assessment"
+description: "Bias and fairness assessment, evaluation metrics, and mitigation strategies"
+
+domain: ethics-ai-accountability
+concerns:
+  - bias-mitigation
+  - fairness
+  - model-evaluation
+
+content:
+  bias_assessment_approach:
+    methodology: "[Statistical testing|Fairness metrics|User studies|etc]"
+    frequency: "[Before deployment|Quarterly|etc]"
+    responsible_party: "[Data science team|Ethics board|etc]"
+
+  protected_attributes:
+    - attribute: "[Race|Gender|Age|etc]"
+      collection: "[Collected|Inferred|Not collected]"
+      usage: "[Never used|Used with safeguards|etc]"
+      monitoring: "[How bias on this attribute is monitored]"
+
+  fairness_metrics:
+    - metric: "[Demographic parity|Equal opportunity|Equalized odds|etc]"
+      definition: "[What this metric measures]"
+      target_value: "[Target value or threshold]"
+      current_value: "[Current value if measured]"
+      measurement_frequency: "[How often measured]"
+
+  evaluation_datasets:
+    - dataset: "[Dataset name]"
+      purpose: "[What it's used to evaluate]"
+      demographics:
+        representative: "[yes|no|partially]"
+        known_gaps:
+          - "[Gap 1]"
+      size: "[Dataset size]"
+      update_frequency: "[How often updated]"
+
+  bias_mitigation_strategies:
+    pre_processing:
+      - strategy: "[Resampling|Reweighting|etc]"
+        applied_to: "[Which data/models]"
+        effectiveness: "[How effectiveness is measured]"
+    in_processing:
+      - strategy: "[Adversarial debiasing|Fairness constraints|etc]"
+        applied_to: "[Which models]"
+        trade_offs: "[Accuracy vs fairness trade-offs]"
+    post_processing:
+      - strategy: "[Threshold adjustment|Calibration|etc]"
+        applied_to: "[Which predictions]"
+        monitoring: "[How monitored]"
+
+  ongoing_monitoring:
+    automated_checks:
+      - check: "[Check name]"
+        metric: "[What is checked]"
+        frequency: "[Continuous|Daily|etc]"
+        alert_threshold: "[When to alert]"
+    manual_reviews:
+      - review_type: "[Review type]"
+        frequency: "[Monthly|Quarterly|etc]"
+        scope: "[What is reviewed]"
+        reviewers:
+          - "[Role]"
+
+  bias_incident_response:
+    definition: "[What constitutes a bias incident]"
+    response_process:
+      - "[Immediate investigation]"
+      - "[Assess impact]"
+      - "[Implement mitigation]"
+      - "[Document and learn]"
+    notification_requirements:
+      internal:
+        - "[Leadership]"
+        - "[Ethics board]"
+      external:
+        - "[Affected users if applicable]"
+
+  documentation_and_transparency:
+    model_cards:
+      required: "[yes|no]"
+      content:
+        - "[Model details]"
+        - "[Intended use]"
+        - "[Limitations]"
+        - "[Bias analysis results]"
+      publication: "[Internal|Public|etc]"
+    fairness_reports:
+      frequency: "[Quarterly|Annually|etc]"
+      audience: "[Internal|Public|Regulators]"
+      content:
+        - "[Fairness metrics]"
+        - "[Bias findings]"
+        - "[Mitigation actions]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Model bias assessment for {{ project_name }}"

@@ -1,0 +1,43 @@
+id: scd:project:constraints-and-assumptions
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Constraints and Assumptions"
+description: "Non-technical constraints, organizational boundaries, and key assumptions"
+
+domain: business-context
+concerns:
+  - constraints
+  - assumptions
+
+content:
+  business_constraints:
+    - constraint: "[Business constraint]"
+      type: "[budget|timeline|resource|organizational]"
+      impact: "[How this affects the project]"
+      mitigation: "[How to work within this constraint]"
+
+  organizational_constraints:
+    - constraint: "[Organizational limitation]"
+      description: "[Details of the constraint]"
+
+  regulatory_constraints:
+    - regulation: "[Regulatory requirement]"
+      jurisdiction: "[Where it applies]"
+      impact: "[How it constrains the project]"
+
+  key_assumptions:
+    - assumption: "[Critical assumption]"
+      rationale: "[Why we're making this assumption]"
+      validation: "[How this will be validated]"
+      risk_if_wrong: "[What happens if this assumption is false]"
+
+  dependencies:
+    - dependency: "[External factor or resource]"
+      type: "[technical|organizational|partner]"
+      criticality: "[high|medium|low]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Constraints and assumptions for {{ project_name }}"

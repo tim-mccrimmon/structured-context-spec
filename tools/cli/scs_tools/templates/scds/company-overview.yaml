@@ -1,0 +1,114 @@
+# SCD Template: Company Overview
+# Type: project-tier
+# Purpose: Company-specific context including mission, values, stakeholders, and business model
+# Owner: CEO
+#
+# IMPORTANT: This template uses LOOSE VALIDATION
+# - All fields in the 'content' section are OPTIONAL
+# - CEO decides what information to share (support spectrum from paranoid to open)
+# - Validation checks structure only, not content completeness
+# - Feel free to add/remove fields based on your company's needs
+
+id: scd:project:company-overview
+type: project
+title: "[Company Name] - Company Overview"
+version: "0.1.0"
+description: >
+  Company overview including mission, vision, values, stakeholders, business model,
+  and strategic context. All fields are optional - share what you're comfortable with.
+
+content:
+  # Basic Company Information (optional)
+  company_info:
+    name: "[Company Name]"
+    founded: "[Year or YYYY-MM-DD]"
+    headquarters: "[City, State/Country]"
+    industry: "[Industry/Sector]"
+    size: "[Number] employees"
+    focus: "[Brief description of company focus]"
+    # Add other fields as needed: website, stock_symbol, etc.
+
+  # Mission Statement (optional)
+  mission: >
+    [Company mission statement - why the company exists]
+
+  # Vision Statement (optional)
+  vision: >
+    [Company vision statement - future aspirational state]
+
+  # Core Values (optional)
+  core_values:
+    - value: "[Value Name]"
+      description: "[What this value means]"
+    - value: "[Value Name]"
+      description: "[What this value means]"
+    # Add more values as needed
+
+  # Key Stakeholders (optional)
+  # Note: Consider privacy - only include what's appropriate to share with AI
+  key_stakeholders:
+    - role: "[Role/Title]"
+      name: "[Name or 'TBD']"
+      background: "[Brief background or area of expertise]"
+    - role: "[Role/Title]"
+      name: "[Name or 'TBD']"
+      background: "[Brief background or area of expertise]"
+    # Add more stakeholders as needed
+
+  # Business Model (optional)
+  business_model:
+    model_type: "[B2B, B2C, B2B2C, SaaS, etc.]"
+    target_customers: "[Description of target customers]"
+    pricing: "[Pricing model description]"
+    delivery: "[How product/service is delivered]"
+    services: "[Additional services offered]"
+    # Add other fields as needed: revenue_model, distribution_channels, etc.
+
+  # Strategic Priorities (optional)
+  # Note: Consider what's appropriate to share - may want to keep high-level
+  strategic_priorities:
+    - "[Strategic priority 1]"
+    - "[Strategic priority 2]"
+    - "[Strategic priority 3]"
+    # Add more as needed
+
+  # Organizational Structure (optional)
+  # Add if relevant for AI context
+  # organizational_structure:
+  #   divisions: ["Division 1", "Division 2"]
+  #   locations: ["Location 1", "Location 2"]
+  #   business_units: ["Unit 1", "Unit 2"]
+
+  # Competitive Positioning (optional)
+  # competitive_positioning:
+  #   market_position: "[Market leader, challenger, niche player, etc.]"
+  #   differentiators: ["Differentiator 1", "Differentiator 2"]
+  #   key_competitors: ["Competitor 1", "Competitor 2"]
+
+  # Culture & Operating Principles (optional)
+  # culture:
+  #   work_style: "[Remote, hybrid, in-office, etc.]"
+  #   decision_making: "[Consensus, hierarchical, data-driven, etc.]"
+  #   communication_style: "[Open, formal, etc.]"
+
+provenance:
+  created_by: "[Creator name/email]"
+  created_at: "[ISO 8601 timestamp: YYYY-MM-DDTHH:MM:SSZ]"
+  source_documents:
+    - "[URL or document reference]"
+    - "[Company website, strategic plan, etc.]"
+  rationale: >
+    Company overview SCD providing business and organizational context
+    for AI services working on [Company Name] projects.
+
+# Usage Notes:
+# 1. Start by filling in company_info (at minimum: name and industry)
+# 2. Add mission/vision if you want AI to understand company purpose
+# 3. Include values if you want AI to align with company culture
+# 4. Add stakeholders if AI needs to know key decision-makers
+# 5. Include business_model if AI needs commercial context
+# 6. Strategic priorities are optional - share only if appropriate
+# 7. All commented sections can be uncommented and filled in as needed
+# 8. Feel free to add custom fields relevant to your company
+#
+# Remember: This is YOUR context - share what makes sense for your use case!

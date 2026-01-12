@@ -1,0 +1,17 @@
+id: bundle:testing-validation
+type: concern
+version: "1.0.0"
+title: "Testing & Validation Concern Bundle"
+description: "Testing strategy, coverage requirements, and validation approach for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:test-coverage
+  - scd:project:validation-plan
+  - scd:project:qa-procedures
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Testing & Validation concern bundle for {{ project_name }}"

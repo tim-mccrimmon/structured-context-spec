@@ -1,0 +1,47 @@
+id: scd:project:opportunity-analysis
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Opportunity Analysis"
+description: "Market context, competitive landscape, and timing factors"
+
+domain: business-context
+concerns:
+  - market-analysis
+  - competitive-positioning
+
+content:
+  opportunity_summary: |
+    [High-level summary of the opportunity]
+
+  market_context:
+    market_size: "[Addressable market size]"
+    growth_trends:
+      - "[Market trend]"
+    market_gaps:
+      - "[Unmet need in the market]"
+
+  competitive_landscape:
+    - competitor: "[Competitor name]"
+      strengths:
+        - "[What they do well]"
+      weaknesses:
+        - "[What they don't address]"
+      differentiation: "[How we differ]"
+
+  timing_factors:
+    why_now: |
+      [Why this is the right time for this initiative]
+    urgency:
+      - "[Factor creating urgency]"
+    windows_of_opportunity:
+      - "[Time-sensitive opportunity]"
+
+  strategic_value:
+    - value: "[Type of value created]"
+      description: "[How this value is realized]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Opportunity analysis for {{ project_name }}"

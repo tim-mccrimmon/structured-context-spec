@@ -1,0 +1,55 @@
+id: scd:project:data-model
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Data Model"
+description: "Canonical data entities, schema definitions, and relationships"
+
+domain: data-provenance
+concerns:
+  - data-modeling
+  - schema-management
+  - data-relationships
+
+content:
+  entities:
+    - name: "[Entity name]"
+      description: "[Entity description]"
+      attributes:
+        - name: "[Attribute name]"
+          type: "[Data type]"
+          required: "[yes|no]"
+          constraints: "[Constraints if any]"
+          pii: "[yes|no]"
+      primary_key: "[Primary key field(s)]"
+      indexes:
+        - "[Index definition]"
+
+  relationships:
+    - from_entity: "[Entity A]"
+      to_entity: "[Entity B]"
+      type: "[one-to-one|one-to-many|many-to-many]"
+      description: "[Relationship description]"
+      referential_integrity: "[How enforced]"
+
+  schema_management:
+    versioning: "[How schemas are versioned]"
+    migration_strategy: "[How schema changes are migrated]"
+    backward_compatibility: "[How compatibility is maintained]"
+
+  data_validation:
+    - field: "[Field name]"
+      validation_rules:
+        - "[Validation rule 1]"
+      error_handling: "[What happens on validation failure]"
+
+  canonical_formats:
+    - data_type: "[Data type]"
+      format: "[ISO 8601|RFC 3339|Custom|etc]"
+      examples:
+        - "[Example value]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data model for {{ project_name }}"

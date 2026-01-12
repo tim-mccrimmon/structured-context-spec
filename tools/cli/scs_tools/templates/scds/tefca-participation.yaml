@@ -1,0 +1,53 @@
+id: scd:project:tefca-participation
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "TEFCA Participation"
+description: "Trusted Exchange Framework and Common Agreement participation and interoperability"
+
+domain: compliance-governance
+concerns:
+  - health-information-exchange
+  - interoperability
+  - trust-framework
+
+content:
+  tefca_role:
+    participant: "[yes|no]"
+    role: "[QHIN|Participant|Subparticipant|Not Applicable]"
+    qhin_connection:
+      qhin_name: "[QHIN name if connected]"
+      connection_type: "[Direct|Through intermediary]"
+
+  interoperability_requirements:
+    exchange_purposes:
+      - "[Treatment|Payment|Operations|etc]"
+    data_standards:
+      - standard: "[FHIR R4|C-CDA|etc]"
+        use_case: "[When this standard is used]"
+    patient_matching:
+      approach: "[Patient matching approach]"
+      minimum_data_set: "[Required data elements]"
+
+  qhin_integration:
+    endpoints:
+      - type: "[REST|SOAP|etc]"
+        purpose: "[Query|Push|Pull|etc]"
+        authentication: "[Authentication method]"
+    data_sharing_policies:
+      - "[Policy 1]"
+
+  consent_management:
+    approach: "[How patient consent is obtained and managed]"
+    opt_in_opt_out: "[Opt-in|Opt-out|Granular]"
+    enforcement: "[How consent is enforced]"
+
+  required_capabilities:
+    - capability: "[Capability name]"
+      status: "[Implemented|Planned|Not applicable]"
+      implementation: "[How implemented]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "TEFCA participation for {{ project_name }}"

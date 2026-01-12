@@ -1,0 +1,56 @@
+id: scd:project:soc2-controls
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "SOC 2 Controls"
+description: "SOC 2 trust service criteria implementation and evidence collection"
+
+domain: compliance-governance
+concerns:
+  - compliance
+  - audit-readiness
+  - governance
+
+content:
+  applicable_criteria:
+    - "[Security|Availability|Processing Integrity|Confidentiality|Privacy]"
+
+  security_controls:
+    - control_id: "CC6.1"
+      description: "[Control description]"
+      implementation: "[How implemented in system]"
+      evidence:
+        - "[Evidence type 1]"
+      testing_frequency: "[How often tested]"
+
+  availability_controls:
+    - control_id: "A1.1"
+      description: "[Control description]"
+      implementation: "[How implemented in system]"
+      evidence:
+        - "[Evidence type 1]"
+
+  confidentiality_controls:
+    - control_id: "C1.1"
+      description: "[Control description]"
+      implementation: "[How implemented in system]"
+      evidence:
+        - "[Evidence type 1]"
+
+  evidence_collection:
+    automated:
+      - "[Automated evidence type]"
+    manual:
+      - evidence_type: "[Manual evidence type]"
+        frequency: "[Collection frequency]"
+        responsible_party: "[Who collects]"
+
+  audit_preparation:
+    documentation_location: "[Where SOC 2 docs are maintained]"
+    evidence_retention: "[Retention period]"
+    review_frequency: "[How often controls are reviewed]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "SOC 2 compliance controls for {{ project_name }}"

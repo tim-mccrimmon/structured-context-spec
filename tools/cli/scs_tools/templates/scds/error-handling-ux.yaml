@@ -1,0 +1,58 @@
+id: scd:project:error-handling-ux
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Error Handling UX"
+description: "Error message guidelines, user feedback patterns, and recovery flows"
+
+domain: usability-accessibility
+concerns:
+  - error-handling
+  - user-feedback
+  - help-documentation
+
+content:
+  error_message_guidelines:
+    tone: "[Friendly|Professional|Technical|etc]"
+    language: "[Simple|Technical|etc]"
+    components:
+      - "[What went wrong]"
+      - "[Why it happened (when appropriate)]"
+      - "[How to fix it]"
+    examples:
+      - scenario: "[Error scenario]"
+        message: "[Example error message]"
+
+  user_feedback_patterns:
+    success:
+      - action: "[Action type]"
+        feedback: "[How success is communicated]"
+        duration: "[How long feedback is shown]"
+    error:
+      - severity: "[low|medium|high|critical]"
+        presentation: "[Toast|Modal|Inline|etc]"
+        dismissible: "[yes|no|auto]"
+    loading:
+      - action: "[Action type]"
+        indicator: "[Spinner|Progress bar|Skeleton|etc]"
+
+  recovery_flows:
+    - error_type: "[Error type]"
+      user_action: "[What user should do]"
+      system_action: "[What system does to help]"
+      escalation: "[When/how to escalate]"
+
+  help_and_documentation:
+    inline_help:
+      tooltips: "[yes|no]"
+      context_help: "[yes|no]"
+    documentation:
+      location: "[Where docs are located]"
+      search: "[Searchable|Not searchable]"
+    support_channels:
+      - "[Email|Chat|Phone|etc]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Error handling UX for {{ project_name }}"
