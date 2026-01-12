@@ -44,3 +44,6 @@ Thumbs.db
 # Personal notes and conversation logs
 *-convo*.md
 *-notes*.md
+
+# Temporary docs and internal materials
+temp-docs/
