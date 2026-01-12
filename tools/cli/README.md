@@ -24,22 +24,22 @@ The `scs-validator` is included as a dependency of `scs-tools`, so installing `s
 
 ## Installation
 
-### From PyPI (when published)
+### From PyPI
 
 ```bash
 pip install scs-tools
 ```
 
-This automatically installs `scs-validator` as a dependency.
+This automatically installs `scs-validator` as an optional dependency (use `pip install scs-tools[validator]` for validation features).
 
 ### From Source
 
 ```bash
 # Clone the main repo
-git clone https://github.com/tim-mccrimmon/scs-spec.git
+git clone https://github.com/tim-mccrimmon/structured-context-spec.git
 
-# Navigate to scs-cli directory
-cd scs-spec/../scs-cli
+# Navigate to CLI directory
+cd structured-context-spec/tools/cli
 
 # Install in development mode
 pip install -e .

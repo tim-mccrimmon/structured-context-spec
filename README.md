@@ -134,20 +134,44 @@ We’re optimizing for **thoughtful critique** and **practical examples**.
 
 ## Quick Start
 
-### 1) Clone
+### Option 1: Using the CLI (Recommended)
+
+Install the SCS CLI tools:
+
+```bash
+pip install scs-tools
+```
+
+Create a new SCS project:
+
+```bash
+scs new project my-app
+cd my-app
+scs validate
+```
+
+That's it! You now have a structured SCS project with bundles, SCDs, and templates.
+
+See the [CLI documentation](tools/cli/README.md) for full command reference.
+
+### Option 2: Manual Setup
+
+If you prefer to work directly with the specification without CLI tools:
+
+**1) Clone the repository**
 
 ```bash
 git clone https://github.com/tim-mccrimmon/structured-context-spec.git
 cd structured-context-spec
 ```
 
-### 2) Read the spec entry points
+**2) Read the spec entry points**
 
 - `spec/0.3/overview.md`
 - `spec/0.3/terminology.md`
 - `spec/0.3/bundle-format.md`
 
-### 3) Explore examples
+**3) Explore examples**
 
 ```bash
 # See real working examples
@@ -160,7 +184,7 @@ cat examples/bundles/project-bundle.yaml
 ls examples/bundles/concerns/
 ```
 
-### 4) Create and validate your own SCD
+**4) Create and validate your own SCD**
 
 ```bash
 # Copy a template
@@ -172,7 +196,7 @@ cd tools/scd-validator
 python validate.py ../../my-first-scd.yaml
 ```
 
-### 5) Join the discussion
+**5) Join the discussion**
 
 - **GitHub Discussions** — share your use case, ask questions
 - **Issues** — report problems or suggest improvements
