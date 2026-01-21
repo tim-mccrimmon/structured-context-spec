@@ -1,0 +1,41 @@
+id: scd:project:audit-requirements
+type: project
+version: "0.1.0"
+domain: compliance-governance
+title: "Audit Requirements"
+description: "Audit logging and compliance reporting requirements"
+
+content:
+  summary: "Comprehensive audit trail for HIPAA and SOC2 compliance"
+
+  audit_events:
+    authentication:
+      - "Login success/failure"
+      - "Password changes"
+      - "MFA enrollment/usage"
+
+    data_access:
+      - "PHI viewed (patient ID, accessor, timestamp)"
+      - "PHI exported"
+      - "Reports generated"
+
+    administrative:
+      - "User account changes"
+      - "Permission modifications"
+      - "Configuration changes"
+
+  log_requirements:
+    retention: "7 years (HIPAA requirement)"
+    format: "Structured JSON"
+    immutability: "Write-once audit log storage"
+    encryption: "Encrypted at rest"
+
+  reporting:
+    - "Monthly access reports for compliance team"
+    - "Real-time alerts for suspicious activity"
+    - "Annual audit report generation for SOC2"
+
+provenance:
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Audit requirements from HIPAA and SOC2 control mapping"

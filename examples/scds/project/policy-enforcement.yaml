@@ -1,0 +1,45 @@
+id: scd:project:policy-enforcement
+type: project
+version: "0.1.0"
+domain: compliance-governance
+title: "Policy Enforcement"
+description: "Mechanisms for enforcing compliance and security policies"
+
+content:
+  summary: "Automated and manual controls for policy enforcement"
+
+  automated_enforcement:
+    - policy: "Password complexity"
+      mechanism: "Auth0 password policy configuration"
+      enforcement: "Reject non-compliant passwords"
+
+    - policy: "Session timeout"
+      mechanism: "JWT expiration + refresh token rotation"
+      enforcement: "Force re-authentication after 15 minutes idle"
+
+    - policy: "Data encryption"
+      mechanism: "AWS KMS + application-level encryption"
+      enforcement: "Cannot store unencrypted PHI"
+
+  access_control_enforcement:
+    - policy: "Role-based access"
+      mechanism: "RBAC with Auth0 roles"
+      enforcement: "API authorization middleware"
+
+    - policy: "Minimum necessary"
+      mechanism: "Scoped data queries per role"
+      enforcement: "Database query filtering"
+
+  manual_controls:
+    - policy: "Code review requirement"
+      mechanism: "GitHub branch protection"
+      enforcement: "PR approval required before merge"
+
+    - policy: "Access review"
+      mechanism: "Quarterly review process"
+      enforcement: "Documented review with sign-off"
+
+provenance:
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Policy enforcement mechanisms for audit readiness"

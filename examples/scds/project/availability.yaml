@@ -1,0 +1,35 @@
+id: scd:project:availability
+type: project
+version: "0.1.0"
+domain: performance-reliability
+title: "Availability"
+description: "System availability requirements and architecture"
+
+content:
+  summary: "99.9% availability target for critical medication reminders"
+
+  availability_target:
+    overall: "99.9% (8.76 hours downtime/year)"
+    reminder_delivery: "99.95% (critical path)"
+    dashboard: "99.5% (less critical)"
+
+  architecture_for_availability:
+    - "Multi-AZ deployment in AWS"
+    - "Database failover with RDS Multi-AZ"
+    - "Load balancing across instances"
+    - "Health checks with automatic instance replacement"
+
+  maintenance_windows:
+    - "Scheduled maintenance: Sundays 2-4 AM ET"
+    - "Zero-downtime deployments for application updates"
+    - "Database maintenance with failover"
+
+  disaster_recovery:
+    rpo: "1 hour (point-in-time recovery)"
+    rto: "4 hours"
+    backup_strategy: "Automated daily backups, cross-region replication"
+
+provenance:
+  created_by: "performance-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Availability requirements from customer SLA discussions"

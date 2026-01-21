@@ -1,0 +1,34 @@
+id: scd:project:audit-requirements
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Audit Requirements"
+description: "Audit logging and compliance reporting requirements"
+
+domain: compliance-governance
+concerns:
+  - audit-logging
+  - compliance-reporting
+
+content:
+  audit_events:
+    authentication:
+      - "[Login events to track]"
+    data_access:
+      - "[Data access events to track]"
+    administrative:
+      - "[Admin events to track]"
+
+  log_requirements:
+    retention: "[Retention period]"
+    format: "[Log format]"
+    immutability: "[Immutability requirements]"
+    encryption: "[Encryption requirements]"
+
+  reporting:
+    - "[Required audit reports]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Initial audit requirements for {{ project_name }}"

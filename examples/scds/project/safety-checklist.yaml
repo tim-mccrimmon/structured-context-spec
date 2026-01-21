@@ -1,0 +1,41 @@
+id: scd:project:safety-checklist
+type: project
+version: "0.1.0"
+domain: safety-risk
+title: "Safety Checklist"
+description: "Safety verification checklist for releases"
+
+content:
+  summary: "Pre-release safety verification for healthcare software"
+
+  pre_release_checklist:
+    clinical_safety:
+      - "No changes to medication display logic without clinical review"
+      - "Reminder timing changes reviewed by clinical team"
+      - "No medical advice or recommendations added"
+
+    data_safety:
+      - "No new PHI exposure points"
+      - "Encryption verified for new data flows"
+      - "Access controls reviewed for new features"
+
+    operational_safety:
+      - "Rollback plan documented and tested"
+      - "Monitoring in place for new features"
+      - "On-call team briefed on changes"
+
+  release_gates:
+    - "All automated tests passing"
+    - "Security scan clean"
+    - "Clinical review sign-off (if applicable)"
+    - "Compliance review sign-off (if PHI changes)"
+
+  post_release_verification:
+    - "Monitor error rates for 24 hours"
+    - "Verify reminder delivery rates"
+    - "Check audit logs for anomalies"
+
+provenance:
+  created_by: "safety-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Safety checklist from clinical and compliance requirements"

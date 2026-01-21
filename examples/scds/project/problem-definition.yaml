@@ -1,0 +1,33 @@
+id: scd:project:problem-definition
+type: project
+version: "0.1.0"
+domain: business-context
+title: "Problem Definition"
+description: "Core problem statement and motivation for the Medication Adherence system"
+
+content:
+  summary: "Medication non-adherence is a $300B healthcare problem affecting patient outcomes"
+
+  problem_statement: |
+    50% of patients with chronic conditions do not take medications as prescribed.
+    This leads to 125,000 preventable deaths and $300B in avoidable healthcare costs annually.
+    Healthcare providers lack visibility into patient adherence between visits.
+
+  root_causes:
+    - "Forgetfulness - patients simply forget doses"
+    - "Complex regimens - multiple medications at different times"
+    - "Lack of feedback - no reinforcement for good behavior"
+    - "Provider blind spots - adherence issues discovered too late"
+
+  target_users:
+    - "Patients with chronic conditions requiring daily medication"
+    - "Healthcare providers managing patient populations"
+
+  desired_outcome: |
+    Improve medication adherence rates by 25% through timely reminders,
+    easy tracking, and proactive provider alerts for at-risk patients.
+
+provenance:
+  created_by: "product-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Problem framing from market research and clinical advisory board"

@@ -1,0 +1,37 @@
+id: scd:project:provenance-tracking
+type: project
+version: "0.1.0"
+domain: data-provenance
+title: "Provenance Tracking"
+description: "Data lineage and provenance requirements"
+
+content:
+  summary: "Track origin and transformations of all patient data"
+
+  provenance_requirements:
+    - data_type: "Patient registration"
+      source: "Mobile app or provider dashboard"
+      tracked_attributes: ["created_by", "created_at", "registration_source"]
+
+    - data_type: "Medication entry"
+      source: "Patient input or provider import"
+      tracked_attributes: ["entered_by", "entry_method", "verified_by"]
+
+    - data_type: "Adherence event"
+      source: "Patient confirmation or automatic detection"
+      tracked_attributes: ["event_source", "timestamp", "confidence_level"]
+
+  lineage_tracking:
+    - "All data modifications tracked with user and timestamp"
+    - "No hard deletes - soft delete with audit trail"
+    - "Change history available for compliance queries"
+
+  data_quality:
+    - "Source system recorded for all imported data"
+    - "Validation rules applied and logged"
+    - "Data quality scores tracked over time"
+
+provenance:
+  created_by: "data-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Provenance requirements for audit and data quality"

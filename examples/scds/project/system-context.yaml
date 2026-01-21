@@ -1,0 +1,42 @@
+id: scd:project:system-context
+type: project
+version: "0.1.0"
+domain: architecture
+title: "System Context"
+description: "System boundaries, external actors, and key interactions for the Medication Adherence system"
+
+content:
+  system_name: "Medication Adherence System"
+
+  summary: |
+    Mobile-first healthcare application helping patients track medication schedules,
+    receive reminders, and share adherence data with healthcare providers.
+
+  in_scope:
+    - "Patient mobile application (iOS/Android)"
+    - "SMS reminder gateway"
+    - "Healthcare provider dashboard"
+    - "Medication schedule management"
+    - "Adherence tracking and reporting"
+
+  out_of_scope:
+    - "EHR/EMR direct integration"
+    - "Insurance billing"
+    - "Prescription fulfillment"
+    - "Telemedicine features"
+
+  external_actors:
+    - name: "Patient"
+      type: "user"
+      interactions: ["Manage medications", "Receive reminders", "View adherence history"]
+    - name: "Healthcare Provider"
+      type: "user"
+      interactions: ["View patient adherence", "Configure alerts", "Export reports"]
+    - name: "SMS Gateway"
+      type: "service"
+      interactions: ["Send reminders", "Receive confirmations"]
+
+provenance:
+  created_by: "architecture-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Initial system context for Medication Adherence MVP"

@@ -1,0 +1,41 @@
+id: scd:project:success-criteria
+type: project
+version: "0.1.0"
+domain: business-context
+title: "Success Criteria"
+description: "Measurable criteria for project success"
+
+content:
+  summary: "Success measured by adherence improvement, user engagement, and business metrics"
+
+  mvp_success_criteria:
+    - criterion: "Patient daily active users"
+      target: "1,000 DAU"
+      measurement: "Analytics dashboard"
+
+    - criterion: "Reminder delivery rate"
+      target: "99.5% delivered within 5 minutes of scheduled time"
+      measurement: "SMS gateway logs"
+
+    - criterion: "Provider dashboard adoption"
+      target: "80% of enrolled providers log in weekly"
+      measurement: "Authentication logs"
+
+  clinical_success_criteria:
+    - criterion: "Self-reported adherence improvement"
+      target: "25% improvement in MMAS-8 scores"
+      measurement: "In-app surveys"
+
+  business_success_criteria:
+    - criterion: "Pilot customer retention"
+      target: "90% renew after pilot"
+      measurement: "Contract renewals"
+
+    - criterion: "Customer acquisition cost"
+      target: "CAC < $5,000 per healthcare org"
+      measurement: "Sales analytics"
+
+provenance:
+  created_by: "product-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Success criteria aligned with investor milestones"

@@ -1,0 +1,50 @@
+id: scd:project:threat-model
+type: project
+version: "0.1.0"
+domain: security
+title: "Threat Model"
+description: "Security threat model and mitigations"
+
+content:
+  summary: "STRIDE-based threat model for healthcare application"
+
+  threat_categories:
+    spoofing:
+      threats: ["Credential theft", "Session hijacking"]
+      mitigations: ["MFA", "Secure token handling", "Session binding"]
+
+    tampering:
+      threats: ["Data modification in transit", "Database tampering"]
+      mitigations: ["TLS everywhere", "Database audit logging", "Integrity checks"]
+
+    repudiation:
+      threats: ["Denial of actions", "Log tampering"]
+      mitigations: ["Immutable audit logs", "Digital signatures on critical actions"]
+
+    information_disclosure:
+      threats: ["PHI breach", "Log exposure"]
+      mitigations: ["Encryption", "Log masking", "Access controls"]
+
+    denial_of_service:
+      threats: ["API abuse", "Resource exhaustion"]
+      mitigations: ["Rate limiting", "WAF", "Auto-scaling"]
+
+    elevation_of_privilege:
+      threats: ["Role escalation", "API bypass"]
+      mitigations: ["RBAC enforcement", "Input validation", "Principle of least privilege"]
+
+  attack_surface:
+    - "Public API endpoints"
+    - "Mobile application"
+    - "Provider dashboard"
+    - "SMS gateway integration"
+
+  security_testing:
+    - "Annual penetration testing"
+    - "Continuous vulnerability scanning"
+    - "SAST/DAST in CI/CD pipeline"
+
+provenance:
+  created_by: "security-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Threat model from security architecture review"

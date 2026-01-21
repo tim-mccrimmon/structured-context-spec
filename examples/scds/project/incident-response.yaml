@@ -1,0 +1,41 @@
+id: scd:project:incident-response
+type: project
+version: "0.1.0"
+domain: deployment-operations
+title: "Incident Response"
+description: "Incident management and response procedures"
+
+content:
+  summary: "Structured incident response for reliability and compliance"
+
+  severity_levels:
+    sev1:
+      description: "Complete service outage or data breach"
+      response_time: "15 minutes"
+      notification: "On-call + leadership + legal (if breach)"
+    sev2:
+      description: "Partial outage or degraded performance"
+      response_time: "30 minutes"
+      notification: "On-call + engineering lead"
+    sev3:
+      description: "Minor issue, workaround available"
+      response_time: "4 hours"
+      notification: "On-call"
+
+  response_procedures:
+    - "Acknowledge alert and assess severity"
+    - "Communicate status to stakeholders"
+    - "Mitigate impact (rollback, failover)"
+    - "Investigate root cause"
+    - "Implement fix and verify"
+    - "Post-incident review within 48 hours"
+
+  breach_notification:
+    - "HIPAA requires notification within 60 days"
+    - "Legal team engaged immediately for potential breaches"
+    - "Document all actions for compliance"
+
+provenance:
+  created_by: "devops-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Incident response aligned with HIPAA and SOC2"

@@ -1,0 +1,51 @@
+id: scd:project:error-handling-ux
+type: project
+version: "0.1.0"
+domain: usability-accessibility
+title: "Error Handling UX"
+description: "User-facing error handling guidelines"
+
+content:
+  summary: "Clear, helpful error messages that guide users"
+
+  error_principles:
+    - "Never show technical errors to users"
+    - "Explain what happened in plain language"
+    - "Provide clear next steps"
+    - "Offer help contact when needed"
+
+  error_categories:
+    validation:
+      example: "Invalid phone number format"
+      message: "Please enter a valid phone number (e.g., 555-123-4567)"
+      action: "Highlight field, show inline error"
+
+    network:
+      example: "API timeout"
+      message: "We're having trouble connecting. Please try again."
+      action: "Retry button, offline indicator"
+
+    authentication:
+      example: "Session expired"
+      message: "Your session has expired. Please sign in again."
+      action: "Redirect to login, preserve context"
+
+    server:
+      example: "500 error"
+      message: "Something went wrong on our end. We're working on it."
+      action: "Log error, show support contact"
+
+  offline_handling:
+    - "Queue medication logs when offline"
+    - "Sync when connection restored"
+    - "Clear offline indicator in UI"
+
+  support_escalation:
+    - "In-app help button on all error screens"
+    - "Support email and phone visible"
+    - "Error reference code for support tickets"
+
+provenance:
+  created_by: "ux-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Error UX from usability testing feedback"

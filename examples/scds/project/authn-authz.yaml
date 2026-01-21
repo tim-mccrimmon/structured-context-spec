@@ -1,0 +1,40 @@
+id: scd:project:authn-authz
+type: project
+version: "0.1.0"
+domain: security
+title: "Authentication and Authorization"
+description: "Authentication and authorization requirements"
+
+content:
+  summary: "OAuth 2.0 / OIDC with role-based access control"
+
+  authentication:
+    provider: "Auth0"
+    protocols: ["OAuth 2.0", "OIDC"]
+    mfa: "Required for providers, optional for patients"
+    session_timeout: "15 minutes idle, 8 hours maximum"
+
+  authorization:
+    model: "Role-Based Access Control (RBAC)"
+    roles:
+      - name: "patient"
+        permissions: ["read:own_data", "write:own_medications", "write:adherence_events"]
+      - name: "provider"
+        permissions: ["read:assigned_patients", "write:alerts", "export:reports"]
+      - name: "admin"
+        permissions: ["manage:users", "read:audit_logs", "manage:organizations"]
+
+  token_management:
+    access_token_lifetime: "15 minutes"
+    refresh_token_lifetime: "7 days"
+    refresh_token_rotation: "Enabled"
+
+  api_security:
+    - "JWT validation on all endpoints"
+    - "Scope checking for each operation"
+    - "Rate limiting per user"
+
+provenance:
+  created_by: "security-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Auth design for HIPAA and SOC2 compliance"

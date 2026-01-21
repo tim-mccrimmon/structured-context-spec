@@ -1,0 +1,36 @@
+id: scd:project:hipaa-compliance
+type: project
+version: "0.1.0"
+domain: compliance-governance
+title: "HIPAA Compliance"
+description: "HIPAA Privacy and Security Rule compliance requirements"
+
+content:
+  summary: "System handles PHI and must comply with HIPAA Privacy and Security Rules"
+
+  phi_categories_handled:
+    - "Patient name and contact information"
+    - "Medication lists and schedules"
+    - "Adherence history and patterns"
+    - "Healthcare provider relationships"
+
+  privacy_rule_requirements:
+    - "Minimum necessary access - users see only data needed for their role"
+    - "Patient authorization required for data sharing beyond treatment"
+    - "Right to access - patients can export their data"
+    - "Right to amend - patients can request corrections"
+
+  security_rule_requirements:
+    - "Encryption at rest (AES-256) and in transit (TLS 1.3)"
+    - "Access controls with unique user identification"
+    - "Audit logging of all PHI access"
+    - "Automatic session timeout after 15 minutes"
+
+  baa_requirements:
+    - "BAA required with all healthcare organization customers"
+    - "BAA required with subprocessors (AWS, Twilio, Auth0)"
+
+provenance:
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "HIPAA compliance framework from legal and compliance review"

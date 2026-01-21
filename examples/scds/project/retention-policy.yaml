@@ -1,0 +1,43 @@
+id: scd:project:retention-policy
+type: project
+version: "0.1.0"
+domain: data-provenance
+title: "Retention Policy"
+description: "Data retention and deletion policies"
+
+content:
+  summary: "HIPAA-compliant retention with patient deletion rights"
+
+  retention_periods:
+    - data_type: "Patient PHI"
+      retention: "7 years from last activity"
+      rationale: "HIPAA minimum retention requirement"
+
+    - data_type: "Audit logs"
+      retention: "7 years"
+      rationale: "HIPAA audit trail requirement"
+
+    - data_type: "Analytics data (de-identified)"
+      retention: "Indefinite"
+      rationale: "No PHI, valuable for product improvement"
+
+    - data_type: "Session logs"
+      retention: "90 days"
+      rationale: "Troubleshooting window"
+
+  deletion_procedures:
+    patient_request:
+      - "Verify patient identity"
+      - "Delete PHI from primary database"
+      - "Delete from backups within 30 days"
+      - "Retain audit log of deletion (no PHI)"
+
+    account_inactive:
+      - "Notify patient at 6 months inactive"
+      - "Archive data at 12 months inactive"
+      - "Delete at 7 years per retention policy"
+
+provenance:
+  created_by: "data-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Retention policy from legal and compliance review"

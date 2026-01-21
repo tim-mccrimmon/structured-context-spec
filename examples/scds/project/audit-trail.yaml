@@ -1,0 +1,43 @@
+id: scd:project:audit-trail
+type: project
+version: "0.1.0"
+domain: data-provenance
+title: "Audit Trail"
+description: "Audit trail implementation for data access and modifications"
+
+content:
+  summary: "Immutable audit log for all PHI access and system changes"
+
+  audit_log_schema:
+    required_fields:
+      - "event_id (UUID)"
+      - "timestamp (ISO 8601)"
+      - "event_type"
+      - "actor_id"
+      - "actor_type (user|system|api)"
+      - "resource_type"
+      - "resource_id"
+      - "action (create|read|update|delete)"
+      - "outcome (success|failure)"
+
+    optional_fields:
+      - "ip_address"
+      - "user_agent"
+      - "request_id"
+      - "previous_value (for updates)"
+
+  implementation:
+    storage: "AWS CloudWatch Logs + S3 archive"
+    immutability: "S3 Object Lock (compliance mode)"
+    encryption: "AWS KMS encryption"
+    access: "Read-only for compliance team"
+
+  query_capabilities:
+    - "Who accessed patient X's data?"
+    - "What did user Y do on date Z?"
+    - "All failed access attempts in time range"
+
+provenance:
+  created_by: "data-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Audit trail design for HIPAA compliance"

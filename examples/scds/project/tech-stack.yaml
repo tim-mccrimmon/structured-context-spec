@@ -1,0 +1,38 @@
+id: scd:project:tech-stack
+type: project
+version: "0.1.0"
+domain: architecture
+title: "Technology Stack"
+description: "Technology choices and rationale for the Medication Adherence system"
+
+content:
+  summary: "Modern cloud-native stack optimized for healthcare compliance and mobile-first UX"
+
+  frontend:
+    mobile: "React Native"
+    web_dashboard: "React + TypeScript"
+    rationale: "Cross-platform mobile with shared codebase, strong typing for reliability"
+
+  backend:
+    language: "Python 3.11+"
+    framework: "FastAPI"
+    rationale: "Async performance, automatic OpenAPI docs, strong typing with Pydantic"
+
+  database:
+    primary: "PostgreSQL 15"
+    cache: "Redis"
+    rationale: "ACID compliance for healthcare data, Redis for session/cache"
+
+  infrastructure:
+    cloud: "AWS"
+    container: "Docker + ECS"
+    rationale: "HIPAA-eligible services, managed container orchestration"
+
+  messaging:
+    sms_provider: "Twilio"
+    push_notifications: "Firebase Cloud Messaging"
+
+provenance:
+  created_by: "architecture-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Technology stack selection for MVP development"

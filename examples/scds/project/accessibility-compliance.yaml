@@ -1,0 +1,50 @@
+id: scd:project:accessibility-compliance
+type: project
+version: "0.1.0"
+domain: usability-accessibility
+title: "Accessibility Compliance"
+description: "Accessibility requirements and WCAG compliance"
+
+content:
+  summary: "WCAG 2.1 AA compliance for inclusive design"
+
+  compliance_target: "WCAG 2.1 Level AA"
+
+  key_requirements:
+    perceivable:
+      - "Text alternatives for images"
+      - "Captions for any audio/video"
+      - "Sufficient color contrast (4.5:1 minimum)"
+      - "Resizable text up to 200%"
+
+    operable:
+      - "All functionality keyboard accessible"
+      - "No time limits or easy extension"
+      - "Skip navigation links"
+      - "Focus visible on all interactive elements"
+
+    understandable:
+      - "Consistent navigation"
+      - "Clear labels and instructions"
+      - "Error identification and suggestions"
+      - "Reading level appropriate for audience"
+
+    robust:
+      - "Valid HTML markup"
+      - "ARIA labels where needed"
+      - "Works with screen readers (VoiceOver, TalkBack)"
+
+  testing:
+    automated: "aXe accessibility scanner in CI"
+    manual: "Screen reader testing quarterly"
+    user_testing: "Include users with disabilities"
+
+  assistive_technology_support:
+    - "iOS VoiceOver"
+    - "Android TalkBack"
+    - "Desktop screen readers"
+
+provenance:
+  created_by: "ux-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Accessibility requirements for healthcare inclusivity"

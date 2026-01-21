@@ -1,0 +1,46 @@
+id: scd:project:test-coverage
+type: project
+version: "0.1.0"
+domain: testing-validation
+title: "Test Coverage"
+description: "Test coverage requirements and strategy"
+
+content:
+  summary: "Comprehensive testing with 80% code coverage target"
+
+  coverage_targets:
+    unit_tests: "80% line coverage"
+    integration_tests: "All API endpoints covered"
+    e2e_tests: "Critical user journeys"
+
+  test_types:
+    unit:
+      scope: "Individual functions and classes"
+      tools: "pytest"
+      run_frequency: "Every commit"
+
+    integration:
+      scope: "API endpoints, database operations"
+      tools: "pytest + test database"
+      run_frequency: "Every PR"
+
+    e2e:
+      scope: "Full user workflows"
+      tools: "Playwright"
+      run_frequency: "Daily + pre-release"
+
+    performance:
+      scope: "Load and stress testing"
+      tools: "Locust"
+      run_frequency: "Weekly + pre-release"
+
+  critical_paths:
+    - "Patient medication entry flow"
+    - "Reminder scheduling and delivery"
+    - "Provider dashboard patient view"
+    - "Authentication flows"
+
+provenance:
+  created_by: "qa-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Test strategy from QA planning"

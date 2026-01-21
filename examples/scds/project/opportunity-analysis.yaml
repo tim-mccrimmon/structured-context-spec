@@ -1,0 +1,37 @@
+id: scd:project:opportunity-analysis
+type: project
+version: "0.1.0"
+domain: business-context
+title: "Opportunity Analysis"
+description: "Market opportunity and competitive positioning"
+
+content:
+  summary: "Large addressable market with fragmented competition and clear differentiation path"
+
+  market_size:
+    tam: "$15B medication adherence market"
+    sam: "$3B chronic condition management segment"
+    som: "$300M initial target (cardiology + diabetes)"
+
+  competitive_landscape:
+    - competitor: "Medisafe"
+      positioning: "Consumer app, limited provider features"
+    - competitor: "Omnicell"
+      positioning: "Hardware-focused, enterprise only"
+    - competitor: "Generic reminder apps"
+      positioning: "No healthcare specialization"
+
+  differentiation:
+    - "Provider dashboard with actionable insights"
+    - "HIPAA-compliant from day one"
+    - "SMS fallback for low-tech patients"
+    - "Outcome-based pricing model"
+
+  go_to_market:
+    initial_segment: "Cardiology and diabetes clinics"
+    channel: "Direct sales to healthcare organizations"
+
+provenance:
+  created_by: "product-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Market analysis from business development team"

@@ -1,0 +1,55 @@
+id: scd:project:qa-procedures
+type: project
+version: "0.1.0"
+domain: testing-validation
+title: "QA Procedures"
+description: "Quality assurance procedures and workflows"
+
+content:
+  summary: "QA integrated into development workflow"
+
+  qa_workflow:
+    development:
+      - "Developers write unit tests with code"
+      - "PR requires passing CI checks"
+      - "Code review includes test review"
+
+    pre_merge:
+      - "Automated test suite execution"
+      - "Static analysis (linting, type checking)"
+      - "Security scanning (SAST)"
+
+    post_merge:
+      - "Integration tests in staging"
+      - "E2E test suite execution"
+      - "Performance regression check"
+
+    pre_release:
+      - "Full regression test suite"
+      - "Manual exploratory testing"
+      - "Clinical workflow validation"
+      - "Security team sign-off"
+
+  defect_management:
+    severity_levels:
+      critical: "Blocks release, fix immediately"
+      high: "Must fix before release"
+      medium: "Should fix, can defer if needed"
+      low: "Fix when convenient"
+
+    sla:
+      critical: "4 hours to fix"
+      high: "24 hours to fix"
+
+  environments:
+    - name: "development"
+      purpose: "Developer testing"
+    - name: "staging"
+      purpose: "Integration and QA testing"
+    - name: "production"
+      purpose: "Live system"
+
+provenance:
+  created_by: "qa-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "QA procedures from team process definition"

@@ -1,0 +1,41 @@
+id: scd:project:infrastructure-definition
+type: project
+version: "0.1.0"
+domain: deployment-operations
+title: "Infrastructure Definition"
+description: "Cloud infrastructure and deployment architecture"
+
+content:
+  summary: "AWS-based HIPAA-eligible infrastructure"
+
+  cloud_provider: "AWS (HIPAA BAA in place)"
+
+  environments:
+    - name: "production"
+      region: "us-east-1"
+      redundancy: "Multi-AZ"
+    - name: "staging"
+      region: "us-east-1"
+      redundancy: "Single-AZ"
+    - name: "development"
+      region: "us-east-1"
+      redundancy: "Single-AZ"
+
+  core_services:
+    compute: "ECS Fargate"
+    database: "RDS PostgreSQL (Multi-AZ)"
+    cache: "ElastiCache Redis"
+    storage: "S3 with versioning"
+    cdn: "CloudFront"
+    dns: "Route 53"
+
+  security_infrastructure:
+    waf: "AWS WAF"
+    secrets: "AWS Secrets Manager"
+    encryption: "AWS KMS"
+    networking: "VPC with private subnets"
+
+provenance:
+  created_by: "devops-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Infrastructure design for HIPAA compliance and scalability"

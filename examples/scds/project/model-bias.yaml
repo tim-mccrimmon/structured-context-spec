@@ -1,0 +1,37 @@
+id: scd:project:model-bias
+type: project
+version: "0.1.0"
+domain: ethics-ai-accountability
+title: "Model Bias"
+description: "Bias detection and mitigation for AI/ML models"
+
+content:
+  summary: "Proactive bias monitoring to ensure equitable outcomes"
+
+  bias_risks:
+    - risk: "Demographic bias in adherence predictions"
+      mitigation: "Stratified evaluation across age, race, socioeconomic status"
+    - risk: "Digital divide affecting low-tech patients"
+      mitigation: "SMS fallback, phone support option"
+    - risk: "Language barriers"
+      mitigation: "Multi-language support (English, Spanish initially)"
+
+  monitoring:
+    - "Monthly bias audits on prediction accuracy by demographic"
+    - "Alert if accuracy varies >10% across groups"
+    - "Quarterly review with clinical advisory board"
+
+  fairness_metrics:
+    - "Equal opportunity: similar true positive rates across groups"
+    - "Demographic parity: similar prediction rates across groups"
+    - "Calibration: predictions equally accurate across groups"
+
+  remediation:
+    - "Retrain models if bias detected"
+    - "Adjust thresholds per group if needed"
+    - "Document all bias findings and actions"
+
+provenance:
+  created_by: "ethics-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Bias framework from AI ethics guidelines and clinical input"

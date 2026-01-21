@@ -1,0 +1,35 @@
+id: scd:project:stakeholders
+type: project
+version: "0.1.0"
+domain: business-context
+title: "Stakeholders"
+description: "Key stakeholders and their interests in the system"
+
+content:
+  summary: "Primary stakeholders are patients and healthcare providers"
+
+  stakeholders:
+    - name: "Patients"
+      role: "Primary end user"
+      interests: ["Easy medication tracking", "Helpful reminders", "Privacy protection"]
+      success_criteria: "Daily active usage, self-reported satisfaction"
+
+    - name: "Healthcare Providers"
+      role: "Secondary user, decision maker"
+      interests: ["Patient adherence visibility", "Actionable alerts", "Minimal workflow disruption"]
+      success_criteria: "Reduced no-shows, improved patient outcomes"
+
+    - name: "Healthcare Organizations"
+      role: "Buyer/payer"
+      interests: ["ROI on patient outcomes", "Compliance with regulations", "Integration with existing systems"]
+      success_criteria: "Measurable adherence improvement, HIPAA compliance"
+
+    - name: "Regulatory Bodies"
+      role: "External constraint"
+      interests: ["Patient data protection", "Clinical safety"]
+      success_criteria: "HIPAA compliance, no adverse events"
+
+provenance:
+  created_by: "product-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Stakeholder analysis from discovery phase"

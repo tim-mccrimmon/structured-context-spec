@@ -1,0 +1,40 @@
+id: scd:project:constraints-and-assumptions
+type: project
+version: "0.1.0"
+domain: business-context
+title: "Constraints and Assumptions"
+description: "Known constraints and working assumptions"
+
+content:
+  summary: "Healthcare regulatory requirements are primary constraints"
+
+  constraints:
+    regulatory:
+      - "Must be HIPAA compliant"
+      - "Must support BAA with healthcare customers"
+      - "Cannot provide medical advice or diagnoses"
+
+    technical:
+      - "Must work on iOS 14+ and Android 10+"
+      - "Must support SMS for users without smartphones"
+      - "Must achieve 99.9% uptime for reminder delivery"
+
+    business:
+      - "MVP budget: $500K"
+      - "Time to market: 9 months"
+      - "Initial team: 8 engineers"
+
+  assumptions:
+    - assumption: "Patients will opt-in to reminders"
+      risk_if_wrong: "Low adoption, pivot to provider-push model"
+
+    - assumption: "Healthcare orgs will pay per-patient SaaS fees"
+      risk_if_wrong: "Revenue model failure, explore B2C"
+
+    - assumption: "SMS delivery is reliable enough for reminders"
+      risk_if_wrong: "Add redundant notification channels"
+
+provenance:
+  created_by: "product-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Constraints from legal, finance, and engineering leads"

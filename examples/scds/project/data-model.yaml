@@ -1,0 +1,46 @@
+id: scd:project:data-model
+type: project
+version: "0.1.0"
+domain: data-provenance
+title: "Data Model"
+description: "Core data entities and relationships"
+
+content:
+  summary: "Patient-centric data model for medication adherence tracking"
+
+  entities:
+    - name: "Patient"
+      description: "Enrolled patient with medication schedules"
+      key_attributes: ["patient_id", "name", "phone", "email", "provider_id"]
+      phi: true
+
+    - name: "Medication"
+      description: "Medication prescribed to a patient"
+      key_attributes: ["medication_id", "patient_id", "name", "dosage", "frequency"]
+      phi: true
+
+    - name: "Reminder"
+      description: "Scheduled reminder for a medication dose"
+      key_attributes: ["reminder_id", "medication_id", "scheduled_time", "status"]
+      phi: false
+
+    - name: "AdherenceEvent"
+      description: "Record of medication taken or missed"
+      key_attributes: ["event_id", "medication_id", "timestamp", "taken", "source"]
+      phi: true
+
+    - name: "Provider"
+      description: "Healthcare provider with dashboard access"
+      key_attributes: ["provider_id", "name", "organization", "role"]
+      phi: false
+
+  relationships:
+    - "Patient has many Medications"
+    - "Medication has many Reminders"
+    - "Medication has many AdherenceEvents"
+    - "Provider has many Patients"
+
+provenance:
+  created_by: "data-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "Core data model from domain modeling sessions"

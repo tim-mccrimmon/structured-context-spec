@@ -1,0 +1,32 @@
+id: scd:project:policy-enforcement
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Policy Enforcement"
+description: "Mechanisms for enforcing compliance and security policies"
+
+domain: compliance-governance
+concerns:
+  - policy-enforcement
+  - automated-controls
+
+content:
+  automated_enforcement:
+    - policy: "[Policy name]"
+      mechanism: "[Enforcement mechanism]"
+      enforcement: "[How it's enforced]"
+
+  access_control_enforcement:
+    - policy: "[Access policy]"
+      mechanism: "[Control mechanism]"
+      enforcement: "[Enforcement method]"
+
+  manual_controls:
+    - policy: "[Manual policy]"
+      mechanism: "[Review process]"
+      enforcement: "[Sign-off requirements]"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Initial policy enforcement for {{ project_name }}"

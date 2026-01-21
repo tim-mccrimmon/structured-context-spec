@@ -1,0 +1,41 @@
+id: scd:project:soc2-controls
+type: project
+version: "0.1.0"
+domain: compliance-governance
+title: "SOC2 Controls"
+description: "SOC2 Type II trust service criteria and controls"
+
+content:
+  summary: "SOC2 Type II certification targeted for Year 1"
+
+  trust_service_criteria:
+    security:
+      - "Logical access controls with MFA"
+      - "Network security with WAF and DDoS protection"
+      - "Change management with code review requirements"
+
+    availability:
+      - "99.9% uptime SLA"
+      - "Disaster recovery with 4-hour RTO"
+      - "Multi-AZ deployment"
+
+    confidentiality:
+      - "Data classification policy"
+      - "Encryption for all confidential data"
+      - "Secure data disposal procedures"
+
+    processing_integrity:
+      - "Input validation on all user data"
+      - "Automated testing in CI/CD pipeline"
+      - "Error handling and logging"
+
+  control_activities:
+    - "Quarterly access reviews"
+    - "Annual penetration testing"
+    - "Continuous vulnerability scanning"
+    - "Security awareness training"
+
+provenance:
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "SOC2 control mapping for enterprise customer requirements"

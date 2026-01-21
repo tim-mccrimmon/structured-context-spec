@@ -1,0 +1,38 @@
+id: scd:project:ai-usage-policy
+type: project
+version: "0.1.0"
+domain: ethics-ai-accountability
+title: "AI Usage Policy"
+description: "Policies governing AI/ML usage in the system"
+
+content:
+  summary: "AI assists but does not replace clinical judgment"
+
+  ai_components:
+    - name: "Adherence prediction"
+      purpose: "Identify at-risk patients for proactive outreach"
+      decision_authority: "Recommendation only - provider reviews"
+
+    - name: "Reminder optimization"
+      purpose: "Optimize reminder timing based on patient behavior"
+      decision_authority: "Automated within patient-approved bounds"
+
+  prohibited_uses:
+    - "No AI-generated medical advice to patients"
+    - "No automated treatment decisions"
+    - "No use of PHI for model training without consent"
+
+  transparency_requirements:
+    - "Patients informed that AI assists with reminders"
+    - "Providers shown confidence scores for predictions"
+    - "Explainability for any flagged patients"
+
+  human_oversight:
+    - "All predictions reviewed before patient contact"
+    - "Provider can override any AI recommendation"
+    - "Escalation path for AI concerns"
+
+provenance:
+  created_by: "ethics-team@medtech.com"
+  created_at: "2025-12-01T00:00:00Z"
+  rationale: "AI policy aligned with healthcare AI ethics guidelines"
