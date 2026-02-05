@@ -1,0 +1,66 @@
+# SCD: Tech Stack
+# Specific technologies and versions used in this project
+
+id: scd:project:tech-stack
+tier: project
+title: Technology Stack
+version: "1.0.0"
+
+metadata:
+  owner: "Engineering Team"
+  created_at: "2025-02-05T10:00:00Z"
+  tags: [python, cli, architecture]
+  priority: high
+
+applies_to:
+  paths: ["**/*"]
+
+content:
+  summary: Python 3.10+ CLI with Click, local JSON storage, pytest for testing.
+
+  layers:
+    - layer: Language
+      technology: Python 3.10+
+      notes: Type hints, dataclasses (stdlib)
+
+    - layer: CLI Framework
+      technology: Click
+      notes: Cleaner than argparse, better UX for complex commands
+
+    - layer: Data Models
+      technology: dataclasses
+      notes: stdlib, no ORM needed for JSON storage
+
+    - layer: Storage
+      technology: JSON file
+      notes: |
+        Local only (~/.careplan/data.json)
+        No encryption yet - relies on workstation full-disk encryption
+        Single-user, no concurrent access concerns
+
+    - layer: Testing
+      technology: pytest
+      notes: Unit tests for service/storage layers
+
+  dependencies:
+    runtime:
+      - click>=8.0
+    dev:
+      - pytest>=7.0
+
+  not_using:
+    - name: ORMs (SQLAlchemy, etc.)
+      reason: Overkill for JSON file storage
+    - name: async/await
+      reason: No I/O concurrency needs, CLI is synchronous
+    - name: External APIs
+      reason: Local-only tool, no network dependencies
+
+output:
+  claude_code:
+    file: .claude/rules/tech-stack.md
+    format: table
+
+  codex:
+    file: AGENTS.md
+    section: "## Tech Stack"

@@ -1,0 +1,92 @@
+# SCD: Architecture
+# System structure, components, and data flow
+
+id: scd:project:architecture
+tier: project
+title: Architecture
+version: "1.0.0"
+
+metadata:
+  owner: "Engineering Team"
+  created_at: "2025-02-05T10:00:00Z"
+  tags: [architecture, design]
+  priority: high
+
+applies_to:
+  paths: ["**/*"]
+
+content:
+  summary: Simple 3-layer Python CLI application (CLI → Service → Storage).
+
+  design:
+    type: Monolith (single CLI application)
+    style: Layered architecture
+    deployment: Installed on clinic workstations
+
+  layers:
+    - name: CLI Layer
+      file: careplan/cli.py
+      responsibility: |
+        Argument parsing (Click commands)
+        Output formatting (tables, messages)
+        User interaction
+      depends_on: Service Layer
+
+    - name: Service Layer
+      file: careplan/service.py
+      responsibility: |
+        Business logic
+        Input validation
+        Coordinating storage operations
+      depends_on: Storage Layer
+      notes: All PHI operations go through here
+
+    - name: Storage Layer
+      file: careplan/storage.py
+      responsibility: |
+        JSON file I/O
+        Serialization/deserialization
+        Data persistence
+      notes: Reads/writes PHI - audit considerations
+
+  data_flow: |
+    User Input → CLI (parse) → Service (validate, process) → Storage (persist)
+                     ↓                    ↓                        ↓
+               Format output      Apply business rules       Load/save JSON
+
+  key_files:
+    - path: careplan/models.py
+      purpose: Data classes (Patient, Medication, Appointment, Task, LogEntry)
+      contains_phi: Defines PHI structure
+      status: Complete
+
+    - path: careplan/service.py
+      purpose: Business logic - add/log/query operations
+      contains_phi: Handles PHI
+      status: TODO (stub)
+
+    - path: careplan/storage.py
+      purpose: Load/save JSON to disk
+      contains_phi: Reads/writes PHI
+      status: TODO (stub)
+
+    - path: careplan/cli.py
+      purpose: Click commands, output formatting
+      contains_phi: Displays PHI
+      status: TODO
+
+    - path: ~/.careplan/data.json
+      purpose: Persisted patient data
+      contains_phi: "**YES - Contains PHI**"
+      status: Created at runtime
+
+  external_dependencies: None (local-only tool)
+
+output:
+  claude_code:
+    file: .claude/rules/architecture.md
+    format: mixed
+
+  codex:
+    file: AGENTS.md
+    section: "## Architecture"

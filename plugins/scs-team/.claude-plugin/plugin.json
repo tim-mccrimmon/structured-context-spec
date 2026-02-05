@@ -1,0 +1,21 @@
+{
+  "name": "scs-team",
+  "description": "Structured Context for Teams - Transform your PRDs, architecture docs, and compliance requirements into structured context that Claude actually uses.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Tim McCrimmon",
+    "email": "tim@structuredcontext.io"
+  },
+  "homepage": "https://structuredcontext.io",
+  "repository": "https://github.com/structuredcontext/scs-team",
+  "license": "MIT",
+  "keywords": [
+    "context",
+    "architecture",
+    "governance",
+    "structured-context",
+    "teams",
+    "compliance",
+    "enterprise"
+  ]
+}

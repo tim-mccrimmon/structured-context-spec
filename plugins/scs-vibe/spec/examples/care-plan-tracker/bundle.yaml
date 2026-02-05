@@ -1,0 +1,58 @@
+# Bundle Manifest: Care Plan Tracker
+# This file lists all SCDs that make up this project's context
+
+id: bundle:project:care-plan-tracker
+type: project
+version: "1.0.0"
+title: Care Plan Tracker
+
+description: |
+  CLI tool for care coordinators to track patient medications,
+  appointments, and daily health tasks.
+
+metadata:
+  owner: "Tim McCrimmon"
+  created_at: "2025-02-05T10:00:00Z"
+
+  # Project characteristics (used by compiler for optimization)
+  characteristics:
+    domain: healthcare
+    deployment: internal-tool
+    data_sensitivity: phi
+
+scds:
+  # Global SCDs (apply to all files)
+  - scd:project:system-overview
+  - scd:project:tech-stack
+  - scd:project:architecture
+  - scd:project:patterns
+  - scd:project:constraints
+  - scd:project:domain-context
+
+  # Path-specific SCDs (apply only to matching files)
+  - scd:project:phi-handling  # Only careplan/models.py, service.py, storage.py
+
+# Future: Import from other bundles
+# imports:
+#   - bundle:standards:hipaa-basics    # Common HIPAA rules
+#   - bundle:domain:acme-health-corp   # Company-wide standards
+
+# Compiler configuration
+compile:
+  default_target: claude_code
+
+  targets:
+    claude_code:
+      # Generate combined CLAUDE.md for overview
+      overview_file: CLAUDE.md
+      overview_sections:
+        - scd:project:system-overview
+
+      # Generate modular rules
+      rules_dir: .claude/rules/
+
+    codex:
+      file: AGENTS.md
+
+    cursor:
+      file: .cursorrules

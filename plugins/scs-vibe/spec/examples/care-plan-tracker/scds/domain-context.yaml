@@ -1,0 +1,94 @@
+# SCD: Domain Context
+# Healthcare/clinical terminology and workflows
+
+id: scd:project:domain-context
+tier: project
+title: Domain Context
+version: "1.0.0"
+
+metadata:
+  owner: "Clinical Team"
+  created_at: "2025-02-05T10:00:00Z"
+  tags: [healthcare, domain, terminology]
+  priority: normal
+
+applies_to:
+  paths: ["**/*"]
+
+content:
+  summary: Healthcare terminology and care coordination workflows.
+
+  terms:
+    - term: Care Plan
+      definition: |
+        Collection of medications, appointments, and tasks prescribed for a patient.
+        The central organizing concept in this system.
+
+    - term: Adherence
+      definition: |
+        Whether the patient followed the care plan - took medications,
+        attended appointments, completed tasks. Tracked via log entries.
+
+    - term: Log Entry
+      definition: |
+        Record that a care plan item was completed.
+        Contains: item reference, timestamp, optional notes.
+        Used to track adherence over time.
+
+    - term: PHI (Protected Health Information)
+      definition: |
+        Any individually identifiable health information.
+        In this system: patient name, medications, appointments, tasks.
+        Subject to HIPAA protection requirements.
+
+    - term: Care Coordinator
+      definition: |
+        Clinical staff member who manages patient care plans.
+        Primary user of this tool. Reviews adherence during check-ins.
+
+    - term: Frequency
+      definition: |
+        How often a medication or task should occur.
+        Values: "daily", "twice daily", "weekly", "as needed", etc.
+
+  workflows:
+    - name: Setup Patient Care Plan
+      actor: Care Coordinator
+      steps:
+        - "Add medications with dosage and frequency"
+        - "Add appointments with provider and datetime"
+        - "Add daily tasks with instructions"
+      outcome: Patient has complete care plan in system
+
+    - name: Daily Logging
+      actor: Care Coordinator (during patient contact)
+      steps:
+        - "Review today's care plan items with patient"
+        - "Log completed medications"
+        - "Log completed tasks"
+        - "Note any issues or concerns"
+      outcome: Adherence record updated
+
+    - name: Adherence Review
+      actor: Care Coordinator
+      steps:
+        - "View patient's care plan summary"
+        - "Review history for date range"
+        - "Identify missed items or patterns"
+        - "Discuss with patient, adjust plan if needed"
+      outcome: Care plan optimized based on actual adherence
+
+  business_rules:
+    - "A patient can have multiple medications, appointments, and tasks"
+    - "Each log entry references exactly one care plan item"
+    - "Adherence is calculated as: logged items / expected items"
+    - "Appointments are one-time; medications and tasks recur per frequency"
+
+output:
+  claude_code:
+    file: .claude/rules/domain-context.md
+    format: mixed
+
+  codex:
+    file: AGENTS.md
+    section: "## Domain Context"

@@ -1,0 +1,82 @@
+# SCD: Patterns
+# What patterns we use and what we avoid
+
+id: scd:project:patterns
+tier: project
+title: Patterns
+version: "1.0.0"
+
+metadata:
+  owner: "Engineering Team"
+  created_at: "2025-02-05T10:00:00Z"
+  tags: [patterns, best-practices]
+  priority: normal
+
+applies_to:
+  paths: ["**/*"]
+
+content:
+  summary: Dataclasses for models, layered architecture, explicit instance passing.
+
+  patterns:
+    use:
+      - name: Dataclasses for models
+        where: careplan/models.py
+        why: Simple, typed, stdlib - no external dependencies
+        example: |
+          @dataclass
+          class Medication:
+              id: str
+              name: str
+              dosage: str
+              frequency: str
+
+      - name: Layered architecture
+        where: CLI → Service → Storage separation
+        why: |
+          Testability - can unit test service without CLI
+          Separation of concerns - validation in service, I/O in storage
+        example: Service calls storage.load(), not JSON directly
+
+      - name: UUIDs for IDs
+        where: All entity IDs
+        why: No collision risk, works offline, no sequence management
+        example: "id: str = field(default_factory=lambda: str(uuid.uuid4()))"
+
+      - name: ISO 8601 for dates
+        where: All datetime serialization
+        why: Consistent, sortable, timezone-aware capable
+        example: "2025-02-05T10:30:00Z"
+
+      - name: Explicit instance passing
+        where: Throughout codebase
+        why: No hidden dependencies, easier testing, clear data flow
+        example: "def add_medication(storage: Storage, medication: Medication)"
+
+    avoid:
+      - name: ORMs
+        why: Overkill for JSON file storage, adds complexity without benefit
+        instead: Direct dataclass serialization to JSON
+
+      - name: Global state
+        why: Makes testing hard, hides dependencies, causes bugs
+        instead: Pass storage/service instances explicitly
+
+      - name: PHI in exceptions/logs
+        why: HIPAA violation risk, audit exposure
+        instead: |
+          Use generic error messages: "Patient not found"
+          NOT: "Patient John Smith (ID: 12345) not found"
+
+      - name: Magic strings for status/types
+        why: Typos cause bugs, no IDE support
+        instead: Use Enums or Literal types
+
+output:
+  claude_code:
+    file: .claude/rules/patterns.md
+    format: mixed
+
+  codex:
+    file: AGENTS.md
+    section: "## Patterns"

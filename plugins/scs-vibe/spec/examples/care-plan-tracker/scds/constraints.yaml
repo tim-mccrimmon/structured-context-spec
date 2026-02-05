@@ -1,0 +1,84 @@
+# SCD: Constraints
+# Technical, clinical, and operational constraints
+
+id: scd:project:constraints
+tier: project
+title: Constraints
+version: "1.0.0"
+
+metadata:
+  owner: "Engineering Team"
+  created_at: "2025-02-05T10:00:00Z"
+  tags: [constraints, requirements]
+  priority: high
+
+applies_to:
+  paths: ["**/*"]
+
+content:
+  summary: Python 3.10+, local-only storage, clinical data accuracy requirements.
+
+  technical:
+    - constraint: "Python 3.10+"
+      reason: Using modern type hints, dataclasses, and match statements
+      implication: Cannot use older Python syntax
+
+    - constraint: "No external services"
+      reason: Local-only tool, simplicity, no network dependencies
+      implication: All operations must work offline
+
+    - constraint: "Single JSON file storage"
+      reason: Simplicity for v1
+      implication: |
+        No concurrent access support
+        File corruption = data loss (mitigated by workstation backups)
+        No querying - must load entire file
+
+    - constraint: "Click for CLI"
+      reason: Chosen for cleaner command syntax than argparse
+      implication: Must follow Click patterns, not argparse
+
+  clinical:
+    - constraint: "Data accuracy is critical"
+      reason: Medication dosages, appointment times must be exact
+      implication: |
+        Validate inputs strictly
+        Don't auto-correct or guess values
+        Display exactly what was entered
+
+    - constraint: "No clinical decision support"
+      reason: Out of scope - this tracks adherence, doesn't recommend
+      implication: |
+        Don't suggest medication changes
+        Don't flag "dangerous" combinations
+        Don't provide medical advice
+
+    - constraint: "Audit trail needed (future)"
+      reason: HIPAA requires knowing who accessed what
+      implication: |
+        Design storage to accommodate audit fields
+        v1 acceptable without, v2 must have
+
+  operational:
+    - constraint: "Care coordinators are the users"
+      reason: Internal clinical staff, not patients
+      implication: |
+        Can assume basic computer literacy
+        Can assume training on tool usage
+        Error messages can be technical
+
+    - constraint: "Clinic workstations"
+      reason: Deployment environment
+      implication: |
+        Can assume Windows or Linux
+        Can assume full-disk encryption (IT policy)
+        Cannot assume admin rights for installation
+
+output:
+  claude_code:
+    file: .claude/rules/constraints.md
+    format: mixed
+
+  codex:
+    file: AGENTS.md
+    section: "## Constraints"

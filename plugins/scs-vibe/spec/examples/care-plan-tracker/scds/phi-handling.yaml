@@ -1,0 +1,79 @@
+# SCD: PHI Handling
+# Rules for files that handle Protected Health Information
+# This is a PATH-SPECIFIC SCD - only loads when working on relevant files
+
+id: scd:project:phi-handling
+tier: project
+title: PHI Handling Rules
+version: "1.0.0"
+
+metadata:
+  owner: "Compliance Team"
+  created_at: "2025-02-05T10:00:00Z"
+  tags: [healthcare, phi, hipaa, compliance]
+  priority: critical  # Always load when applicable
+
+# PATH-SPECIFIC: Only applies to files that handle PHI
+applies_to:
+  paths:
+    - "careplan/models.py"      # Defines PHI structures
+    - "careplan/service.py"     # Handles PHI operations
+    - "careplan/storage.py"     # Reads/writes PHI
+    # NOT cli.py - it displays but doesn't process
+    # NOT tests/ - test data should be synthetic anyway
+
+content:
+  summary: These files handle PHI. HIPAA awareness required.
+
+  context: |
+    This codebase handles Protected Health Information (PHI):
+    - Patient names
+    - Medications (name, dosage, frequency)
+    - Appointments (provider, datetime, location)
+    - Health tasks and completion logs
+
+    HIPAA applies. While this is a local-only tool (contained risk),
+    development practices must still protect PHI.
+
+  rules:
+    - "**Never log PHI**: No patient names, medications, or appointment details in logs"
+    - "**Generic error messages**: Use 'Patient not found' NOT 'Patient John Smith not found'"
+    - "**No PHI in exceptions**: Exception messages may end up in logs or error reports"
+    - "**Validate before storage**: All inputs validated in service layer before persisting"
+    - "**Minimize PHI exposure**: Only load/display what's needed for the operation"
+
+  what_is_phi:
+    - Patient name
+    - Patient ID (internal identifier)
+    - Medication names and dosages
+    - Appointment details (provider, location, datetime)
+    - Task descriptions (may contain health info)
+    - Log entries (timestamped health activities)
+
+  safe_to_log:
+    - Operation type (add_medication, log_task)
+    - Timestamps
+    - Success/failure status
+    - Generic counts ("Added 1 medication", not "Added Metformin")
+
+  before_making_changes:
+    - "[ ] Does this change touch PHI?"
+    - "[ ] Are error messages generic (no PHI)?"
+    - "[ ] Is logging PHI-free?"
+    - "[ ] Is validation in place?"
+
+  current_limitations:
+    - "Data file (~/.careplan/data.json) is not encrypted at rest"
+    - "No audit logging of who accessed what"
+    - "No role-based access control"
+    - note: "Acceptable for v1 internal tool - workstations have full-disk encryption"
+
+output:
+  claude_code:
+    file: .claude/rules/phi-handling.md
+    include_paths_frontmatter: true  # Adds YAML frontmatter for conditional loading
+    format: mixed
+
+  codex:
+    file: careplan/AGENTS.md  # Directory-specific for Codex
+    section: "## PHI Handling"

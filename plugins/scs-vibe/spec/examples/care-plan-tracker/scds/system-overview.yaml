@@ -1,0 +1,62 @@
+# SCD: System Overview
+# Provides high-level understanding of what this system is and does
+
+id: scd:project:system-overview
+tier: project
+title: System Overview
+version: "1.0.0"
+
+metadata:
+  owner: "Tim McCrimmon"
+  created_at: "2025-02-05T10:00:00Z"
+  tags: [healthcare, cli, internal-tool]
+  priority: high  # Load early - sets context for everything else
+
+applies_to:
+  paths: ["**/*"]  # Global - always relevant
+
+content:
+  summary: CLI tool for care coordinators to track patient medications, appointments, and daily health tasks.
+
+  what_it_is: |
+    Care Plan Tracker is an internal tool used by care coordinators within
+    a healthcare organization to help patients stay on track with their care plans.
+
+    It provides a simple command-line interface for tracking:
+    - Medications (name, dosage, frequency)
+    - Appointments (provider, datetime, location)
+    - Daily health tasks (e.g., "check blood pressure", "walk 30 minutes")
+
+  users:
+    primary: Care coordinators (clinical staff)
+    context: |
+      Used during patient check-ins to review adherence and update care plans.
+      Not patient-facing - coordinators use it on clinic workstations.
+
+  data_sensitivity: |
+    **Contains PHI** - patient names, medications, appointments, health tasks.
+    HIPAA awareness required for all development.
+
+  deployment:
+    type: Internal tool (hospital/clinic)
+    installation: Installed on clinic workstations
+    storage: Local JSON file per user (~/.careplan/data.json)
+    network: None - all operations local, no external API calls
+
+  project_status:
+    stage: Early development
+    models: Complete
+    service: TODO (stub)
+    storage: TODO (stub)
+    cli: TODO
+    tests: Skeleton only
+
+output:
+  claude_code:
+    file: CLAUDE.md
+    section: "## System Overview"
+    format: prose
+
+  codex:
+    file: AGENTS.md
+    section: "## System Overview"
