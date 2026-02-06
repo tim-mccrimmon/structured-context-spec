@@ -1,0 +1,61 @@
+id: scd:standards:gdpr-data-rights
+tier: standards
+version: "1.0.0"
+title: "GDPR - Data Subject Rights & Consent"
+description: "GDPR requirements for data subject rights, consent management, and data minimization"
+
+content:
+  standard: "GDPR"
+  standard_version: "Regulation (EU) 2016/679"
+  scope: "Articles 5-9, 12-23: Principles, Rights of the Data Subject"
+
+  requirements:
+    - id: "GDPR-RIGHTS-001"
+      description: "Implement right of access (Article 15)"
+      implementation_guidance: >
+        Data subjects can request a copy of all personal data held about them.
+        Respond within 1 month. Provide data in commonly used electronic format.
+        Include purpose of processing, categories of data, recipients, and retention periods.
+    - id: "GDPR-RIGHTS-002"
+      description: "Implement right to erasure (Article 17)"
+      implementation_guidance: >
+        Delete personal data when: consent is withdrawn, data is no longer needed,
+        subject objects to processing, or data was unlawfully processed.
+        Must also notify third parties who received the data.
+        Exceptions exist for legal obligations and public interest.
+    - id: "GDPR-RIGHTS-003"
+      description: "Implement right to data portability (Article 20)"
+      implementation_guidance: >
+        Provide personal data in structured, commonly used, machine-readable format
+        (JSON, CSV). Allow direct transfer to another controller where technically feasible.
+        Applies to data provided by subject and processed by automated means.
+    - id: "GDPR-RIGHTS-004"
+      description: "Obtain and manage valid consent (Articles 6-7)"
+      implementation_guidance: >
+        Consent must be freely given, specific, informed, and unambiguous.
+        Use clear, plain language. Provide granular consent options (not bundled).
+        Make withdrawal as easy as giving consent. Maintain consent records
+        showing who consented, when, to what, and how.
+    - id: "GDPR-RIGHTS-005"
+      description: "Apply data minimization principle (Article 5)"
+      implementation_guidance: >
+        Only collect personal data that is adequate, relevant, and limited to
+        what is necessary for the stated purpose. Review data collection
+        regularly and eliminate unnecessary fields. Implement purpose limitation -
+        do not use data for purposes beyond what was stated at collection.
+
+  controls:
+    - id: "GDPR-RIGHTS-CTRL-001"
+      description: "Subject access request process"
+      evidence_required: "SAR handling procedure, response time tracking, sample responses"
+    - id: "GDPR-RIGHTS-CTRL-002"
+      description: "Consent management"
+      evidence_required: "Consent records, consent UI screenshots, withdrawal mechanism, consent audit trail"
+    - id: "GDPR-RIGHTS-CTRL-003"
+      description: "Data minimization review"
+      evidence_required: "Data inventory, purpose documentation for each data field, periodic review records"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "General Data Protection Regulation (EU) 2016/679"

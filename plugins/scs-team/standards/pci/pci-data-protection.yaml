@@ -1,0 +1,53 @@
+id: scd:standards:pci-data-protection
+tier: standards
+version: "1.0.0"
+title: "PCI DSS - Cardholder Data Protection"
+description: "PCI DSS requirements for identifying, protecting, and encrypting cardholder data"
+
+content:
+  standard: "PCI DSS"
+  standard_version: "v4.0"
+  scope: "Requirements 3, 4: Protect stored and transmitted cardholder data"
+
+  requirements:
+    - id: "PCI-DATA-001"
+      description: "Identify and inventory all cardholder data (Req 3.1)"
+      implementation_guidance: >
+        Map all locations where PAN (Primary Account Number), cardholder name,
+        expiration date, and service code are stored, processed, or transmitted.
+        Never store sensitive authentication data (CVV, PIN, full magnetic stripe)
+        after authorization.
+    - id: "PCI-DATA-002"
+      description: "Minimize cardholder data storage (Req 3.1)"
+      implementation_guidance: >
+        Only store cardholder data if there is a legitimate business need.
+        Define retention periods and implement automated purging.
+        Use tokenization to replace PAN with non-sensitive tokens where possible.
+    - id: "PCI-DATA-003"
+      description: "Render PAN unreadable when stored (Req 3.5)"
+      implementation_guidance: >
+        Use one of: one-way hash (SHA-256+), truncation (first 6 / last 4 only),
+        index tokens, or strong cryptography (AES-256). If encryption is used,
+        key management must follow Req 3.6.
+    - id: "PCI-DATA-004"
+      description: "Encrypt cardholder data in transit over open networks (Req 4.1)"
+      implementation_guidance: >
+        Use TLS 1.2+ for all transmission of cardholder data over public networks.
+        Do not send unencrypted PAN via email, chat, or SMS.
+        Verify TLS certificates and reject invalid certificates.
+
+  controls:
+    - id: "PCI-DATA-CTRL-001"
+      description: "Cardholder data flow diagram"
+      evidence_required: "Data flow diagram showing all systems that store, process, or transmit cardholder data"
+    - id: "PCI-DATA-CTRL-002"
+      description: "Data retention compliance"
+      evidence_required: "Retention policy, automated purge logs, quarterly reviews of stored data"
+    - id: "PCI-DATA-CTRL-003"
+      description: "Encryption verification"
+      evidence_required: "Encryption configuration, key management procedures, annual crypto review"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "PCI DSS v4.0 (PCI Security Standards Council)"

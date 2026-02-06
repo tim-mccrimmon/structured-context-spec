@@ -1,0 +1,62 @@
+id: scd:standards:gdpr-processing
+tier: standards
+version: "1.0.0"
+title: "GDPR - Data Processing & Transfers"
+description: "GDPR requirements for lawful basis of processing, DPIAs, cross-border transfers, and data protection by design"
+
+content:
+  standard: "GDPR"
+  standard_version: "Regulation (EU) 2016/679"
+  scope: "Articles 24-36, 44-49: Controller obligations, Transfers, DPIAs"
+
+  requirements:
+    - id: "GDPR-PROC-001"
+      description: "Establish lawful basis for each processing activity (Article 6)"
+      implementation_guidance: >
+        Document the lawful basis for each category of personal data processing:
+        consent, contract performance, legal obligation, vital interests,
+        public task, or legitimate interests. Maintain a Record of Processing
+        Activities (ROPA) listing all processing with its lawful basis.
+    - id: "GDPR-PROC-002"
+      description: "Conduct DPIAs for high-risk processing (Article 35)"
+      implementation_guidance: >
+        Data Protection Impact Assessments required when processing is likely
+        to result in high risk to individuals. Triggers include: systematic
+        profiling, large-scale processing of special categories, large-scale
+        public monitoring. Document risks, mitigations, and DPO consultation.
+    - id: "GDPR-PROC-003"
+      description: "Restrict cross-border data transfers (Articles 44-49)"
+      implementation_guidance: >
+        Personal data may only be transferred outside EEA to countries with
+        adequacy decisions, or with appropriate safeguards: Standard Contractual
+        Clauses, Binding Corporate Rules, or explicit consent. Document all
+        international transfer mechanisms and conduct Transfer Impact Assessments.
+    - id: "GDPR-PROC-004"
+      description: "Implement data protection by design and default (Article 25)"
+      implementation_guidance: >
+        Build privacy into system architecture from the start. Default settings
+        must be most privacy-protective. Implement pseudonymization where possible.
+        Conduct privacy reviews during design phase. Document design decisions.
+    - id: "GDPR-PROC-005"
+      description: "Report breaches within 72 hours (Article 33)"
+      implementation_guidance: >
+        Notify supervisory authority within 72 hours of becoming aware of a
+        personal data breach (unless unlikely to result in risk to individuals).
+        Notify affected individuals without undue delay if high risk.
+        Document all breaches including facts, effects, and remedial action.
+
+  controls:
+    - id: "GDPR-PROC-CTRL-001"
+      description: "Record of Processing Activities"
+      evidence_required: "Complete ROPA with lawful basis, purposes, categories, retention, and transfers for each activity"
+    - id: "GDPR-PROC-CTRL-002"
+      description: "DPIA completion"
+      evidence_required: "DPIA reports for high-risk processing, DPO consultation records, risk mitigation documentation"
+    - id: "GDPR-PROC-CTRL-003"
+      description: "Transfer mechanism documentation"
+      evidence_required: "Transfer impact assessments, SCCs or BCRs, adequacy decision references"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "General Data Protection Regulation (EU) 2016/679"

@@ -1,0 +1,59 @@
+id: scd:standards:pci-monitoring
+tier: standards
+version: "1.0.0"
+title: "PCI DSS - Logging & Monitoring"
+description: "PCI DSS requirements for logging, monitoring, and vulnerability management in cardholder data environments"
+
+content:
+  standard: "PCI DSS"
+  standard_version: "v4.0"
+  scope: "Requirements 10, 11: Track, monitor, and test"
+
+  requirements:
+    - id: "PCI-MON-001"
+      description: "Log all access to cardholder data (Req 10.2)"
+      implementation_guidance: >
+        Log all individual user access to cardholder data, all actions taken
+        by anyone with root/admin privileges, access to audit trails,
+        invalid access attempts, use of identification and authentication
+        mechanisms, and initialization/stopping of audit logs.
+    - id: "PCI-MON-002"
+      description: "Protect audit trails from tampering (Req 10.5)"
+      implementation_guidance: >
+        Use file integrity monitoring on log files. Restrict access to logs
+        to need-to-know only. Store logs on centralized log server.
+        Retain logs for minimum 12 months (3 months immediately available).
+    - id: "PCI-MON-003"
+      description: "Review logs daily (Req 10.6)"
+      implementation_guidance: >
+        Review security event logs at least daily. Use automated tools
+        (SIEM) to correlate events and flag anomalies. Define and document
+        review procedures for each log source.
+    - id: "PCI-MON-004"
+      description: "Conduct vulnerability scans quarterly (Req 11.3)"
+      implementation_guidance: >
+        Run internal vulnerability scans at least quarterly and after significant
+        changes. Use ASV (Approved Scanning Vendor) for external scans.
+        Remediate high/critical vulnerabilities and rescan to verify.
+    - id: "PCI-MON-005"
+      description: "Conduct penetration testing annually (Req 11.4)"
+      implementation_guidance: >
+        Perform annual penetration testing of both network and application layers.
+        Test both from outside the network and from within. Remediate findings
+        and retest to verify. Use qualified penetration testers.
+
+  controls:
+    - id: "PCI-MON-CTRL-001"
+      description: "Log completeness and retention"
+      evidence_required: "Log source inventory, sample logs showing required fields, retention verification"
+    - id: "PCI-MON-CTRL-002"
+      description: "Vulnerability management"
+      evidence_required: "Quarterly scan reports, remediation records, ASV scan certificates"
+    - id: "PCI-MON-CTRL-003"
+      description: "Penetration testing"
+      evidence_required: "Annual pentest report, remediation tracking, retest results"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "PCI DSS v4.0 (PCI Security Standards Council)"

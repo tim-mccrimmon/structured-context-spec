@@ -1,0 +1,52 @@
+id: scd:standards:pci-access-control
+tier: standards
+version: "1.0.0"
+title: "PCI DSS - Access Control"
+description: "PCI DSS requirements for authentication, authorization, and least-privilege access to cardholder data environments"
+
+content:
+  standard: "PCI DSS"
+  standard_version: "v4.0"
+  scope: "Requirements 7, 8: Restrict and authenticate access"
+
+  requirements:
+    - id: "PCI-ACC-001"
+      description: "Restrict access by business need-to-know (Req 7.1)"
+      implementation_guidance: >
+        Implement role-based access control. Define access needs for each role
+        before granting permissions. Default deny - only grant access explicitly
+        required for job function. Document and review access policies.
+    - id: "PCI-ACC-002"
+      description: "Assign unique IDs to all users (Req 8.1)"
+      implementation_guidance: >
+        Every user must have a unique ID. No shared or group accounts for
+        accessing cardholder data environments. Service accounts must be
+        individually trackable and have minimal required permissions.
+    - id: "PCI-ACC-003"
+      description: "Implement multi-factor authentication (Req 8.4)"
+      implementation_guidance: >
+        Require MFA for all non-console administrative access to the CDE
+        and for all remote network access. MFA must use at least two of:
+        something you know, something you have, something you are.
+    - id: "PCI-ACC-004"
+      description: "Manage passwords securely (Req 8.3)"
+      implementation_guidance: >
+        Minimum 12 characters (or 8 if system doesn't support longer).
+        Require complexity (numeric + alpha). Change every 90 days.
+        Do not allow reuse of last 4 passwords. Lock out after 10 failed attempts.
+
+  controls:
+    - id: "PCI-ACC-CTRL-001"
+      description: "Access control review"
+      evidence_required: "Quarterly access reviews, role-permission matrix, access change logs"
+    - id: "PCI-ACC-CTRL-002"
+      description: "MFA implementation"
+      evidence_required: "MFA configuration, coverage audit showing all admin and remote access uses MFA"
+    - id: "PCI-ACC-CTRL-003"
+      description: "Password policy enforcement"
+      evidence_required: "Password policy configuration, compliance scan results"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "PCI DSS v4.0 (PCI Security Standards Council)"

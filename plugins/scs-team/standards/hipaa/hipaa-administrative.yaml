@@ -1,0 +1,72 @@
+id: scd:standards:hipaa-administrative
+tier: standards
+version: "1.0.0"
+title: "HIPAA - Administrative Safeguards"
+description: "Business Associate Agreements, workforce training, and incident response requirements per HIPAA Administrative Safeguards"
+
+content:
+  standard: "HIPAA"
+  standard_version: "As amended by HITECH Act"
+  scope: "Administrative Safeguards (45 CFR §164.308)"
+
+  requirements:
+    - id: "ADM-001"
+      description: "Conduct regular risk analysis"
+      implementation_guidance: >
+        Perform risk analysis identifying threats and vulnerabilities to ePHI.
+        Must be repeated when significant changes occur to systems or operations.
+        Document findings and remediation actions.
+        Reference: §164.308(a)(1)(ii)(A)
+    - id: "ADM-002"
+      description: "Implement risk management program"
+      implementation_guidance: >
+        Apply security measures to reduce identified risks to reasonable levels.
+        Document risk acceptance decisions for residual risks.
+        Reference: §164.308(a)(1)(ii)(B)
+    - id: "ADM-003"
+      description: "Execute Business Associate Agreements with all vendors handling PHI"
+      implementation_guidance: >
+        Any third party that creates, receives, maintains, or transmits PHI
+        on your behalf must sign a BAA. BAAs must specify permitted uses,
+        required safeguards, breach notification obligations, and termination conditions.
+        Reference: §164.308(b)(1)
+    - id: "ADM-004"
+      description: "Implement workforce security training"
+      implementation_guidance: >
+        All workforce members must receive HIPAA training at onboarding
+        and annually thereafter. Training must cover PHI handling, security
+        policies, and breach reporting procedures.
+        Reference: §164.308(a)(5)
+    - id: "ADM-005"
+      description: "Establish incident response and breach notification procedures"
+      implementation_guidance: >
+        Define procedures for detecting, containing, and reporting security incidents.
+        Breaches affecting 500+ individuals must be reported to HHS within 60 days
+        and to affected individuals without unreasonable delay.
+        Breaches affecting fewer than 500 must be reported to HHS annually.
+        Reference: §164.308(a)(6), §164.404-408
+    - id: "ADM-006"
+      description: "Maintain contingency plan for ePHI"
+      implementation_guidance: >
+        Establish data backup plan, disaster recovery plan, and emergency mode
+        operations plan. Test and revise contingency plans regularly.
+        Reference: §164.308(a)(7)
+
+  controls:
+    - id: "ADM-CTRL-001"
+      description: "BAA inventory and compliance"
+      evidence_required: "List of all business associates, signed BAAs, annual review records"
+    - id: "ADM-CTRL-002"
+      description: "Training completion records"
+      evidence_required: "Training logs showing completion by all workforce members, training materials, dates"
+    - id: "ADM-CTRL-003"
+      description: "Incident response testing"
+      evidence_required: "Incident response plan document, tabletop exercise records, post-incident reviews"
+    - id: "ADM-CTRL-004"
+      description: "Risk analysis documentation"
+      evidence_required: "Most recent risk analysis report, remediation tracking, risk register"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "HIPAA Administrative Safeguards (45 CFR §164.308)"

@@ -1,0 +1,76 @@
+id: scd:standards:hipaa-security-controls
+tier: standards
+version: "1.0.0"
+title: "HIPAA - Security Controls"
+description: "Technical safeguards for access control, audit logging, integrity, and transmission security per HIPAA Security Rule"
+
+content:
+  standard: "HIPAA"
+  standard_version: "As amended by HITECH Act"
+  scope: "Security Rule (45 CFR §164.312)"
+
+  requirements:
+    - id: "SEC-001"
+      description: "Implement unique user identification for all PHI access"
+      implementation_guidance: >
+        Every user must have a unique identifier. No shared accounts for PHI access.
+        System accounts that access PHI must be individually trackable.
+        Reference: §164.312(a)(2)(i)
+    - id: "SEC-002"
+      description: "Implement emergency access procedures"
+      implementation_guidance: >
+        Define break-glass procedures for emergency PHI access.
+        Emergency access must still be logged and reviewed after the fact.
+        Reference: §164.312(a)(2)(ii)
+    - id: "SEC-003"
+      description: "Implement automatic session termination"
+      implementation_guidance: >
+        Terminate sessions after period of inactivity (recommend 15 minutes for clinical).
+        Require re-authentication to resume.
+        Reference: §164.312(a)(2)(iii)
+    - id: "SEC-004"
+      description: "Encrypt PHI at rest"
+      implementation_guidance: >
+        Use AES-256 encryption for all stored PHI. This includes database fields,
+        file storage, backups, and any cached copies. Key management must follow
+        NIST SP 800-57 guidelines.
+        Reference: §164.312(a)(2)(iv)
+    - id: "SEC-005"
+      description: "Implement audit controls recording all PHI access"
+      implementation_guidance: >
+        Log all access to PHI including: user ID, timestamp, action performed,
+        records accessed, success/failure. Retain audit logs for minimum 6 years.
+        Logs must be tamper-evident.
+        Reference: §164.312(b)
+    - id: "SEC-006"
+      description: "Protect PHI integrity with authentication mechanisms"
+      implementation_guidance: >
+        Implement mechanisms to verify PHI has not been improperly altered or destroyed.
+        Use checksums, digital signatures, or database integrity constraints.
+        Reference: §164.312(c)(1)
+    - id: "SEC-007"
+      description: "Encrypt PHI in transit"
+      implementation_guidance: >
+        Use TLS 1.2 or higher for all PHI transmission. Internal service-to-service
+        communication carrying PHI must also be encrypted. No PHI over unencrypted
+        channels (HTTP, unencrypted email, FTP).
+        Reference: §164.312(e)(1)
+
+  controls:
+    - id: "SEC-CTRL-001"
+      description: "Encryption at rest verification"
+      evidence_required: "Database encryption configuration, key management documentation, encryption audit"
+    - id: "SEC-CTRL-002"
+      description: "Encryption in transit verification"
+      evidence_required: "TLS configuration, certificate management, network diagram showing encrypted paths"
+    - id: "SEC-CTRL-003"
+      description: "Audit log completeness"
+      evidence_required: "Sample audit log entries, log retention policy, tamper-evidence mechanism documentation"
+    - id: "SEC-CTRL-004"
+      description: "Access control testing"
+      evidence_required: "Penetration test results, access control matrix, role-permission mapping"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "HIPAA Security Rule (45 CFR §164.312)"

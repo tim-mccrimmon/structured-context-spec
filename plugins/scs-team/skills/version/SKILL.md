@@ -75,7 +75,26 @@ provenance:
   version_rationale: "<Why this version>"
 ```
 
-### Step 5: Git Integration
+### Step 5: Recompile to Claude Code Format
+
+After versioning, recompile `.scs/` source to `.claude/rules/` output to reflect the new version:
+
+1. Read all SCDs in `.scs/scds/` and all concern bundles in `.scs/concerns/`
+2. For each concern that has SCDs:
+   a. Compress the SCD content to actionable rules (constraints, boundaries, patterns - NOT documentation)
+   b. Target 300-500 tokens per concern file
+   c. Write to `.claude/rules/<concern-name>.md`
+   d. Add header: `<!-- scs-team:managed -->` and footer with source SCD attribution including version
+3. Generate/update the scs-team section in CLAUDE.md:
+   a. If CLAUDE.md exists, find `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers
+   b. If markers exist, replace content between them
+   c. If no markers, append the section at the end
+   d. If no CLAUDE.md, create one with the markers
+   e. Content: project overview, architecture summary, quick reference table, links to rules files
+   f. Include the version number in the section header
+4. **Only overwrite files with `<!-- scs-team:managed -->` header** - leave other `.claude/rules/` files untouched
+
+### Step 6: Git Integration
 
 Offer to:
 1. Stage the changed files
@@ -93,12 +112,13 @@ chore(scs): version context to X.Y.Z
 
 **Tag format**: `scs-v1.0.0`
 
-### Step 6: Report Completion
+### Step 7: Report Completion
 
 Tell the user:
 1. What was versioned
-2. Git actions taken (if any)
-3. Next steps
+2. What `.claude/rules/` files were recompiled
+3. Git actions taken (if any)
+4. Next steps
 
 ## Output Format
 
@@ -146,8 +166,14 @@ Proceed? (This will modify files)
 - `.scs/concerns/architecture.yaml` → 1.0.0
 - `.scs/concerns/security.yaml` → 1.0.0
 - `.scs/concerns/compliance.yaml` → 1.0.0
-- `.scs/bundles/my-project.yaml` → 1.0.0
+- `.scs/project.yaml` → 1.0.0
 - 8 SCDs updated to 1.0.0
+
+**Recompiled:**
+- `.claude/rules/architecture.md`
+- `.claude/rules/security.md`
+- `.claude/rules/compliance.md`
+- Updated CLAUDE.md scs-team section (v1.0.0)
 
 **Git actions:**
 - Staged all changes
@@ -159,32 +185,6 @@ Proceed? (This will modify files)
 - Your context is now locked at version 1.0.0
 - Future changes should create version 1.1.0 or 2.0.0
 ```
-
-## Example Interaction
-
-User: `/scs-team:version`
-
-You: "Let me check if we're ready to version..."
-
-[Run pre-checks]
-
-You: "All checks pass. You have 3 DRAFT bundles and 8 DRAFT SCDs.
-
-Is this your first version? I'd recommend starting with `1.0.0`.
-
-What version would you like to use?"
-
-User: "1.0.0"
-
-You: "Got it. I'll version in this order:
-1. Concern bundles (architecture, security, compliance)
-2. Project bundle (my-project)
-
-This will update 12 files. Ready to proceed?"
-
-User: "Yes"
-
-You: [Update files, report completion]
 
 ## Handling Issues
 

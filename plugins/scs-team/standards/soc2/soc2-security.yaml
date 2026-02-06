@@ -1,0 +1,64 @@
+id: scd:standards:soc2-security
+tier: standards
+version: "1.0.0"
+title: "SOC 2 - Security (Common Criteria)"
+description: "SOC 2 Trust Services Criteria for security: logical and physical access controls, system operations, and change management"
+
+content:
+  standard: "SOC 2 Type II"
+  standard_version: "2017 Trust Services Criteria (TSP Section 100)"
+  scope: "CC6: Logical and Physical Access Controls, CC7: System Operations, CC8: Change Management"
+
+  requirements:
+    - id: "SOC2-SEC-001"
+      description: "Implement logical access controls (CC6.1)"
+      implementation_guidance: >
+        Restrict system access to authorized users. Implement authentication
+        mechanisms (MFA recommended), role-based access control, and least-privilege
+        principles. Review access rights quarterly.
+    - id: "SOC2-SEC-002"
+      description: "Manage user lifecycle (CC6.2)"
+      implementation_guidance: >
+        Implement processes for provisioning, modifying, and revoking access.
+        Disable accounts within 24 hours of termination. Require manager approval
+        for access grants. Maintain access request records.
+    - id: "SOC2-SEC-003"
+      description: "Restrict physical access to facilities (CC6.4)"
+      implementation_guidance: >
+        Control physical access to data centers and server rooms.
+        For cloud deployments, verify provider's SOC 2 report covers physical controls.
+        Maintain visitor logs and escort policies.
+    - id: "SOC2-SEC-004"
+      description: "Protect against malicious software (CC6.8)"
+      implementation_guidance: >
+        Deploy anti-malware controls, implement code signing for deployments,
+        use dependency scanning for supply chain risks, and maintain
+        vulnerability management program.
+    - id: "SOC2-SEC-005"
+      description: "Detect and respond to security events (CC7.2)"
+      implementation_guidance: >
+        Implement security monitoring (SIEM or equivalent), define alert thresholds,
+        establish incident response procedures, and conduct regular security reviews.
+        Log all security-relevant events.
+    - id: "SOC2-SEC-006"
+      description: "Manage system changes (CC8.1)"
+      implementation_guidance: >
+        All changes must go through change management: code review, testing,
+        approval, deployment tracking. Emergency changes must be documented
+        and reviewed after the fact. Maintain change log.
+
+  controls:
+    - id: "SOC2-SEC-CTRL-001"
+      description: "Access control matrix"
+      evidence_required: "Role-permission mapping, quarterly access reviews, access provisioning/deprovisioning records"
+    - id: "SOC2-SEC-CTRL-002"
+      description: "Security monitoring"
+      evidence_required: "SIEM configuration, alert rules, incident response runbooks, monthly review records"
+    - id: "SOC2-SEC-CTRL-003"
+      description: "Change management process"
+      evidence_required: "Change management policy, sample change tickets with approvals, deployment logs"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "AICPA SOC 2 Trust Services Criteria (2017)"

@@ -1,0 +1,58 @@
+id: scd:standards:soc2-confidentiality
+tier: standards
+version: "1.0.0"
+title: "SOC 2 - Confidentiality"
+description: "SOC 2 Trust Services Criteria for confidentiality: data classification, encryption, and confidential information handling"
+
+content:
+  standard: "SOC 2 Type II"
+  standard_version: "2017 Trust Services Criteria (TSP Section 100)"
+  scope: "C1: Confidentiality criteria"
+
+  requirements:
+    - id: "SOC2-CONF-001"
+      description: "Classify data by sensitivity level (C1.1)"
+      implementation_guidance: >
+        Define data classification levels (e.g., Public, Internal, Confidential, Restricted).
+        Label all data stores and document what classification applies.
+        Implement handling procedures for each classification level.
+    - id: "SOC2-CONF-002"
+      description: "Encrypt confidential data at rest (C1.1)"
+      implementation_guidance: >
+        Use AES-256 or equivalent for confidential and restricted data at rest.
+        Implement key management with rotation schedules. Ensure backups
+        are also encrypted. Document encryption scope and any exceptions.
+    - id: "SOC2-CONF-003"
+      description: "Encrypt confidential data in transit (C1.1)"
+      implementation_guidance: >
+        Use TLS 1.2+ for all external communications. Encrypt internal
+        service-to-service traffic carrying confidential data. Disable
+        legacy protocols (SSL, TLS 1.0/1.1).
+    - id: "SOC2-CONF-004"
+      description: "Control access to confidential information (C1.2)"
+      implementation_guidance: >
+        Restrict access based on data classification and job function.
+        Implement DLP (Data Loss Prevention) controls for high-sensitivity data.
+        Monitor and alert on bulk data exports.
+    - id: "SOC2-CONF-005"
+      description: "Securely dispose of confidential data (C1.2)"
+      implementation_guidance: >
+        Define retention periods for each data classification. Implement
+        secure deletion procedures (cryptographic erasure for encrypted data,
+        secure wipe for unencrypted). Document disposal and maintain records.
+
+  controls:
+    - id: "SOC2-CONF-CTRL-001"
+      description: "Data classification inventory"
+      evidence_required: "Data classification policy, inventory of data stores with classifications, handling procedures"
+    - id: "SOC2-CONF-CTRL-002"
+      description: "Encryption implementation"
+      evidence_required: "Encryption configuration, key management documentation, encryption coverage audit"
+    - id: "SOC2-CONF-CTRL-003"
+      description: "Data disposal records"
+      evidence_required: "Retention schedule, disposal logs, secure deletion verification"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "AICPA SOC 2 Trust Services Criteria (2017)"

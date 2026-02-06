@@ -1,0 +1,60 @@
+id: scd:standards:hipaa-phi-handling
+tier: standards
+version: "1.0.0"
+title: "HIPAA - PHI Handling Requirements"
+description: "Protected Health Information identification, minimum necessary principle, and permitted uses and disclosures under HIPAA Privacy Rule"
+
+content:
+  standard: "HIPAA"
+  standard_version: "As amended by HITECH Act"
+  scope: "Privacy Rule (45 CFR Part 160 and Subparts A and E of Part 164)"
+
+  requirements:
+    - id: "PHI-001"
+      description: "Identify all 18 HIPAA identifiers in system data"
+      implementation_guidance: >
+        Map every data field to the 18 HIPAA identifiers: names, geographic data smaller than state,
+        dates (except year) related to an individual, phone numbers, fax numbers, email addresses,
+        SSNs, medical record numbers, health plan beneficiary numbers, account numbers,
+        certificate/license numbers, vehicle identifiers, device identifiers, web URLs, IP addresses,
+        biometric identifiers, full-face photos, any other unique identifying number.
+    - id: "PHI-002"
+      description: "Apply minimum necessary standard to all PHI access"
+      implementation_guidance: >
+        Limit PHI disclosure to the minimum amount needed for the intended purpose.
+        Implement role-based access so each role only sees PHI relevant to their function.
+        API endpoints must not return PHI fields unless explicitly needed for the request.
+    - id: "PHI-003"
+      description: "Restrict PHI use to permitted purposes"
+      implementation_guidance: >
+        PHI may only be used for: treatment, payment, healthcare operations,
+        as authorized by the individual, or as required by law.
+        All other uses require explicit patient authorization.
+    - id: "PHI-004"
+      description: "Never log PHI to application logs"
+      implementation_guidance: >
+        Audit logs must record WHO accessed WHAT (by record ID, not PHI content),
+        WHEN, and WHY. Application logs, error logs, and debug output must never
+        contain PHI. Use tokenized references instead of actual PHI values in logs.
+    - id: "PHI-005"
+      description: "Support de-identification when PHI is used for analytics"
+      implementation_guidance: >
+        Use Safe Harbor method (remove all 18 identifiers) or Expert Determination
+        method (statistical/scientific assessment). Document which method is used
+        and maintain de-identification audit trail.
+
+  controls:
+    - id: "PHI-CTRL-001"
+      description: "PHI data classification and inventory"
+      evidence_required: "Data map showing all systems, databases, and fields containing PHI"
+    - id: "PHI-CTRL-002"
+      description: "Access logging for all PHI access events"
+      evidence_required: "Audit logs showing user, timestamp, record accessed, and purpose"
+    - id: "PHI-CTRL-003"
+      description: "Authorization checks before PHI disclosure"
+      evidence_required: "Code review showing authorization gates on all PHI-returning endpoints"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "HIPAA Privacy Rule (45 CFR Parts 160, 164)"

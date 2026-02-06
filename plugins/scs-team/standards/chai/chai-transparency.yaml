@@ -1,0 +1,56 @@
+id: scd:standards:chai-transparency
+tier: standards
+version: "1.0.0"
+title: "CHAI - AI Transparency & Explainability"
+description: "Coalition for Health AI requirements for model transparency, explainability, and documentation of AI systems in healthcare"
+
+content:
+  standard: "CHAI"
+  standard_version: "Blueprint for Trustworthy AI (2023)"
+  scope: "Transparency, Explainability, and Documentation"
+
+  requirements:
+    - id: "CHAI-TR-001"
+      description: "Document AI model purpose and intended use"
+      implementation_guidance: >
+        Clearly state what the AI model does, what clinical decisions it supports,
+        and what it should NOT be used for. Include target population,
+        intended clinical setting, and expected users (clinician, patient, admin).
+    - id: "CHAI-TR-002"
+      description: "Disclose training data characteristics"
+      implementation_guidance: >
+        Document the source, size, and demographic characteristics of training data.
+        Identify known gaps in representation. State any data quality limitations
+        that may affect model performance in specific populations.
+    - id: "CHAI-TR-003"
+      description: "Provide model performance metrics"
+      implementation_guidance: >
+        Report accuracy, sensitivity, specificity, and other relevant metrics.
+        Break down performance by demographic subgroups (age, sex, race/ethnicity,
+        insurance status). Report confidence intervals where applicable.
+    - id: "CHAI-TR-004"
+      description: "Enable clinical explainability"
+      implementation_guidance: >
+        Provide explanations that are meaningful to clinical end users.
+        For each prediction/recommendation, show contributing factors.
+        Avoid black-box outputs for clinical decisions. Use established
+        explainability methods (SHAP, LIME, attention weights) as appropriate.
+    - id: "CHAI-TR-005"
+      description: "Maintain model card or fact sheet"
+      implementation_guidance: >
+        Create and maintain a model card documenting: model architecture,
+        training process, evaluation results, known limitations, ethical
+        considerations, and update history. Make accessible to all stakeholders.
+
+  controls:
+    - id: "CHAI-TR-CTRL-001"
+      description: "Model documentation completeness"
+      evidence_required: "Model card/fact sheet, training data documentation, performance reports by subgroup"
+    - id: "CHAI-TR-CTRL-002"
+      description: "Explainability implementation"
+      evidence_required: "Sample explanations, user testing results showing clinical comprehension, explanation method documentation"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "Coalition for Health AI (CHAI) Blueprint for Trustworthy AI"

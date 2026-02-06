@@ -1,0 +1,63 @@
+id: scd:standards:chai-accountability
+tier: standards
+version: "1.0.0"
+title: "CHAI - AI Accountability & Oversight"
+description: "Coalition for Health AI requirements for bias detection, human oversight, validation, and accountability in healthcare AI systems"
+
+content:
+  standard: "CHAI"
+  standard_version: "Blueprint for Trustworthy AI (2023)"
+  scope: "Accountability, Bias, Human Oversight, and Validation"
+
+  requirements:
+    - id: "CHAI-AC-001"
+      description: "Implement bias detection and monitoring"
+      implementation_guidance: >
+        Test for bias across protected classes (race, sex, age, disability, etc.)
+        before deployment and on an ongoing basis. Define acceptable disparity
+        thresholds. Implement automated bias monitoring in production.
+        Document bias testing methodology and results.
+    - id: "CHAI-AC-002"
+      description: "Maintain human oversight for clinical decisions"
+      implementation_guidance: >
+        AI must support clinical decisions, not replace clinical judgment.
+        Define which decisions require human review before action.
+        Implement clear override mechanisms for clinicians.
+        Never automate decisions that require clinical judgment without human-in-the-loop.
+    - id: "CHAI-AC-003"
+      description: "Conduct clinical validation before deployment"
+      implementation_guidance: >
+        Validate model performance in the target clinical environment.
+        Use prospective validation where possible. Compare AI-assisted outcomes
+        with standard of care. Obtain clinical review board approval.
+        Document validation methodology, results, and limitations.
+    - id: "CHAI-AC-004"
+      description: "Implement post-deployment monitoring"
+      implementation_guidance: >
+        Monitor model performance drift over time. Track adverse events
+        and near-misses related to AI recommendations. Implement alerting
+        for performance degradation. Conduct periodic re-validation.
+        Define triggers for model retraining or retirement.
+    - id: "CHAI-AC-005"
+      description: "Establish clear accountability chain"
+      implementation_guidance: >
+        Define who is accountable for AI system outcomes at each level:
+        development, deployment, clinical use, and governance.
+        Maintain incident reporting process for AI-related adverse events.
+        Document escalation paths and decision authority.
+
+  controls:
+    - id: "CHAI-AC-CTRL-001"
+      description: "Bias testing records"
+      evidence_required: "Bias test results by protected class, methodology documentation, remediation actions"
+    - id: "CHAI-AC-CTRL-002"
+      description: "Human oversight verification"
+      evidence_required: "Clinical workflow showing human review points, override logs, clinician feedback"
+    - id: "CHAI-AC-CTRL-003"
+      description: "Clinical validation documentation"
+      evidence_required: "Validation study design, results, clinical review board approval, limitation disclosures"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "Coalition for Health AI (CHAI) Blueprint for Trustworthy AI"

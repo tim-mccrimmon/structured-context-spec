@@ -1,0 +1,58 @@
+id: scd:standards:soc2-availability
+tier: standards
+version: "1.0.0"
+title: "SOC 2 - Availability"
+description: "SOC 2 Trust Services Criteria for availability: system monitoring, incident management, disaster recovery, and capacity planning"
+
+content:
+  standard: "SOC 2 Type II"
+  standard_version: "2017 Trust Services Criteria (TSP Section 100)"
+  scope: "A1: Availability criteria"
+
+  requirements:
+    - id: "SOC2-AV-001"
+      description: "Define and maintain availability commitments (A1.1)"
+      implementation_guidance: >
+        Document availability SLAs (e.g., 99.9% uptime). Define maintenance
+        windows, planned downtime procedures, and communication protocols.
+        Publish status page for customers.
+    - id: "SOC2-AV-002"
+      description: "Implement system monitoring (A1.1)"
+      implementation_guidance: >
+        Monitor system health, resource utilization, and performance metrics.
+        Configure alerts for threshold breaches. Implement automated health
+        checks and synthetic monitoring for critical paths.
+    - id: "SOC2-AV-003"
+      description: "Establish incident management process (A1.2)"
+      implementation_guidance: >
+        Define severity levels, escalation paths, and response time targets.
+        Maintain on-call rotation. Document and review all incidents.
+        Track mean time to detect (MTTD) and mean time to resolve (MTTR).
+    - id: "SOC2-AV-004"
+      description: "Maintain disaster recovery plan (A1.2)"
+      implementation_guidance: >
+        Define RPO (Recovery Point Objective) and RTO (Recovery Time Objective).
+        Implement automated backups. Test recovery procedures at least annually.
+        Document and maintain runbooks for common failure scenarios.
+    - id: "SOC2-AV-005"
+      description: "Implement capacity planning (A1.1)"
+      implementation_guidance: >
+        Monitor resource trends, plan for growth, implement auto-scaling
+        where applicable. Conduct load testing before major releases.
+        Document capacity thresholds and scaling procedures.
+
+  controls:
+    - id: "SOC2-AV-CTRL-001"
+      description: "Uptime measurement and reporting"
+      evidence_required: "Monthly uptime reports, SLA compliance records, status page history"
+    - id: "SOC2-AV-CTRL-002"
+      description: "Disaster recovery testing"
+      evidence_required: "Annual DR test results, RTO/RPO achievement records, recovery runbooks"
+    - id: "SOC2-AV-CTRL-003"
+      description: "Incident management records"
+      evidence_required: "Incident tickets, post-mortem reports, MTTD/MTTR metrics"
+
+provenance:
+  created_by: "SCS Team Plugin"
+  created_at: "2026-02-06T00:00:00Z"
+  source: "AICPA SOC 2 Trust Services Criteria (2017)"
