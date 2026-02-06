@@ -37,6 +37,18 @@ content:
       type: "[technical|organizational|partner]"
       criticality: "[high|medium|low]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Example:
+  # - type: "depends-on"
+  #   target: "scd:project:other-scd-name"
+  #   description: "Why this relationship exists"
+  # - type: "satisfies"
+  #   target: "scd:standards:compliance-requirement"
+  #   description: "How this SCD satisfies the requirement"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

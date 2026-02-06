@@ -90,6 +90,25 @@ content:
       action_item_tracking: "[How action items are tracked]"
       review_frequency: "[How often past incidents are reviewed]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Incident Response depends on observability and satisfies compliance.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:observability"
+    description: "Incident detection relies on observability tooling"
+  - type: "depends-on"
+    target: "scd:project:threat-model"
+    description: "Security incidents respond to identified threats"
+  - type: "satisfies"
+    target: "scd:project:soc2-controls"
+    description: "Incident response satisfies SOC2 incident management"
+  # - type: "satisfies"
+  #   target: "scd:project:hipaa-compliance"
+  #   description: "Breach notification procedures satisfy HIPAA requirements"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

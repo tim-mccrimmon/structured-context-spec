@@ -56,6 +56,22 @@ content:
     monitoring: "[Tool name]"
     logging: "[Tool name]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Tech Stack is foundational - component and infrastructure design depend on it.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:business-objectives"
+    description: "Technology choices align with business goals"
+  # - type: "constrains"
+  #   target: "scd:project:component-model"
+  #   description: "Technology choices constrain component implementation"
+  # - type: "constrains"
+  #   target: "scd:project:infrastructure-definition"
+  #   description: "Technology choices constrain infrastructure options"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

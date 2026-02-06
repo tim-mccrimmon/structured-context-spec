@@ -60,8 +60,13 @@ class CompletenessValidator:
             result.add_error(e)
             return result
 
+        # Check if completeness validation is enabled (opt-in)
+        # Default is False - completeness validation is opt-in
+        if not rules.get("enabled", False):
+            return result  # Skip all completeness checks
+
         # Check rule severity
-        severity = rules.get("severity", "error")
+        severity = rules.get("severity", "warning")
 
         # Validate required bundles
         self._validate_required_bundles(bundle, rules, severity, result, file_path)

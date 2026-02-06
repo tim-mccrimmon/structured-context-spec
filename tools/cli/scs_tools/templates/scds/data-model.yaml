@@ -49,6 +49,22 @@ content:
       examples:
         - "[Example value]"
 
+relationships:
+  # SCD-to-SCD relationships (not to be confused with data entity relationships in content above)
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Data Model is foundational - many SCDs depend on it.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:business-objectives"
+    description: "Data model reflects business domain entities"
+  # - type: "constrains"
+  #   target: "scd:project:integration-map"
+  #   description: "Data model constrains API contracts and integrations"
+  # - type: "satisfies"
+  #   target: "scd:standards:hipaa-compliance"
+  #   description: "PII/PHI classification satisfies HIPAA data requirements"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

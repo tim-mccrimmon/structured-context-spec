@@ -119,7 +119,7 @@ When your project gets serious - team members, compliance requirements, real doc
 
 ## License
 
-MIT
+Apache 2.0
 
 ---
 

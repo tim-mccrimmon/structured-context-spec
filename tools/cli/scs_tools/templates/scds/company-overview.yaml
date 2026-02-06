@@ -91,6 +91,18 @@ content:
   #   decision_making: "[Consensus, hierarchical, data-driven, etc.]"
   #   communication_style: "[Open, formal, etc.]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Example:
+  # - type: "depends-on"
+  #   target: "scd:project:other-scd-name"
+  #   description: "Why this relationship exists"
+  # - type: "satisfies"
+  #   target: "scd:standards:compliance-requirement"
+  #   description: "How this SCD satisfies the requirement"
+
 provenance:
   created_by: "[Creator name/email]"
   created_at: "[ISO 8601 timestamp: YYYY-MM-DDTHH:MM:SSZ]"

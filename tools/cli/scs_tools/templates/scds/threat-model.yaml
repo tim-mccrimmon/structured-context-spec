@@ -54,6 +54,25 @@ content:
       rationale: "[Why this risk is accepted]"
       monitoring: "[How this risk is monitored]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Threat Model depends on architecture and constrains implementation.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:component-model"
+    description: "Threat analysis is based on component architecture"
+  - type: "depends-on"
+    target: "scd:project:data-model"
+    description: "Threat analysis considers data sensitivity"
+  - type: "constrains"
+    target: "scd:project:authn-authz"
+    description: "Identified threats constrain authentication design"
+  # - type: "satisfies"
+  #   target: "scd:standards:soc2-controls"
+  #   description: "Threat mitigations satisfy SOC2 security controls"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

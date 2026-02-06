@@ -44,6 +44,25 @@ content:
       - system: "[System name]"
         our_sla: "[SLA we provide]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Integration Map depends on architecture and is constrained by security/data policies.
+  # Example relationships:
+  - type: "refines"
+    target: "scd:project:system-context"
+    description: "Integration map details external system interactions"
+  - type: "depends-on"
+    target: "scd:project:component-model"
+    description: "Integrations connect to specific components"
+  - type: "depends-on"
+    target: "scd:project:authn-authz"
+    description: "Integration authentication follows security model"
+  # - type: "satisfies"
+  #   target: "scd:project:data-handling"
+  #   description: "Data exchange follows data handling policies"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

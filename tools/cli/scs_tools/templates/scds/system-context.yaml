@@ -43,6 +43,19 @@ content:
       data_type: "[Type of data]"
       frequency: "[real-time|batch|on-demand]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # System Context is foundational - other SCDs typically depend on it.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:business-objectives"
+    description: "System boundaries derive from business objectives"
+  # - type: "constrains"
+  #   target: "scd:project:component-model"
+  #   description: "System boundaries constrain component design"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

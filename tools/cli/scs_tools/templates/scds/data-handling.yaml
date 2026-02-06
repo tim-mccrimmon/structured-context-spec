@@ -53,6 +53,25 @@ content:
       method: "[Overwrite|Crypto-erase|Physical destruction|etc]"
       verification: "[How deletion is verified]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Data Handling is constrained by compliance and constrains system design.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:data-model"
+    description: "Data handling policies apply to entities in data model"
+  - type: "satisfies"
+    target: "scd:project:hipaa-compliance"
+    description: "Data handling satisfies HIPAA PHI requirements"
+  - type: "constrains"
+    target: "scd:project:integration-map"
+    description: "Data handling rules constrain how data flows to external systems"
+  # - type: "satisfies"
+  #   target: "scd:standards:gdpr"
+  #   description: "Data handling satisfies GDPR requirements"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

@@ -1,16 +1,21 @@
 # Completeness Validation Rules v0.2.0
 #
-# Default strict completeness rules for production projects
+# Completeness rules for SCS projects - OPT-IN by default
 # Projects can customize by creating .scs/completeness-rules.yaml
 # Based on decisions documented in docs/scs-v0.1-design-decisions.md
+#
+# PHILOSOPHY: SCS validates STRUCTURE, not CONTENT COMPLETENESS.
+# Completeness checking is OPT-IN for teams who want guardrails.
 
 version: "0.2.0"
-description: "Default strict completeness rules for production SCS projects"
-profile: "comprehensive"  # Requires all 11 prescribed domains
+description: "Optional completeness rules for SCS projects (opt-in)"
+profile: "permissive"  # No required domains by default
 
 # Validation Level 6: Completeness/Compliance
+# DISABLED BY DEFAULT - opt-in only
 level: 6
-severity: "error"  # Strict by default (can be overridden to "warning" in custom rules)
+enabled: false  # Set to true in .scs/completeness-rules.yaml to enable
+severity: "warning"  # When enabled, issues are warnings by default
 
 # Required Bundle Types
 required_bundles:

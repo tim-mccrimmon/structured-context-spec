@@ -51,6 +51,25 @@ content:
         access_check: "[How access is checked]"
         denied_action: "[What happens on denial]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # AuthN/AuthZ is constrained by compliance and constrains application design.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:threat-model"
+    description: "Authentication design addresses security threats"
+  - type: "satisfies"
+    target: "scd:project:hipaa-compliance"
+    description: "Access controls satisfy HIPAA requirements"
+  - type: "satisfies"
+    target: "scd:project:soc2-controls"
+    description: "Access controls satisfy SOC2 requirements"
+  # - type: "constrains"
+  #   target: "scd:project:component-model"
+  #   description: "AuthZ boundaries constrain component interactions"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

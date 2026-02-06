@@ -1,59 +1,60 @@
 # Completeness Validation Rules v0.3.0
 #
 # Domain-aware completeness rules for SCS 0.3 multi-domain architecture
-# Projects can customize by creating .scs/completeness-rules.yaml
+# Projects can OPT-IN to completeness checking by creating .scs/completeness-rules.yaml
 # Based on SCS 0.3 specification with domain bundles and concern bundles
+#
+# PHILOSOPHY: SCS validates STRUCTURE, not CONTENT COMPLETENESS.
+# You can version bundles with whatever context you have.
+# If your context is incomplete, that's your problem - not a validation failure.
+# Completeness checking is available for teams who want it (opt-in).
 
 version: "0.3.0"
-description: "Domain-aware completeness rules for SCS 0.3 multi-domain projects"
-profile: "comprehensive"  # Requires all concerns within imported domains
+description: "Optional completeness rules for SCS 0.3 multi-domain projects (opt-in)"
+profile: "permissive"  # No required concerns - create what you need
 
 # Validation Level 6: Completeness/Compliance
+# DISABLED BY DEFAULT - opt-in only
 level: 6
-severity: "error"  # Strict by default (can be overridden to "warning" in custom rules)
+enabled: false  # Set to true in .scs/completeness-rules.yaml to enable
+severity: "warning"  # When enabled, issues are warnings not errors
 
-# Required Bundle Types (0.3 Architecture)
-required_bundles:
-  - type: "meta"
-    count: 1
-    message: "Project must import exactly 1 meta bundle"
-
-  - type: "standards"
-    count: 1
-    message: "Project must import at least 1 standards bundle"
-    min: 1  # At least 1, but can have more
-
-  - type: "domain"
-    count: 1
-    message: "Project must import at least 1 domain bundle (e.g., software-development, legal, clinical)"
-    min: 1  # At least 1, can have multiple domains
+# Required Bundle Types - NONE BY DEFAULT
+# Uncomment in your .scs/completeness-rules.yaml if you want to enforce these
+required_bundles: []
+#  - type: "meta"
+#    count: 1
+#    message: "Project must import exactly 1 meta bundle"
+#
+#  - type: "standards"
+#    min: 1
+#    message: "Project must import at least 1 standards bundle"
+#
+#  - type: "domain"
+#    min: 1
+#    message: "Project must import at least 1 domain bundle"
 
 # Domain-Specific Completeness Rules
-# The Software Development domain defines 11 concerns
+# The Software Development domain defines 11 concerns as RECOMMENDATIONS, not requirements
+# Teams can opt-in to enforcement via .scs/completeness-rules.yaml
 domains:
   software-development:
     id: "domain:software-development"
     name: "Software Development"
-    description: "Software engineering domain with 11 concern areas"
+    description: "Software engineering domain with 11 concern areas (all optional)"
 
-    required_concerns:
-      - business-context
-      - architecture
-      - security
-      - performance-reliability
-      - usability-accessibility
-      - compliance-governance
-      - data-provenance
-      - testing-validation
-      - deployment-operations
-      - safety-risk
-      - ethics-ai-accountability
+    # NO REQUIRED CONCERNS - create what you need
+    # To enforce specific concerns, add required_concerns in .scs/completeness-rules.yaml:
+    # required_concerns:
+    #   - architecture
+    #   - security
+    required_concerns: []
 
     concerns:
       - id: "business-context"
         name: "Business Context"
         description: "Foundational business and product context (problem, stakeholders, objectives, opportunity)"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "problem|problem-definition|root-cause"
@@ -85,7 +86,7 @@ domains:
       - id: "architecture"
         name: "Architecture"
         description: "System structure, components, boundaries, and technical design"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "system-context|system-boundary|context"
@@ -111,7 +112,7 @@ domains:
       - id: "security"
         name: "Security"
         description: "Security architecture, threat models, authentication, authorization, data protection"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "auth|authn|authz|authentication|authorization|access-control"
@@ -137,7 +138,7 @@ domains:
       - id: "performance-reliability"
         name: "Performance & Reliability"
         description: "Performance requirements, reliability targets, scalability, availability"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "performance|perf-requirements"
@@ -158,7 +159,7 @@ domains:
       - id: "usability-accessibility"
         name: "Usability & Accessibility"
         description: "User experience, interface design, accessibility requirements"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "ux|user-experience|usability"
@@ -178,7 +179,7 @@ domains:
       - id: "compliance-governance"
         name: "Compliance & Governance"
         description: "Regulatory compliance, audit requirements, governance policies"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "compliance|regulatory|compliance-mapping"
@@ -199,7 +200,7 @@ domains:
       - id: "data-provenance"
         name: "Data & Provenance"
         description: "Data models, data flow, data governance, provenance tracking"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "data-model|data-models|schema"
@@ -220,7 +221,7 @@ domains:
       - id: "testing-validation"
         name: "Testing & Validation"
         description: "Testing strategy, validation approach, quality assurance"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "testing|test-strategy"
@@ -241,7 +242,7 @@ domains:
       - id: "deployment-operations"
         name: "Deployment & Operations"
         description: "Deployment strategy, operational procedures, monitoring, incident response"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "deployment|deploy-strategy|cicd"
@@ -262,7 +263,7 @@ domains:
       - id: "safety-risk"
         name: "Safety & Risk"
         description: "Safety requirements, risk assessment, hazard analysis"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "risk|risk-assessment"
@@ -283,7 +284,7 @@ domains:
       - id: "ethics-ai-accountability"
         name: "Ethics & AI Accountability"
         description: "Ethical considerations, AI/ML governance, bias mitigation, explainability"
-        minimum_scds: 1
+        minimum_scds: 0  # No minimum - create what you need
 
         recommended_scds:
           - pattern: "ethics|ai-ethics|ethical"
@@ -317,10 +318,10 @@ domains:
     enabled: false
     note: "Domain-specific rules to be defined by clinical domain experts"
 
-# Stub Detection Configuration
+# Stub Detection Configuration - DISABLED BY DEFAULT
 stub_detection:
-  enabled: true
-  description: "Detect placeholder/stub SCDs that lack real content"
+  enabled: false  # Opt-in: set to true in .scs/completeness-rules.yaml
+  description: "Detect placeholder/stub SCDs that lack real content (opt-in)"
 
   indicators:
     - check: "short_description"
@@ -345,48 +346,68 @@ stub_detection:
     SCD '{scd_id}' appears to be a stub or placeholder.
     Consider adding more detailed content before versioning.
 
-# Compliance Validation
+# Compliance Validation - DISABLED BY DEFAULT
 compliance_validation:
-  enabled: true
-  severity: "error"  # Can be overridden to "warning" in custom rules
+  enabled: false  # Opt-in: set to true in .scs/completeness-rules.yaml
+  severity: "warning"  # When enabled, issues are warnings not errors
 
   checks:
     - check: "standards_bundle_present"
       description: "Project must import at least one standards bundle"
-      severity: "error"
+      severity: "warning"
 
     - check: "standards_satisfied"
       description: "All standards SCDs should be satisfied by project SCDs"
-      severity: "warning"  # Warning, not error (some standards may not require satisfaction)
+      severity: "warning"
       relationship_type: "satisfies"
 
 # Customization Guidance
 customization:
-  description: "Projects can customize these rules by creating .scs/completeness-rules.yaml"
+  description: "Completeness validation is OPT-IN. Create .scs/completeness-rules.yaml to enable."
 
-  common_customizations:
-    - scenario: "Early-stage project / POC"
-      suggestion: "Reduce required concerns to 3-5 key areas"
-      example_concerns: ["architecture", "security", "testing-validation"]
+  philosophy: |
+    SCS validates STRUCTURE, not CONTENT COMPLETENESS.
+    - You can version bundles with whatever context you have
+    - If your context is incomplete, that's your choice
+    - Completeness checking exists for teams who want guardrails
+    - Enable it by creating .scs/completeness-rules.yaml with enabled: true
 
-    - scenario: "Non-UI system"
-      suggestion: "Remove usability-accessibility from required concerns"
+  opt_in_examples:
+    - scenario: "Strict enterprise project"
+      suggestion: "Enable completeness validation with required concerns"
+      example: |
+        # .scs/completeness-rules.yaml
+        enabled: true
+        severity: "error"
+        domains:
+          software-development:
+            required_concerns:
+              - architecture
+              - security
+              - compliance-governance
 
-    - scenario: "Non-AI system"
-      suggestion: "Remove ethics-ai-accountability from required concerns"
+    - scenario: "Team wants recommendations only"
+      suggestion: "Enable with warnings (no blocking errors)"
+      example: |
+        # .scs/completeness-rules.yaml
+        enabled: true
+        severity: "warning"
 
-    - scenario: "Internal tool"
-      suggestion: "Set compliance_validation severity to 'warning'"
-
-    - scenario: "Multi-domain project"
-      suggestion: "Import multiple domain bundles (e.g., software-development + clinical)"
+    - scenario: "Regulated industry (healthcare, fintech)"
+      suggestion: "Enable with compliance validation"
+      example: |
+        # .scs/completeness-rules.yaml
+        enabled: true
+        compliance_validation:
+          enabled: true
+          severity: "error"
 
   override_location: ".scs/completeness-rules.yaml"
 
   priority:
     - "1. Explicit --completeness-rules flag (highest)"
     - "2. Project .scs/completeness-rules.yaml"
-    - "3. This default file (fallback)"
+    - "3. This default file (fallback - permissive)"
 
 # Error Messages
 error_messages:
@@ -421,19 +442,24 @@ reporting:
 
 # Validation Strategy for 0.3
 validation_strategy:
-  description: "How completeness is validated in 0.3 multi-domain architecture"
+  description: "Level 6 (completeness) is OPT-IN. When enabled, here's how it works:"
 
-  steps:
-    1: "Verify project bundle imports at least one domain bundle"
-    2: "For each imported domain, identify required concerns"
-    3: "Verify each required concern bundle is imported by the domain"
-    4: "Verify each concern bundle has minimum required SCDs"
-    5: "Check for recommended SCDs in each concern (warnings)"
-    6: "Detect stub/placeholder SCDs"
-    7: "Validate standards compliance"
+  default_behavior: |
+    By default, Level 6 validation is DISABLED.
+    Levels 1-5 (syntax, semantics, references, versioning, bundle structure) still run.
+    You can version bundles with any amount of content.
+
+  when_enabled:
+    steps:
+      1: "Verify project bundle imports required bundle types (if configured)"
+      2: "For each imported domain, check required concerns (if configured)"
+      3: "Verify each concern bundle has minimum SCDs (if configured)"
+      4: "Check for recommended SCDs in each concern (warnings only)"
+      5: "Detect stub/placeholder SCDs (if enabled)"
+      6: "Validate standards compliance (if enabled)"
 
   notes:
-    - "Domain bundles import concern bundles (not project directly)"
-    - "Concerns are reusable across domains"
-    - "Projects can import multiple domains (software-development + clinical)"
-    - "Each domain defines its own completeness requirements"
+    - "Completeness validation is OPT-IN via .scs/completeness-rules.yaml"
+    - "By default, you can version whatever you want"
+    - "Teams can enforce their own completeness standards"
+    - "This supports the spectrum from 'minimal disclosure' to 'full transparency'"

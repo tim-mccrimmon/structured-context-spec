@@ -61,6 +61,25 @@ content:
     notification_timeline: "[Timeline for notification]"
     responsible_party: "[Who is responsible]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # HIPAA Compliance satisfies regulatory standards and constrains implementation.
+  # Example relationships:
+  - type: "satisfies"
+    target: "scd:standards:hipaa-security-rule"
+    description: "Implements HIPAA Security Rule requirements"
+  - type: "constrains"
+    target: "scd:project:data-handling"
+    description: "HIPAA requirements constrain how PHI is handled"
+  - type: "constrains"
+    target: "scd:project:authn-authz"
+    description: "HIPAA access controls constrain authentication design"
+  # - type: "depends-on"
+  #   target: "scd:project:data-model"
+  #   description: "PHI identification depends on data model"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

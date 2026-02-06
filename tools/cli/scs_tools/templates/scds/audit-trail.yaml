@@ -94,6 +94,25 @@ content:
       requirement: "[Specific audit logging requirement]"
       how_met: "[How system meets requirement]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Audit Trail satisfies compliance requirements and is constrained by them.
+  # Example relationships:
+  - type: "satisfies"
+    target: "scd:project:hipaa-compliance"
+    description: "Audit logging satisfies HIPAA audit control requirements"
+  - type: "satisfies"
+    target: "scd:project:soc2-controls"
+    description: "Audit logging satisfies SOC2 audit requirements"
+  - type: "depends-on"
+    target: "scd:project:data-model"
+    description: "Audit events reference data model entities"
+  # - type: "constrains"
+  #   target: "scd:project:component-model"
+  #   description: "All components must implement audit logging"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

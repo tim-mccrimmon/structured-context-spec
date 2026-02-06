@@ -85,6 +85,25 @@ content:
       frequency: "[How often checked]"
       timeout: "[Health check timeout]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Observability supports incident response and satisfies compliance.
+  # Example relationships:
+  - type: "depends-on"
+    target: "scd:project:component-model"
+    description: "Observability covers all system components"
+  - type: "depends-on"
+    target: "scd:project:infrastructure-definition"
+    description: "Observability tools deploy to infrastructure"
+  - type: "satisfies"
+    target: "scd:project:soc2-controls"
+    description: "Logging and monitoring satisfy SOC2 requirements"
+  # - type: "constrains"
+  #   target: "scd:project:incident-response"
+  #   description: "Alerts feed into incident response process"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

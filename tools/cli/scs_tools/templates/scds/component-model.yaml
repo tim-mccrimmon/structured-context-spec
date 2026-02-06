@@ -42,6 +42,22 @@ content:
       description: "[What this boundary protects/separates]"
       crossing_mechanism: "[How components cross this boundary]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Component Model typically depends on system context and is constrained by security/compliance.
+  # Example relationships:
+  - type: "refines"
+    target: "scd:project:system-context"
+    description: "Component model refines high-level system boundaries"
+  - type: "depends-on"
+    target: "scd:project:tech-stack"
+    description: "Component design depends on technology choices"
+  # - type: "satisfies"
+  #   target: "scd:standards:hipaa-compliance"
+  #   description: "Component boundaries satisfy PHI isolation requirements"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

@@ -50,6 +50,25 @@ content:
     evidence_retention: "[Retention period]"
     review_frequency: "[How often controls are reviewed]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # SOC2 Controls satisfy compliance standards and constrain implementation.
+  # Example relationships:
+  - type: "satisfies"
+    target: "scd:standards:soc2-trust-criteria"
+    description: "Implements SOC2 Trust Service Criteria"
+  - type: "constrains"
+    target: "scd:project:authn-authz"
+    description: "SOC2 access controls constrain authentication design"
+  - type: "constrains"
+    target: "scd:project:audit-trail"
+    description: "SOC2 requires specific audit logging"
+  # - type: "depends-on"
+  #   target: "scd:project:threat-model"
+  #   description: "SOC2 controls address identified threats"
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"

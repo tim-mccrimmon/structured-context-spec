@@ -34,6 +34,20 @@ content:
       target: "[Target value]"
       rationale: "[Why this KPI matters]"
 
+relationships:
+  # Define how this SCD relates to others in your project.
+  # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
+  #
+  # Business Objectives is foundational - most project SCDs depend on it.
+  # Example relationships (note: this SCD is typically depended ON, not depending):
+  - type: "depends-on"
+    target: "scd:project:stakeholders"
+    description: "Business objectives reflect stakeholder needs"
+  # Other SCDs typically depend on this one:
+  # - system-context depends-on business-objectives
+  # - tech-stack depends-on business-objectives
+  # - data-model depends-on business-objectives
+
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
