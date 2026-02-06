@@ -1,0 +1,28 @@
+[project]
+name = "patient-portal"
+version = "0.1.0"
+description = "Patient-facing portal for health records, scheduling, and messaging"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
+    "sqlalchemy>=2.0",
+    "asyncpg>=0.29.0",
+    "redis>=5.0",
+    "pydantic>=2.5",
+    "python-jose[cryptography]>=3.3",
+    "passlib[bcrypt]>=1.7",
+    "httpx>=0.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.26.0",
+    "ruff>=0.2.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
