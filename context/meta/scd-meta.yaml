@@ -151,9 +151,9 @@ content:
 relationships: []
 
 provenance:
-  created_by: "scs-spec-maintainers@ohana.ai"
+  created_by: "info@ohana-tech.com"
   created_at: "2025-01-23T10:00:00Z"
-  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_by: "info@ohana-tech.com"
   updated_at: "2025-01-23T10:00:00Z"
   rationale: >
     Foundational META SCD defining the structure and semantics of all SCDs

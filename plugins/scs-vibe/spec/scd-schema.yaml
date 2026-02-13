@@ -5,7 +5,7 @@
 # used by scs-vibe to generate AI coding assistant context.
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://structuredcontext.io/schemas/scd/0.1.0"
+$id: "https://structuredcontext.dev/schemas/scd/0.1.0"
 title: Structured Context Document (SCD)
 description: |
   A structured document that captures context for AI coding assistants.

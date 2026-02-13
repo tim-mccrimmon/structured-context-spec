@@ -2,8 +2,14 @@
 name: draft
 description: Conversational drafting for a specific concern area when documentation doesn't exist. Ask targeted questions and generate draft SCDs.
 argument-hint: "<concern: architecture|security|performance|usability|compliance|data|testing|deployment|safety|ethics|business>"
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, Bash(mkdir -p *)
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-team:draft`. Never auto-invoke based on project state or conversation context.
+- **Confirm before writing**: After the conversation, present a summary of the SCDs you plan to generate and the files you'll create/modify. Get explicit user confirmation before writing any files.
+
 ---
 
 # SCS Team Draft - Conversational Context Creation

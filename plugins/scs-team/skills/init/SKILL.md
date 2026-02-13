@@ -2,8 +2,14 @@
 name: init
 description: Initialize structured context for this project. Scaffolds .scs/ with all 11 concern bundles, scans the project, and recommends where to start.
 argument-hint: "[project-name]"
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, Bash(ls *), Bash(mkdir -p *), Bash(cat package.json), Bash(cat requirements.txt), Bash(cat go.mod), Bash(cat Cargo.toml), Bash(cat pyproject.toml)
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-team:init`. Never auto-invoke based on project state or conversation context.
+- **Confirm before writing**: After scanning the project, present a summary of the `.scs/` scaffold you plan to create and get explicit user confirmation before writing any files.
+
 ---
 
 # SCS Team Init - Initialize Structured Context

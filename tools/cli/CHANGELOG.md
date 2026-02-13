@@ -109,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Command reference
   - Common workflows
   - CI/CD integration examples
-  - MIT License
+  - Apache 2.0 License
 
 ### Developer Experience
 - Click-based CLI framework

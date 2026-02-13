@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in the Structured Context Specification or related tooling, please report it responsibly.
 
-**Contact:** tim@ohanaconsulting.llc
+**Contact:** tim@ohana-tech.com
 
 **Please include:**
 - Description of the vulnerability

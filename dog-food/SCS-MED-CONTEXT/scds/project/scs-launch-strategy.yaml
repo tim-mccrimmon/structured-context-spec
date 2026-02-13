@@ -75,7 +75,7 @@ content:
 
     freedom:
       statement: |
-        MIT licensed. No cloud service, no vendor lock-in. Your context lives in your
+        Apache 2.0 licensed. No cloud service, no vendor lock-in. Your context lives in your
         git repo. Works with any AI tool.
 
   differentiation:
@@ -169,7 +169,7 @@ content:
       - "OICP pilot conversions: 3"
 
   open_source_strategy:
-    license: "MIT (maximizes adoption, friendly to commercial use)"
+    license: "Apache 2.0 (maximizes adoption, friendly to commercial use)"
     repository: "github.com/tim-mccrimmon/structured-context-spec"
 
     why_open_source:

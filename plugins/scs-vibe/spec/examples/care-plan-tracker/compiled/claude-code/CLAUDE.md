@@ -63,6 +63,6 @@ Additional context is loaded from `.claude/rules/`:
 ---
 
 *Compiled from SCS bundle `bundle:project:care-plan-tracker:1.0.0`*
-*Generated with [SCS](https://structuredcontext.io)*
+*Generated with [SCS](https://structuredcontext.dev)*
 
 **REMINDER**: This codebase handles PHI. Keep patient data out of logs and error messages.

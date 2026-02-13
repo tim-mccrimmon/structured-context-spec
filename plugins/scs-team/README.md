@@ -17,7 +17,11 @@ SCS Team takes your existing documentation and transforms it into structured con
 ## Installation
 
 ```bash
-/install scs-team
+# From a plugin marketplace
+/plugin install scs-team@marketplace-name
+
+# Or load locally during development
+claude --plugin-dir /path/to/plugins/scs-team
 ```
 
 ## Quick Start
@@ -259,13 +263,13 @@ If you don't have documentation yet, check out [SCS Vibe](https://github.com/str
 
 ## Links
 
-- Documentation: https://structuredcontext.io
+- Documentation: https://structuredcontext.dev
 - GitHub: https://github.com/structuredcontext/scs-team
 - For Solo Devs: https://github.com/structuredcontext/scs-vibe
 
 ## License
 
-MIT
+Apache 2.0
 
 ---
 

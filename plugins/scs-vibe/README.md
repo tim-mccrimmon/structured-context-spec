@@ -22,7 +22,11 @@ No PRDs. No architecture docs. Just answer a few questions.
 ## Installation
 
 ```bash
-/install scs-vibe
+# From a plugin marketplace
+/plugin install scs-vibe@marketplace-name
+
+# Or load locally during development
+claude --plugin-dir /path/to/plugins/scs-vibe
 ```
 
 ## Commands
@@ -113,7 +117,7 @@ When your project gets serious - team members, compliance requirements, real doc
 
 ## Links
 
-- Documentation: https://structuredcontext.io
+- Documentation: https://structuredcontext.dev
 - GitHub: https://github.com/structuredcontext/scs-vibe
 - For Teams: https://github.com/structuredcontext/scs-team
 

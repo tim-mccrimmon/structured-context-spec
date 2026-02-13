@@ -108,7 +108,7 @@ content:
     - "A specification for structured context bundles"
     - "LLM-agnostic (works with any AI system)"
     - "Git-native (standard version control workflows)"
-    - "Open source (MIT license)"
+    - "Open source (Apache 2.0 license)"
 
   what_scs_is_not:
     - "Not a model, platform, or hosted service"
@@ -213,6 +213,6 @@ content:
 
     funnel: "SCS users who need runtime deployment, governance, and scale → OICP"
 
-  license: "MIT (open source, free forever)"
+  license: "Apache 2.0 (open source, free forever)"
 
   status: "v0.3, pre-launch (launching Q1 2026)"

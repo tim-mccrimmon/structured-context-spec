@@ -13,10 +13,10 @@ You're a solo developer with an idea: a CLI tool to help patients track their ca
 
 ## Demo
 
-### 1. Install the plugin
+### 1. Launch Claude Code with the plugin
 
-```
-/install <path-to>/plugins/scs-vibe
+```bash
+claude --plugin-dir /path/to/plugins/scs-vibe
 ```
 
 ### 2. Run init

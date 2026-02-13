@@ -1,8 +1,13 @@
 ---
 name: validate
 description: Check structure and surface issues for human review. Validates YAML, references, concern coverage, and compilation status.
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-team:validate`. Never auto-invoke based on project state or conversation context.
+
 ---
 
 # SCS Team Validate - Structure Check and Review Surface

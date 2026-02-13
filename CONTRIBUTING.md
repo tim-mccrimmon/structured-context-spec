@@ -15,7 +15,7 @@ Thank you for your interest in contributing to SCS! This document provides guide
 
 ## Code of Conduct
 
-This project adheres to a code of conduct adapted from the [Contributor Covenant](https://www.contributor-covenant.org/). By participating, you are expected to uphold this code. Please report unacceptable behavior to [tim@ohanaconsulting.llc](mailto:tim@ohanaconsulting.llc).
+This project adheres to a code of conduct adapted from the [Contributor Covenant](https://www.contributor-covenant.org/). By participating, you are expected to uphold this code. Please report unacceptable behavior to [tim@ohana-tech.com](mailto:tim@ohana-tech.com).
 
 **Our Standards:**
 - Be respectful and inclusive
@@ -257,7 +257,7 @@ RFCs are appropriate for:
 
 - **GitHub Discussions** - Ask questions, share ideas, discuss use cases
 - **GitHub Issues** - Report bugs or request features
-- **Email** - [tim@ohanaconsulting.llc](mailto:tim@ohanaconsulting.llc) for private inquiries
+- **Email** - [tim@ohana-tech.com](mailto:tim@ohana-tech.com) for private inquiries
 
 ### Staying Informed
 

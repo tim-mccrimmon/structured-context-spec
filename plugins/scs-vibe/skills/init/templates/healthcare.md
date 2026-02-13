@@ -173,6 +173,6 @@ Clinical Input → [PHI Boundary] → [Processing] → [PHI Boundary] → Output
 ---
 
 *Last updated: [Date]*
-*Generated with [SCS](https://structuredcontext.io)*
+*Generated with [SCS](https://structuredcontext.dev)*
 
 **REMINDER**: This codebase handles PHI. When in doubt, ask before implementing.

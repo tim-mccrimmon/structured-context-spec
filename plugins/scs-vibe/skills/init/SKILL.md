@@ -2,8 +2,14 @@
 name: init
 description: Quick, conversational setup with professional-grade considerations. Generates CLAUDE.md, modular .claude/rules/, and a Considerations Document that ensures you've thought through compliance, security, and legal requirements before shipping.
 argument-hint: "[project-type: saas|healthcare|fintech|minimal]"
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, Bash(ls *), Bash(mkdir *), Bash(cat package.json), Bash(cat requirements.txt), Bash(cat go.mod), Bash(cat Cargo.toml)
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-vibe:init`. Never auto-invoke based on project state or conversation context.
+- **Confirm before writing**: After completing the scan and conversation, present a summary of all files you plan to create/modify and get explicit user confirmation before writing anything.
+
 ---
 
 # SCS Vibe Init - Quick Setup with Architect-Grade Considerations
@@ -179,7 +185,28 @@ HIPAA violations can result in:
 Are you sure? If yes, please briefly document why this risk is acceptable:
 ```
 
-### Step 5: Save Considerations Document
+### Step 5: Confirm Before Writing
+
+Before writing any files, present the user with a summary of what you plan to create:
+
+```
+Here's what I'll generate for your project:
+
+Files to create:
+- CLAUDE.md (project overview)
+- CONSIDERATIONS.md (compliance decisions)
+- .claude/rules/tech-stack.md
+- .claude/rules/architecture.md
+- .claude/rules/patterns.md
+- .claude/rules/phi-handling.md (path-specific for [files])
+  ...
+
+Shall I go ahead and write these files?
+```
+
+**Do NOT write any files until the user confirms.** If they want to adjust the plan (skip a file, change scope), accommodate before proceeding.
+
+### Step 6: Save Considerations Document
 
 Write CONSIDERATIONS.md to the project root with:
 - All applicable considerations
@@ -189,7 +216,7 @@ Write CONSIDERATIONS.md to the project root with:
 
 This becomes a **project artifact** - evidence they thought through the implications.
 
-### Step 6: Generate CLAUDE.md
+### Step 7: Generate CLAUDE.md
 
 Generate CLAUDE.md as an **overview** document with:
 
@@ -201,7 +228,7 @@ Generate CLAUDE.md as an **overview** document with:
 
 Keep CLAUDE.md concise (under 150 lines). It's the entry point, not the whole story.
 
-### Step 7: Generate .claude/rules/ (Modular Context)
+### Step 8: Generate .claude/rules/ (Modular Context)
 
 Create modular context files in `.claude/rules/` directory. This is how Claude Code loads context efficiently.
 

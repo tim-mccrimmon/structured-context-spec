@@ -5,7 +5,7 @@ domain:
   description: "Structured context for software development projects, including architecture, requirements, components, and technical decisions"
   author: "SCS Core Team"
   license: "open"
-  homepage: "https://ohana-scs.org/domains/software-development"
+  homepage: "https://structuredcontext.dev/domains/software-development"
 
   schemas:
     meta:

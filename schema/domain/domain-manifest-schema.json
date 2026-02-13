@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ohana-scs.org/schema/domain-manifest.schema.json",
+  "$id": "https://structuredcontext.dev/schema/domain-manifest.schema.json",
   "title": "SCS Domain Manifest",
   "description": "Schema for domain manifest files that define domain-specific content schemas, templates, and validation rules.",
   "type": "object",

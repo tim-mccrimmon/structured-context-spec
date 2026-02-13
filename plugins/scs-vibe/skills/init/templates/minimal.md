@@ -46,4 +46,4 @@
 
 ---
 
-*Generated with [SCS](https://structuredcontext.io)*
+*Generated with [SCS](https://structuredcontext.dev)*

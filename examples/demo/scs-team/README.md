@@ -13,10 +13,10 @@ You're on a team building a patient portal for Acme Health. The project has a PR
 
 ## Demo
 
-### 1. Install the plugin
+### 1. Launch Claude Code with the plugin
 
-```
-/install <path-to>/plugins/scs-team
+```bash
+claude --plugin-dir /path/to/plugins/scs-team
 ```
 
 ### 2. Initialize

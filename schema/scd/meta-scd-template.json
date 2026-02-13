@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ohana-scs.org/schema/scd.meta.schema.json",
+  "$id": "https://structuredcontext.dev/schema/scd.meta.schema.json",
   "title": "SCS Meta-Tier SCD",
   "description": "Schema for Meta-Tier Structured Context Documents (SCDs).",
   "type": "object",

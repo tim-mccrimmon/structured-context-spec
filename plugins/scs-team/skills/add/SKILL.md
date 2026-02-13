@@ -2,8 +2,14 @@
 name: add
 description: Process a document (PRD, architecture doc, security requirements, etc.) into structured context. Extracts relevant information and generates appropriate SCDs.
 argument-hint: "<file-path>"
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, Bash(mkdir -p *)
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-team:add`. Never auto-invoke based on project state or conversation context.
+- **Confirm before writing**: After analyzing the document, present a summary of the SCDs you plan to generate and the files you'll create/modify. Get explicit user confirmation before writing any files.
+
 ---
 
 # SCS Team Add - Process Document into Structured Context

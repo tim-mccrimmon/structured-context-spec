@@ -2,8 +2,14 @@
 name: use
 description: Add known compliance or regulatory standards (HIPAA, SOC2, PCI, CHAI, GDPR) to your project context. Copies pre-built standards SCDs from the plugin's standards library.
 argument-hint: "<standard: hipaa|soc2|pci|chai|gdpr>"
-disable-model-invocation: true
 allowed-tools: Read, Glob, Write, Bash(mkdir -p *)
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-team:use`. Never auto-invoke based on project state or conversation context.
+- **Confirm before writing**: After identifying the standard, present a summary of the SCDs that will be copied and the files that will be created/modified. Get explicit user confirmation before writing any files.
+
 ---
 
 # SCS Team Use - Add Known Standards

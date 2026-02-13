@@ -64,7 +64,7 @@
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability in SCS, please email:
-tim@ohanaconsulting.llc
+tim@ohana-tech.com
 
 Please include:
 - Description of the vulnerability

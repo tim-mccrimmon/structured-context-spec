@@ -197,4 +197,4 @@ Link to organization's existing incident response procedures.
 
 *This document demonstrates due diligence in considering compliance, security, and legal requirements for this project. It should be reviewed and updated as the project evolves.*
 
-*Generated with [SCS Vibe](https://structuredcontext.io)*
+*Generated with [SCS Vibe](https://structuredcontext.dev)*

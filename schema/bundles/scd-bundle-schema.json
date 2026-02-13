@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ohana-scs.org/schema/bundle.schema.json",
+  "$id": "https://structuredcontext.dev/schema/bundle.schema.json",
   "title": "SCS Bundle",
   "description": "Schema for SCS Bundle manifests. Bundles are container documents that organize and reference SCDs. They are NOT SCDs themselves - they are manifests similar to Docker container manifests or Kubernetes pod specs.",
   "type": "object",

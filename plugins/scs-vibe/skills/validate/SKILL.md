@@ -1,8 +1,13 @@
 ---
 name: validate
 description: Check your CLAUDE.md for completeness and issues. Identifies missing sections, stale references, and gaps that might bite you later.
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-vibe:validate`. Never auto-invoke based on project state or conversation context.
+
 ---
 
 # SCS Vibe Validate - Check Your Context

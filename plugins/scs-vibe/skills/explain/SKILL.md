@@ -1,7 +1,12 @@
 ---
 name: explain
 description: Learn why structured context matters. Quick explanation for skeptics and the curious.
-disable-model-invocation: true
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-vibe:explain`. Never auto-invoke based on project state or conversation context.
+
 ---
 
 # Why Structured Context Matters (For Vibe Coders)
@@ -108,6 +113,6 @@ When you have a real team, PRDs, architecture docs - check out [SCS Team](https:
 
 ## Resources to Mention
 
-- Documentation: https://structuredcontext.io
+- Documentation: https://structuredcontext.dev
 - Commands: `/scs-vibe:init`, `/scs-vibe:validate`
 - For teams: [SCS Team](https://github.com/structuredcontext/scs-team)

@@ -464,7 +464,7 @@ imports:
 scds: []
 
 provenance:
-  created_by: "scs-maintainers@ohana-scs.org"
+  created_by: "info@ohana-tech.com"
   created_at: "2025-11-01T10:00:00Z"
   rationale: "Software Development domain v1.0.0 - reference implementation"
 ```

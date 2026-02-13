@@ -7,7 +7,7 @@
 
 SCS Vibe is a Claude Code plugin that helps solo developers and small teams create structured context for their projects. It acts as a **professional architect in your pocket** - surfacing compliance, security, and legal considerations you might not think about until they become problems.
 
-The plugin "thinks" in [Structured Context Specification (SCS)](https://structuredcontext.io) but outputs native Claude Code format (CLAUDE.md and `.claude/rules/`), so there's no new format to learn.
+The plugin "thinks" in [Structured Context Specification (SCS)](https://structuredcontext.dev) but outputs native Claude Code format (CLAUDE.md and `.claude/rules/`), so there's no new format to learn.
 
 ## The Problem It Solves
 
@@ -220,11 +220,11 @@ This keeps context relevant and reduces token usage.
 ## Installation
 
 ```bash
-# Install from Claude Code marketplace
-/install scs-vibe
+# From a plugin marketplace
+/plugin install scs-vibe@marketplace-name
 
-# Or use locally during development
-claude --plugin-dir /path/to/scs-vibe
+# Or load locally during development
+claude --plugin-dir /path/to/plugins/scs-vibe
 ```
 
 ## Usage
@@ -375,4 +375,4 @@ scs-vibe/
 
 ---
 
-*Built by [Tim McCrimmon](https://github.com/tim-mccrimmon) as part of the [Structured Context Specification](https://structuredcontext.io) project.*
+*Built by [Tim McCrimmon](https://github.com/tim-mccrimmon) as part of the [Structured Context Specification](https://structuredcontext.dev) project.*

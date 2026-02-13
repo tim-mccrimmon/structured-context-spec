@@ -221,6 +221,6 @@ Request → [Auth] → [Validation] → [Processing] → [Settlement] → Respon
 ---
 
 *Last updated: [Date]*
-*Generated with [SCS](https://structuredcontext.io)*
+*Generated with [SCS](https://structuredcontext.dev)*
 
 **REMINDER**: This codebase handles financial data. Money must never appear or disappear. When in doubt, ask before implementing.

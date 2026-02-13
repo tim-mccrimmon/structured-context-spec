@@ -1,8 +1,14 @@
 ---
 name: version
 description: Lock bundles with semantic versioning. Guides through version selection, updates files, and integrates with git.
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, Bash(git status), Bash(git add *), Bash(git commit *), Bash(git tag *)
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-team:version`. Never auto-invoke based on project state or conversation context.
+- **Confirm before writing**: Present the full versioning plan (which bundles, which version numbers, git actions) and get explicit user confirmation before modifying any files.
+
 ---
 
 # SCS Team Version - Lock Context with Semantic Version

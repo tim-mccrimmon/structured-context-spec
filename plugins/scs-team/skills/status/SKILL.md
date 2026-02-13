@@ -1,8 +1,13 @@
 ---
 name: status
 description: Show what structured context exists and what's missing. Overview of bundles, SCDs, coverage across all 11 concerns, and compilation sync status.
-disable-model-invocation: true
 allowed-tools: Read, Glob, Grep
+---
+
+## Invocation Rules
+
+- **User-initiated only**: Do NOT invoke this skill unless the user explicitly runs `/scs-team:status`. Never auto-invoke based on project state or conversation context.
+
 ---
 
 # SCS Team Status - Context Overview
@@ -171,5 +176,5 @@ Or if you want to jump right in:
 /scs-team:draft architecture
 
 **For quick setup (no docs):**
-Consider `/install scs-vibe` for a 15-minute conversational setup.
+Consider `scs-vibe` for a 15-minute conversational setup (install with `claude --plugin-dir /path/to/plugins/scs-vibe`).
 ```

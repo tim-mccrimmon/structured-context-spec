@@ -4,11 +4,11 @@
   "version": "2.0.0",
   "author": {
     "name": "Tim McCrimmon",
-    "email": "tim@structuredcontext.io"
+    "email": "tim@structuredcontext.dev"
   },
-  "homepage": "https://structuredcontext.io",
+  "homepage": "https://structuredcontext.dev",
   "repository": "https://github.com/structuredcontext/scs-team",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "structured-context",
     "scs",

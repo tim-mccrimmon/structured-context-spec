@@ -116,4 +116,4 @@ User Request → [Component A] → [Component B] → [Database] → Response
 ---
 
 *Last updated: [Date]*
-*Generated with [SCS](https://structuredcontext.io)*
+*Generated with [SCS](https://structuredcontext.dev)*
