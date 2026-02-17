@@ -1,0 +1,128 @@
+id: scd:standards:chai-pa-usefulness
+type: standards
+version: "DRAFT"
+title: "CHAI Prior Auth - Usefulness, Usability, and Efficacy"
+description: >
+  Governance boundaries for AI prior authorization agents ensuring useful,
+  effective criteria matching. Defines turnaround time requirements, policy
+  coverage expectations, scope boundaries, and performance monitoring
+  obligations after policy updates.
+
+content:
+  standard_name: "CHAI Responsible AI Framework"
+  standard_version: "1.0 (December 2025)"
+  scope: "Usefulness, Usability, and Efficacy - Prior Authorization Criteria Matching"
+  source_url: "https://rai-content.chai.org/en/latest/prior-authorization-ai-supported-criteria-matching/t%26e-framework.html"
+
+  principle: "Usefulness, Usability, and Efficacy"
+  principle_summary: >
+    AI-supported prior authorization must demonstrably improve the criteria
+    matching process while maintaining or exceeding the quality of human review.
+    The agent must operate within defined scope boundaries and degrade gracefully
+    when policies change.
+
+  requirements:
+    - id: "CHAI-PA-USE-001"
+      name: "Turnaround Time Compliance"
+      description: >
+        Agent must process prior authorization requests within CMS-mandated
+        turnaround windows. Separately track auto-approved vs. manual review
+        pathways to ensure AI routing does not create bottlenecks.
+      benchmark: "72 hours for expedited requests, 7 calendar days for standard requests"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "implementer"
+      implementation_guidance: >
+        Configure agent to flag requests approaching TAT deadlines.
+        Auto-approved pathway should complete significantly faster than
+        manual review. Monitor for cases where AI uncertainty causes
+        unnecessary routing to manual review, inflating TAT.
+
+    - id: "CHAI-PA-USE-002"
+      name: "Policy Coverage Completeness"
+      description: >
+        Agent must capture all non-judgment policy criteria including
+        inclusion/exclusion rules, numeric thresholds, and contraindications.
+        Missing or mis-mapped criteria constitute a governance failure.
+      benchmark: ">=90% of required criteria represented; <=10% missing or mis-mapped"
+      measurement_phase: "pre_implementation"
+      responsible_role: "developer"
+      implementation_guidance: >
+        Maintain a structured inventory of all policy criteria the agent
+        evaluates. When policies update, diff against previous version to
+        identify new/changed/removed criteria. Flag coverage gaps before
+        deploying updated policies to production agents.
+
+    - id: "CHAI-PA-USE-003"
+      name: "Scope Boundary Enforcement"
+      description: >
+        Agent must reject queries outside its defined scope. Clinical
+        judgments beyond criteria alignment, treatment recommendations,
+        and diagnostic interpretations are out-of-scope and must be
+        refused with appropriate routing to human review.
+      benchmark: ">=95% correct rejection of out-of-scope queries"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "developer"
+      implementation_guidance: >
+        Define explicit scope boundaries in agent context. The agent
+        performs CRITERIA MATCHING only — it does not render clinical
+        opinions, recommend treatments, or override physician judgment.
+        Out-of-scope requests must be routed to human reviewers with
+        clear documentation of why the request exceeded agent scope.
+      in_scope:
+        - "Criteria matching against payer medical necessity guidelines"
+        - "Verification of required documentation completeness"
+        - "Identification of missing information for criteria evaluation"
+        - "Routing recommendations (auto-approve, manual review, deny)"
+      out_of_scope:
+        - "Clinical judgment or medical opinion"
+        - "Treatment recommendations or alternatives"
+        - "Diagnostic interpretation"
+        - "Override of physician-provided clinical rationale"
+        - "Benefit determination beyond criteria matching"
+
+    - id: "CHAI-PA-USE-004"
+      name: "Efficiency Improvement"
+      description: >
+        AI-assisted criteria matching should measurably reduce time-on-task
+        compared to fully manual review baseline.
+      benchmark: ">=15-30% reduction in time-on-task considered meaningful"
+      measurement_phase: "pre_implementation"
+      responsible_role: "implementer"
+
+    - id: "CHAI-PA-USE-005"
+      name: "Policy Update Resilience"
+      description: >
+        Agent performance must be monitored after policy updates. Governance
+        protocols must define retraining or re-evaluation triggers when
+        new or revised coverage policies are deployed.
+      benchmark: "No specific threshold — requires governance protocols defining retraining triggers"
+      measurement_phase: "post_implementation"
+      responsible_role: "developer"
+      implementation_guidance: >
+        Track all metrics (coverage completeness, scope rejection, TAT)
+        before and after policy updates. Define thresholds for acceptable
+        degradation. If metrics drop below threshold after policy update,
+        halt auto-approval pathway until remediated.
+
+    - id: "CHAI-PA-USE-006"
+      name: "Appeal Overturn Rate Monitoring"
+      description: >
+        Track claims paid only after successful appeals, comparing pre
+        and post AI implementation rates. AI should not increase the
+        rate of incorrect initial denials.
+      benchmark: "Maintain historical baseline during adoption; reduce below pre-AI levels over time"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "implementer"
+
+  governance_note: >
+    CRITICAL: The AI model does not render actual approvals or denials.
+    It informs organizational routing logic. The agent's output is a
+    criteria matching assessment, not a coverage determination. Final
+    decisions remain with authorized human reviewers per organizational
+    policy and regulatory requirements.
+
+provenance:
+  created_by: "tim@ohana-tech.com"
+  created_at: "2026-02-16T00:00:00Z"
+  source: "CHAI T&E Framework v1.0 - Prior Authorization AI-Supported Criteria Matching (December 2025)"
+  rationale: "Transposition of CHAI usefulness, usability, and efficacy requirements into SCS standards format"

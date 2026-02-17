@@ -1,0 +1,33 @@
+id: bundle:chai-prior-auth
+type: standards
+version: "DRAFT"
+title: "CHAI - AI-Supported Prior Authorization Criteria Matching"
+description: >
+  Standards bundle encoding the Coalition for Health AI (CHAI) Best Practice
+  Guide and Testing & Evaluation Framework for AI-supported prior authorization
+  criteria matching. Based on CHAI's v1.0 release (December 2025), developed
+  by 100+ industry experts from UnitedHealth Group, CVS Health, BCBS Minnesota,
+  MCG Health, Lyric.ai, Mayo Clinic, Duke, Stanford, and others.
+
+  This bundle provides the governance boundaries that AI agents performing
+  prior authorization criteria matching must operate within. It does NOT
+  provide workflow logic or operational data — it provides the behavioral
+  rules, fairness requirements, safety thresholds, and transparency
+  obligations the agent must satisfy.
+
+imports: []
+
+scds:
+  - scd:standards:chai-pa-usefulness
+  - scd:standards:chai-pa-fairness
+  - scd:standards:chai-pa-safety
+  - scd:standards:chai-pa-transparency
+
+provenance:
+  created_by: "tim@ohana-tech.com"
+  created_at: "2026-02-16T00:00:00Z"
+  rationale: >
+    Transposition of CHAI Prior Authorization Best Practice Guide and T&E
+    Framework into SCS standards bundle format. Source documents freely
+    available at https://www.chai.org/workgroup/use-case/ai-supported-prior-authorization-criteria-matching
+    and https://rai-content.chai.org/en/latest/prior-authorization-ai-supported-criteria-matching/

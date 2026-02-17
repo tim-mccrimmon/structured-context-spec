@@ -1,0 +1,112 @@
+id: scd:standards:chai-pa-transparency
+type: standards
+version: "DRAFT"
+title: "CHAI Prior Auth - Transparency"
+description: >
+  Governance boundaries ensuring AI prior authorization decisions are
+  explainable, documented, and auditable. Defines model card requirements,
+  decision traceability obligations, and documentation standards.
+
+content:
+  standard_name: "CHAI Responsible AI Framework"
+  standard_version: "1.0 (December 2025)"
+  scope: "Transparency - Prior Authorization Criteria Matching"
+  source_url: "https://rai-content.chai.org/en/latest/prior-authorization-ai-supported-criteria-matching/t%26e-framework.html"
+
+  principle: "Transparency"
+  principle_summary: >
+    AI-supported prior authorization must be transparent about what the
+    model does, how it was developed, what data it was trained on, and
+    how individual decisions were reached. Stakeholders (providers, patients,
+    regulators) must be able to understand why a specific criteria matching
+    assessment was made.
+
+  requirements:
+    - id: "CHAI-PA-TRANS-001"
+      name: "CHAI Applied Model Card"
+      description: >
+        Developers must complete and maintain a CHAI Applied Model Card
+        (or equivalent documentation) for all AI models used in prior
+        authorization criteria matching. The model card must be accessible
+        to authorized stakeholders.
+      benchmark: "Model card completed and published before production deployment"
+      measurement_phase: "pre_implementation"
+      responsible_role: "developer"
+      model_card_contents:
+        - section: "Model Overview"
+          required_fields:
+            - "Model name and version"
+            - "Intended use case and scope"
+            - "Out-of-scope uses"
+            - "Development organization and contact"
+
+        - section: "Training and Evaluation"
+          required_fields:
+            - "Training data description and sources"
+            - "Evaluation methodology"
+            - "Performance metrics on held-out test sets"
+            - "Known limitations and failure modes"
+
+        - section: "Fairness Assessment"
+          required_fields:
+            - "Demographic groups evaluated"
+            - "Fairness metrics and results"
+            - "Identified disparities and mitigation steps"
+
+        - section: "Deployment Context"
+          required_fields:
+            - "Deployment environment description"
+            - "Human oversight mechanisms"
+            - "Fallback and escalation procedures"
+            - "Monitoring and alerting configuration"
+
+    - id: "CHAI-PA-TRANS-002"
+      name: "Decision Traceability"
+      description: >
+        Every criteria matching assessment must be traceable to the specific
+        policy criteria evaluated, the evidence considered, and the reasoning
+        applied. Stakeholders must be able to reconstruct why a specific
+        assessment was reached.
+      benchmark: "100% of assessments include traceable reasoning"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "developer"
+      implementation_guidance: >
+        For each criteria matching assessment, log:
+        1. Which policy version was active at the time of assessment
+        2. Which specific criteria were evaluated
+        3. What evidence (from the request) was matched against each criterion
+        4. The assessment outcome for each criterion
+        5. The overall routing recommendation and rationale
+
+        This log must be immutable and retained per organizational and
+        regulatory retention policies.
+
+    - id: "CHAI-PA-TRANS-003"
+      name: "Context Version Auditability"
+      description: >
+        It must be possible to determine exactly which governance context
+        (policies, criteria, thresholds) the AI agent was operating under
+        at the time of any specific decision. This enables retrospective
+        audit and investigation.
+      benchmark: "100% of assessments linked to specific context version"
+      measurement_phase: "post_implementation"
+      responsible_role: "implementer"
+      implementation_guidance: >
+        Record the bundle version, tag resolution, and SCD versions
+        active at the time of each assessment. When investigating a
+        past decision, it must be possible to reconstruct the exact
+        governance context the agent had — not just the current context.
+
+  scs_alignment_note: >
+    CHAI-PA-TRANS-003 (Context Version Auditability) maps directly to
+    SCS/SCP capabilities: immutable versioned bundles, tag-based
+    resolution with audit trails, and the Context Service's ability
+    to reconstruct what context any agent had at any timestamp. This
+    is the strongest alignment point between CHAI's requirements and
+    the SCS delivery mechanism.
+
+provenance:
+  created_by: "tim@ohana-tech.com"
+  created_at: "2026-02-16T00:00:00Z"
+  source: "CHAI T&E Framework v1.0 - Prior Authorization AI-Supported Criteria Matching (December 2025)"
+  rationale: "Transposition of CHAI transparency requirements into SCS standards format"

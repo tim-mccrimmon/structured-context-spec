@@ -1,0 +1,111 @@
+id: scd:standards:chai-pa-safety
+type: standards
+version: "DRAFT"
+title: "CHAI Prior Auth - Safety and Reliability"
+description: >
+  Governance boundaries ensuring AI prior authorization systems are safe,
+  reliable, and fail gracefully. Defines failure analysis requirements,
+  risk priority thresholds, and system availability obligations.
+
+content:
+  standard_name: "CHAI Responsible AI Framework"
+  standard_version: "1.0 (December 2025)"
+  scope: "Safety and Reliability - Prior Authorization Criteria Matching"
+  source_url: "https://rai-content.chai.org/en/latest/prior-authorization-ai-supported-criteria-matching/t%26e-framework.html"
+
+  principle: "Safety and Reliability"
+  principle_summary: >
+    AI-supported prior authorization must be resilient, fail safely, and
+    undergo rigorous pre-deployment failure analysis. When the system fails
+    or encounters uncertainty, it must default to human review rather than
+    rendering potentially incorrect determinations.
+
+  requirements:
+    - id: "CHAI-PA-SAFE-001"
+      name: "Pre-Deployment Failure Analysis"
+      description: >
+        Apply structured failure analysis methodologies before deploying
+        AI criteria matching to production. Must address AI-specific risk
+        categories beyond traditional software failure modes.
+      benchmark: "Risk Priority Number (RPN) <100 for all critical failure modes"
+      measurement_phase: "pre_implementation"
+      responsible_role: "developer_and_implementer"
+      methodologies:
+        - "Fault Tree Analysis (FTA)"
+        - "Failure Mode and Effects Analysis (FMEA)"
+        - "Root Cause Analysis (RCA)"
+      ai_specific_risks:
+        - id: "RISK-001"
+          category: "Data Drift"
+          description: >
+            Input data characteristics change over time, causing model
+            performance to degrade. Examples: new drug categories, changing
+            patient demographics, evolving clinical guidelines.
+          mitigation: >
+            Monitor input data distributions against training baselines.
+            Define drift thresholds that trigger re-evaluation.
+
+        - id: "RISK-002"
+          category: "Model Bias"
+          description: >
+            Systematic errors in criteria matching that correlate with
+            demographic characteristics or specific clinical categories.
+          mitigation: >
+            Cross-reference with CHAI-PA-FAIR-001 (Predictive Parity).
+            Include bias detection in failure analysis scope.
+
+        - id: "RISK-003"
+          category: "Hallucination"
+          description: >
+            Agent generates criteria assessments referencing policies,
+            guidelines, or clinical evidence that do not exist or are
+            misrepresented.
+          mitigation: >
+            Ground all criteria matching against structured policy documents.
+            Require citation of specific policy sections for each criterion
+            evaluated. Flag assessments that cannot be traced to source policy.
+
+        - id: "RISK-004"
+          category: "Policy Change Impact"
+          description: >
+            New or revised coverage policies cause unpredictable changes
+            in agent behavior. Agent may apply outdated criteria or
+            misinterpret new policy language.
+          mitigation: >
+            Version all policy context. Test agent behavior against new
+            policies in staging before production deployment. Monitor
+            metrics (per CHAI-PA-USE-005) after each policy update.
+
+      implementation_guidance: >
+        Conduct FMEA for each critical failure mode. Calculate Risk Priority
+        Number (RPN) as Severity x Occurrence x Detection. Any failure mode
+        with RPN >= 100 must be mitigated before production deployment.
+        Re-evaluate FMEA quarterly and after significant system changes.
+
+    - id: "CHAI-PA-SAFE-002"
+      name: "System Reliability and Availability"
+      description: >
+        AI criteria matching services must maintain high availability.
+        Downtime directly impacts prior authorization processing timelines
+        and may cause CMS turnaround time violations.
+      benchmark: ">=99.9% system uptime"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "developer_and_implementer"
+      implementation_guidance: >
+        Define fallback pathways for when AI service is unavailable.
+        All requests must route to manual review during outages — requests
+        must never be silently dropped or delayed without notification.
+        Monitor uptime continuously and alert on degradation before
+        SLA thresholds are breached.
+
+  fail_safe_principle: >
+    When the AI system encounters uncertainty, errors, or edge cases
+    beyond its defined scope, the default behavior MUST be to route
+    to human review. The system must NEVER auto-deny based on inability
+    to match criteria. Uncertainty routes to humans, not to denial.
+
+provenance:
+  created_by: "tim@ohana-tech.com"
+  created_at: "2026-02-16T00:00:00Z"
+  source: "CHAI T&E Framework v1.0 - Prior Authorization AI-Supported Criteria Matching (December 2025)"
+  rationale: "Transposition of CHAI safety and reliability requirements into SCS standards format"

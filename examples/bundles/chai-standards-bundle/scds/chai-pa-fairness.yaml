@@ -1,0 +1,110 @@
+id: scd:standards:chai-pa-fairness
+type: standards
+version: "DRAFT"
+title: "CHAI Prior Auth - Fairness and Bias Management"
+description: >
+  Governance boundaries ensuring AI prior authorization criteria matching
+  does not introduce or amplify demographic bias. Defines predictive parity
+  requirements, language safety checks, and disparity monitoring obligations
+  across auto-approved vs. manually reviewed pathways.
+
+content:
+  standard_name: "CHAI Responsible AI Framework"
+  standard_version: "1.0 (December 2025)"
+  scope: "Fairness and Bias Management - Prior Authorization Criteria Matching"
+  source_url: "https://rai-content.chai.org/en/latest/prior-authorization-ai-supported-criteria-matching/t%26e-framework.html"
+
+  principle: "Fairness and Bias Management"
+  principle_summary: >
+    AI-supported prior authorization must not systematically disadvantage
+    any demographic group. Criteria matching accuracy, processing pathways,
+    and appeal experiences must be equitable across race, sex, age, language,
+    disability status, and other protected characteristics.
+
+  requirements:
+    - id: "CHAI-PA-FAIR-001"
+      name: "Predictive Parity (PPV Parity)"
+      description: >
+        Prediction accuracy must be consistent across demographic subgroups.
+        Positive Predictive Value (the rate at which the agent's "meets criteria"
+        determination is correct) must not vary significantly by race, sex,
+        age, language, or disability status.
+      benchmark: "PPV difference >0.05 across any demographic subgroup triggers mandatory review of training data or thresholding"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "developer_and_implementer"
+      implementation_guidance: >
+        Stratify all criteria matching outcomes by available demographic
+        dimensions. When PPV disparity exceeds 0.05 threshold, investigate
+        root cause — may indicate biased training data, proxy variables,
+        or threshold calibration issues. Document findings and remediation
+        actions. Re-evaluate after remediation to confirm disparity resolved.
+      protected_characteristics:
+        - "Race/ethnicity"
+        - "Sex/gender"
+        - "Age"
+        - "Primary language"
+        - "Disability status"
+
+    - id: "CHAI-PA-FAIR-002"
+      name: "Toxicity Language Scoring"
+      description: >
+        All generative outputs (approval rationales, denial explanations,
+        information request narratives) must be screened for harmful or
+        biased language using NLP toxicity detection.
+      benchmark: "Toxicity score <0.1 (10%); goal is zero toxic language"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "developer"
+      implementation_guidance: >
+        Apply toxicity scoring to all agent-generated text before delivery.
+        Calibrate scoring to distinguish legitimate clinical terminology
+        (which may flag as toxic in general-purpose models) from genuinely
+        harmful or biased language. Maintain allowlist of clinical terms
+        that should not trigger toxicity flags.
+
+    - id: "CHAI-PA-FAIR-003"
+      name: "Auto-Approval vs. Manual Review Outcome Disparity"
+      description: >
+        Compare health outcomes between cases routed to auto-approval
+        vs. manual review, stratified by demographics. Address the
+        "Symptoms Paradox" where manual review concentrates processing
+        delays on vulnerable or complex populations.
+      benchmark: "No fixed benchmark — transparency and reporting required"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "developer_and_implementer"
+      implementation_guidance: >
+        Monitor whether the auto-approve pathway disproportionately serves
+        certain demographics while routing others to slower manual review.
+        If disparity is detected, investigate whether routing criteria
+        correlate with demographic proxies. Report findings regardless
+        of whether disparity is detected — absence of disparity is also
+        a meaningful finding that should be documented.
+      symptoms_paradox_note: >
+        The "Symptoms Paradox" occurs when AI correctly identifies complex
+        cases for manual review, but those complex cases disproportionately
+        affect certain populations (e.g., patients with comorbidities,
+        rare conditions, or non-standard presentations). The result is
+        that vulnerable patients experience longer processing times even
+        though the routing logic is clinically appropriate. This requires
+        monitoring and mitigation strategies, not simply accepting the
+        disparity as "correct" behavior.
+
+    - id: "CHAI-PA-FAIR-004"
+      name: "Demographic Appeal Delay Monitoring"
+      description: >
+        Evaluate whether turnaround times and appeal experiences are
+        equitable across demographic groups within the same clinical
+        categories.
+      benchmark: "No specific benchmark — requires ongoing monitoring and reporting"
+      measurement_phase: "pre_and_post_implementation"
+      responsible_role: "developer_and_implementer"
+      implementation_guidance: >
+        Within each clinical category (e.g., oncology, cardiology,
+        orthopedics), compare appeal processing times across demographic
+        groups. Disparities within the same clinical category cannot be
+        explained by case complexity and warrant investigation.
+
+provenance:
+  created_by: "tim@ohana-tech.com"
+  created_at: "2026-02-16T00:00:00Z"
+  source: "CHAI T&E Framework v1.0 - Prior Authorization AI-Supported Criteria Matching (December 2025)"
+  rationale: "Transposition of CHAI fairness and bias management requirements into SCS standards format"
