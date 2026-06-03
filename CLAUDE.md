@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Structured Context Specification (SCS) — Project Context
 
 ## What This Project Is
@@ -49,6 +53,56 @@ structured-context-spec/
 ├── docs/                   # Non-spec documentation
 └── CONTRIBUTING.md         # Contribution guide
 ```
+
+---
+
+## Tools & Development Commands
+
+Two **independent** Python packages live under `tools/` — there is no top-level build.
+Each has its own `pyproject.toml`; install and test them separately. Both require **Python ≥ 3.11**.
+There is no CI workflow yet, so run these locally before submitting.
+
+### `tools/cli/` — `scs-tools` (project scaffolding)
+
+Click-based CLI exposing the `scs` command (`scs_tools.cli:cli`). Subcommands: `new`, `init`,
+`add`, `bundle`, `validate`. Templates it scaffolds live in `scs_tools/templates/`.
+
+```bash
+cd tools/cli
+pip install -e .          # installs the `scs` command
+scs new project my-app    # scaffold a project
+scs validate              # validate within a project
+```
+
+### `tools/scd-validator/` — `scs-validator` (the validation engine)
+
+`src/`-layout package (`src/scs_validator/`). Validates SCDs and bundles in layered passes:
+syntax → schema → semantic → relationship → bundle/completeness (one module per pass,
+e.g. `schema_validator.py`, `semantic_validator.py`, `bundle_validator.py`). Validation
+**rules are data**, declared in `rules/v0.1.0/*.yaml` and loaded by `rules_loader.py` —
+prefer editing rule YAML over hardcoding checks. JSON Schemas it validates against live in
+the repo-root `schema/` directory (pass `--schema-dir ../../schema` if not auto-found).
+
+```bash
+cd tools/scd-validator
+pip install -e ".[dev]"                       # runtime + pytest/black/ruff/mypy
+
+# Validate
+scs-validate path/to/scd.yaml                 # single SCD (or glob)
+scs-validate --bundle path/to/bundle.yaml --strict   # bundle; --strict fails on warnings
+python -m scs_validator --bundle bundle.yaml  # equivalent, as a module
+
+# Test / lint / type-check (config in pyproject.toml; line-length 100)
+pytest                                         # runs with coverage (addopts in pyproject)
+pytest tests/test_schema_validator.py          # single test file
+pytest -k semantic                             # single test by name
+black src/ tests/
+ruff check src/ tests/
+mypy src/                                       # disallow_untyped_defs is on
+```
+
+Exit codes matter for scripting: `0` valid, `1` errors, `2` warnings-in-strict-mode,
+`3` bad args, `4` file error, `5` internal error.
 
 ---
 

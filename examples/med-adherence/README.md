@@ -97,7 +97,7 @@ scs-validator bundles/project-bundle.yaml --recursive
 
 ## Related Documentation
 
-- [Bundle Format Specification](../../spec/0.1/bundle-format.md)
+- [Bundle Format Specification](../../spec/0.3/bundle-format.md)
 - [Bundle Lifecycle](../../docs/bundle-lifecycle.md)
 - [Project Structure](../../docs/project-structure.md)
 - [Minimum Project SCDs](../../docs/minimum-project-scds.md)

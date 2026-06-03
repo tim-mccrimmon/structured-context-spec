@@ -742,9 +742,9 @@ Change Management (repeat as needed)
 
 ## Related Documentation
 
-- [Bundle Format Specification](../spec/0.1/bundle-format.md) - Technical bundle structure
+- [Bundle Format Specification](../spec/0.3/bundle-format.md) - Technical bundle structure
 - [Validation Workflow](validation-workflow.md) - How to validate bundles
-- [SCS Overview](../spec/0.1/overview.md) - Core SCS concepts
+- [SCS Overview](../spec/0.3/overview.md) - Core SCS concepts
 - [Getting Started](getting-started.md) - Creating your first SCD
 
 ---

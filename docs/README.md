@@ -27,15 +27,15 @@ Welcome to the Structured Context Specification (SCS) documentation. This direct
 ## Reference Materials
 
 ### Specification
-- **[Normative Specification](../spec/0.1/)** - The complete SCS specification
-  - [Overview](../spec/0.1/overview.md) - High-level introduction
-  - [Core Model](../spec/0.1/core-model.md) - Data structures and relationships
-  - [Meta Tier](../spec/0.1/meta-tier.md) - Semantic foundation
-  - [Project Tier](../spec/0.1/project-tier.md) - Project-specific context
-  - [Standards Tier](../spec/0.1/standards-tier.md) - External obligations
-  - [Bundle Format](../spec/0.1/bundle-format.md) - Bundle structure
-  - [Governance & Compliance](../spec/0.1/governance-and-compliance.md)
-  - [Terminology](../spec/0.1/terminology.md)
+- **[Normative Specification](../spec/0.3/)** - The complete SCS specification
+  - [Overview](../spec/0.3/overview.md) - High-level introduction
+  - [Core Model](../spec/0.3/core-model.md) - Data structures and relationships
+  - [Meta Tier](../spec/0.3/meta-tier.md) - Semantic foundation
+  - [Project Tier](../spec/0.3/project-tier.md) - Project-specific context
+  - [Standards Tier](../spec/0.3/standards-tier.md) - External obligations
+  - [Bundle Format](../spec/0.3/bundle-format.md) - Bundle structure
+  - [Governance & Compliance](../spec/0.3/governance-and-compliance.md)
+  - [Terminology](../spec/0.3/terminology.md)
 
 ### Schemas & Templates
 - **[JSON Schemas](../schema/)** - Validation schemas for SCDs and bundles
@@ -88,10 +88,10 @@ Welcome to the Structured Context Specification (SCS) documentation. This direct
 → Browse [domain-docs/](domain-docs/)
 
 **"I'm building tools that use SCS"**
-→ Study the [JSON Schemas](../schema/) and [Core Model](../spec/0.1/core-model.md)
+→ Study the [JSON Schemas](../schema/) and [Core Model](../spec/0.3/core-model.md)
 
 **"I want to understand the specification formally"**
-→ Read the [Normative Specification](../spec/0.1/)
+→ Read the [Normative Specification](../spec/0.3/)
 
 ---
 
