@@ -62,6 +62,10 @@ Two **independent** Python packages live under `tools/` — there is no top-leve
 Each has its own `pyproject.toml`; install and test them separately. Both require **Python ≥ 3.11**.
 There is no CI workflow yet, so run these locally before submitting.
 
+The two packages expose **distinct** console scripts — `scs` (scaffolding, `scs-tools`) and
+`scs-validate` (validation, `scs-validator`). Keep them distinct: both once declared `scs`,
+which collided when installed together. Don't rename either back to a shared name.
+
 ### `tools/cli/` — `scs-tools` (project scaffolding)
 
 Click-based CLI exposing the `scs` command (`scs_tools.cli:cli`). Subcommands: `new`, `init`,
