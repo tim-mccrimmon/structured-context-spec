@@ -1,6 +1,6 @@
 """Entry point for running scs_validator as a module."""
 
-from .cli import cli
+from .commands.validate import validate
 
 if __name__ == "__main__":
-    cli()
+    validate()

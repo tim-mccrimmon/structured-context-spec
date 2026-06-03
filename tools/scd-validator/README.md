@@ -267,7 +267,7 @@ See the main [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution guideline
 
 - [Validator Overview](VALIDATOR_OVERVIEW.md) - Technical design document
 - [Validation Workflow](../../docs/validation-workflow.md) - Complete validation guide
-- [SCS Specification](../../spec/0.1/) - Core specification
+- [SCS Specification](../../spec/0.3/) - Core specification
 
 ## License
 

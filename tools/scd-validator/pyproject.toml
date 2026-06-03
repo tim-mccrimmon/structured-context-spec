@@ -42,7 +42,7 @@ dev = [
 ]
 
 [project.scripts]
-scs = "scs_validator.cli:cli"
+scs-validate = "scs_validator.commands.validate:validate"
 
 [project.urls]
 Homepage = "https://github.com/tim-mccrimmon/scs-spec"

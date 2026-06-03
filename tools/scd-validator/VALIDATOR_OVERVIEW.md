@@ -569,7 +569,7 @@ The SCD Validator will be considered successful when it can:
 ## Related Documentation
 
 - [Validation Workflow](../../docs/validation-workflow.md) - Complete validation guide
-- [SCS Overview](../../spec/0.1/overview.md) - Specification overview
+- [SCS Overview](../../spec/0.3/overview.md) - Specification overview
 - [JSON Schemas](../../schema/) - Schema definitions
 - [Templates](../../templates/) - SCD templates for testing
 

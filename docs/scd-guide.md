@@ -634,7 +634,7 @@ Now that you understand SCDs:
 
 ## Additional Resources
 
-- [SCS Specification](../spec/0.1/) - Normative specification
+- [SCS Specification](../spec/0.3/) - Normative specification
 - [FAQ](FAQ.md) - Common questions about SCS
 - [Glossary](glossary.yaml) - Terminology reference
 - [Templates](../templates/scd/) - SCD templates for all tiers
