@@ -1,0 +1,30 @@
+# ================================================================
+# Concern Bundle: Compliance & Governance
+# ================================================================
+# Regulatory + QMS guardrails and the AI-use governance rules an
+# assistant must operate inside (deployment tiers, autonomy, Part 11,
+# prohibited uses). Generic SCD slots — values are organization-specific.
+# ================================================================
+
+id: bundle:compliance-governance
+type: concern
+version: "0.1.0"
+title: "Compliance & Governance Concern Bundle"
+description: >
+  Regulatory and QMS governance for a medical-device CDMO: which
+  regulations bind the work, the AI deployment-tier and autonomy rules,
+  electronic-records controls, and hard prohibitions on AI use.
+
+imports: []
+
+scds:
+  - scd:project:regulatory-applicability
+  - scd:project:ai-deployment-tiers
+  - scd:project:agent-autonomy-rules
+  - scd:project:electronic-records-controls
+  - scd:project:prohibited-uses
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  rationale: "Generic compliance-governance concern for the Medical-Device CDMO domain"

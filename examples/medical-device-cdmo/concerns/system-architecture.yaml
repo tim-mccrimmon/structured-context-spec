@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: System Architecture
+# ================================================================
+# RENAMED from `architecture`: in a CDMO this means solution /
+# integration / configuration design, NOT source code. Generic SCD slots.
+# ================================================================
+
+id: bundle:system-architecture
+type: concern
+version: "0.1.0"
+title: "System Architecture Concern Bundle"
+description: >
+  Solution architecture for a medical-device CDMO program: target
+  system design and configuration, integration topology, target data/
+  object model, and the architectural constraints an assistant must not
+  drift from. Solution-level, not source code.
+
+imports: []
+
+scds:
+  - scd:project:solution-architecture
+  - scd:project:integration-map
+  - scd:project:target-data-model
+  - scd:project:architecture-constraints
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  rationale: "Generic system-architecture concern (renamed from architecture) for the Medical-Device CDMO domain"

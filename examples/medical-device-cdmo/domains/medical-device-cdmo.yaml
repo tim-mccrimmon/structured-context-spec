@@ -1,0 +1,39 @@
+# ================================================================
+# Domain Bundle: Medical-Device CDMO
+# ================================================================
+# Imports all concern bundles relevant to a regulated medical-device
+# CDMO and the AI assistants operating within it. Domain bundles
+# import concerns and contain no SCDs of their own.
+# ================================================================
+
+id: bundle:medical-device-cdmo
+type: domain
+version: "0.1.0"
+title: "Medical-Device CDMO Domain"
+description: >
+  Medical-Device CDMO domain bundle importing all concern bundles for
+  regulated QMS work, computer-system validation, multi-client program
+  segregation, and the governance of AI assistants in design, quality,
+  and regulatory workflows.
+
+imports:
+  - bundle:compliance-governance:0.1.0
+  - bundle:data-provenance:0.1.0
+  - bundle:security:0.1.0
+  - bundle:business-context:0.1.0
+  - bundle:system-architecture:0.1.0
+  - bundle:verification-validation:0.1.0
+  - bundle:risk-management:0.1.0
+  - bundle:implementation-cutover:0.1.0
+  - bundle:ai-accountability:0.1.0
+  - bundle:training-competency:0.1.0
+  - bundle:qms-records:0.1.0
+  - bundle:supplier-qualification:0.1.0
+
+# Domain bundles don't contain SCDs directly - they import concerns
+scds: []
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  rationale: "Medical-Device CDMO domain v0.1.0 - generic reference structure (12 concerns)"
