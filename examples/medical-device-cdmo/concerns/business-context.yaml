@@ -1,0 +1,28 @@
+# ================================================================
+# Concern Bundle: Business Context
+# ================================================================
+# Why the program exists, its scope, success criteria, and the client
+# program it serves. Generic SCD slots.
+# ================================================================
+
+id: bundle:business-context
+type: concern
+version: "0.1.0"
+title: "Business Context Concern Bundle"
+description: >
+  Business context for a medical-device CDMO program: objectives and
+  business case, explicit scope boundaries, measurable success criteria,
+  and the client-program context the work serves.
+
+imports: []
+
+scds:
+  - scd:project:program-objectives
+  - scd:project:scope-definition
+  - scd:project:success-criteria
+  - scd:project:client-program-context
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  rationale: "Generic business-context concern for the Medical-Device CDMO domain"

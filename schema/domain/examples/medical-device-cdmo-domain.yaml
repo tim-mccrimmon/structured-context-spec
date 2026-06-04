@@ -1,0 +1,85 @@
+domain:
+  id: "domain:medical-device-cdmo"
+  name: "Medical-Device CDMO"
+  version: "0.1.0"
+  description: "Structured context for contract development & manufacturing organizations (CDMOs) in the medical-device industry — regulated QMS work, computer-system validation, multi-client program segregation, and the governance of AI assistants operating inside that environment."
+  author: "Ohana Consulting"
+  license: "open"
+  homepage: "https://structuredcontext.dev/domains/medical-device-cdmo"
+
+  # The 12 concerns of this domain. Derived by adapting the software-development
+  # reference set to a regulated medical-device CDMO: concerns kept where they fit,
+  # renamed where the meaning shifts (e.g. architecture -> system-architecture,
+  # testing-validation -> verification-validation), and added where the domain has
+  # needs the software set has no home for (qms-records, supplier-qualification,
+  # training-competency). Inclusion rule: a concern belongs here only where AI
+  # agents actually operate.
+  concerns:
+    - "bundle:compliance-governance:0.1.0"
+    - "bundle:data-provenance:0.1.0"
+    - "bundle:security:0.1.0"
+    - "bundle:business-context:0.1.0"
+    - "bundle:system-architecture:0.1.0"
+    - "bundle:verification-validation:0.1.0"
+    - "bundle:risk-management:0.1.0"
+    - "bundle:implementation-cutover:0.1.0"
+    - "bundle:ai-accountability:0.1.0"
+    - "bundle:training-competency:0.1.0"
+    - "bundle:qms-records:0.1.0"
+    - "bundle:supplier-qualification:0.1.0"
+
+  # Shared base SCD schemas (inherited from the core spec, as in the sibling domains).
+  schemas:
+    meta:
+      content_schema: "../../scd/meta-scd-content-schema.json"
+      template: "../../scd/meta-scd-template.json"
+
+    standards:
+      content_schema: "../../scd/standards-scd-content-schema.json"
+      template: "../../scd/standards-scd-template.json"
+
+    project:
+      content_schema: "../../scd/project-scd-content-schema.json"
+      template: "../../scd/project-scd-template.json"
+
+  examples:
+    - "../../../examples/medical-device-cdmo/README.md"
+
+  metadata:
+    tags:
+      - "medical-device"
+      - "cdmo"
+      - "qms"
+      - "computer-system-validation"
+      - "iso-13485"
+      - "21-cfr-part-11"
+      - "ai-governance"
+
+    industry:
+      - "Medical Devices"
+      - "Life Sciences"
+      - "Contract Manufacturing"
+
+    use_cases:
+      - "QMS / PLM system implementation and migration"
+      - "Regulated document authoring (DHF, SOPs, validation protocols)"
+      - "Computer-system validation (IQ/OQ/PQ)"
+      - "Multi-client program governance and segregation"
+      - "Governance of AI assistants in design, quality, and regulatory workflows"
+
+# Domain-specific content structure preview:
+#
+# Meta-tier content (roles, concepts, capabilities):
+#   - cdmo_roles: [quality_engineer, regulatory_lead, validation_engineer, ...]
+#   - data_classifications: [public, internal, client_confidential, trade_secret, regulated]
+#   - agent_autonomy_levels: [L1_human_in_loop, L2_human_on_loop, L3_autonomous]
+#   - deployment_tiers: [tier_1_public, tier_2_confidential, tier_3_regulated]
+#
+# Standards-tier content (regulations the domain implements):
+#   - quality_system: [ISO 13485, 21 CFR 820 / QMSR]
+#   - software_lifecycle: [IEC 62304, 21 CFR Part 11, GAMP 5]
+#   - risk: [ISO 14971, ISO/IEC 23894]
+#   - ai_governance: [EU AI Act, ISO/IEC 42001, NIST AI RMF, FDA AI guidances]
+#
+# Project-tier content (per-program implementation):
+#   - the SCDs declared by each concern bundle in examples/medical-device-cdmo/concerns/

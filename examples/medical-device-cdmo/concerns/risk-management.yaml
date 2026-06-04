@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: Risk Management
+# ================================================================
+# RENAMED from `safety-risk`: ISO 14971 + project + data-integrity
+# risk (patient-safety only where device-intersecting). Generic SCD slots.
+# ================================================================
+
+id: bundle:risk-management
+type: concern
+version: "0.1.0"
+title: "Risk Management Concern Bundle"
+description: >
+  Risk management for a medical-device CDMO program: the risk register
+  (probability x severity with controls), risk-to-requirement-to-
+  controlling-deliverable traceability, data-integrity risk controls,
+  and risk-acceptability criteria per ISO 14971.
+
+imports: []
+
+scds:
+  - scd:project:risk-register
+  - scd:project:risk-traceability
+  - scd:project:data-integrity-risk
+  - scd:project:risk-acceptability-criteria
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  rationale: "Generic risk-management concern (renamed from safety-risk) for the Medical-Device CDMO domain"

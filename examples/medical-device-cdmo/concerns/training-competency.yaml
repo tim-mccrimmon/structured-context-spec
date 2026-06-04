@@ -1,0 +1,28 @@
+# ================================================================
+# Concern Bundle: Training & Competency
+# ================================================================
+# ADDED concern (no home in the software-dev set): who is qualified to
+# do and review the work. ISO 13485 §6.2. Generic SCD slots.
+# ================================================================
+
+id: bundle:training-competency
+type: concern
+version: "0.1.0"
+title: "Training & Competency Concern Bundle"
+description: >
+  Training and competency for a medical-device CDMO program: the
+  role-to-required-competency matrix, the definition of a qualified
+  reviewer (who may approve AI-assisted output), and training-completion
+  gates on system/data access.
+
+imports: []
+
+scds:
+  - scd:project:role-competency-matrix
+  - scd:project:qualified-reviewer-definition
+  - scd:project:training-completion-gates
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  rationale: "Generic training-competency concern (added) for the Medical-Device CDMO domain"

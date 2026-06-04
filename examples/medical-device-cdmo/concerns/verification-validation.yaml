@@ -1,0 +1,29 @@
+# ================================================================
+# Concern Bundle: Verification & Validation
+# ================================================================
+# RENAMED from `testing-validation`: the CSV lifecycle (IQ/OQ/PQ),
+# requirements traceability, and acceptance criteria. Generic SCD slots.
+# ================================================================
+
+id: bundle:verification-validation
+type: concern
+version: "0.1.0"
+title: "Verification & Validation Concern Bundle"
+description: >
+  Computer-system validation for a medical-device CDMO program: the
+  validation approach (GAMP category; IQ/OQ/PQ), requirements (URS)
+  traceability, quantitative acceptance criteria, and qualification
+  protocols and evidence.
+
+imports: []
+
+scds:
+  - scd:project:validation-approach
+  - scd:project:requirements-traceability
+  - scd:project:acceptance-criteria
+  - scd:project:qualification-protocols
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  rationale: "Generic verification-validation concern (renamed from testing-validation) for the Medical-Device CDMO domain"
