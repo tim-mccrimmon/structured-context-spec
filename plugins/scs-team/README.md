@@ -264,8 +264,8 @@ If you don't have documentation yet, check out [SCS Vibe](https://github.com/str
 ## Links
 
 - Documentation: https://structuredcontext.dev
-- GitHub: https://github.com/structuredcontext/scs-team
-- For Solo Devs: https://github.com/structuredcontext/scs-vibe
+- GitHub: https://github.com/tim-mccrimmon/structured-context-spec/tree/main/plugins/scs-team
+- For Solo Devs: https://github.com/tim-mccrimmon/structured-context-spec/tree/main/plugins/scs-vibe
 
 ## License
 

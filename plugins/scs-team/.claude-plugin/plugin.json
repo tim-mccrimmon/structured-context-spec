@@ -7,7 +7,7 @@
     "email": "tim@structuredcontext.dev"
   },
   "homepage": "https://structuredcontext.dev",
-  "repository": "https://github.com/structuredcontext/scs-team",
+  "repository": "https://github.com/tim-mccrimmon/structured-context-spec/tree/main/plugins/scs-team",
   "license": "Apache-2.0",
   "keywords": [
     "structured-context",

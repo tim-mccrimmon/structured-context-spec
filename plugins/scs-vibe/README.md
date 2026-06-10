@@ -118,8 +118,8 @@ When your project gets serious - team members, compliance requirements, real doc
 ## Links
 
 - Documentation: https://structuredcontext.dev
-- GitHub: https://github.com/structuredcontext/scs-vibe
-- For Teams: https://github.com/structuredcontext/scs-team
+- GitHub: https://github.com/tim-mccrimmon/structured-context-spec/tree/main/plugins/scs-vibe
+- For Teams: https://github.com/tim-mccrimmon/structured-context-spec/tree/main/plugins/scs-team
 
 ## License
 

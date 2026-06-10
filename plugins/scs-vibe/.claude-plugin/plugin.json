@@ -7,7 +7,7 @@
     "email": "tim@structuredcontext.dev"
   },
   "homepage": "https://structuredcontext.dev",
-  "repository": "https://github.com/structuredcontext/scs-vibe",
+  "repository": "https://github.com/tim-mccrimmon/structured-context-spec/tree/main/plugins/scs-vibe",
   "license": "Apache-2.0",
   "keywords": [
     "context",
