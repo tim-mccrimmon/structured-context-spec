@@ -1,0 +1,37 @@
+site_name: Structured Context Spec
+site_description: SCS — open specification for structured AI context bundles
+docs_dir: docs
+
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: deep purple
+    accent: deep purple
+  features:
+    - navigation.sections
+    - navigation.top
+    - toc.integrate
+
+nav:
+  - Overview: README.md
+  - Quick Start: quick-start-guide.md
+  - SCD Guide: scd-guide.md
+  - Validation: validation-guide.md
+  - Concern Docs:
+    - Architecture: concern-docs/architecture/README.md
+    - Business Context: concern-docs/business-context/README.md
+    - Compliance & Governance: concern-docs/compliance-governance/README.md
+    - Data Provenance: concern-docs/data-provenance/README.md
+    - Security: concern-docs/security/README.md
+    - Safety & Risk: concern-docs/safety-risk/README.md
+    - Testing & Validation: concern-docs/testing-validation/README.md
+    - Performance & Reliability: concern-docs/performance-reliability/README.md
+    - Deployment & Operations: concern-docs/deployment-operations/README.md
+    - Ethics & AI Accountability: concern-docs/ethics-ai-accountability/README.md
+    - Usability & Accessibility: concern-docs/usability-accessibility/README.md
+  - Examples:
+    - Medical Device CDMO: concern-docs/med-adherence-examples/GETTING_STARTED.md
+    - Med Adherence Getting Started: concern-docs/med-adherence-examples/GETTING_STARTED.md
+  - FAQ: FAQ.md
+  - Migration (0.3): MIGRATION-0.3.md
