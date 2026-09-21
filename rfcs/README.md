@@ -93,7 +93,7 @@ Idea Discussion → RFC Written → PR Submitted → Community Review (2+ weeks)
 
 | Number | Title | Author | Status | PR |
 |--------|-------|--------|--------|----|
-| 0001 | Domain Ontology (replaces "Concern") | @tim-mccrimmon | Draft (SCS 2.0) | — |
+| 0001 | Domain Ontology (replaces "Concern") | @tim-mccrimmon | Draft (SCS 0.5.0) | — |
 
 ### Accepted (Pending Implementation)
 

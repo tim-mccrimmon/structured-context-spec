@@ -1,19 +1,20 @@
 # SCS Roadmap
 
-Current stable: **0.3** (tagged `v0.3.0`). Active development: **2.0** on the `2.0-dev`
+Current stable: **0.3** (tagged `v0.3.0`). Active development: **0.5.0** on the `0.5-dev`
 branch.
 
 This document supersedes the forward-looking "Roadmap" section of
-`RELEASE-NOTES-0.3.md` for 2.0 and beyond. Granular backlog: `ISSUES.md`.
+`RELEASE-NOTES-0.3.md` for 0.5.0 and beyond. Granular backlog: `ISSUES.md`.
 
-## SCS 2.0 — theme
+## SCS 0.5.0 — theme
 
 **Structured context is the governed context layer for any AI actor** — chat assistants,
-autonomous agents, MCP tool invocations, and multi-agent workflows — not just chat. 2.0
+autonomous agents, MCP tool invocations, and multi-agent workflows — not just chat. 0.5.0
 makes the domain model explicit, resolves the runtime-facing open questions, and hardens
 the tooling so downstream systems can depend on it.
 
-2.0 is a **breaking change**.
+0.5.0 is a **breaking change** — expected pre-1.0, per semver; the spec is still settling
+and isn't claiming stability yet (see Governance, below).
 
 ## Workstreams
 
@@ -24,7 +25,7 @@ an optional shallow taxonomy, a small fixed set of typed relationships, and a ma
 each concept to the standards it satisfies. Hierarchy becomes
 `Project → Domain → Concept → SCD`. Design: `rfcs/RFC-0001-domain-ontology.md`.
 
-Everything else in 2.0 sequences behind this.
+Everything else in 0.5.0 sequences behind this.
 
 ### 2. "Any AI actor" reframe
 
@@ -55,26 +56,28 @@ Turn the runtime-blocking items in `OPEN_QUESTIONS.md` into normative spec decis
 
 ### 5. Tier stack
 
-Corporate / Project tiers only in 2.0. (The Personal tier is deferred.)
+Corporate / Project tiers only in 0.5.0. (The Personal tier is deferred.)
 
 ### 6. Tooling & release engineering
 
 - CI for `scs-tools` and `scs-validator` (none today).
 - Published, pinned releases (PyPI) so downstream builds can depend on a fixed version.
-- Converge validator rules on a single `rules/v2.0.0/` set; retire `v0.1.0` and `v0.3.0`.
+- Converge validator rules on a single `rules/v0.5.0/` set; retire `v0.1.0` and `v0.3.0`.
 
 ### 7. Migration
 
-- `spec/2.0/` docs, a 0.3 → 2.0 migration guide, and (open) a `scs migrate` helper for the
+- `spec/0.5/` docs, a 0.3 → 0.5.0 migration guide, and (open) a `scs migrate` helper for the
   mechanical concern → concept rename.
 
 ## Governance
 
-Through 2.0, the specification is maintained by Tim McCrimmon as sole maintainer; RFCs and
-Discussions are informative, not gating. The transition to broader community governance
-(the 0.3 roadmap's "path to 1.0") is **deferred to after 2.0 ships**.
+Through 0.5.0, the specification is maintained by Tim McCrimmon as sole maintainer; RFCs
+and Discussions are informative, not gating. The transition to broader community governance
+(the 0.3 roadmap's "path to 1.0") is **deferred to 1.0**, which is likewise not scheduled by
+this roadmap — 0.5.0 is deliberately pre-1.0 while the domain model and runtime decisions
+are still settling.
 
-## Beyond 2.0
+## Beyond 0.5.0
 
 Carried forward from the 0.3 roadmap, not scheduled:
 

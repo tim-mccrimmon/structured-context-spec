@@ -1,6 +1,6 @@
 # SCS Issues
 
-Working backlog for SCS **2.0** (branch `2.0-dev`). See `ROADMAP.md` for the theme and
+Working backlog for SCS **0.5.0** (branch `0.5-dev`). See `ROADMAP.md` for the theme and
 workstreams, `rfcs/` for design proposals.
 
 Status: `open` · `in-progress` · `blocked` · `done`
@@ -34,8 +34,8 @@ migration hint). Rename all `concern` handling in the validator.
 
 ### ISS-004 — Domain Ontology: spec text
 **Status:** blocked (ISS-001)
-`spec/2.0/`: rewrite `core-model.md`, `terminology.md`, `bundle-format.md` for the rename
-and the `Project → Domain → Concept → SCD` hierarchy. New `spec/2.0/domain-ontology.md`.
+`spec/0.5/`: rewrite `core-model.md`, `terminology.md`, `bundle-format.md` for the rename
+and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain-ontology.md`.
 
 ### ISS-005 — Domain Ontology: examples + templates + plugins
 **Status:** blocked (ISS-002)
@@ -96,7 +96,7 @@ supports.
 
 ### ISS-012 — Tier stack: Corporate / Project only
 **Status:** open
-2.0 ships Corporate and Project tiers; Personal is deferred. Reconcile spec text and
+0.5.0 ships Corporate and Project tiers; Personal is deferred. Reconcile spec text and
 schemas (the current tier names in `core-model.md` are meta / standards / project — align
 tier naming with the Corporate/Project framing, or document the mapping).
 
@@ -114,33 +114,33 @@ No CI today. Add lint + test + schema-validation CI for both `tools/cli` and
 Publish `scs-tools` and `scs-validator` (PyPI or equivalent) with versioned releases, so
 downstream builds can pin a fixed version. Verify current PyPI state first.
 
-### ISS-015 — Converge validator rules on v2.0.0
+### ISS-015 — Converge validator rules on v0.5.0
 **Status:** blocked (ISS-003)
-Retire `rules/v0.1.0/` and `rules/v0.3.0/`; single `rules/v2.0.0/` set.
+Retire `rules/v0.1.0/` and `rules/v0.3.0/`; single `rules/v0.5.0/` set.
 
 ---
 
 ## Migration
 
-### ISS-016 — 0.3 → 2.0 migration guide
+### ISS-016 — 0.3 → 0.5.0 migration guide
 **Status:** blocked (ISS-002, ISS-004)
-`docs/MIGRATION-2.0.md`: the concern → concept rename, the domain-manifest `ontology`
+`docs/MIGRATION-0.5.0.md`: the concern → concept rename, the domain-manifest `ontology`
 conversion, incremental depth, SCD `concept` field.
 
 ### ISS-017 — `scs migrate` helper (open)
 **Status:** open
-Decide whether to ship an automated helper for the mechanical parts of the 0.3 → 2.0
+Decide whether to ship an automated helper for the mechanical parts of the 0.3 → 0.5.0
 migration (concern → concept rename, flat `concerns[]` → flat `ontology.concepts[]`), or
 keep migration guide-only.
 
 ---
 
-## Housekeeping (not 2.0-blocking)
+## Housekeeping (not 0.5.0-blocking)
 
 ### ISS-018 — Spec file version labels
 **Status:** open
 `spec/0.3/core-model.md` and others are under `spec/0.3/` but internally labelled "0.1".
-Fix version headers when creating `spec/2.0/`.
+Fix version headers when creating `spec/0.5/`.
 
 ### ISS-019 — `.claude/` and scaffold files in the repo
 **Status:** open

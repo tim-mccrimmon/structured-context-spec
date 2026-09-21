@@ -5,7 +5,7 @@
 - **Tracking Issue**: (leave blank, will be filled when RFC is accepted)
 - **Author(s)**: Tim McCrimmon (@tim-mccrimmon)
 - **Status**: Draft
-- **Target**: SCS 2.0 (breaking change)
+- **Target**: SCS 0.5.0 (breaking change)
 
 ---
 
@@ -42,7 +42,7 @@ coverage) changed with it. SCS today treats that list as `concerns: [bundle:arch
   of-concerns design, where it means a cross-cutting *implementation* aspect. SCS concepts
   are domain knowledge categories, a different thing. The overload causes confusion.
 
-**Why this matters now — structured context is for any AI actor, not just chat.** SCS 2.0
+**Why this matters now — structured context is for any AI actor, not just chat.** SCS 0.5.0
 reframes structured context as the governed context layer for any AI actor: chat
 assistants, autonomous agents, MCP tool invocations, and multi-agent workflows. Consumers
 in that world do more than prepend text to a prompt — a control plane traverses a graph to
@@ -55,9 +55,27 @@ Expected outcome: a domain can state its ontology once, in the domain manifest; 
 to concepts; consumers reason over concepts and their relationships; and, in regulated
 domains, coverage against a framework is answerable from the ontology.
 
-> **[Tim to augment]** Prior art / supporting evidence on ontology-grounded context
-> (knowledge-graph-grounded retrieval, semantic layers, ontology-driven RAG, enterprise
-> context modeling). Drop references and the argument here.
+**Field evidence — three ontologies, not one.** The original "concerns" list was never
+domain-neutral; it was one ontology (Software Development / SDLC) wearing a generic name.
+Its structure maps directly onto the chapters of a conventional product plan — architecture,
+security, testing, deployment, and so on — because that is the business it was modeled on.
+Two subsequent engagements broke that assumption in different ways:
+
+- **Medical-device CDMO (Nextern).** The SDLC concern list didn't fit a regulated contract
+  manufacturer's work at all — risk management, design controls, supplier qualification,
+  and CAPA aren't SDLC concepts, and forcing them into that shape lost the regulatory
+  framework mapping that matters most in this market. This is what prompted renaming
+  "concern" to "Domain Ontology" in the first place — the fix wasn't a new concern list, it
+  was recognizing that *domain* means "the type of market the business is in," and each
+  market needs its own conceptual model.
+- **Business Funding (Everest).** A third, distinct ontology, not yet modeled — this market
+  has no obvious existing regulatory framework to align to, unlike CDMO's alignment with
+  ISO 13485 / IEC 62304 / 21 CFR 820.
+
+Three data points is enough to say the pattern is real: **a single fixed ontology cannot
+serve every business type SCS is used in**, and every new market encountered so far has
+needed its own. That is the actual argument for the Domain Ontology, ahead of any external
+prior art.
 
 ---
 
@@ -88,12 +106,35 @@ incrementally as it matures. SCS does not require a fully modeled graph.
 YAML/schema style as the rest of SCS. It is not OWL, not RDF, not description logic, and
 there is no reasoner. It is a typed graph you can read.
 
+### Ontology Models
+
+A Domain Ontology is authored once per **type of business** (a market/industry vertical),
+not once per company. So far there are three:
+
+- **SDLC** — the original "concerns" list (architecture, security, testing, …), for
+  software development businesses.
+- **CDMO** — risk management, design controls, verification & validation, supplier
+  qualification, …, for regulated medical-device contract manufacturers.
+- **Business Funding** — not yet modeled; a third market with no obvious existing framework
+  to align to.
+
+The first step in adopting SCS is choosing your business's ontology, not writing one from a
+blank page: **use an existing model if one fits your market, or create a new one by
+adapting the nearest existing model** rather than starting from nothing. A company's domain
+manifest instantiates a model — it declares which concepts it uses and how they relate — but
+the model itself (the reusable shape) is the thing worth naming, versioning, and sharing
+across companies in the same market.
+
+This RFC does not yet specify how an Ontology Model is packaged, versioned, or referenced
+independently of a specific domain manifest — see Unresolved Questions.
+
 ### How you use it
 
-You author a domain manifest with an `ontology` block. You create SCDs and attach each to a
-concept via `concept: concept:<id>` (replacing the current implicit "this SCD is in the
-architecture concern bundle" grouping). A concern *bundle* becomes a **concept bundle** —
-same idea, renamed — collecting the SCDs for one concept.
+You start from an Ontology Model that fits your business — or the nearest one, adapted —
+and author a domain manifest with an `ontology` block instantiating it. You create SCDs and
+attach each to a concept via `concept: concept:<id>` (replacing the current implicit "this
+SCD is in the architecture concern bundle" grouping). A concern *bundle* becomes a **concept
+bundle** — same idea, renamed — collecting the SCDs for one concept.
 
 A consumer (a runtime, a validator, an agent) reads the ontology to know: what concepts
 this domain has, how they relate, which SCDs realize each, and which frameworks each
@@ -112,7 +153,7 @@ whole thing a name that says what it is.
 
 ### Terminology changes
 
-| 0.3 | 2.0 |
+| 0.3 | 0.5.0 |
 |---|---|
 | Concern | **Concept** |
 | Concern bundle (`type: concern`) | **Concept bundle** (`type: concept`) |
@@ -127,7 +168,7 @@ Replace the flat `concerns` array with an `ontology` object. Sketch:
 domain:
   id: domain:medical-device-cdmo
   name: Medical Device CDMO
-  version: 2.0.0
+  version: 0.5.0
   description: >
     Context domain for contract design & manufacturing of medical devices under
     ISO 13485, IEC 62304, and FDA 21 CFR 820.
@@ -149,7 +190,7 @@ domain:
           - scd:standards:iso-14971
           - scd:standards:iso-13485-clause-7.1
         # the concept bundle realizing this concept (optional until SCDs exist)
-        bundle: bundle:risk-management:2.0.0
+        bundle: bundle:risk-management:0.5.0
 
       - id: concept:iso-14971-risk-analysis
         name: ISO 14971 Risk Analysis
@@ -194,7 +235,7 @@ An SCD in a concept bundle SHOULD declare its concept:
 id: scd:project:hazard-analysis-procedure
 type: project
 title: Hazard Analysis Procedure
-version: "2.0"
+version: "0.5.0"
 concept: concept:risk-management        # NEW — replaces implicit concern-bundle grouping
 content:
   ...
@@ -211,6 +252,59 @@ optional at the schema level but expected for SCDs that live in a concept bundle
 - Domain bundles import concept bundles instead of concern bundles; the "MUST import ≥ 1
   concern bundle, MUST contain no direct SCDs" rule carries over unchanged with the rename.
 
+### Bundle validity properties
+
+Beyond the structural rules above, a concept bundle is expected to have four properties.
+Only the first is validator-enforced as of this RFC; the rest are stated intent for future
+validator work, tracked separately:
+
+1. **Reflects the ontology** — every SCD's `concept` resolves to a real concept in the
+   active domain (Validation rule 6, enforced).
+2. **Approved, not just authored** — see Provenance and approval, below (enforced once
+   those fields ship).
+3. **Consistent version to version** *(not yet enforced)* — a concept cannot be renamed or
+   removed, and a relationship's meaning cannot change, without a major version bump. No
+   version-diff/compatibility check exists in the validator today; this needs its own
+   design (rule set + what "breaking" means for a concept bundle).
+4. **Compact and non-conflicting** *(not yet enforced)* — no redundant or duplicate
+   concepts, and no contradictory relationships beyond the acyclic checks in Validation
+   rules 2 and 5. The validator's current philosophy is permissive-by-default
+   (`completeness-rules.yaml`: "SCS validates STRUCTURE, not CONTENT COMPLETENESS");
+   compactness/non-conflict checking would be new, opt-in-first the same way completeness
+   checking is today.
+
+Content **accuracy or coverage completeness is explicitly out of scope for the validator** —
+SCS cannot verify that domain content is true or sufficient, only that someone with standing
+has attested to it. See Provenance and approval.
+
+### Provenance and approval
+
+Today's bundle `provenance` block records **authorship** only (`created_by`, `created_at`,
+`updated_by`, `updated_at`, `rationale`) — there is no field recording that anyone reviewed
+or agreed to the content. This RFC adds an explicit approval to bundle provenance:
+
+```yaml
+provenance:
+  created_by: jane@nextern.com
+  created_at: "2026-09-20T00:00:00Z"
+  version_approved_by: sam@nextern.com          # NEW — required
+  version_approved_at: "2026-09-21T00:00:00Z"   # NEW — required
+  rationale: "Added ISO 14971 clause mapping for risk-management concept"
+```
+
+`version_approved_by` names one accountable person (in practice, the senior governance
+authority) per bundle version — not per concept. This is a deliberate MVP, not the final
+shape: it is single-source attestation, where regulated use (CDMO) will likely need a
+**per-perspective** model instead — the owner of risk management attesting the
+risk-management concept, compliance attesting the compliance concept, etc. — which is
+already tracked as multi-author provenance in `ISSUES.md` (ISS-011). Ship
+`version_approved_by` now; treat per-perspective attestation as a follow-on RFC once real
+usage shows whether a single approver is actually insufficient.
+
+`version_approved_by` / `version_approved_at` are required on every bundle version. SCDs'
+own `provenance` blocks are unchanged — authorship only; approval is a bundle-level event,
+not a per-SCD one.
+
 ### Relationship semantics
 
 Reuse the existing vocabulary where it fits, keep the concept-level set small:
@@ -222,7 +316,7 @@ Reuse the existing vocabulary where it fits, keep the concept-level set small:
 | `satisfies` | concept → `scd:standards:` | this concept exists to address that requirement |
 
 `constrains`, `refines`, `extends`, `conflicts-with`, `implements` remain available for
-SCD-to-SCD relationships; they are **not** part of the concept-level ontology set in 2.0
+SCD-to-SCD relationships; they are **not** part of the concept-level ontology set in 0.5.0
 (may be added later — see Future Possibilities).
 
 ### Validation rules
@@ -239,7 +333,7 @@ SCD-to-SCD relationships; they are **not** part of the concept-level ontology se
 6. An SCD's `concept` (if present) resolves to a concept in the active domain.
 7. A concept bundle's SCDs SHOULD all declare the same `concept` as the bundle's concept
    (warning, not error).
-8. `concerns` / `type: concern` in a 2.0 bundle is an error (with a migration hint).
+8. `concerns` / `type: concern` in a 0.5.0 bundle is an error (with a migration hint).
 
 ---
 
@@ -257,6 +351,9 @@ SCD-to-SCD relationships; they are **not** part of the concept-level ontology se
   entry). Convenience vs one-way-to-do-it. Resolvable — see Unresolved Questions.
 - Domains that never model relationships get slightly more manifest ceremony (an `ontology:
   { concepts: [...] }` wrapper) for no immediate gain over the old flat list.
+- **Bundle validity properties (consistency across versions, compactness, non-conflict)
+  are new validator scope**, not just the concern→concept rename — they need their own
+  design and are unbuilt today.
 
 ---
 
@@ -266,7 +363,10 @@ SCD-to-SCD relationships; they are **not** part of the concept-level ontology se
 
 Add `relationships` and `satisfies` to concern bundles without renaming. Less churn.
 Rejected because it leaves the name collision with separation-of-concerns in place, and
-"concern" never signals "this is the domain's conceptual model" — which is the point.
+"concern" never signals "this is the domain's conceptual model" — which is the point. It
+would also anchor the now-generalized model to its origin: "concern" is specifically the
+SDLC ontology's vocabulary (see Motivation), and keeping it as the umbrella term undercuts
+the point of supporting CDMO- and Business-Funding-shaped ontologies on equal footing.
 
 ### Alternative 2: Full ontology stack (OWL / RDF / SKOS)
 
@@ -302,13 +402,19 @@ any AI actor, not just chat" reframe lands with a weaker foundation.
   only?
 - **Relationship set**: is `{depends-on, relates-to, satisfies}` the right minimal set, or
   do we also need `part-of` distinct from `parent` taxonomy?
-- **Cross-domain concepts**: 0.3 says concerns are "reusable across domains" (a shared
-  Security concern). Do concepts stay domain-scoped (this RFC assumes yes) or can a concept
-  be defined once and imported by multiple domains? If shared, where does the canonical
-  definition live?
-- **Migration tooling**: ship an automated `scs migrate 0.3→2.0` for the concern→concept
+- **Cross-domain concepts** *(parked indefinitely)*: 0.3 said concerns are "reusable across
+  domains" (a shared Security concern). This RFC's working assumption — concepts stay
+  domain-scoped, no cross-domain import — stands, and is not being actively pursued.
+  Ontology Models (see Guide-level Explanation) cover the reuse need instead: two CDMO
+  companies each instantiate the CDMO model rather than importing one another's concepts.
+  Revisit only if a concrete case for concept-level import across domains shows up.
+- **Migration tooling**: ship an automated `scs migrate 0.3→0.5.0` for the concern→concept
   rename, or guide-only?
 - **`concept` on SCDs**: optional (this RFC) or required for SCDs in a concept bundle?
+- **Approval model**: `version_approved_by` ships as a single-source MVP (Reference-level
+  Explanation, Provenance and approval). Is that sufficient going forward, or does a
+  regulated domain need per-perspective/per-concept attestation (ISS-011) before this RFC's
+  provenance story is credible for CDMO-type domains?
 
 ---
 
@@ -320,8 +426,12 @@ any AI actor, not just chat" reframe lands with a weaker foundation.
   `satisfies` edges.
 - **Richer concept relationships** (`constrains`, `conflicts-with`) promoted from
   SCD-level to concept-level if demand appears.
-- **Shared/importable concept libraries** across domains (depends on the cross-domain
-  question above).
+- **Ontology Model library**: package SDLC / CDMO / future models as reusable, versioned
+  artifacts a domain manifest instantiates, rather than each domain authoring its ontology
+  from scratch (depends on the cross-domain question above).
+- **Per-perspective attestation**: extend `version_approved_by` to a per-concept or
+  per-perspective approval list (ISS-011) once single-source approval proves insufficient
+  for regulated domains.
 - **Ontology diff**: show what changed between two versions of a domain's ontology as part
   of domain versioning.
 
@@ -334,33 +444,33 @@ any AI actor, not just chat" reframe lands with a weaker foundation.
 - Schema: edit `schema/domain/domain-manifest-schema.json` (replace `concerns`, add
   `ontology`); add a concept-id pattern; extend the SCD schema with optional `concept`.
 - Validator: new rules module for ontology validation (rules 1–8 above); rename all
-  `concern` handling; converge on a single `rules/v2.0.0/` set (retire v0.1.0 / v0.3.0 —
-  tracked separately in the SCS 2.0 backlog).
+  `concern` handling; converge on a single `rules/v0.5.0/` set (retire v0.1.0 / v0.3.0 —
+  tracked separately in the SCS 0.5.0 backlog).
 - `scs-tools`: rename `templates/bundles/concerns/` → `.../concepts/`; `scs new concept`;
   domain-manifest scaffolding emits an `ontology` block.
-- Docs: `spec/2.0/` rewrite of core-model / terminology / bundle-format; new
-  `spec/2.0/domain-ontology.md`.
+- Docs: `spec/0.5/` rewrite of core-model / terminology / bundle-format; new
+  `spec/0.5/domain-ontology.md`.
 - Plugins (`scs-vibe`, `scs-team`): update skill prompts and templates.
 
-### Migration Guide (0.3 → 2.0)
+### Migration Guide (0.3 → 0.5.0)
 
 1. **Rename** `type: concern` → `type: concept` in every concern bundle; the directory
    `concerns/` → `concepts/` by convention.
 2. **Domain manifest**: replace
    `concerns: [bundle:x:1.0.0, …]`
    with
-   `ontology: { concepts: [ { id: concept:x, name: X, bundle: bundle:x:2.0.0 }, … ] }`.
+   `ontology: { concepts: [ { id: concept:x, name: X, bundle: bundle:x:0.5.0 }, … ] }`.
    This alone is a valid (flat) Domain Ontology.
 3. **Add depth incrementally**: set `parent` where a taxonomy exists; add `depends-on` /
    `relates-to`; add `satisfies` pointing at your standards-tier SCDs.
 4. **SCDs**: add `concept: concept:<id>` to each SCD in a concept bundle (optional but
    recommended).
-5. Run `scs validate` against the 2.0 rules; fix reported `concern` residue.
+5. Run `scs validate` against the 0.5.0 rules; fix reported `concern` residue.
 
 A migration script for steps 1–2 is an open question (above).
 
 ### Related RFCs
 
-- None yet. The broader SCS 2.0 changes (the "any AI actor" reframe, runtime open-question
+- None yet. The broader SCS 0.5.0 changes (the "any AI actor" reframe, runtime open-question
   resolutions, model-routing metadata, multi-author provenance, tooling CI) are tracked in
   `ISSUES.md` / `ROADMAP.md` and may spawn their own RFCs.
