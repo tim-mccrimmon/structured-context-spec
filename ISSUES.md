@@ -10,13 +10,15 @@ Status: `open` · `in-progress` · `blocked` · `done`
 ## Anchor
 
 ### ISS-001 — Domain Ontology: accept RFC-0001
-**Status:** open · **Blocks:** most of the rest
-Review and accept `rfcs/RFC-0001-domain-ontology.md`. Resolve its Unresolved Questions
-(bundle type name, `satisfies[]` sugar, minimal relationship set, cross-domain concepts,
-migration tooling, `concept` required-vs-optional on SCDs).
+**Status:** done (2026-09-21)
+Reviewed and accepted `rfcs/RFC-0001-domain-ontology.md`. Decisions: `type: concept`;
+`satisfies[]` sugar kept; minimal relationship set `{depends-on, relates-to, satisfies}`
+(no `part-of` yet); migration guide-only (no `scs migrate` helper); `concept` optional on
+SCDs. Cross-domain concepts parked indefinitely; approval model (`version_approved_by`
+single-source MVP) deferred-open, not blocking.
 
 ### ISS-002 — Domain Ontology: schema changes
-**Status:** blocked (ISS-001)
+**Status:** open
 - `schema/domain/domain-manifest-schema.json`: remove `concerns`, add `domain.ontology`
   (`concepts[]` with `id` / `name` / `description` / `parent` / `relationships[]` /
   `satisfies[]` / `bundle`; optional `relationship_types[]`).

@@ -8,26 +8,23 @@ check this first when picking up 0.5.0 work.
 **Target:** `v0.5.0`, tagged and pushed to origin, before 2026-12-01 (TaskWarrior task 61,
 gates GTC DC attendance).
 
-**Current phase:** 0 — RFC-0001 acceptance
+**Current phase:** 1 — Domain Ontology anchor (schema, validator, spec text, examples)
 
 ---
 
-## Phase 0 — Accept RFC-0001 (blocks everything else)
+## Phase 0 — Accept RFC-0001 (blocks everything else) — DONE 2026-09-21
 
-RFC-0001 (`rfcs/RFC-0001-domain-ontology.md`) has five open bikeshed-level questions left
-before it can move from Draft to Accepted. None require deep new design — each is a call
-only you can make, and any reasonable answer is fine to commit to:
+Five bikeshed-level questions, decided:
 
-- [ ] **Bundle type name**: `type: concept` or `type: concept-bundle`?
-- [ ] **`satisfies[]` sugar**: keep the shorthand, or require the full `relationships` form?
-- [ ] **Relationship set**: is `{depends-on, relates-to, satisfies}` enough, or add
-      `part-of` distinct from `parent`?
-- [ ] **Migration tooling**: ship an automated `scs migrate 0.3→0.5.0`, or guide-only?
-- [ ] **`concept` on SCDs**: optional or required for SCDs in a concept bundle?
-- [ ] Mark RFC-0001 `Status: Accepted`; fill in `RFC PR` / `Tracking Issue` fields
-- [ ] Update `rfcs/README.md`: move RFC-0001 from "Under Review" to "Accepted (Pending
-      Implementation)"
-- [ ] Update `ISSUES.md`: ISS-001 → `done`
+- [x] **Bundle type name**: `type: concept`
+- [x] **`satisfies[]` sugar**: kept
+- [x] **Relationship set**: minimal 3 (`depends-on`, `relates-to`, `satisfies`); `part-of`
+      deferred
+- [x] **Migration tooling**: guide-only, no automated helper
+- [x] **`concept` on SCDs**: optional
+- [x] RFC-0001 `Status: Accepted`; `Tracking` field points at ISS-001–005
+- [x] `rfcs/README.md`: RFC-0001 moved to "Accepted (Pending Implementation)"
+- [x] `ISSUES.md`: ISS-001 → `done`
 
 Not blocking, already settled: cross-domain concepts is parked indefinitely; the approval
 model is decided (`version_approved_by` ships as a single-source MVP, per-perspective

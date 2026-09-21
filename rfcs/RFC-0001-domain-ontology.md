@@ -4,8 +4,9 @@
 - **RFC PR**: (leave blank, will be filled by maintainer)
 - **Tracking Issue**: (leave blank, will be filled when RFC is accepted)
 - **Author(s)**: Tim McCrimmon (@tim-mccrimmon)
-- **Status**: Draft
+- **Status**: Accepted (2026-09-21)
 - **Target**: SCS 0.5.0 (breaking change)
+- **Tracking**: `ISSUES.md` ISS-001 – ISS-005
 
 ---
 
@@ -394,27 +395,34 @@ any AI actor, not just chat" reframe lands with a weaker foundation.
 
 ---
 
-## Unresolved Questions
+## Decisions (2026-09-21)
 
-- **Naming**: `concept` confirmed. Confirm `type: concept` (vs `type: concept-bundle`) for
-  the bundle type.
-- **`satisfies[]` sugar**: keep the shorthand list, or require the `relationships` form
-  only?
-- **Relationship set**: is `{depends-on, relates-to, satisfies}` the right minimal set, or
-  do we also need `part-of` distinct from `parent` taxonomy?
+- **Bundle type name**: `type: concept` — confirmed, matches the naming pattern every other
+  bundle type uses (`project`, `meta`, `standards`, `domain` — none repeat "bundle" in the
+  type value).
+- **`satisfies[]` sugar**: kept, as shorthand for a `relationships` entry of type
+  `satisfies`. The common case in a regulated domain is worth the convenience.
+- **Relationship set**: ship the minimal `{depends-on, relates-to, satisfies}`. `part-of`
+  is deferred — additive-safe, no concrete case needs it yet.
+- **Migration tooling**: guide-only for 0.5.0. No automated `scs migrate` helper — you're
+  the only consumer of 0.3 content today, so manual migration is cheap. Revisit if a third
+  party (e.g. Nextern) has real 0.3 content to migrate.
+- **`concept` on SCDs**: optional, as originally drafted — matches the RFC's
+  permissive-by-default philosophy elsewhere (completeness checking is opt-in too).
+  Tightening to required later is a safe direction; loosening later would not be.
+
+## Deferred (not blocking acceptance)
+
 - **Cross-domain concepts** *(parked indefinitely)*: 0.3 said concerns are "reusable across
   domains" (a shared Security concern). This RFC's working assumption — concepts stay
   domain-scoped, no cross-domain import — stands, and is not being actively pursued.
   Ontology Models (see Guide-level Explanation) cover the reuse need instead: two CDMO
   companies each instantiate the CDMO model rather than importing one another's concepts.
   Revisit only if a concrete case for concept-level import across domains shows up.
-- **Migration tooling**: ship an automated `scs migrate 0.3→0.5.0` for the concern→concept
-  rename, or guide-only?
-- **`concept` on SCDs**: optional (this RFC) or required for SCDs in a concept bundle?
 - **Approval model**: `version_approved_by` ships as a single-source MVP (Reference-level
-  Explanation, Provenance and approval). Is that sufficient going forward, or does a
-  regulated domain need per-perspective/per-concept attestation (ISS-011) before this RFC's
-  provenance story is credible for CDMO-type domains?
+  Explanation, Provenance and approval). Whether that's sufficient long-term, or a
+  regulated domain needs per-perspective/per-concept attestation (ISS-011), is left open —
+  revisit once real usage shows whether single-source approval is actually insufficient.
 
 ---
 
