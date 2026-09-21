@@ -48,10 +48,21 @@ tested against real content.
         (caught during implementation, wasn't in the original checklist)
   - Note: existing example data (`schema/domain/examples/medical-device-cdmo-domain.yaml`,
     `examples/*`) still uses `concerns:` and will fail validation until ISS-005 migrates it
-- [ ] **ISS-003 — Validator**
-  - [ ] New ontology-validation rules module (RFC-0001's Validation rules 1–8)
-  - [ ] Enforce `version_approved_by` / `version_approved_at` presence on bundles
-  - [ ] Rename all `concern` handling; `concern` residue → error with migration hint
+- [x] **ISS-003 — Validator** — done 2026-09-21
+  - [x] New `rules/v0.5.0/` set (seeded from v0.3.0, concern→concept renamed); new
+        `domain-ontology-rules.yaml`
+  - [x] New `OntologyValidator` implementing all 8 RFC-0001 rules (`ontology_validator.py`)
+  - [x] `version_approved_by` / `version_approved_at` presence enforced (via ISS-002's
+        schema `required`, confirmed working against a real example bundle)
+  - [x] `concern` residue → error with migration hint (both `domain.concerns` and bundle
+        `type: concern`)
+  - [x] New `scs validate --domain <manifest>` CLI path; `rules_loader.py` default
+        repointed to `rules/v0.5.0/`
+  - [x] Set up a venv (`tools/scd-validator/venv/`, gitignored) and manually verified all
+        8 rules against hand-built valid/invalid fixtures, plus regression-checked against
+        existing `tests/fixtures/` and `examples/` content
+  - Note: `tools/scd-validator/tests/` has no actual test functions yet (0 collected by
+    pytest) — that's ISS-013's job, not this one
 - [ ] **ISS-004 — Spec text**
   - [ ] `spec/0.5/core-model.md`, `terminology.md`, `bundle-format.md` rewritten for the
         rename + `Project → Domain → Concept → SCD` hierarchy

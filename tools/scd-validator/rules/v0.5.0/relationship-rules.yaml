@@ -1,0 +1,273 @@
+# Relationship Validation Rules v0.1.0
+#
+# Defines relationship types, tier constraints, and validation rules
+# Based on decisions documented in docs/scs-v0.1-design-decisions.md
+
+version: "0.1.0"
+description: "Relationship validation rules for SCS v0.1"
+
+# The 7 Relationship Types
+relationship_types:
+  - type: "depends-on"
+    description: "This SCD requires another SCD"
+    directionality: "directional"  # source → target
+    examples:
+      - "Component SCD depends on Architecture SCD"
+      - "Auth Service depends on Role Definitions"
+    allowed_tiers:
+      # Project can depend on meta or other project
+      - from: "project"
+        to: ["meta", "project"]
+      # Standards can depend on meta or other standards
+      - from: "standards"
+        to: ["meta", "standards"]
+      # Meta can depend on other meta
+      - from: "meta"
+        to: ["meta"]
+    rationale: "Layers depend on same level or foundation, not upward"
+
+  - type: "satisfies"
+    description: "This SCD fulfills requirements from another SCD"
+    directionality: "directional"
+    examples:
+      - "Auth Service SCD satisfies HIPAA Security Rule SCD"
+      - "API Design satisfies Performance Requirements"
+    allowed_tiers:
+      # Project satisfies standards (compliance)
+      - from: "project"
+        to: ["standards"]
+      # Standards can satisfy other standards (hierarchical compliance)
+      - from: "standards"
+        to: ["standards"]
+    rationale: "Implementation satisfies requirements/standards"
+
+  - type: "constrains"
+    description: "This SCD imposes constraints on another SCD"
+    directionality: "directional"
+    examples:
+      - "Security Policy SCD constrains API Design SCD"
+      - "Performance Requirements constrain Architecture Decisions"
+    allowed_tiers:
+      # Standards constrain project implementation
+      - from: "standards"
+        to: ["project"]
+      # Meta can constrain standards
+      - from: "meta"
+        to: ["standards"]
+      # Project can constrain other project
+      - from: "project"
+        to: ["project"]
+    rationale: "Higher-level concerns constrain implementation"
+
+  - type: "refines"
+    description: "This SCD provides more detail for another SCD"
+    directionality: "directional"
+    examples:
+      - "Detailed Module SCD refines High-Level Architecture SCD"
+      - "Specific Control refines General Security Policy"
+    allowed_tiers:
+      # Any tier can refine same tier
+      - from: "project"
+        to: ["project"]
+      - from: "standards"
+        to: ["standards"]
+      - from: "meta"
+        to: ["meta"]
+    rationale: "Refinement happens within same tier"
+
+  - type: "extends"
+    description: "This SCD builds upon another SCD"
+    directionality: "directional"
+    examples:
+      - "Enhanced Component SCD extends Base Component SCD"
+      - "Advanced Security Control extends Basic Control"
+    allowed_tiers:
+      # Any tier can extend same tier
+      - from: "project"
+        to: ["project"]
+      - from: "standards"
+        to: ["standards"]
+      - from: "meta"
+        to: ["meta"]
+    rationale: "Extension happens within same tier"
+
+  - type: "conflicts-with"
+    description: "This SCD has conflicts with another SCD"
+    directionality: "directional"  # But semantically bidirectional
+    examples:
+      - "New Design SCD conflicts with Legacy Architecture SCD"
+      - "Performance Optimization conflicts with Security Hardening"
+    allowed_tiers:
+      # Any tier can conflict with same tier
+      - from: "project"
+        to: ["project"]
+      - from: "standards"
+        to: ["standards"]
+      - from: "meta"
+        to: ["meta"]
+    rationale: "Conflicts typically occur within same tier"
+    note: "If bidirectional conflict needed, create both A→B and B→A"
+
+  - type: "implements"
+    description: "This SCD implements specifications from another SCD"
+    directionality: "directional"
+    examples:
+      - "Code Module SCD implements Interface Specification SCD"
+      - "Service Implementation implements API Contract"
+    allowed_tiers:
+      # Project implements standards
+      - from: "project"
+        to: ["standards"]
+      # Project implements project specs
+      - from: "project"
+        to: ["project"]
+    rationale: "Implementation realizes specifications"
+
+# Relationship Metadata Schema
+relationship_schema:
+  required_fields:
+    - type
+    - target
+  optional_fields:
+    - description
+
+  field_constraints:
+    type:
+      type: "string"
+      enum: ["depends-on", "satisfies", "constrains", "refines", "extends", "conflicts-with", "implements"]
+      description: "Must be one of the 7 defined relationship types"
+
+    target:
+      type: "string"
+      pattern: "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+      description: "Must be a valid SCD ID"
+
+    description:
+      type: "string"
+      min_length: 1
+      description: "Human-readable explanation of why this relationship exists"
+
+# Validation Rules (Level 4)
+validation_rules:
+  - rule: "target_exists"
+    description: "Relationship target SCD must exist in loaded bundles"
+    severity:
+      standalone_bundle: "warning"  # Target may be in another bundle
+      complete_project: "error"  # Target must exist somewhere
+    check: "target_scd_id in all_loaded_scd_ids"
+
+  - rule: "tier_constraints"
+    description: "Relationship must follow tier constraint rules"
+    severity: "error"
+    check: "relationship_type_allows_tier_combination(source_tier, target_tier)"
+
+  - rule: "no_self_reference"
+    description: "SCD cannot have relationship to itself"
+    severity: "error"
+    check: "source_scd_id != target_scd_id"
+
+  - rule: "acyclic_depends_on"
+    description: "Circular depends-on relationships detected"
+    severity: "warning"
+    applies_to: ["depends-on"]
+    check: "detect_cycles_in_dependency_graph()"
+    note: "A → B → C → A creates circular dependency"
+
+  - rule: "valid_relationship_type"
+    description: "Relationship type must be one of the 7 defined types"
+    severity: "error"
+    check: "relationship.type in allowed_types"
+
+# Tier Constraint Validation
+tier_constraint_validation:
+  enabled: true
+  description: "Enforce tier constraints for each relationship type"
+
+  error_message_template: >
+    Relationship type '{relationship_type}' from {source_tier}-tier SCD '{source_id}'
+    to {target_tier}-tier SCD '{target_id}' violates tier constraints.
+    Allowed: {allowed_combinations}
+
+  examples:
+    valid:
+      - type: "satisfies"
+        from_tier: "project"
+        to_tier: "standards"
+        reason: "Project satisfies standards (compliance)"
+
+      - type: "depends-on"
+        from_tier: "project"
+        to_tier: "meta"
+        reason: "Project depends on meta (foundation)"
+
+    invalid:
+      - type: "satisfies"
+        from_tier: "meta"
+        to_tier: "standards"
+        reason: "Meta cannot satisfy standards (wrong direction)"
+
+      - type: "depends-on"
+        from_tier: "standards"
+        to_tier: "project"
+        reason: "Standards should not depend on project (upward dependency)"
+
+# Cross-Bundle Relationship Handling
+cross_bundle_relationships:
+  enabled: true
+  description: "Allow relationships across domain bundle boundaries"
+
+  validation_strategy:
+    standalone_domain_bundle:
+      unresolved_targets: "warning"
+      message: "Relationship target '{target}' not found in this bundle. May exist in another domain bundle."
+
+    complete_project_bundle:
+      unresolved_targets: "error"
+      message: "Relationship target '{target}' not found in any loaded bundle."
+
+  rationale: "Domains interact in real systems; validate completeness at project level"
+
+# Circular Dependency Detection
+circular_dependency_detection:
+  enabled: true
+  applies_to: ["depends-on"]
+  description: "Detect cycles in dependency graph"
+  algorithm: "depth_first_search"
+  severity: "warning"  # Warning, not error (may be intentional in some cases)
+  max_cycle_length: 10  # Report cycles up to length 10
+
+  error_message_template: >
+    Circular dependency detected: {cycle_path}
+    Consider breaking the cycle by refactoring dependencies.
+
+# Relationship Cardinality
+cardinality:
+  min_relationships_per_scd: 0  # Optional
+  max_relationships_per_scd: null  # No limit
+  warn_threshold: 50  # Warn if SCD has > 50 relationships (may indicate over-coupling)
+
+# Performance Optimization
+optimization:
+  cache_relationship_graph: true
+  cache_tier_mappings: true
+  lazy_load_targets: false  # Always load for validation
+
+# Error Messages
+error_messages:
+  target_not_found:
+    "Relationship target SCD '{target}' not found in loaded bundles. Source: '{source}', Type: '{type}'"
+
+  tier_constraint_violation:
+    "Relationship '{type}' from {from_tier} to {to_tier} violates tier constraints. Allowed: {allowed}"
+
+  self_reference:
+    "SCD '{scd_id}' cannot have relationship to itself. Type: '{type}'"
+
+  invalid_type:
+    "Invalid relationship type '{type}'. Must be one of: {allowed_types}"
+
+  circular_dependency:
+    "Circular dependency detected in depends-on relationships: {cycle}"
+
+  excessive_relationships:
+    "SCD '{scd_id}' has {count} relationships, which exceeds recommended threshold of {threshold}. Consider refactoring."

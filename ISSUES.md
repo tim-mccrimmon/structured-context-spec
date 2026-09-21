@@ -36,11 +36,26 @@ single-source MVP) deferred-open, not blocking.
   schema until ISS-005 lands.
 
 ### ISS-003 — Domain Ontology: validator
-**Status:** open
-New ontology-validation rules (concept id format + uniqueness; acyclic `parent`; allowed
-relationship types; target resolution; acyclic `depends-on`; SCD `concept` resolves;
-concept-bundle SCD/concept agreement as a warning; `concern` residue as an error with a
-migration hint). Rename all `concern` handling in the validator.
+**Status:** done (2026-09-21)
+New `rules/v0.5.0/` rule set (seeded from v0.3.0, `concern` -> `concept` renamed throughout;
+new `domain-ontology-rules.yaml`). New `OntologyValidator` (`ontology_validator.py`)
+implementing all 8 RFC-0001 rules: concept id format + uniqueness; acyclic `parent`;
+allowed relationship types (covers both `relationships[]` and the `satisfies[]` shorthand);
+target resolution; acyclic `depends-on`; SCD `concept` resolves (best-effort, needs SCDs
+passed in); concept-bundle SCD/concept agreement as a warning (best-effort, needs SCDs +
+bundles passed in); `concern` residue as an error with a migration hint (both
+`domain.concerns` and bundle `type: concern`). New `scs validate --domain <manifest>` CLI
+path (schema + ontology rules). `rules_loader.py` default path repointed to `rules/v0.5.0/`.
+
+Tested against hand-built valid/invalid fixtures (all 8 rules fire correctly, including
+both cycle detections) and against the existing `tests/fixtures/` and `examples/`
+content — confirms existing valid SCDs still pass, and that unmigrated `examples/*`
+bundles now correctly fail on the new `version_approved_by`/`version_approved_at`
+requirement (expected; ISS-005's job to fix).
+
+Note: `tools/scd-validator/tests/` has no actual test functions today (only fixture data,
+0 items collected by pytest) - matches ISS-013 ("No CI today"). All verification above was
+manual CLI runs, not an automated regression suite.
 
 ### ISS-004 — Domain Ontology: spec text
 **Status:** open

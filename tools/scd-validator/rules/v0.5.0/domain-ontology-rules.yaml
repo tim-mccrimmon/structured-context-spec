@@ -1,0 +1,116 @@
+# Domain Ontology Validation Rules v0.5.0
+#
+# Implements RFC-0001 (Domain Ontology) Validation rules 1-8.
+# These rules validate the `ontology` block of a domain manifest
+# (schema/domain/domain-manifest-schema.json), and the `concept` field
+# on SCDs and concept bundles.
+
+version: "0.5.0"
+description: "Domain Ontology (RFC-0001) semantic validation rules for SCS v0.5.0"
+
+# Rule 1: concept id format + uniqueness
+id_pattern:
+  pattern: "^concept:[a-z][a-z0-9-]*$"
+  description: "Concept IDs must follow pattern concept:<name>"
+  severity: "error"
+
+uniqueness:
+  scope: "domain"
+  description: "Concept IDs must be unique within a domain"
+  severity: "error"
+
+# Rule 2: parent taxonomy - resolves + acyclic
+parent_taxonomy:
+  resolution:
+    enabled: true
+    description: "A concept's parent must resolve to a concept in the same domain"
+    severity: "error"
+  acyclic:
+    enabled: true
+    description: "The parent graph must be acyclic"
+    severity: "error"
+
+# Rule 3: allowed relationship types (a domain may restrict via ontology.relationship_types)
+relationship_types:
+  default: ["depends-on", "relates-to", "satisfies"]
+  description: "Default allowed concept-level relationship types"
+  severity: "error"
+
+# Rule 4: relationship target resolution
+relationship_targets:
+  depends-on:
+    target_kind: "concept"
+    description: "target must be a concept: id in the same domain and must resolve"
+    severity: "error"
+  relates-to:
+    target_kind: "concept"
+    description: "target must be a concept: id in the same domain and must resolve"
+    severity: "error"
+  satisfies:
+    target_kind: "scd:standards"
+    description: "target must be an scd:standards: id"
+    severity: "error"
+    unresolved_severity: "warning"  # when standards SCDs aren't loaded in this validation context
+
+# Rule 5: depends-on acyclic
+depends_on_cycle_detection:
+  enabled: true
+  description: "depends-on relationships among concepts must be acyclic"
+  severity: "error"
+
+# Rule 6: SCD concept resolution
+scd_concept_resolution:
+  enabled: true
+  description: "An SCD's concept field, if present, must resolve to a concept in the active domain"
+  severity: "error"
+
+# Rule 7: concept-bundle SCD/concept agreement (SHOULD, warning per RFC-0001)
+concept_bundle_agreement:
+  enabled: true
+  description: "A concept bundle's SCDs SHOULD all declare the same concept as the bundle's concept"
+  severity: "warning"
+
+# Rule 8: concern residue is an error, with a migration hint
+concern_residue:
+  enabled: true
+  description: "Legacy 'concern' terminology (domain.concerns, type: concern) is an error in 0.5.0"
+  severity: "error"
+  migration_hint: "See docs/MIGRATION-0.5.0.md for the concern -> concept rename."
+
+# Error Messages
+error_messages:
+  invalid_concept_id:
+    "Concept ID '{concept_id}' does not match required pattern '{pattern}'."
+
+  duplicate_concept_id:
+    "Concept ID '{concept_id}' is used more than once in domain '{domain_id}'. Concept IDs must be unique within a domain."
+
+  parent_not_found:
+    "Concept '{concept_id}' has parent '{parent_id}', which does not resolve to a concept in domain '{domain_id}'."
+
+  parent_cycle:
+    "Cycle detected in concept parent taxonomy: {cycle}"
+
+  invalid_relationship_type:
+    "Concept '{concept_id}' has a relationship of type '{type}', which is not in the allowed set: {allowed_types}."
+
+  relationship_target_not_found:
+    "Concept '{concept_id}' has a '{type}' relationship targeting '{target}', which does not resolve to a concept in domain '{domain_id}'."
+
+  satisfies_target_unresolved:
+    "Concept '{concept_id}' satisfies '{target}', which could not be resolved in this validation context (no standards SCDs loaded)."
+
+  depends_on_cycle:
+    "Cycle detected in concept depends-on relationships: {cycle}"
+
+  scd_concept_not_found:
+    "SCD '{scd_id}' declares concept '{concept_id}', which does not resolve to a concept in domain '{domain_id}'."
+
+  concept_bundle_mismatch:
+    "SCD '{scd_id}' in concept bundle '{bundle_id}' declares concept '{scd_concept}', which does not match the bundle's concept '{bundle_concept}'."
+
+  legacy_concerns_field:
+    "Domain manifest uses the legacy 'concerns' field, retired in SCS 0.5.0 (RFC-0001). Replace with 'ontology: { concepts: [...] }'. See docs/MIGRATION-0.5.0.md."
+
+  legacy_concern_type:
+    "Bundle '{bundle_id}' has type 'concern', which was retired in SCS 0.5.0 (RFC-0001). Rename to type: concept. See docs/MIGRATION-0.5.0.md."

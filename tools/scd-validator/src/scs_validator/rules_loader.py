@@ -19,8 +19,8 @@ class RulesLoader:
             rules_dir: Directory containing rules files. If None, uses default location.
         """
         if rules_dir is None:
-            # Default: rules/v0.3.0 relative to this module
-            self.rules_dir = Path(__file__).parent.parent.parent / "rules" / "v0.3.0"
+            # Default: rules/v0.5.0 relative to this module
+            self.rules_dir = Path(__file__).parent.parent.parent / "rules" / "v0.5.0"
         else:
             self.rules_dir = Path(rules_dir)
 
@@ -52,6 +52,14 @@ class RulesLoader:
             Dictionary containing relationship rules
         """
         return self._load_rules_file("relationship-rules.yaml")
+
+    def load_domain_ontology_rules(self) -> Dict[str, Any]:
+        """Load Domain Ontology validation rules (RFC-0001).
+
+        Returns:
+            Dictionary containing domain ontology rules
+        """
+        return self._load_rules_file("domain-ontology-rules.yaml")
 
     def load_completeness_rules(
         self, custom_rules_path: Optional[Path] = None, project_root: Optional[Path] = None

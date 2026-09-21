@@ -50,6 +50,15 @@ class BundleValidator:
             )
             return result
 
+        # RFC-0001 Validation rule 8: 'concern' residue is an error, with a
+        # migration hint (not just the generic "unknown bundle type" warning).
+        if bundle_type == "concern":
+            error_msg = self.rules_loader.get_error_message(
+                self.rules, "legacy_concern_type", bundle_id=bundle_id
+            )
+            result.add_error(ValidationError(error_msg, file_path=file_path))
+            return result
+
         # Validate XOR constraint
         self._validate_xor_constraint(bundle, bundle_id, bundle_type, result, file_path)
 

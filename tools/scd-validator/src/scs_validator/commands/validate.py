@@ -9,6 +9,7 @@ import click
 from .. import __version__
 from ..bundle_validator import BundleValidator
 from ..completeness_validator import CompletenessValidator
+from ..ontology_validator import OntologyValidator
 from ..parser import Parser
 from ..relationship_validator import RelationshipValidator
 from ..reporter import Reporter
@@ -25,6 +26,12 @@ from ..utils import ValidationError, ValidationResult
     "-b",
     type=click.Path(exists=True),
     help="Validate an SCD bundle file",
+)
+@click.option(
+    "--domain",
+    "-d",
+    type=click.Path(exists=True),
+    help="Validate a domain manifest file (schema + Domain Ontology rules, RFC-0001)",
 )
 @click.option(
     "--schema-dir",
@@ -68,6 +75,7 @@ from ..utils import ValidationError, ValidationResult
 def validate(
     files: tuple,
     bundle: str | None,
+    domain: str | None,
     schema_dir: str | None,
     output: str,
     strict: bool,
@@ -91,6 +99,10 @@ def validate(
         \b
         # Validate a bundle
         scs validate --bundle context/bundle.yaml
+
+        \b
+        # Validate a domain manifest (Domain Ontology, RFC-0001)
+        scs validate --domain domain-manifest.yaml
 
         \b
         # Strict mode (fail on warnings)
@@ -126,6 +138,7 @@ def validate(
         semantic_validator = SemanticValidator(rules_loader)
         bundle_validator = BundleValidator(rules_loader)
         relationship_validator = RelationshipValidator(rules_loader)
+        ontology_validator = OntologyValidator(rules_loader)
 
         # Initialize completeness validator with custom rules if provided
         completeness_rules_path = Path(completeness_rules) if completeness_rules else None
@@ -148,6 +161,9 @@ def validate(
                 verbose,
                 skip_completeness,
             )
+        elif domain:
+            # Validate domain manifest (Domain Ontology, RFC-0001)
+            results = validate_domain(domain, parser, schema_validator, ontology_validator, verbose)
         elif files:
             # Validate individual files
             results = validate_files(
@@ -180,6 +196,44 @@ def validate(
 
             traceback.print_exc()
         sys.exit(5)
+
+
+def validate_domain(
+    domain_path: str,
+    parser: Parser,
+    schema_validator: SchemaValidator,
+    ontology_validator: OntologyValidator,
+    verbose: bool,
+) -> List[ValidationResult]:
+    """Validate a domain manifest: schema, then Domain Ontology rules (RFC-0001).
+
+    Only the manifest itself is validated - SCDs and concept bundles aren't
+    loaded here, so Domain Ontology rules 6 and 7 (which need that broader
+    context) are skipped in this path.
+    """
+    syntax_result = ValidationResult("syntax")
+    schema_result = ValidationResult("domain_manifest_schema")
+    ontology_result = ValidationResult("ontology")
+
+    if verbose:
+        click.echo(f"Validating domain manifest {domain_path}...")
+
+    try:
+        manifest = parser.load_domain_manifest(Path(domain_path))
+
+        schema_result = schema_validator.validate_domain_manifest(manifest, domain_path)
+        if not schema_result.passed:
+            # Still run ontology rules - concern residue (rule 8) is useful
+            # even when the schema is otherwise invalid (e.g. legacy
+            # 'concerns' field triggers both a schema error and rule 8).
+            pass
+
+        ontology_result = ontology_validator.validate_domain_manifest(manifest, domain_path)
+
+    except ValidationError as e:
+        syntax_result.add_error(e)
+
+    return [syntax_result, schema_result, ontology_result]
 
 
 def validate_files(
@@ -266,8 +320,17 @@ def validate_bundle(
         # Level 2: Validate bundle schema
         bundle_schema_result = schema_validator.validate_bundle(bundle, bundle_path)
         if not bundle_schema_result.passed:
-            # Stop here if schema validation fails
-            return [syntax_result, bundle_schema_result]
+            # Stop the pipeline here (SCD loading/relationships/completeness
+            # all assume a well-formed bundle) - but still run the Level 5
+            # type-specific check, since it can add a clearer, actionable
+            # message on top of the generic schema error (e.g. RFC-0001
+            # Validation rule 8's migration hint for a legacy 'concern' type,
+            # which the schema's enum error alone doesn't provide).
+            bundle_result = bundle_validator.validate_bundle(bundle, bundle_path)
+            results = [syntax_result, bundle_schema_result]
+            if bundle_result.errors or bundle_result.warnings:
+                results.append(bundle_result)
+            return results
 
         # Level 5: Validate bundle organization (XOR constraint, bundle type rules)
         bundle_result = bundle_validator.validate_bundle(bundle, bundle_path)

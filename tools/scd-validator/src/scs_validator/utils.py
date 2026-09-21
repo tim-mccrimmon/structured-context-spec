@@ -128,3 +128,21 @@ def find_bundle_schema(schema_dir: Path) -> Path:
     if not schema_file.exists():
         raise FileNotFoundError(f"Bundle schema file not found: {schema_file}")
     return schema_file
+
+
+def find_domain_manifest_schema(schema_dir: Path) -> Path:
+    """Find the domain manifest schema file.
+
+    Args:
+        schema_dir: Root schema directory
+
+    Returns:
+        Path to domain manifest schema file
+
+    Raises:
+        FileNotFoundError: If schema file not found
+    """
+    schema_file = schema_dir / "domain" / "domain-manifest-schema.json"
+    if not schema_file.exists():
+        raise FileNotFoundError(f"Domain manifest schema file not found: {schema_file}")
+    return schema_file

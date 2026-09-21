@@ -25,6 +25,10 @@ venv/
 ENV/
 env/
 
+# Test coverage
+.coverage
+htmlcov/
+
 # IDE
 .vscode/
 .idea/

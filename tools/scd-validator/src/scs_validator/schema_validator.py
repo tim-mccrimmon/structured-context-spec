@@ -128,6 +128,72 @@ class SchemaValidator:
 
         return result
 
+    def validate_domain_manifest(
+        self, manifest: Dict[str, Any], file_path: str | None = None
+    ) -> ValidationResult:
+        """Validate a domain manifest against the domain manifest schema.
+
+        Args:
+            manifest: Domain manifest data as dictionary
+            file_path: Optional file path for error messages
+
+        Returns:
+            ValidationResult with errors if validation fails
+        """
+        result = ValidationResult("domain_manifest_schema")
+
+        try:
+            schema = self._load_domain_manifest_schema()
+        except ValidationError as e:
+            result.add_error(e)
+            return result
+
+        try:
+            validator = Draft202012Validator(schema)
+            errors = list(validator.iter_errors(manifest))
+
+            if errors:
+                for error in errors:
+                    error_msg = self._format_schema_error(error)
+                    result.add_error(ValidationError(error_msg, file_path=file_path))
+        except Exception as e:
+            result.add_error(
+                ValidationError(
+                    f"Domain manifest schema validation failed: {e}", file_path=file_path
+                )
+            )
+
+        if result.passed:
+            domain = manifest.get("domain", {})
+            result.details["domain_id"] = domain.get("id", "unknown")
+
+        return result
+
+    def _load_domain_manifest_schema(self) -> Dict[str, Any]:
+        """Load domain manifest schema (with caching).
+
+        Returns:
+            Domain manifest schema as dictionary
+
+        Raises:
+            ValidationError: If schema cannot be loaded
+        """
+        cache_key = "__domain_manifest__"
+        if cache_key in self._schema_cache:
+            return self._schema_cache[cache_key]
+
+        try:
+            from .utils import find_domain_manifest_schema
+
+            schema_file = find_domain_manifest_schema(self.schema_dir)
+            schema = Parser.load_schema(schema_file)
+            self._schema_cache[cache_key] = schema
+            return schema
+        except FileNotFoundError as e:
+            raise ValidationError(str(e))
+        except Exception as e:
+            raise ValidationError(f"Failed to load domain manifest schema: {e}")
+
     def _load_schema(self, tier: str) -> Dict[str, Any]:
         """Load schema for a specific tier (with caching).
 

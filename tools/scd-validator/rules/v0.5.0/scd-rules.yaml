@@ -1,0 +1,191 @@
+# SCD Validation Rules v0.1.0
+#
+# Defines structural validation rules for Structured Context Documents (SCDs)
+# Based on decisions documented in docs/scs-v0.1-design-decisions.md
+
+version: "0.1.0"
+description: "SCD structure validation rules for SCS v0.1"
+
+# SCD ID Pattern Rules
+id_pattern:
+  pattern: "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+  description: "SCD IDs must follow pattern scd:<tier>:<name>"
+  severity: "error"
+  examples:
+    valid:
+      - "scd:meta:scd-meta"
+      - "scd:project:system-context"
+      - "scd:standards:hipaa-security-rule"
+      - "scd:project:my-org.auth-service"
+    invalid:
+      - "meta:roles"  # Missing scd: prefix
+      - "scd:project:my context"  # Spaces not allowed
+      - "scd:foo:test"  # Invalid tier
+
+# Type-Tier Matching Rules
+type_tier_matching:
+  enabled: true
+  description: "SCD type field must match tier in ID"
+  severity: "error"
+  rule: "Extract tier from ID (scd:<TIER>:<name>), must equal type field"
+
+# Version Pattern Rules
+version_pattern:
+  pattern: "^(\\d+\\.\\d+\\.\\d+|DRAFT)$"
+  description: "Version must be DRAFT or semantic version X.Y.Z"
+  severity: "error"
+  examples:
+    valid:
+      - "DRAFT"
+      - "1.0.0"
+      - "2.3.1"
+    invalid:
+      - "v1.0"  # No 'v' prefix
+      - "1.0"  # Must be X.Y.Z
+      - "1.0.0-beta.1"  # No pre-release in v0.1
+      - "latest"  # Not allowed
+
+# Required Fields
+required_fields:
+  all_scds:
+    - id
+    - type
+    - title
+    - version
+    - description
+    - content
+    - provenance
+
+  provenance:
+    required:
+      - created_by
+      - created_at
+    optional:
+      - updated_by
+      - updated_at
+      - rationale
+
+# Field Constraints
+field_constraints:
+  id:
+    type: "string"
+    min_length: 10  # Minimum reasonable: scd:x:name
+    pattern_ref: "id_pattern"
+
+  type:
+    type: "string"
+    enum: ["meta", "standards", "project"]
+    must_match_tier: true
+
+  title:
+    type: "string"
+    min_length: 1
+    max_length: 200
+
+  version:
+    type: "string"
+    pattern_ref: "version_pattern"
+
+  description:
+    type: "string"
+    min_length: 1
+
+  content:
+    type: "object"
+    min_properties: 1
+    description: "Content must be a non-empty object"
+
+  relationships:
+    type: "array"
+    optional: true
+    item_schema:
+      required_fields:
+        - type
+        - target
+      optional_fields:
+        - description
+
+  provenance:
+    type: "object"
+    required_fields_ref: "required_fields.provenance"
+    field_constraints:
+      created_by:
+        type: "string"
+        min_length: 1
+      created_at:
+        type: "string"
+        format: "date-time"  # ISO-8601
+      updated_by:
+        type: "string"
+        min_length: 1
+      updated_at:
+        type: "string"
+        format: "date-time"
+      rationale:
+        type: "string"
+        min_length: 1
+
+# Validation Mode Rules
+validation_modes:
+  DRAFT:
+    description: "Permissive mode for active development"
+    level_1_syntax: "error"  # Always strict
+    level_2_schema: "error"  # Always strict
+    level_3_semantic: "error"  # Always strict
+    level_4_relationships: "warning"  # Permissive
+    level_5_bundle: "warning"  # Permissive
+    level_6_completeness: "skip"  # Skip by default
+
+  VERSIONED:
+    description: "Strict mode for locked SCDs"
+    level_1_syntax: "error"
+    level_2_schema: "error"
+    level_3_semantic: "error"
+    level_4_relationships: "error"
+    level_5_bundle: "error"
+    level_6_completeness: "error"
+
+# Stub Detection Rules (for completeness validation)
+stub_detection:
+  enabled: true
+  description: "Detect placeholder/stub SCDs"
+  indicators:
+    - check: "short_description"
+      threshold: 50  # Characters
+      weight: 1
+    - check: "minimal_content"
+      threshold: 2  # Fields
+      weight: 1
+    - check: "generic_title"
+      patterns: ["tbd", "todo", "placeholder", "stub"]
+      weight: 2
+    - check: "no_relationships"
+      weight: 1
+  stub_threshold: 2  # If weight sum >= 2, likely stub
+  severity: "warning"
+
+# Additional Semantic Rules
+semantic_rules:
+  - rule: "unique_id_in_scope"
+    description: "SCD ID must be unique across loaded bundle set"
+    severity: "error"
+
+  - rule: "valid_tier_for_relationships"
+    description: "Relationship types must respect tier constraints"
+    severity: "error"
+    reference: "relationship-rules.yaml"
+
+  - rule: "self_reference_forbidden"
+    description: "SCD cannot have relationship to itself"
+    severity: "error"
+
+# Error Messages
+error_messages:
+  invalid_id_format:
+    "ID '{scd_id}' does not match required pattern '{pattern}'"
+
+  invalid_version_format:
+    "Version '{version}' does not match required pattern '{pattern}'. Must be DRAFT or semantic version X.Y.Z"
+
+  type_tier_mismatch:
+    "Type '{type}' does not match tier '{tier}' in ID '{scd_id}'"
