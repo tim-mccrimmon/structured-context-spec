@@ -26,6 +26,11 @@
       "type": "string",
       "minLength": 1
     },
+    "concept": {
+      "type": "string",
+      "pattern": "^concept:[a-z][a-z0-9-]*$",
+      "description": "Optional: the domain concept this SCD realizes (RFC-0001 Domain Ontology). Expected for SCDs in a concept bundle."
+    },
     "content": {
       "type": "object",
       "description": "Project-specific system context: architecture, requirements, flows, etc.",

@@ -18,29 +18,37 @@ SCDs. Cross-domain concepts parked indefinitely; approval model (`version_approv
 single-source MVP) deferred-open, not blocking.
 
 ### ISS-002 — Domain Ontology: schema changes
-**Status:** open
-- `schema/domain/domain-manifest-schema.json`: remove `concerns`, add `domain.ontology`
+**Status:** done (2026-09-21)
+- `schema/domain/domain-manifest-schema.json`: `concerns` removed, `domain.ontology` added
   (`concepts[]` with `id` / `name` / `description` / `parent` / `relationships[]` /
   `satisfies[]` / `bundle`; optional `relationship_types[]`).
-- Add the `concept:` id pattern.
-- SCD schema(s): add optional `concept` field.
-- Bundle schema: `type: concern` → `type: concept`; carry over the structural rules
+- `concept:` id pattern added (domain manifest, all three SCD tier schemas).
+- SCD schema(s) (project/meta/standards): optional `concept` field added.
+- Bundle schema: `type: concern` → `type: concept`; structural rules carried over
   (no imports, ≥ 1 SCD).
+- Bundle schema: `provenance` gained required `version_approved_by` / `version_approved_at`
+  (RFC-0001, Provenance and approval).
+- Also renamed: `schema/scd/meta-scd-template.json`'s `content.concerns[]` vocabulary block
+  → `content.concepts[]` (`concern:` id pattern → `concept:`) — same residue, not called out
+  in the original RFC checklist but caught during implementation.
+- Not yet migrated (ISS-005): `schema/domain/examples/medical-device-cdmo-domain.yaml` and
+  the `examples/` domains still use `concerns:` and will fail validation against the new
+  schema until ISS-005 lands.
 
 ### ISS-003 — Domain Ontology: validator
-**Status:** blocked (ISS-002)
+**Status:** open
 New ontology-validation rules (concept id format + uniqueness; acyclic `parent`; allowed
 relationship types; target resolution; acyclic `depends-on`; SCD `concept` resolves;
 concept-bundle SCD/concept agreement as a warning; `concern` residue as an error with a
 migration hint). Rename all `concern` handling in the validator.
 
 ### ISS-004 — Domain Ontology: spec text
-**Status:** blocked (ISS-001)
+**Status:** open
 `spec/0.5/`: rewrite `core-model.md`, `terminology.md`, `bundle-format.md` for the rename
 and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain-ontology.md`.
 
 ### ISS-005 — Domain Ontology: examples + templates + plugins
-**Status:** blocked (ISS-002)
+**Status:** open
 - Migrate example domains (`examples/medical-device-cdmo`, `examples/med-adherence`, …):
   `concerns/` → `concepts/`, add `ontology` blocks (flat first; add depth for the CDMO
   example as the reference).

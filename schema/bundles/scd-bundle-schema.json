@@ -13,8 +13,8 @@
     },
     "type": {
       "type": "string",
-      "enum": ["project", "meta", "standards", "concern", "domain"],
-      "description": "Bundle type: 'project' (top-level), 'meta' (vocabulary), 'standards' (compliance), 'concern' (functional area), 'domain' (industry vertical)"
+      "enum": ["project", "meta", "standards", "concept", "domain"],
+      "description": "Bundle type: 'project' (top-level), 'meta' (vocabulary), 'standards' (compliance), 'concept' (a Domain Ontology concept, RFC-0001), 'domain' (industry vertical)"
     },
     "version": {
       "type": "string",
@@ -33,7 +33,7 @@
     },
     "imports": {
       "type": "array",
-      "description": "List of external bundle references with versions (e.g., bundle:architecture:1.0.0). Domain bundles import concern bundles. Concern bundles MUST have empty imports array.",
+      "description": "List of external bundle references with versions (e.g., bundle:architecture:1.0.0). Domain bundles import concept bundles. Concept bundles MUST have empty imports array.",
       "items": {
         "type": "string",
         "pattern": "^bundle:[a-zA-Z0-9._-]+(:[0-9]+\\.[0-9]+\\.[0-9]+)?$",
@@ -51,7 +51,7 @@
     },
     "provenance": {
       "type": "object",
-      "required": ["created_by", "created_at"],
+      "required": ["created_by", "created_at", "version_approved_by", "version_approved_at"],
       "properties": {
         "created_by": {
           "type": "string",
@@ -71,13 +71,22 @@
           "format": "date-time",
           "description": "ISO-8601 timestamp of last update"
         },
+        "version_approved_by": {
+          "type": "string",
+          "description": "Email or identifier of the person who approved this bundle version (RFC-0001: single-source MVP, not per-concept)."
+        },
+        "version_approved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO-8601 timestamp of version approval."
+        },
         "rationale": {
           "type": "string",
           "description": "Explanation of why this bundle version was created or updated"
         }
       },
       "additionalProperties": true,
-      "description": "Provenance tracking for bundle changes"
+      "description": "Provenance tracking for bundle changes. created_by/created_at/updated_by/updated_at record authorship; version_approved_by/version_approved_at record that someone with standing reviewed and agreed to this version (RFC-0001)."
     }
   },
   "additionalProperties": false,
@@ -86,7 +95,7 @@
       "if": {
         "properties": {
           "type": {
-            "const": "concern"
+            "const": "concept"
           }
         }
       },
@@ -94,11 +103,11 @@
         "properties": {
           "imports": {
             "maxItems": 0,
-            "description": "Concern bundles MUST NOT import other bundles - they contain only SCDs"
+            "description": "Concept bundles MUST NOT import other bundles - they contain only SCDs"
           },
           "scds": {
             "minItems": 1,
-            "description": "Concern bundles MUST contain at least one SCD"
+            "description": "Concept bundles MUST contain at least one SCD"
           }
         }
       }
@@ -115,11 +124,11 @@
         "properties": {
           "imports": {
             "minItems": 1,
-            "description": "Domain bundles MUST import at least one concern bundle"
+            "description": "Domain bundles MUST import at least one concept bundle"
           },
           "scds": {
             "maxItems": 0,
-            "description": "Domain bundles import concerns, they do not directly contain SCDs"
+            "description": "Domain bundles import concepts, they do not directly contain SCDs"
           }
         }
       }
@@ -175,5 +184,5 @@
       }
     }
   ],
-  "$comment": "Bundle Types: project (top-level, imports all), meta (foundational vocabulary), standards (compliance requirements), concern (functional area), domain (industry vertical)"
+  "$comment": "Bundle Types: project (top-level, imports all), meta (foundational vocabulary), standards (compliance requirements), concept (a Domain Ontology concept, RFC-0001), domain (industry vertical)"
 }

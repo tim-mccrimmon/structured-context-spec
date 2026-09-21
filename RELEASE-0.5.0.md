@@ -37,13 +37,17 @@ attestation deferred to ISS-011).
 The core rename + schema work. Nothing downstream unblocks until this phase is done and
 tested against real content.
 
-- [ ] **ISS-002 — Schema changes**
-  - [ ] `schema/domain/domain-manifest-schema.json`: remove `concerns`, add `domain.ontology`
-  - [ ] Add `concept:` id pattern
-  - [ ] SCD schema(s): add `concept` field (per Phase 0's optional/required decision)
-  - [ ] Bundle schema: `type: concern` → `type: concept`
-  - [ ] Bundle schema: add `version_approved_by` / `version_approved_at` to `provenance`
+- [x] **ISS-002 — Schema changes** — done 2026-09-21
+  - [x] `schema/domain/domain-manifest-schema.json`: `concerns` removed, `domain.ontology` added
+  - [x] `concept:` id pattern added (domain manifest + all 3 SCD tier schemas)
+  - [x] SCD schema(s): optional `concept` field added (project/meta/standards)
+  - [x] Bundle schema: `type: concern` → `type: concept`
+  - [x] Bundle schema: `version_approved_by` / `version_approved_at` added to `provenance`
         (required)
+  - [x] Bonus: `meta-scd-template.json`'s `content.concerns[]` → `content.concepts[]`
+        (caught during implementation, wasn't in the original checklist)
+  - Note: existing example data (`schema/domain/examples/medical-device-cdmo-domain.yaml`,
+    `examples/*`) still uses `concerns:` and will fail validation until ISS-005 migrates it
 - [ ] **ISS-003 — Validator**
   - [ ] New ontology-validation rules module (RFC-0001's Validation rules 1–8)
   - [ ] Enforce `version_approved_by` / `version_approved_at` presence on bundles

@@ -26,9 +26,14 @@
       "type": "string",
       "minLength": 1
     },
+    "concept": {
+      "type": "string",
+      "pattern": "^concept:[a-z][a-z0-9-]*$",
+      "description": "Optional: the domain concept this SCD realizes (RFC-0001 Domain Ontology). Expected for SCDs in a concept bundle."
+    },
     "content": {
       "type": "object",
-      "description": "Meta-level definitions: roles, capabilities, domains, concerns, etc.",
+      "description": "Meta-level definitions: roles, capabilities, domains, concepts, etc.",
       "properties": {
         "roles": {
           "type": "array",
@@ -119,7 +124,7 @@
             "additionalProperties": true
           }
         },
-        "concerns": {
+        "concepts": {
           "type": "array",
           "items": {
             "type": "object",
@@ -127,7 +132,7 @@
             "properties": {
               "id": {
                 "type": "string",
-                "pattern": "^concern:[a-zA-Z0-9._-]+$"
+                "pattern": "^concept:[a-zA-Z0-9._-]+$"
               },
               "name": {
                 "type": "string"

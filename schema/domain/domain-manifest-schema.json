@@ -8,7 +8,7 @@
   "properties": {
     "domain": {
       "type": "object",
-      "required": ["id", "name", "version", "description", "concerns", "schemas"],
+      "required": ["id", "name", "version", "description", "ontology", "schemas"],
       "properties": {
         "id": {
           "type": "string",
@@ -30,14 +30,85 @@
           "minLength": 1,
           "description": "Description of what this domain covers and its intended use cases"
         },
-        "concerns": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "string",
-            "pattern": "^bundle:[a-z][a-z0-9-]*:[0-9]+\\.[0-9]+\\.[0-9]+$"
+        "ontology": {
+          "type": "object",
+          "required": ["concepts"],
+          "description": "The Domain Ontology (RFC-0001): this domain's concepts, their optional taxonomy, and their optional typed relationships. Replaces the 0.3 'concerns' list.",
+          "properties": {
+            "concepts": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["id", "name"],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^concept:[a-z][a-z0-9-]*$",
+                    "description": "Unique concept identifier using concept: prefix (e.g., concept:risk-management)"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Human-readable concept name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description of what this concept covers"
+                  },
+                  "parent": {
+                    "type": "string",
+                    "pattern": "^concept:[a-z][a-z0-9-]*$",
+                    "description": "Optional parent concept id in the same domain, forming a taxonomy. MUST resolve to a concept in this domain; the parent graph MUST be acyclic."
+                  },
+                  "relationships": {
+                    "type": "array",
+                    "description": "Optional typed edges to other concepts or to standards-tier SCDs.",
+                    "items": {
+                      "type": "object",
+                      "required": ["type", "target"],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["depends-on", "relates-to", "satisfies"],
+                          "description": "Relationship type; a domain may restrict the allowed set with relationship_types."
+                        },
+                        "target": {
+                          "type": "string",
+                          "pattern": "^(concept:[a-z][a-z0-9-]*|scd:standards:[a-zA-Z0-9._-]+)$",
+                          "description": "A concept: id (for depends-on / relates-to) or an scd:standards: id (for satisfies). Must resolve."
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "satisfies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^scd:standards:[a-zA-Z0-9._-]+$"
+                    },
+                    "description": "Shorthand list of scd:standards: ids this concept satisfies (sugar for a relationships entry of type satisfies)."
+                  },
+                  "bundle": {
+                    "type": "string",
+                    "pattern": "^bundle:[a-z][a-z0-9-]*:[0-9]+\\.[0-9]+\\.[0-9]+$",
+                    "description": "Optional: the concept bundle realizing this concept (e.g., bundle:risk-management:0.5.0)."
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "relationship_types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["depends-on", "relates-to", "satisfies"]
+              },
+              "description": "Optional: restrict which relationship types this domain uses."
+            }
           },
-          "description": "List of concern bundle references with versions (e.g., bundle:architecture:1.0.0, bundle:security:1.0.0)"
+          "additionalProperties": false
         },
         "author": {
           "type": "string",
