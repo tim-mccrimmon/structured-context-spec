@@ -1,7 +1,7 @@
 # Medical-Device CDMO — Context Intake Template
 
 > **Generic.** This template defines what *concrete* context a medical-device CDMO must supply for
-> each of the 12 concerns before its context can be authored into SCS bundles. It contains no
+> each of the 12 concepts before its context can be authored into SCS bundles. It contains no
 > organization-specific values — a specific CDMO records its readiness and its actual rules in its
 > own private workspace, against this template.
 
@@ -16,7 +16,7 @@ A unit of context is usable in a bundle only if it is all three:
 2. **Terminal** — it is self-contained. It does not dangle to a document you don't have. "Per the
    approved-tool register" is a pointer; the register's actual contents are terminal.
 3. **Agent-relevant** — it shapes what an AI assistant may, must, or must not do. If no agent
-   operates in it, it is not a concern in this domain.
+   operates in it, it is not a concept in this domain.
 
 ### Readiness states
 
@@ -39,9 +39,9 @@ The 🟡-vs-❌ split is the point: **🟡 is a fetch; ❌ is a decision.** Sepa
 
 ---
 
-## 2. The 12 concerns — what to stipulate
+## 2. The 12 concepts — what to stipulate
 
-For each concern: its purpose, the concrete items to stipulate, and a generic good-vs-pointer cue.
+For each concept: its purpose, the concrete items to stipulate, and a generic good-vs-pointer cue.
 
 ### 1. `compliance-governance`
 **Stipulate:** the data-class → permitted-AI-tool/tier mapping; autonomy rules (what an assistant may
@@ -110,9 +110,9 @@ supplier assessment); per-tier vendor approval; re-qualification triggers.
 
 ## 3. How to use it
 
-1. **Walk the 12 concerns**, not your source documents. For each, ask: is there a concrete, terminal
+1. **Walk the 12 concepts**, not your source documents. For each, ask: is there a concrete, terminal
    stipulation? Mark ✅ / 🟡 / ❌ / ⚪.
 2. **For every 🟡 — retrieve the artifact.** It exists; collect it.
 3. **For every ❌ — name the decision and an owner.** No one has set this limit; someone must. Park
    what can't be decided yet; don't let it stall the rest.
-4. **A concern is bundle-ready when its items are all ✅.** That is the gate into authoring its SCDs.
+4. **A concept is bundle-ready when its items are all ✅.** That is the gate into authoring its SCDs.

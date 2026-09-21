@@ -1,16 +1,16 @@
 # ================================================================
-# Concern Bundle: Security
+# Concept Bundle: Security
 # ================================================================
 # Defines security controls, data protection, and threat management
 # for the Medication Adherence system.
 # ================================================================
 
 id: bundle:security
-type: concern
+type: concept
 version: "0.1.0"
 title: "Medication Adherence System - Security Bundle"
 description: >
-  Security concern bundle defining authentication, authorization, encryption,
+  Security concept bundle defining authentication, authorization, encryption,
   data protection, and threat modeling for the Medication Adherence system.
 
 imports: []
@@ -24,6 +24,8 @@ scds:
 provenance:
   created_by: "security-team@medtech.com"
   created_at: "2025-11-01T10:15:00Z"
+  version_approved_by: "engineering-lead@medtech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
   updated_by: "rachel.kim@medtech.com"
   updated_at: "2025-11-19T09:45:00Z"
   rationale: "Security bundle v1.0.0 - PHI protection and HIPAA security controls defined"

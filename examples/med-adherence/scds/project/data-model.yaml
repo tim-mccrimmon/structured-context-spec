@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: data-provenance
 title: "Data Model"
 description: "Core data entities and relationships"
+concept: concept:data-provenance
 
 content:
   summary: "Patient-centric data model for medication adherence tracking"

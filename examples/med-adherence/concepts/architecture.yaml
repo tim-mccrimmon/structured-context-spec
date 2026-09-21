@@ -1,19 +1,19 @@
 # ================================================================
-# Concern Bundle: Architecture
+# Concept Bundle: Architecture
 # ================================================================
 # Defines system architecture, components, and technical design
 # for the Medication Adherence system.
 # ================================================================
 
 id: bundle:architecture
-type: concern
+type: concept
 version: "0.1.0"
-title: "Medication Adherence System - Architecture Concern Bundle"
+title: "Medication Adherence System - Architecture Concept Bundle"
 description: >
-  Architecture concern bundle defining system boundaries, components,
+  Architecture concept bundle defining system boundaries, components,
   technology stack, and integration points for the Medication Adherence system.
 
-# Concern bundles don't import other bundles - they contain only SCDs
+# Concept bundles don't import other bundles - they contain only SCDs
 imports: []
 
 # Architecture SCDs
@@ -26,6 +26,8 @@ scds:
 provenance:
   created_by: "architecture-team@medtech.com"
   created_at: "2025-11-01T10:00:00Z"
+  version_approved_by: "engineering-lead@medtech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
   updated_by: "mike.johnson@medtech.com"
   updated_at: "2025-11-18T11:30:00Z"
   rationale: "Architecture bundle v1.0.0 - locked for development phase"

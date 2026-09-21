@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: business-context
 title: "Constraints and Assumptions"
 description: "Known constraints and working assumptions"
+concept: concept:business-context
 
 content:
   summary: "Healthcare regulatory requirements are primary constraints"

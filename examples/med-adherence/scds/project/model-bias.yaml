@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: ethics-ai-accountability
 title: "Model Bias"
 description: "Bias detection and mitigation for AI/ML models"
+concept: concept:ethics-ai-accountability
 
 content:
   summary: "Proactive bias monitoring to ensure equitable outcomes"

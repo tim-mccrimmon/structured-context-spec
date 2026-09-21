@@ -1,14 +1,14 @@
 # ================================================================
-# Concern Bundle: Supplier Qualification
+# Concept Bundle: Supplier Qualification
 # ================================================================
-# ADDED concern (no home in the software-dev set): GAMP supplier
+# ADDED concept (no home in the software-dev set): GAMP supplier
 # assessment for platforms AND AI vendors. Generic SCD slots.
 # ================================================================
 
 id: bundle:supplier-qualification
-type: concern
+type: concept
 version: "0.1.0"
-title: "Supplier Qualification Concern Bundle"
+title: "Supplier Qualification Concept Bundle"
 description: >
   Supplier and vendor qualification for a medical-device CDMO: GAMP
   supplier assessment for platform vendors, per-tier vendor approval,
@@ -26,4 +26,6 @@ scds:
 provenance:
   created_by: "info@ohana-tech.com"
   created_at: "2026-06-04T00:00:00Z"
-  rationale: "Generic supplier-qualification concern (added) for the Medical-Device CDMO domain"
+  version_approved_by: "info@ohana-tech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
+  rationale: "Generic supplier-qualification concept (added) for the Medical-Device CDMO domain"

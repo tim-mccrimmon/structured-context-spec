@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: safety-risk
 title: "Safety Checklist"
 description: "Safety verification checklist for releases"
+concept: concept:safety-risk
 
 content:
   summary: "Pre-release safety verification for healthcare software"

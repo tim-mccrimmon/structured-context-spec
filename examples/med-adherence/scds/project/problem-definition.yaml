@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: business-context
 title: "Problem Definition"
 description: "Core problem statement and motivation for the Medication Adherence system"
+concept: concept:business-context
 
 content:
   summary: "Medication non-adherence is a $300B healthcare problem affecting patient outcomes"

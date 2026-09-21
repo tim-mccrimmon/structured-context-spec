@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: usability-accessibility
 title: "Accessibility Compliance"
 description: "Accessibility requirements and WCAG compliance"
+concept: concept:usability-accessibility
 
 content:
   summary: "WCAG 2.1 AA compliance for inclusive design"

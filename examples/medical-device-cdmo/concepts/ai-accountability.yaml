@@ -1,5 +1,5 @@
 # ================================================================
-# Concern Bundle: AI Accountability
+# Concept Bundle: AI Accountability
 # ================================================================
 # RENAMED from `ethics-ai-accountability`: human authority, the
 # non-decision principle, named accountability, bias handling.
@@ -7,9 +7,9 @@
 # ================================================================
 
 id: bundle:ai-accountability
-type: concern
+type: concept
 version: "0.1.0"
-title: "AI Accountability Concern Bundle"
+title: "AI Accountability Concept Bundle"
 description: >
   AI accountability for a medical-device CDMO: human decision authority
   and sign-off gates, the non-decision principle (automated controls do
@@ -27,4 +27,6 @@ scds:
 provenance:
   created_by: "info@ohana-tech.com"
   created_at: "2026-06-04T00:00:00Z"
-  rationale: "Generic ai-accountability concern (renamed from ethics-ai-accountability) for the Medical-Device CDMO domain"
+  version_approved_by: "info@ohana-tech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
+  rationale: "Generic ai-accountability concept (renamed from ethics-ai-accountability) for the Medical-Device CDMO domain"

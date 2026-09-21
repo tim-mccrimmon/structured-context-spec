@@ -1,22 +1,22 @@
 # ================================================================
-# Concern Bundle: Business Context
+# Concept Bundle: Business Context
 # ================================================================
 # Foundational business and product context for the Medication
-# Adherence system. Prerequisite for all other concern bundles.
+# Adherence system. Prerequisite for all other concept bundles.
 # ================================================================
 
 id: bundle:business-context
-type: concern
+type: concept
 version: "0.2.0"
 title: "Medication Adherence System - Business Context Bundle"
 description: >
-  Business context concern bundle defining the problem, stakeholders,
+  Business context concept bundle defining the problem, stakeholders,
   objectives, opportunity, constraints, and success criteria for the
   Medication Adherence system. Provides foundational "what/why/who"
   context that all other domains depend on. This bundle should be
   completed first during the Intent phase.
 
-# Concern bundles don't import other bundles - they contain only SCDs
+# Concept bundles don't import other bundles - they contain only SCDs
 imports: []
 
 # Business Context SCDs
@@ -31,6 +31,8 @@ scds:
 provenance:
   created_by: "business-team@medtech.com"
   created_at: "2025-10-15T09:00:00Z"
+  version_approved_by: "engineering-lead@medtech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
   updated_by: "sarah.chen@medtech.com"
   updated_at: "2025-10-20T14:00:00Z"
   rationale: "Business context bundle v0.2.0 - foundational context establishing the problem space, stakeholders, and success criteria for the medication adherence initiative"

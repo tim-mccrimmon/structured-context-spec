@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: security
 title: "Data Handling"
 description: "Data handling procedures and policies"
+concept: concept:security
 
 content:
   summary: "Minimum necessary access and secure data handling"

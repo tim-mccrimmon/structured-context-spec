@@ -7,6 +7,68 @@ domain:
   license: "open"
   homepage: "https://structuredcontext.dev/domains/software-development"
 
+  # The Domain Ontology (RFC-0001). Flat for now - this domain hasn't needed
+  # taxonomy or relationships yet; add depth incrementally if that changes.
+  # These 11 concepts are recommendations, not requirements (see
+  # tools/scd-validator/rules/v0.5.0/completeness-rules.yaml) - a project in
+  # this domain uses whichever subset fits, as examples/med-adherence does.
+  ontology:
+    concepts:
+      - id: concept:business-context
+        name: Business Context
+        description: Problem, stakeholders, objectives, and opportunity.
+        bundle: bundle:business-context:0.1.0
+
+      - id: concept:architecture
+        name: Architecture
+        description: System structure, components, boundaries, and technical design.
+        bundle: bundle:architecture:0.1.0
+
+      - id: concept:security
+        name: Security
+        description: Authentication, authorization, encryption, and data protection.
+        bundle: bundle:security:0.1.0
+
+      - id: concept:performance-reliability
+        name: Performance & Reliability
+        description: Performance requirements, reliability targets, and scalability.
+        bundle: bundle:performance-reliability:0.1.0
+
+      - id: concept:usability-accessibility
+        name: Usability & Accessibility
+        description: User experience, interface design, and accessibility requirements.
+        bundle: bundle:usability-accessibility:0.1.0
+
+      - id: concept:compliance-governance
+        name: Compliance & Governance
+        description: Regulatory compliance, audit requirements, and governance policies.
+        bundle: bundle:compliance-governance:0.1.0
+
+      - id: concept:data-provenance
+        name: Data & Provenance
+        description: Data models, data flow, data governance, and provenance tracking.
+        bundle: bundle:data-provenance:0.1.0
+
+      - id: concept:testing-validation
+        name: Testing & Validation
+        description: Testing strategy, validation approach, and quality assurance.
+        bundle: bundle:testing-validation:0.1.0
+
+      - id: concept:deployment-operations
+        name: Deployment & Operations
+        description: Deployment strategy, operational procedures, and monitoring.
+        bundle: bundle:deployment-operations:0.1.0
+
+      - id: concept:safety-risk
+        name: Safety & Risk
+        description: Safety requirements, risk assessment, and hazard analysis.
+        bundle: bundle:safety-risk:0.1.0
+
+      - id: concept:ethics-ai-accountability
+        name: Ethics & AI Accountability
+        description: Ethical considerations, AI/ML governance, and bias mitigation.
+        bundle: bundle:ethics-ai-accountability:0.1.0
+
   schemas:
     meta:
       content_schema: "../../scd/meta-scd-content-schema.json"

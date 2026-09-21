@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: deployment-operations
 title: "Infrastructure Definition"
 description: "Cloud infrastructure and deployment architecture"
+concept: concept:deployment-operations
 
 content:
   summary: "AWS-based HIPAA-eligible infrastructure"

@@ -34,4 +34,6 @@ provenance:
   created_at: "2025-11-01T09:30:00Z"
   updated_by: "compliance-team@medtech.com"
   updated_at: "2025-11-15T16:00:00Z"
+  version_approved_by: "compliance-team@medtech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
   rationale: "Standards bundle for healthcare compliance - SOC2 + HIPAA requirements"

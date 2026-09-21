@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: business-context
 title: "Business Objectives"
 description: "Measurable business goals for the system"
+concept: concept:business-context
 
 content:
   summary: "Drive adherence improvement while building sustainable healthcare SaaS business"

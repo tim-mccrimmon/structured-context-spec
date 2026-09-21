@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: testing-validation
 title: "QA Procedures"
 description: "Quality assurance procedures and workflows"
+concept: concept:testing-validation
 
 content:
   summary: "QA integrated into development workflow"

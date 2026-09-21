@@ -1,14 +1,14 @@
 # ================================================================
-# Concern Bundle: Data & Provenance
+# Concept Bundle: Data & Provenance
 # ================================================================
 # Data classification, lineage, integrity (ALCOA+), RAG source
 # precedence, and multi-client segregation. Generic SCD slots.
 # ================================================================
 
 id: bundle:data-provenance
-type: concern
+type: concept
 version: "0.1.0"
-title: "Data & Provenance Concern Bundle"
+title: "Data & Provenance Concept Bundle"
 description: >
   Data governance for a medical-device CDMO: classification scheme,
   source-to-target lineage, ALCOA+ integrity, RAG source-precedence
@@ -26,4 +26,6 @@ scds:
 provenance:
   created_by: "info@ohana-tech.com"
   created_at: "2026-06-04T00:00:00Z"
-  rationale: "Generic data-provenance concern for the Medical-Device CDMO domain"
+  version_approved_by: "info@ohana-tech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
+  rationale: "Generic data-provenance concept for the Medical-Device CDMO domain"

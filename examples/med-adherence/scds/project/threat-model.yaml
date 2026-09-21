@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: security
 title: "Threat Model"
 description: "Security threat model and mitigations"
+concept: concept:security
 
 content:
   summary: "STRIDE-based threat model for healthcare application"

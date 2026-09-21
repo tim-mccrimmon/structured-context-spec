@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: performance-reliability
 title: "Response Time"
 description: "Response time requirements and SLOs"
+concept: concept:performance-reliability
 
 content:
   summary: "Sub-second response times for interactive features"

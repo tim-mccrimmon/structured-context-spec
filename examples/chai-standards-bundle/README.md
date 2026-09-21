@@ -68,7 +68,7 @@ For teams running the SCS Control Plane, compose your project bundle to import t
 id: bundle:acme-prior-auth-agent
 type: project
 imports:
-  - bundle:acme-health-domain:1.0.0    # Company domain (all concerns)
+  - bundle:acme-health-domain:1.0.0    # Company domain (all concepts)
   - bundle:chai-prior-auth:1.0.0       # CHAI standards (this bundle)
   - bundle:hipaa:1.0.0                 # HIPAA standards
 scds:

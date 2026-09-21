@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: performance-reliability
 title: "Availability"
 description: "System availability requirements and architecture"
+concept: concept:performance-reliability
 
 content:
   summary: "99.9% availability target for critical medication reminders"

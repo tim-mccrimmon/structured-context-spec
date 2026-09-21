@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: compliance-governance
 title: "SOC2 Controls"
 description: "SOC2 Type II trust service criteria and controls"
+concept: concept:compliance-governance
 
 content:
   summary: "SOC2 Type II certification targeted for Year 1"

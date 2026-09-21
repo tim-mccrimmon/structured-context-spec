@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: architecture
 title: "System Context"
 description: "System boundaries, external actors, and key interactions for the Medication Adherence system"
+concept: concept:architecture
 
 content:
   system_name: "Medication Adherence System"

@@ -63,13 +63,33 @@ manual CLI runs, not an automated regression suite.
 and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain-ontology.md`.
 
 ### ISS-005 — Domain Ontology: examples + templates + plugins
-**Status:** open
-- Migrate example domains (`examples/medical-device-cdmo`, `examples/med-adherence`, …):
-  `concerns/` → `concepts/`, add `ontology` blocks (flat first; add depth for the CDMO
-  example as the reference).
-- `scs-tools`: `templates/bundles/concerns/` → `.../concepts/`; `scs new concept`;
-  domain-manifest scaffold emits `ontology`.
-- `scs-vibe`, `scs-team`: update skill prompts and templates.
+**Status:** in-progress (examples done 2026-09-21; scs-tools + plugins remain)
+- [x] Migrate example domains: `examples/medical-device-cdmo` and `examples/med-adherence`
+  `concerns/` → `concepts/` (23 bundle files), `type: concern` → `type: concept`,
+  `version_approved_by`/`version_approved_at` added to every bundle's provenance.
+- [x] Domain manifests: `schema/domain/examples/medical-device-cdmo-domain.yaml` got the
+  reference-depth ontology (12 concepts, relationships, `satisfies` mapped to ISO 13485 /
+  IEC 62304 / 21 CFR 820 / ISO 14971 / 21 CFR Part 11 - illustrative ids, not researched
+  clause citations); `software-development-domain.yaml` got a flat ontology (11 concepts,
+  matching what `examples/med-adherence` actually imports - it was missing `concerns`
+  entirely before, so this is new content, not just a rename).
+- [x] `examples/med-adherence`'s 39 project-tier SCDs got an optional `concept:` field,
+  derived mechanically from each concept bundle's own `scds:` list (1:1 mapping, no
+  orphans). Domain bundles and top-level meta/standards/project bundles updated too.
+- [x] Docs swept for stray `concern` text (`README.md`s, `context-intake-template.md`,
+  `chai-standards-bundle/README.md`); `examples/llm-portability/` deliberately left alone -
+  it's a frozen historical experiment snapshot, not living reference content.
+- [x] Tested: every migrated bundle validates individually (`scs validate --bundle`), both
+  domain manifests validate via the new `--domain` path (CDMO's `satisfies` targets get the
+  expected "unresolved in this context" warnings, 0 errors on both).
+- Found and tracked, not fixed here (pre-existing, unrelated to the rename): ISS-020, ISS-021
+  (bundle-tree SCD loading never actually recurses into concept bundles, so full
+  project-bundle validation doesn't exercise SCD-level checks), ISS-022 (a pre-existing XOR
+  violation + malformed import in `examples/med-adherence/standards-bundle.yaml`).
+- [ ] `scs-tools`: `templates/bundles/concerns/` → `.../concepts/`; `scs new concept`;
+  domain-manifest scaffold emits `ontology`. (Not started - real Python logic in
+  `commands/new.py`/`utils/project_types.py`, not just template renames.)
+- [ ] `scs-vibe`, `scs-team`: update skill prompts and templates. (Not started.)
 
 ---
 
@@ -172,3 +192,32 @@ Fix version headers when creating `spec/0.5/`.
 `.claude/` (machine-local `settings.local.json`) and `project-starter.md` are untracked in
 the working tree. Decide: `.gitignore` them (likely) or commit intentionally. `.gitignore`
 also has an uncommitted `.envrc` line.
+
+---
+
+## Validator engine gaps (found during ISS-005 testing, pre-existing, not RFC-0001 scope)
+
+### ISS-020 — Bundle-tree SCD loading never recurses into concept bundles
+**Status:** open
+`commands/validate.py`'s `validate_bundle()` resolves project bundle -> domain bundle, then
+reads `domain_bundle.get("scds", [])` directly - but domain bundles are required to have an
+*empty* `scds` array by design (they aggregate concept bundles via `imports`). This means
+`--bundle` on a project bundle has never actually loaded real SCDs through a correctly
+structured domain hierarchy; it silently reports "0 SCDs loaded" instead of erroring. Fix:
+recurse one more level - read the domain bundle's `imports`, load each concept bundle, and
+collect *their* `scds`.
+
+### ISS-021 — Hardcoded SCD file path template doesn't match example layouts
+**Status:** open
+The same code resolves an SCD reference to `project_root / "context" / <tier> / <name>.yaml`.
+`examples/med-adherence`'s actual SCDs live under `scds/project/`, not `context/project/` -
+so even with ISS-020 fixed, SCD files wouldn't resolve for this example. Needs either a
+configurable path convention or a documented one the examples are made to match.
+
+### ISS-022 — `examples/med-adherence/standards-bundle.yaml` pre-existing violations
+**Status:** open
+Two bugs unrelated to the concern->concept rename, confirmed present before this session's
+changes (only `provenance` was touched here for ISS-005): the `imports` entry
+`bundle:standards:soc2-type2:2023.1` doesn't match the bundle reference pattern (extra
+segment, non-semver version `2023.1`), and the bundle has both `imports` and `scds` set,
+violating the standards-bundle XOR rule. `scs validate --bundle` fails on this file.

@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: security
 title: "Data Protection"
 description: "Data protection and encryption requirements"
+concept: concept:security
 
 content:
   summary: "Encryption at rest and in transit for all PHI"

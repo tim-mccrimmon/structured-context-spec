@@ -1,5 +1,5 @@
 # ================================================================
-# Concern Bundle: Compliance & Governance
+# Concept Bundle: Compliance & Governance
 # ================================================================
 # Regulatory + QMS guardrails and the AI-use governance rules an
 # assistant must operate inside (deployment tiers, autonomy, Part 11,
@@ -7,9 +7,9 @@
 # ================================================================
 
 id: bundle:compliance-governance
-type: concern
+type: concept
 version: "0.1.0"
-title: "Compliance & Governance Concern Bundle"
+title: "Compliance & Governance Concept Bundle"
 description: >
   Regulatory and QMS governance for a medical-device CDMO: which
   regulations bind the work, the AI deployment-tier and autonomy rules,
@@ -27,4 +27,6 @@ scds:
 provenance:
   created_by: "info@ohana-tech.com"
   created_at: "2026-06-04T00:00:00Z"
-  rationale: "Generic compliance-governance concern for the Medical-Device CDMO domain"
+  version_approved_by: "info@ohana-tech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
+  rationale: "Generic compliance-governance concept for the Medical-Device CDMO domain"

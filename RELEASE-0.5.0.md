@@ -67,15 +67,26 @@ tested against real content.
   - [ ] `spec/0.5/core-model.md`, `terminology.md`, `bundle-format.md` rewritten for the
         rename + `Project → Domain → Concept → SCD` hierarchy
   - [ ] New `spec/0.5/domain-ontology.md`
-- [ ] **ISS-005 — Examples, templates, plugins**
-  - [ ] `examples/medical-device-cdmo`: `concerns/` → `concepts/`, add `ontology` block
-        (this is the reference example — give it real depth, not just a flat list)
-  - [ ] `examples/med-adherence`: same, flat is fine
-  - [ ] `scs-tools`: `templates/bundles/concerns/` → `.../concepts/`; `scs new concept`;
-        domain-manifest scaffold emits `ontology`
-  - [ ] `scs-vibe`, `scs-team`: update skill prompts and templates
-- [ ] **Test**: run `scs validate` against both migrated examples; fix anything the new
-      rules catch
+- [x] **ISS-005a — Examples** — done 2026-09-21
+  - [x] `examples/medical-device-cdmo`: `concerns/` → `concepts/`; domain manifest got real
+        depth (12 concepts, relationships, `satisfies` mapped to ISO 13485 / IEC 62304 /
+        21 CFR 820 / ISO 14971 / 21 CFR Part 11)
+  - [x] `examples/med-adherence`: same rename; domain manifest ontology is flat (11
+        concepts); 39 SCDs got a `concept:` field derived from each concept bundle's own
+        `scds:` list
+  - [x] All bundles' provenance gained `version_approved_by`/`version_approved_at`
+  - [x] **Test**: every bundle validates individually; both domain manifests validate via
+        `scs validate --domain` (0 errors on both)
+  - Found 3 pre-existing, unrelated bugs while testing — tracked as ISS-020, ISS-021,
+    ISS-022, not fixed here
+- [ ] **ISS-005b — scs-tools** — not started
+  - [ ] `templates/bundles/concerns/` → `.../concepts/`; `scs new concept`; domain-manifest
+        scaffold emits `ontology`
+  - [ ] Real Python logic to rename too (`commands/new.py`, `utils/project_types.py`,
+        `utils/files.py`, `commands/bundle.py` all reference `concern` in variable/function
+        names, CLI messages, and file paths — not just template data)
+- [ ] **ISS-005c — scs-vibe, scs-team plugins** — not started
+  - [ ] Update skill prompts and templates referencing `concern`
 
 ---
 

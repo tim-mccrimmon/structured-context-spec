@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: deployment-operations
 title: "Incident Response"
 description: "Incident management and response procedures"
+concept: concept:deployment-operations
 
 content:
   summary: "Structured incident response for reliability and compliance"

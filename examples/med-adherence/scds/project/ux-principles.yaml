@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: usability-accessibility
 title: "UX Principles"
 description: "User experience principles and guidelines"
+concept: concept:usability-accessibility
 
 content:
   summary: "Simple, supportive UX for diverse patient population"

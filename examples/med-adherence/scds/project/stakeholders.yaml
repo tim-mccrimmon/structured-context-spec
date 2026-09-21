@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: business-context
 title: "Stakeholders"
 description: "Key stakeholders and their interests in the system"
+concept: concept:business-context
 
 content:
   summary: "Primary stakeholders are patients and healthcare providers"

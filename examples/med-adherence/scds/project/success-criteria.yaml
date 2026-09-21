@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: business-context
 title: "Success Criteria"
 description: "Measurable criteria for project success"
+concept: concept:business-context
 
 content:
   summary: "Success measured by adherence improvement, user engagement, and business metrics"
