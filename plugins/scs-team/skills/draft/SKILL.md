@@ -1,7 +1,7 @@
 ---
 name: draft
-description: Conversational drafting for a specific concern area when documentation doesn't exist. Ask targeted questions and generate draft SCDs.
-argument-hint: "<concern: architecture|security|performance|usability|compliance|data|testing|deployment|safety|ethics|business>"
+description: Conversational drafting for a specific concept area when documentation doesn't exist. Ask targeted questions and generate draft SCDs.
+argument-hint: "<concept: architecture|security|performance|usability|compliance|data|testing|deployment|safety|ethics|business>"
 allowed-tools: Read, Glob, Grep, Write, Bash(mkdir -p *)
 ---
 
@@ -14,11 +14,11 @@ allowed-tools: Read, Glob, Grep, Write, Bash(mkdir -p *)
 
 # SCS Team Draft - Conversational Context Creation
 
-You are helping the user create structured context for a specific concern area through conversation. Use this when they don't have existing documentation.
+You are helping the user create structured context for a specific concept area through conversation. Use this when they don't have existing documentation.
 
-## The 11 Concerns
+## The 11 Concepts
 
-| # | Concern | Slug | What It Covers |
+| # | Concept | Slug | What It Covers |
 |---|---------|------|----------------|
 | 1 | Architecture | `architecture` | System structure, components, boundaries, tech stack |
 | 2 | Security | `security` | Auth, data protection, threats, access control |
@@ -43,7 +43,7 @@ Before asking questions:
 
 ### Step 2: Ask Targeted Questions
 
-Ask questions specific to the concern area. Be conversational, not interrogative.
+Ask questions specific to the concept area. Be conversational, not interrogative.
 
 **Architecture Questions**:
 - "What's the high-level structure? Monolith, microservices, serverless?"
@@ -134,17 +134,17 @@ Based on the conversation, generate SCDs with version: "DRAFT".
 - Don't invent details that weren't provided
 - Flag areas that need follow-up
 
-**Update concern bundle**: After creating SCDs, update the relevant `.scs/concerns/<concern>.yaml` to include the new SCDs in its `scds:` array.
+**Update concept bundle**: After creating SCDs, update the relevant `.scs/concepts/<concept>.yaml` to include the new SCDs in its `scds:` array.
 
 ### Step 5: Compile to Claude Code Format
 
 After creating/modifying SCDs, compile the `.scs/` source to `.claude/rules/` output:
 
-1. Read all SCDs in `.scs/scds/` and all concern bundles in `.scs/concerns/`
-2. For each concern that has SCDs:
+1. Read all SCDs in `.scs/scds/` and all concept bundles in `.scs/concepts/`
+2. For each concept that has SCDs:
    a. Compress the SCD content to actionable rules (constraints, boundaries, patterns - NOT documentation)
-   b. Target 300-500 tokens per concern file
-   c. Write to `.claude/rules/<concern-name>.md`
+   b. Target 300-500 tokens per concept file
+   c. Write to `.claude/rules/<concept-name>.md`
    d. Add header: `<!-- scs-team:managed -->` and footer with source SCD attribution
 3. Generate/update the scs-team section in CLAUDE.md:
    a. If CLAUDE.md exists, find `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers
@@ -162,7 +162,7 @@ After generating:
 1. Summarize what was created
 2. Note what's still missing
 3. Show what was compiled to `.claude/rules/`
-4. Suggest other concerns to draft or documents to add
+4. Suggest other concepts to draft or documents to add
 
 ## Example Interaction
 
@@ -199,7 +199,7 @@ You: "Got it. Let me generate the architecture context...
 3. `tech-stack.yaml` - FastAPI, Postgres, Redis specifics
 
 **Updated Bundles:**
-- `concerns/architecture.yaml` - Added 3 SCDs
+- `concepts/architecture.yaml` - Added 3 SCDs
 
 **Compiled to Claude Code:**
 - `.claude/rules/architecture.md` - Architecture rules and constraints

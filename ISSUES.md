@@ -67,7 +67,7 @@ manual CLI runs, not an automated regression suite.
 and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain-ontology.md`.
 
 ### ISS-005 — Domain Ontology: examples + templates + plugins
-**Status:** in-progress (examples + scs-tools done; scs-vibe/scs-team plugins remain)
+**Status:** done (2026-09-22)
 - [x] Migrate example domains: `examples/medical-device-cdmo` and `examples/med-adherence`
   `concerns/` → `concepts/` (23 bundle files), `type: concern` → `type: concept`,
   `version_approved_by`/`version_approved_at` added to every bundle's provenance.
@@ -128,7 +128,27 @@ and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain
   to a bare `scs` on `$PATH`, which silently fails outside an activated venv (`--no-validate`
   works around it). Minor, not tracked as a numbered issue.
 
-**Still not started:** `scs-vibe`, `scs-team` plugin prompts/templates (ISS-005c).
+**scs-vibe / scs-team plugins done 2026-09-22 (ISS-005c):**
+- [x] `scs-team`: all 7 skill files (`init`, `draft`, `validate`, `status`, `use`, `add`,
+  `version`), `README.md`, `demo/README.md`, `demo/DEMO-SCRIPT.md` renamed (124
+  replacements) - directory paths (`.scs/concerns/` → `.scs/concepts/`), `type: concern` →
+  `type: concept`, and all prose. One generic-English "concerned about" correctly preserved.
+- [x] `scs-vibe`: `scs-vibe-plugin-overview.md` and `demo/DEMO-SCRIPT.md` renamed (5
+  replacements). `spec/examples/care-plan-tracker/` left alone - its 5 `concern(s)` hits are
+  all generic English ("separation of concerns," "any issues or concerns," "concurrent
+  access concerns"), not the SCS term.
+- [x] **Found a third variant of the ISS-005b provenance field bug**: `scs-team`'s `version`
+  skill (the plugin equivalent of `scs bundle version`) told the model to write
+  `versioned_by`/`versioned_at`/`version_rationale` — none of which match the schema's
+  `version_approved_by`/`version_approved_at`/`rationale`. Fixed. This is the third distinct
+  naming attempt found across the codebase for the same concept (CLI's original
+  `approved_by`/`approved_at`, this plugin's `versioned_by`/`versioned_at`, and the actual
+  schema) - worth remembering when touching any other approval-writing code path.
+- [x] Verified: all 7 `SKILL.md` YAML frontmatter blocks still parse after the bulk rename.
+- Not deeply tested end-to-end (these are Claude Code skill prompts, not executable code -
+  no venv/CLI to run them through the way ISS-005a/b were tested).
+
+**ISS-005 (examples + templates + plugins) is now fully done.**
 
 ---
 

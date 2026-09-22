@@ -27,7 +27,7 @@ claude --plugin-dir /path/to/plugins/scs-team
 ## Quick Start
 
 ```bash
-/scs-team:init                    # Scaffold .scs/ with 11 concern bundles
+/scs-team:init                    # Scaffold .scs/ with 11 concept bundles
 /scs-team:add ./docs/PRD.md       # Process existing docs
 /scs-team:use hipaa               # Add compliance standards
 /scs-team:draft architecture      # Draft what's not documented
@@ -44,7 +44,7 @@ Scaffold your project's structured context:
 /scs-team:init
 ```
 
-Scans your project, creates `.scs/` with all 11 concern bundle placeholders, and recommends where to start based on what it finds (existing docs, compliance signals, etc.).
+Scans your project, creates `.scs/` with all 11 concept bundle placeholders, and recommends where to start based on what it finds (existing docs, compliance signals, etc.).
 
 ### Phase 1: Build Context
 
@@ -97,7 +97,7 @@ Initialize structured context for your project.
 /scs-team:init my-project-name
 ```
 
-Creates `.scs/` scaffold with all 11 concern bundles, scans the project for language/framework and existing docs, and recommends next steps.
+Creates `.scs/` scaffold with all 11 concept bundles, scans the project for language/framework and existing docs, and recommends next steps.
 
 ### `/scs-team:add <file>`
 
@@ -107,7 +107,7 @@ Process a document into structured context.
 /scs-team:add ./docs/PRD.md
 ```
 
-Analyzes the document, extracts relevant information, generates SCDs, updates concern bundles, and compiles to `.claude/rules/`.
+Analyzes the document, extracts relevant information, generates SCDs, updates concept bundles, and compiles to `.claude/rules/`.
 
 ### `/scs-team:use <standard>`
 
@@ -123,7 +123,7 @@ Add known compliance/regulatory standards from the bundled library.
 
 Copies pre-built standards SCDs from the plugin's standards library rather than generating from scratch.
 
-### `/scs-team:draft <concern>`
+### `/scs-team:draft <concept>`
 
 Conversational drafting when you don't have documentation.
 
@@ -153,7 +153,7 @@ See what context exists and what's missing.
 
 Shows:
 - Bundles and SCDs created
-- Coverage across all 11 concerns
+- Coverage across all 11 concepts
 - Compilation sync status (`.scs/` vs `.claude/rules/`)
 - Draft vs. versioned status
 
@@ -182,11 +182,11 @@ Lock bundles with semantic version.
 
 Guides you through version selection, updates all files, recompiles output, and optionally creates a git commit and tag.
 
-## The 11 Concerns
+## The 11 Concepts
 
-SCS Team organizes structured context into 11 concern areas:
+SCS Team organizes structured context into 11 concept areas:
 
-| # | Concern | SCDs |
+| # | Concept | SCDs |
 |---|---------|------|
 | 1 | Architecture | system-context, tech-stack, integration-map, component-model |
 | 2 | Security | authn-authz, data-protection, data-handling, threat-model |
@@ -211,18 +211,18 @@ SCS Team creates a **dual-layer structure**:
 ```
 .scs/
 ├── project.yaml              # Project bundle manifest
-├── concerns/
-│   ├── architecture.yaml     # Architecture concern bundle
-│   ├── security.yaml         # Security concern bundle
-│   ├── performance.yaml      # Performance concern bundle
-│   ├── usability.yaml        # Usability concern bundle
-│   ├── compliance.yaml       # Compliance concern bundle
-│   ├── data.yaml             # Data concern bundle
-│   ├── testing.yaml          # Testing concern bundle
-│   ├── deployment.yaml       # Deployment concern bundle
-│   ├── safety.yaml           # Safety concern bundle
-│   ├── ethics.yaml           # Ethics concern bundle
-│   └── business.yaml         # Business concern bundle
+├── concepts/
+│   ├── architecture.yaml     # Architecture concept bundle
+│   ├── security.yaml         # Security concept bundle
+│   ├── performance.yaml      # Performance concept bundle
+│   ├── usability.yaml        # Usability concept bundle
+│   ├── compliance.yaml       # Compliance concept bundle
+│   ├── data.yaml             # Data concept bundle
+│   ├── testing.yaml          # Testing concept bundle
+│   ├── deployment.yaml       # Deployment concept bundle
+│   ├── safety.yaml           # Safety concept bundle
+│   ├── ethics.yaml           # Ethics concept bundle
+│   └── business.yaml         # Business concept bundle
 └── scds/
     ├── system-context.yaml   # From architecture doc
     ├── tech-stack.yaml       # From architecture doc

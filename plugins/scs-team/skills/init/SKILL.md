@@ -1,6 +1,6 @@
 ---
 name: init
-description: Initialize structured context for this project. Scaffolds .scs/ with all 11 concern bundles, scans the project, and recommends where to start.
+description: Initialize structured context for this project. Scaffolds .scs/ with all 11 concept bundles, scans the project, and recommends where to start.
 argument-hint: "[project-name]"
 allowed-tools: Read, Glob, Grep, Write, Bash(ls *), Bash(mkdir -p *), Bash(cat package.json), Bash(cat requirements.txt), Bash(cat go.mod), Bash(cat Cargo.toml), Bash(cat pyproject.toml)
 ---
@@ -59,7 +59,7 @@ Create the following structure:
 ```
 .scs/
 ├── project.yaml              # Project bundle manifest
-├── concerns/
+├── concepts/
 │   ├── architecture.yaml
 │   ├── security.yaml
 │   ├── performance.yaml
@@ -103,14 +103,14 @@ provenance:
   rationale: "Project bundle scaffolded by scs-team init"
 ```
 
-**Concern Bundles** (each concern follows this pattern):
+**Concept Bundles** (each concept follows this pattern):
 
 ```yaml
-id: bundle:<concern-slug>
-type: concern
+id: bundle:<concept-slug>
+type: concept
 version: "DRAFT"
-title: "<Project Name> - <Concern Title>"
-description: "<Brief description of what this concern covers>"
+title: "<Project Name> - <Concept Title>"
+description: "<Brief description of what this concept covers>"
 imports: []
 scds: []
 provenance:
@@ -119,7 +119,7 @@ provenance:
   rationale: "Scaffolded by scs-team init"
 ```
 
-Use these exact concern definitions:
+Use these exact concept definitions:
 
 | # | Slug | Title | Description | Expected SCDs |
 |---|------|-------|-------------|---------------|
@@ -144,7 +144,7 @@ Present a summary:
 
 **Project**: <name>
 **Language**: <detected language/framework>
-**Location**: .scs/ (11 concern bundles scaffolded)
+**Location**: .scs/ (11 concept bundles scaffolded)
 
 ### What I Found
 
@@ -187,7 +187,7 @@ Present a summary:
 - **Do NOT modify existing files** - only create new ones in `.scs/`
 - **Do NOT overwrite** if `.scs/` already exists - warn the user and show what's there
 - **Keep it fast** - scan, scaffold, report. Don't ask questions during init.
-- The `scds: []` arrays in concern bundles are intentionally empty - they get populated by `add`, `draft`, and `use`
+- The `scds: []` arrays in concept bundles are intentionally empty - they get populated by `add`, `draft`, and `use`
 
 ## If .scs/ Already Exists
 
@@ -195,7 +195,7 @@ Present a summary:
 ## SCS Already Initialized
 
 Found existing .scs/ directory with:
-- <N> concern bundles
+- <N> concept bundles
 - <N> SCDs
 - Project bundle: <version status>
 
@@ -215,7 +215,7 @@ You: "## SCS Initialized
 
 **Project**: patient-portal
 **Language**: Python (FastAPI)
-**Location**: .scs/ (11 concern bundles scaffolded)
+**Location**: .scs/ (11 concept bundles scaffolded)
 
 ### What I Found
 

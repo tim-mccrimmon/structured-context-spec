@@ -69,9 +69,9 @@ Solo developers building with AI are the highest-risk group in software:
 
 ### SCS-Informed Questioning
 
-The plugin asks about concerns that map to SCS categories:
+The plugin asks about concepts that map to SCS categories:
 
-| Question | SCS Concern |
+| Question | SCS Concept |
 |----------|-------------|
 | "What does this do, who uses it?" | System Context |
 | "What's your tech stack?" | Tech Stack |
@@ -270,12 +270,12 @@ Explains why structured context matters and how it helps.
 
 **SCS (Structured Context Specification)** is a formal specification for AI context documents:
 - YAML-based SCDs (Structured Context Documents)
-- Bundle hierarchy (Meta → Standards → Domain → Concern → Project)
+- Bundle hierarchy (Meta → Standards → Domain → Concept → Project)
 - Validation, versioning, registry publishing
 - Control plane for production AI agents
 
 **SCS Vibe** is the entry point for developers who don't need all that:
-- Plugin thinks in SCS (asks about the right concerns)
+- Plugin thinks in SCS (asks about the right concepts)
 - Outputs native Claude Code format (no YAML to learn)
 - No bundles, no registry, no control plane
 - Just CLAUDE.md and `.claude/rules/`

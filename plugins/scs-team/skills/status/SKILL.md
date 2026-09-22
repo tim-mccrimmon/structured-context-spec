@@ -1,6 +1,6 @@
 ---
 name: status
-description: Show what structured context exists and what's missing. Overview of bundles, SCDs, coverage across all 11 concerns, and compilation sync status.
+description: Show what structured context exists and what's missing. Overview of bundles, SCDs, coverage across all 11 concepts, and compilation sync status.
 allowed-tools: Read, Glob, Grep
 ---
 
@@ -19,7 +19,7 @@ You are showing the user what structured context exists for their project and hi
 ### Step 1: Scan for Existing Context
 
 Look for SCS artifacts:
-- `.scs/` directory (bundles, concerns, SCDs)
+- `.scs/` directory (bundles, concepts, SCDs)
 - `.claude/rules/` directory (compiled output)
 - `CLAUDE.md` (might have scs-team managed section)
 
@@ -33,14 +33,14 @@ For each bundle found:
 
 For each SCD found:
 - SCD ID and tier
-- What concern it addresses
+- What concept it addresses
 - Version status
 
-### Step 3: Assess Coverage Against All 11 Concerns
+### Step 3: Assess Coverage Against All 11 Concepts
 
-Map what exists to the full concern model:
+Map what exists to the full concept model:
 
-| # | Concern | Expected SCDs | Status |
+| # | Concept | Expected SCDs | Status |
 |---|---------|---------------|--------|
 | 1 | Architecture | system-context, tech-stack, integration-map, component-model | Covered / Partial / Missing |
 | 2 | Security | authn-authz, data-protection, data-handling, threat-model | Covered / Partial / Missing |
@@ -58,13 +58,13 @@ Map what exists to the full concern model:
 
 Compare `.scs/` source with `.claude/rules/` output:
 
-- For each concern with SCDs, does a corresponding `.claude/rules/<concern>.md` exist?
+- For each concept with SCDs, does a corresponding `.claude/rules/<concept>.md` exist?
 - Do `.claude/rules/` files have `<!-- scs-team:managed -->` headers?
 - Does `CLAUDE.md` have `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers?
 - Are there any `.claude/rules/` files that are NOT scs-team managed (project context vs developer context)?
 
 Report sync status:
-- **In sync**: Compiled output exists and matches source concerns
+- **In sync**: Compiled output exists and matches source concepts
 - **Out of sync**: Source SCDs exist but compiled output is missing or stale
 - **Not compiled**: No `.claude/rules/` output exists yet
 
@@ -82,7 +82,7 @@ Flag potential problems:
 Based on gaps, suggest:
 - Documents to add (`/scs-team:add`)
 - Standards to use (`/scs-team:use`)
-- Concerns to draft (`/scs-team:draft`)
+- Concepts to draft (`/scs-team:draft`)
 - Recompilation if out of sync
 
 ## Output Format
@@ -96,18 +96,18 @@ Based on gaps, suggest:
 | Bundle | Type | Version | SCDs |
 |--------|------|---------|------|
 | bundle:my-project | project | DRAFT | 3 |
-| bundle:architecture | concern | DRAFT | 2 |
+| bundle:architecture | concept | DRAFT | 2 |
 
 ### SCDs (8 total)
-| SCD | Concern | Version | Source |
+| SCD | Concept | Version | Source |
 |-----|---------|---------|--------|
 | scd:project:problem-definition | Business | DRAFT | PRD.md |
 | scd:project:system-context | Architecture | DRAFT | architecture.md |
 | scd:project:tech-stack | Architecture | DRAFT | architecture.md |
 | scd:standards:hipaa-phi-handling | Compliance | 1.0.0 | /scs-team:use |
 
-### Coverage (11 Concerns)
-| # | Concern | Status | SCDs | Notes |
+### Coverage (11 Concepts)
+| # | Concept | Status | SCDs | Notes |
 |---|---------|--------|------|-------|
 | 1 | Architecture | Partial | 2/4 | Has system-context, tech-stack. Missing integration-map, component-model |
 | 2 | Security | Missing | 0/4 | No security context found |
@@ -133,7 +133,7 @@ Based on gaps, suggest:
 ### Issues
 - Security context missing - critical for most projects
 - HIPAA SCDs need customization (PHI locations not specified)
-- 2 concerns have SCDs but compiled output is stale
+- 2 concepts have SCDs but compiled output is stale
 
 ### Suggested Next Steps
 1. `/scs-team:draft security` - Add security context

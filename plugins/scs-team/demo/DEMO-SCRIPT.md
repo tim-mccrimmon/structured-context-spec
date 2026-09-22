@@ -11,7 +11,7 @@
 
 > "Your team has PRDs, architecture docs, security requirements. Claude doesn't know any of it. So every session, it makes decisions that conflict with what's already been decided.
 >
-> SCS Team takes your existing documentation and transforms it into structured context that Claude actually uses. It organizes it into 11 concern areas — from architecture to compliance to business context — and compiles it into Claude Code rules automatically.
+> SCS Team takes your existing documentation and transforms it into structured context that Claude actually uses. It organizes it into 11 concept areas — from architecture to compliance to business context — and compiles it into Claude Code rules automatically.
 >
 > Here's a team project with real docs. Let's see what happens."
 
@@ -51,7 +51,7 @@ claude --plugin-dir /path/to/plugins/scs-team
 /scs-team:init
 ```
 
-> "Init scans the project and scaffolds the .scs directory with all 11 concern bundles. It detects Python, FastAPI, finds our three docs, and spots HIPAA keywords. Watch the recommendations it gives us."
+> "Init scans the project and scaffolds the .scs directory with all 11 concept bundles. It detects Python, FastAPI, finds our three docs, and spots HIPAA keywords. Watch the recommendations it gives us."
 
 **[Show the output — it should recommend adding the docs and using HIPAA]**
 
@@ -65,9 +65,9 @@ claude --plugin-dir /path/to/plugins/scs-team
 /scs-team:add docs/PRD.md
 ```
 
-> "We feed it the PRD. It analyzes the document, extracts structured information — problem definition, stakeholders, success criteria — and maps it to the right concern areas. Then it compiles to Claude Code rules automatically."
+> "We feed it the PRD. It analyzes the document, extracts structured information — problem definition, stakeholders, success criteria — and maps it to the right concept areas. Then it compiles to Claude Code rules automatically."
 
-**[Show the output summary — what SCDs were created, what concerns were updated]**
+**[Show the output summary — what SCDs were created, what concepts were updated]**
 
 ```
 /scs-team:add docs/architecture.md
@@ -99,7 +99,7 @@ claude --plugin-dir /path/to/plugins/scs-team
 /scs-team:status
 ```
 
-> "Status shows us the full picture across all 11 concerns. Architecture and business context are covered from our docs. Compliance is partially covered from HIPAA. But look — security, performance, testing, deployment — all missing. The plugin doesn't pretend those gaps don't exist. It surfaces them."
+> "Status shows us the full picture across all 11 concepts. Architecture and business context are covered from our docs. Compliance is partially covered from HIPAA. But look — security, performance, testing, deployment — all missing. The plugin doesn't pretend those gaps don't exist. It surfaces them."
 
 **[Show the coverage table — some Covered, some Partial, most Missing]**
 
@@ -123,7 +123,7 @@ ls .claude/rules/
 
 ## SEGMENT 3: OUTRO (Can be live or recorded separately, ~15 seconds)
 
-> "SCS Team is open source. It supports HIPAA, SOC2, PCI, GDPR, and CHAI out of the box, with 11 concern areas that cover everything from architecture to ethics. Link in the description.
+> "SCS Team is open source. It supports HIPAA, SOC2, PCI, GDPR, and CHAI out of the box, with 11 concept areas that cover everything from architecture to ethics. Link in the description.
 >
 > If you're a solo dev, start with SCS Vibe — same idea, 15-minute setup, no docs required.
 >
@@ -144,7 +144,7 @@ ls .claude/rules/
 ### Key talking points to hit:
 1. **The problem**: Team has docs, Claude doesn't know about them
 2. **The workflow**: init → add docs → use standards → status
-3. **The 11 concerns**: This is a taxonomy, not a checklist — use what's relevant
+3. **The 11 concepts**: This is a taxonomy, not a checklist — use what's relevant
 4. **Pre-built standards**: One command for HIPAA compliance context
 5. **Gap surfacing**: The plugin tells you what's MISSING, not just what exists
 6. **Dual-layer output**: Source in .scs/, compiled to .claude/rules/

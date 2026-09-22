@@ -54,21 +54,21 @@ Copy the standard SCD files to `.scs/scds/` in the project:
 - Write each standard SCD file to the project's `.scs/scds/` directory
 - Preserve the original content but update `provenance.created_at` to current timestamp
 
-### Step 4: Update Concern Bundle
+### Step 4: Update Concept Bundle
 
-Update the compliance concern bundle (`.scs/concerns/compliance.yaml`) to reference the new SCDs:
+Update the compliance concept bundle (`.scs/concepts/compliance.yaml`) to reference the new SCDs:
 - Add each standard SCD to the `scds:` array
-- If the compliance concern bundle doesn't exist, create it
+- If the compliance concept bundle doesn't exist, create it
 
 ### Step 5: Compile to Claude Code Format
 
 After adding standards SCDs, compile the `.scs/` source to `.claude/rules/` output:
 
-1. Read all SCDs in `.scs/scds/` and all concern bundles in `.scs/concerns/`
-2. For each concern that has SCDs:
+1. Read all SCDs in `.scs/scds/` and all concept bundles in `.scs/concepts/`
+2. For each concept that has SCDs:
    a. Compress the SCD content to actionable rules (constraints, boundaries, patterns - NOT documentation)
-   b. Target 300-500 tokens per concern file
-   c. Write to `.claude/rules/<concern-name>.md`
+   b. Target 300-500 tokens per concept file
+   c. Write to `.claude/rules/<concept-name>.md`
    d. Add header: `<!-- scs-team:managed -->` and footer with source SCD attribution
 3. Generate/update the scs-team section in CLAUDE.md:
    a. If CLAUDE.md exists, find `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers
@@ -95,7 +95,7 @@ User: `/scs-team:use hipaa`
 
 You: "Adding HIPAA compliance context from the standards library..."
 
-[Read standards/hipaa/*.yaml, copy to .scs/scds/, update concern bundle]
+[Read standards/hipaa/*.yaml, copy to .scs/scds/, update concept bundle]
 
 You: "**Added HIPAA Standards** (3 SCDs from standards library):
 
@@ -115,7 +115,7 @@ You: "**Added HIPAA Standards** (3 SCDs from standards library):
    - Incident response and breach notification
 
 **Updated:**
-- `concerns/compliance.yaml` - Added 3 HIPAA SCDs
+- `concepts/compliance.yaml` - Added 3 HIPAA SCDs
 - `.claude/rules/compliance.md` - Compiled compliance rules
 
 **You Need To Customize:**

@@ -8,7 +8,7 @@ check this first when picking up 0.5.0 work.
 **Target:** `v0.5.0`, tagged and pushed to origin, before 2026-12-01 (TaskWarrior task 61,
 gates GTC DC attendance).
 
-**Current phase:** 1 — Domain Ontology anchor (schema, validator, spec text, examples)
+**Current phase:** 1 — Domain Ontology anchor (only ISS-004, spec text rewrite, remains)
 
 ---
 
@@ -95,8 +95,16 @@ tested against real content.
         the formal `concept:` singular field (judgment call, not a pure mechanical rename)
   - [x] **Tested end-to-end**: real venv, real `scs new project` run, full output validated
         (0 errors), real `scs bundle version` run, resulting versioned bundle validated
-- [ ] **ISS-005c — scs-vibe, scs-team plugins** — not started
-  - [ ] Update skill prompts and templates referencing `concern`
+- [x] **ISS-005c — scs-vibe, scs-team plugins** — done 2026-09-22
+  - [x] `scs-team`: all 7 skills + docs renamed (124 replacements); `scs-vibe`: overview +
+        demo renamed (5 replacements); `care-plan-tracker` example correctly left alone
+        (generic-English hits only)
+  - [x] Found a third variant of the provenance-field-name bug (ISS-005b's bug, again): the
+        `version` skill told the model to write `versioned_by`/`versioned_at` instead of
+        `version_approved_by`/`version_approved_at` — fixed
+  - [x] Verified all 7 SKILL.md frontmatter blocks still parse
+
+**ISS-005 (examples + templates + plugins) is fully done.**
 
 ---
 
