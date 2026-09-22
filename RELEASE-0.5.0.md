@@ -8,7 +8,7 @@ check this first when picking up 0.5.0 work.
 **Target:** `v0.5.0`, tagged and pushed to origin, before 2026-12-01 (TaskWarrior task 61,
 gates GTC DC attendance).
 
-**Current phase:** 2 — "Any AI actor" reframe (Phase 1, the Domain Ontology anchor, is fully done)
+**Current phase:** 3 — Runtime decisions (Phase 2, the "Any AI actor" reframe, is fully done)
 
 ---
 
@@ -121,12 +121,22 @@ tested against real content.
 
 ---
 
-## Phase 2 — "Any AI actor" reframe (ISS-006)
+## Phase 2 — "Any AI actor" reframe (ISS-006) — DONE 2026-09-22
 
-- [ ] Rewrite model/spec docs: context scoped to agent + intent, not just "session"
-- [ ] Document policy-as-context (tool/MCP-server permitted operations as governed context)
-- [ ] Document context flowing through a workflow, version pinned at a checkpoint
-- [ ] Rewrite "SCS maps onto CLAUDE.md / .claude/rules/" framing to "one consumer among many"
+- [x] Rewrite model/spec docs: context scoped to agent + intent, not just "session" —
+      new `spec/0.5/any-ai-actor-model.md` §2, cross-referenced from `core-model.md`
+- [x] Document policy-as-context (tool/MCP-server permitted operations as governed
+      context) — `any-ai-actor-model.md` §3 + new Policy SCD pattern in `project-tier.md`
+      §5.7; capability-class tool naming, enforcement explicitly out of scope
+- [x] Document context flowing through a workflow, version pinned at a checkpoint —
+      `any-ai-actor-model.md` §4; new `schema/checkpoint/checkpoint-record-schema.json`
+      + validator/CLI support (`scs validate --checkpoint`)
+- [x] Rewrite "SCS maps onto CLAUDE.md / .claude/rules/" framing to "one consumer among
+      many" — `README.md`'s "SCS and Claude Code" section rewritten
+- [x] **Tested end-to-end** with the real `scs-validate` CLI: valid + invalid checkpoint
+      records, and the §5.7 Policy SCD example (validates as an ordinary project-tier SCD)
+
+See ISS-006 in `ISSUES.md` for the full design rationale and implementation detail.
 
 ## Phase 3 — Runtime decisions (ISS-007 – ISS-009)
 

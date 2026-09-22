@@ -146,3 +146,21 @@ def find_domain_manifest_schema(schema_dir: Path) -> Path:
     if not schema_file.exists():
         raise FileNotFoundError(f"Domain manifest schema file not found: {schema_file}")
     return schema_file
+
+
+def find_checkpoint_record_schema(schema_dir: Path) -> Path:
+    """Find the checkpoint record schema file.
+
+    Args:
+        schema_dir: Root schema directory
+
+    Returns:
+        Path to checkpoint record schema file
+
+    Raises:
+        FileNotFoundError: If schema file not found
+    """
+    schema_file = schema_dir / "checkpoint" / "checkpoint-record-schema.json"
+    if not schema_file.exists():
+        raise FileNotFoundError(f"Checkpoint record schema file not found: {schema_file}")
+    return schema_file

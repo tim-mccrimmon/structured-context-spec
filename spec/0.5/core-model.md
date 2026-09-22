@@ -12,6 +12,11 @@ It establishes the conceptual architecture upon which SCDs, tiers, bundles, sche
 
 This model is **normative** for SCS 0.5.0 and is intended to remain stable across future versions.
 
+This document describes the model as it applies to any single AI actor reasoning over a
+bundle. For how context is *selected* for a given actor, how tool permissions become
+governed context, and how a workflow records which context version applied at a given
+step, see `any-ai-actor-model.md` (RFC tracked as ISS-006).
+
 ---
 
 ## 2. Model Overview

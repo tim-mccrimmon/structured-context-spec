@@ -87,6 +87,22 @@ class Parser:
         return Parser.load_scd(file_path)
 
     @staticmethod
+    def load_checkpoint_record(file_path: Path) -> Dict[str, Any]:
+        """Load a checkpoint record file (YAML or JSON).
+
+        Args:
+            file_path: Path to the checkpoint record file
+
+        Returns:
+            Parsed checkpoint record as dictionary
+
+        Raises:
+            ValidationError: If file cannot be loaded or parsed
+        """
+        # Checkpoint record loading is the same as SCD loading (generic YAML/JSON)
+        return Parser.load_scd(file_path)
+
+    @staticmethod
     def _parse_yaml(content: str, file_path: Path) -> Dict[str, Any]:
         """Parse YAML content.
 

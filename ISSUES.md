@@ -184,12 +184,68 @@ the separate `docs/` website (see ISS-023).
 ## Reframe
 
 ### ISS-006 — "Any AI actor" model rewrite
-**Status:** open
+**Status:** done (2026-09-22)
 Reframe the spec so structured context is defined for any AI runtime (agent, MCP tool,
 workflow step), chat as one case. Concretely: context scoped to **agent + intent**;
 **policy-as-context** (a tool/MCP-server's permitted operations as governed context);
 context that **flows through a workflow** with a version pinned at a checkpoint. Rewrite
 the "SCS maps onto `CLAUDE.md` / `.claude/rules/`" framing to "one consumer among many".
+
+**Design converged via discussion, resolving the three open questions this ticket
+originally carried (see the retired `OPEN_QUESTIONS.md` items) around a single
+distinction:** context is a guardrail/decision (domain-invariant, worth versioning); state
+is a fact looked up because a specific prompt's wording demands it (prompt-contingent,
+never worth diffing); a prompt is the literal ask - a third, distinct thing. This directly
+resolved all three sub-questions:
+- **Scope key**: not session-scoped (sessions are paepae's/the runtime's concern, not
+  SCS's) - context is selected by **`(agent, intent)`**, the same pair a checkpoint record
+  later reuses to record which version governed a given point.
+- **Policy-as-context**: a tool/MCP server's permitted operations are a governed decision
+  (who may use what capability, under what constraint), the same as any other guardrail -
+  modeled as a **Policy SCD** (project-tier content pattern, not a new schema type,
+  following the existing convention for Architecture/Security/Governance SCDs). Tools are
+  named by **capability class** (`fetch-data`, `execute-code`, `query-db`, `write-data`,
+  `send-communication`, domain-extensible), not by protocol/MCP-endpoint - the binding to
+  an actual implementation is a runtime concern, not part of the decision the SCD records.
+  Enforcement is explicitly out of scope: SCS declares the policy; a runtime-specific
+  compilation step (an MCP gateway, a LangGraph guard, whatever) enforces it.
+- **Checkpoint-pinning**: SCS does not model workflows (that's paepae's domain) - it
+  defines only the **checkpoint record** shape, a small non-SCD, runtime-generated audit
+  artifact recording which `bundle` version was in effect for a given `(agent, intent)` at
+  a given `timestamp`, with an opaque `workflow_ref` so it can be traced back to whatever
+  the runtime calls "the workflow" without SCS needing a model of what that is.
+
+**Implemented:**
+- [x] `spec/0.5/any-ai-actor-model.md` (new) - the normative doc: §2 context scoped to
+  agent+intent (incl. the context-vs-state table from the design discussion), §3
+  policy-as-context (incl. the capability-class tool taxonomy and the enforcement
+  boundary), §4 the checkpoint record (incl. field table), §5 "consumers, not targets".
+- [x] `spec/0.5/project-tier.md` §5.7 - new Policy SCD content pattern, with a worked YAML
+  example (`applies_to_roles`, `permitted_operations[].capability`/`resource`/
+  `requires_approval`).
+- [x] `spec/0.5/core-model.md` - cross-reference to `any-ai-actor-model.md` added after the
+  Purpose section.
+- [x] `README.md` - "SCS and Claude Code" section rewritten: kept the CLAUDE.md/
+  `.claude/rules/`/`.claude/agents` mapping table, but reframed the surrounding text from
+  "SCS maps directly onto Claude Code's native context hierarchy" to Claude Code as "one
+  consumer of SCS content, not the target it's designed around", closing with a pointer to
+  `any-ai-actor-model.md` and other valid composition targets (an MCP permission gate, a
+  LangGraph node, a checkpoint record).
+- [x] `schema/checkpoint/checkpoint-record-schema.json` (new) - the only piece of this
+  design needing a schema, since it's a genuinely new artifact type (not an SCD, not a
+  bundle). Policy SCDs needed no new schema - they use the existing permissive project-tier
+  `content:` object, same as other documented-not-enforced content patterns.
+- [x] Validator/CLI support mirroring the existing `--domain` pattern:
+  `schema_validator.py`'s `validate_checkpoint_record()`/`_load_checkpoint_record_schema()`,
+  `utils.py`'s `find_checkpoint_record_schema()`, `parser.py`'s `load_checkpoint_record()`,
+  and `commands/validate.py`'s `--checkpoint`/`-c` option and `validate_checkpoint()`
+  dispatch (schema-only - a checkpoint record has no relationships/completeness/ontology
+  dimension to check).
+- [x] **Tested end-to-end** with the real `scs-validate` CLI: a valid checkpoint record
+  passes cleanly; an invalid one (bad bundle-id pattern, missing `intent`/`timestamp`)
+  fails with three clear, correctly-targeted errors; the §5.7 Policy SCD example validates
+  as a normal project-tier SCD (0 errors, 1 expected warning for the optional
+  `provenance.rationale` field).
 
 ### ISS-007 — Runtime decisions: immutability scope
 **Status:** open

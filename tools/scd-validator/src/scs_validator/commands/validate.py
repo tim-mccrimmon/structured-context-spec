@@ -34,6 +34,12 @@ from ..utils import ValidationError, ValidationResult
     help="Validate a domain manifest file (schema + Domain Ontology rules, RFC-0001)",
 )
 @click.option(
+    "--checkpoint",
+    "-c",
+    type=click.Path(exists=True),
+    help="Validate a checkpoint record file (any-ai-actor-model.md, RFC-0001/ISS-006)",
+)
+@click.option(
     "--schema-dir",
     "-s",
     type=click.Path(exists=True),
@@ -76,6 +82,7 @@ def validate(
     files: tuple,
     bundle: str | None,
     domain: str | None,
+    checkpoint: str | None,
     schema_dir: str | None,
     output: str,
     strict: bool,
@@ -103,6 +110,10 @@ def validate(
         \b
         # Validate a domain manifest (Domain Ontology, RFC-0001)
         scs validate --domain domain-manifest.yaml
+
+        \b
+        # Validate a checkpoint record (any-ai-actor-model.md, RFC-0001/ISS-006)
+        scs validate --checkpoint checkpoint.yaml
 
         \b
         # Strict mode (fail on warnings)
@@ -164,6 +175,9 @@ def validate(
         elif domain:
             # Validate domain manifest (Domain Ontology, RFC-0001)
             results = validate_domain(domain, parser, schema_validator, ontology_validator, verbose)
+        elif checkpoint:
+            # Validate checkpoint record (any-ai-actor-model.md, RFC-0001/ISS-006)
+            results = validate_checkpoint(checkpoint, parser, schema_validator, verbose)
         elif files:
             # Validate individual files
             results = validate_files(
@@ -234,6 +248,32 @@ def validate_domain(
         syntax_result.add_error(e)
 
     return [syntax_result, schema_result, ontology_result]
+
+
+def validate_checkpoint(
+    checkpoint_path: str,
+    parser: Parser,
+    schema_validator: SchemaValidator,
+    verbose: bool,
+) -> List[ValidationResult]:
+    """Validate a checkpoint record: schema only (any-ai-actor-model.md, RFC-0001/ISS-006).
+
+    A checkpoint record is not an SCD - it's a small, runtime-generated audit
+    shape with no relationships/completeness/ontology dimension to check.
+    """
+    syntax_result = ValidationResult("syntax")
+    schema_result = ValidationResult("checkpoint_record_schema")
+
+    if verbose:
+        click.echo(f"Validating checkpoint record {checkpoint_path}...")
+
+    try:
+        record = parser.load_checkpoint_record(Path(checkpoint_path))
+        schema_result = schema_validator.validate_checkpoint_record(record, checkpoint_path)
+    except ValidationError as e:
+        syntax_result.add_error(e)
+
+    return [syntax_result, schema_result]
 
 
 def validate_files(

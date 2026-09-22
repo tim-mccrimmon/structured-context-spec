@@ -194,6 +194,74 @@ class SchemaValidator:
         except Exception as e:
             raise ValidationError(f"Failed to load domain manifest schema: {e}")
 
+    def validate_checkpoint_record(
+        self, record: Dict[str, Any], file_path: str | None = None
+    ) -> ValidationResult:
+        """Validate a checkpoint record against the checkpoint record schema.
+
+        Args:
+            record: Checkpoint record data as dictionary
+            file_path: Optional file path for error messages
+
+        Returns:
+            ValidationResult with errors if validation fails
+        """
+        result = ValidationResult("checkpoint_record_schema")
+
+        try:
+            schema = self._load_checkpoint_record_schema()
+        except ValidationError as e:
+            result.add_error(e)
+            return result
+
+        try:
+            validator = Draft202012Validator(schema)
+            errors = list(validator.iter_errors(record))
+
+            if errors:
+                for error in errors:
+                    error_msg = self._format_schema_error(error)
+                    result.add_error(ValidationError(error_msg, file_path=file_path))
+        except Exception as e:
+            result.add_error(
+                ValidationError(
+                    f"Checkpoint record schema validation failed: {e}", file_path=file_path
+                )
+            )
+
+        if result.passed:
+            checkpoint = record.get("checkpoint", {})
+            result.details["bundle"] = checkpoint.get("bundle", "unknown")
+            result.details["agent"] = checkpoint.get("agent", "unknown")
+            result.details["intent"] = checkpoint.get("intent", "unknown")
+
+        return result
+
+    def _load_checkpoint_record_schema(self) -> Dict[str, Any]:
+        """Load checkpoint record schema (with caching).
+
+        Returns:
+            Checkpoint record schema as dictionary
+
+        Raises:
+            ValidationError: If schema cannot be loaded
+        """
+        cache_key = "__checkpoint_record__"
+        if cache_key in self._schema_cache:
+            return self._schema_cache[cache_key]
+
+        try:
+            from .utils import find_checkpoint_record_schema
+
+            schema_file = find_checkpoint_record_schema(self.schema_dir)
+            schema = Parser.load_schema(schema_file)
+            self._schema_cache[cache_key] = schema
+            return schema
+        except FileNotFoundError as e:
+            raise ValidationError(str(e))
+        except Exception as e:
+            raise ValidationError(f"Failed to load checkpoint record schema: {e}")
+
     def _load_schema(self, tier: str) -> Dict[str, Any]:
         """Load schema for a specific tier (with caching).
 

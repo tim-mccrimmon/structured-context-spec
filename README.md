@@ -60,7 +60,12 @@ A specification and tooling for representing AI context as structured, versioned
 
 ## SCS and Claude Code
 
-SCS maps directly onto Claude Code's native context hierarchy:
+Claude Code is one consumer of SCS content, not the target it's designed around. SCS itself
+is defined for any AI runtime — a chat assistant, an autonomous agent, an MCP tool
+invocation, a step in a multi-agent workflow. What makes something "a consumer" is that it
+has its own composition step turning governed SCS content into whatever shape it needs.
+
+For Claude Code, that composition looks like this:
 
 | Claude Code | SCS |
 |-------------|-----|
@@ -68,7 +73,11 @@ SCS maps directly onto Claude Code's native context hierarchy:
 | `.claude/rules/` | Individual SCDs |
 | `.claude/agents/` | Per-agent context composition |
 
-The scs-vibe plugin outputs to this structure by design. If you're writing `CLAUDE.md` files by hand, you're already doing structured context. SCS is how you do it with validation and versioning.
+The scs-vibe plugin performs that composition for you. If you're writing `CLAUDE.md` files
+by hand, you're already doing structured context — SCS is how you do it with validation and
+versioning, in a form that isn't locked to Claude Code specifically. The same governed
+content composes just as validly into an MCP server's tool-permission gate, a LangGraph
+node's system prompt, or a checkpoint record in an audit trail — see `spec/0.5/any-ai-actor-model.md`.
 
 ---
 

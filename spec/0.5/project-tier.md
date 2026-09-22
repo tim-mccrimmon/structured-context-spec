@@ -189,6 +189,32 @@ content:
         date: "2025-11-10"
 ```
 
+### 5.7 Policy SCD
+
+Defines which roles may use which tool capabilities, and under what constraints —
+**policy-as-context** (`any-ai-actor-model.md` §3, RFC tracked as ISS-006). A tool or
+MCP server's permitted operations are a governed decision, the same as any other
+guardrail, not a runtime implementation detail.
+
+```yaml
+concept: concept:risk-management   # the purpose this policy exists for
+content:
+  applies_to_roles:
+    - role:quality-engineer
+  permitted_operations:
+    - capability: fetch-data       # capability class, not a specific tool/endpoint
+      resource: risk-register
+    - capability: write-data
+      resource: risk-register
+      requires_approval: true
+```
+
+`capability` names a functional class (`fetch-data`, `execute-code`, `query-db`,
+`write-data`, `send-communication` by default, domain-extensible) rather than a specific
+tool or MCP endpoint — the binding to an actual implementation is a runtime concern, not
+part of the decision this SCD records. A Policy SCD is declarative; enforcement happens
+elsewhere, via a runtime-specific compilation step (`any-ai-actor-model.md` §3.4).
+
 ---
 
 ## 6. Relationships With Other SCD Tiers
