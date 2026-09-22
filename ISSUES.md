@@ -62,9 +62,38 @@ Note: `tools/scd-validator/tests/` has no actual test functions today (only fixt
 manual CLI runs, not an automated regression suite.
 
 ### ISS-004 — Domain Ontology: spec text
-**Status:** open
-`spec/0.5/`: rewrite `core-model.md`, `terminology.md`, `bundle-format.md` for the rename
-and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain-ontology.md`.
+**Status:** done (2026-09-22)
+Scope ended up larger than written here: all 8 files in `spec/0.3/` (not just the 3 named)
+reference `concern`, and `spec/0.5/` didn't exist yet, so this was a full-directory
+migration, not an edit of 3 files. Tim decided: do `spec/0.3/` → `spec/0.5/` fully, defer
+the separate `docs/` website (see ISS-023).
+
+- `core-model.md`, `meta-tier.md`, `project-tier.md`, `standards-tier.md`,
+  `governance-and-compliance.md`: light touch — version labels fixed (also resolves
+  ISS-018's stale "0.1"/"0.3" internal labels across the whole directory, not just
+  `core-model.md`), a few terminology fixes, `concept:` field added to `project-tier.md`
+  §4.2, cross-reference to `domain-ontology.md` added to `core-model.md` §6.
+- `terminology.md`: heavy rewrite — §2.12 Concern → Concept (full RFC-0001 definition, not
+  just a rename: domain-scoped not cross-domain reusable), new §2.13 Domain Ontology, new
+  §2.14 Ontology Model, new §2.16 DRAFT/Approved Versions, §2.15 Bundle Types table updated.
+- `bundle-format.md`: heavy rewrite — §3.4 Concept Bundle examples rebuilt with correct
+  schema fields (DRAFT + versioned-with-approval cases), §3.6 guidance corrected (used to
+  say "concerns should be composable across domains" — now correctly says concepts are
+  domain-scoped), §9/§10 got the DRAFT-approval-exemption documented, §16 Key Takeaways
+  updated.
+- New `domain-ontology.md`: the normative spec translation of RFC-0001 — Domain Ontology
+  structure, Ontology Models, concept bundles, bundle validity properties, provenance/
+  approval (including the DRAFT exemption), all 8 validation rules restated normatively,
+  migration guide, open questions, future extensions.
+- **Tested, not just written**: extracted every YAML code block from all 9 files (42 total)
+  and confirmed they parse; ran the schema-relevant examples through the real
+  `scs-validate` CLI. Found and fixed 3 real bugs this way: `domain-ontology.md`'s example
+  had `parent: null` (schema types `parent` as string, not nullable — omit the field
+  instead) and a relationship targeting an undefined concept; `bundle-format.md`'s
+  pre-existing §3.3 Standards Bundle example violated the XOR constraint (imports + scds
+  both set) - same class of bug as ISS-022, but in the spec document itself, so fixed here
+  rather than just tracked; and two of my own new §3.4 examples were missing the required
+  `description` field.
 
 ### ISS-005 — Domain Ontology: examples + templates + plugins
 **Status:** done (2026-09-22)
@@ -242,9 +271,10 @@ keep migration guide-only.
 ## Housekeeping (not 0.5.0-blocking)
 
 ### ISS-018 — Spec file version labels
-**Status:** open
-`spec/0.3/core-model.md` and others are under `spec/0.3/` but internally labelled "0.1".
-Fix version headers when creating `spec/0.5/`.
+**Status:** done (2026-09-22, resolved as a side effect of ISS-004)
+All `spec/0.5/` files now consistently say 0.5.0 — headers and every internal "SCS 0.1" /
+"SCS 0.3" / "in 0.1" / "for 0.3" mention (not just `core-model.md`; all 8 files had at
+least one).
 
 ### ISS-019 — `.claude/` and scaffold files in the repo
 **Status:** open
@@ -280,3 +310,15 @@ changes (only `provenance` was touched here for ISS-005): the `imports` entry
 `bundle:standards:soc2-type2:2023.1` doesn't match the bundle reference pattern (extra
 segment, non-semver version `2023.1`), and the bundle has both `imports` and `scds` set,
 violating the standards-bundle XOR rule. `scs validate --bundle` fails on this file.
+
+### ISS-023 — `docs/` documentation website: migrate to concept terminology
+**Status:** open (deferred, scoped out of ISS-004 by Tim 2026-09-22)
+A separate tree from `spec/` - the mkdocs-built site (`mkdocs.yml`, `docs_dir: docs`).
+45 files, ~9,300 lines, 15 referencing `concern`. Has its own **"Concern Docs" nav section**
+(11 subdirectories, `docs/concern-docs/<concept>/README.md`, one per concept) plus
+`quick-start-guide.md`, `scd-guide.md`, `validation-guide.md`, `FAQ.md`,
+`MIGRATION-0.3.md`, `bundle-lifecycle.md`, `scs-overview.md`, `glossary.yaml`. Overlaps
+conceptually with `spec/` but is a distinct, separately-maintained tree - not touched by
+the ISS-004 `spec/0.3/` → `spec/0.5/` migration. Rename `docs/concern-docs/` →
+`docs/concept-docs/` (matches the `templates/docs/` rename pattern from ISS-005b) plus a
+full terminology sweep, whenever this gets picked up.

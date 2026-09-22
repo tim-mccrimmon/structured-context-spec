@@ -8,7 +8,7 @@ check this first when picking up 0.5.0 work.
 **Target:** `v0.5.0`, tagged and pushed to origin, before 2026-12-01 (TaskWarrior task 61,
 gates GTC DC attendance).
 
-**Current phase:** 1 — Domain Ontology anchor (only ISS-004, spec text rewrite, remains)
+**Current phase:** 2 — "Any AI actor" reframe (Phase 1, the Domain Ontology anchor, is fully done)
 
 ---
 
@@ -32,7 +32,7 @@ attestation deferred to ISS-011).
 
 ---
 
-## Phase 1 — Domain Ontology anchor (ISS-002 – ISS-005)
+## Phase 1 — Domain Ontology anchor (ISS-002 – ISS-005) — DONE 2026-09-22
 
 The core rename + schema work. Nothing downstream unblocks until this phase is done and
 tested against real content.
@@ -63,10 +63,23 @@ tested against real content.
         existing `tests/fixtures/` and `examples/` content
   - Note: `tools/scd-validator/tests/` has no actual test functions yet (0 collected by
     pytest) — that's ISS-013's job, not this one
-- [ ] **ISS-004 — Spec text**
-  - [ ] `spec/0.5/core-model.md`, `terminology.md`, `bundle-format.md` rewritten for the
-        rename + `Project → Domain → Concept → SCD` hierarchy
-  - [ ] New `spec/0.5/domain-ontology.md`
+- [x] **ISS-004 — Spec text** — done 2026-09-22
+  - [x] All 8 `spec/0.3/` files migrated to `spec/0.5/` (not just the 3 originally named —
+        all 8 referenced `concern`; scope was bigger than the ticket said)
+  - [x] `terminology.md` and `bundle-format.md`: heavy rewrite (Concept, Domain Ontology,
+        Ontology Model, DRAFT/Approved terminology; concept bundle examples rebuilt;
+        cross-domain-reusability guidance corrected)
+  - [x] New `spec/0.5/domain-ontology.md` — normative RFC-0001 translation
+  - [x] Bonus: resolved ISS-018 (stale "0.1"/"0.3" version labels) across the whole
+        directory as a side effect
+  - [x] **Tested**: all 42 embedded YAML blocks parse; schema-relevant examples run through
+        the real validator. Found and fixed 3 real bugs: an invalid `parent: null` +
+        dangling relationship target in the new file's own example, a pre-existing
+        XOR-violating example in `bundle-format.md` §3.3 (fixed in the spec itself, not
+        just noted), and two of my own new examples missing `description`
+  - Deferred by Tim: the separate `docs/` website (ISS-023, not part of this ticket)
+
+**ISS-004 completes Phase 1 — the Domain Ontology anchor is now fully done.**
 - [x] **ISS-005a — Examples** — done 2026-09-21
   - [x] `examples/medical-device-cdmo`: `concerns/` → `concepts/`; domain manifest got real
         depth (12 concepts, relationships, `satisfies` mapped to ISO 13485 / IEC 62304 /
