@@ -6,7 +6,7 @@ title: "Retention Policy"
 description: "Data retention periods, archival strategy, and deletion rules"
 
 domain: data-provenance
-concerns:
+topics:
   - data-retention
   - data-lifecycle
   - compliance

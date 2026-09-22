@@ -6,7 +6,7 @@ title: "CHAI Adherence"
 description: "Coalition for Health AI (CHAI) criteria applicability and validation"
 
 domain: compliance-governance
-concerns:
+topics:
   - healthcare-ai
   - responsible-ai
   - assurance

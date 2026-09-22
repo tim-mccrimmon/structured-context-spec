@@ -6,7 +6,7 @@ title: "Infrastructure Definition"
 description: "Environment definitions, infrastructure patterns, and IaC approach"
 
 domain: deployment-operations
-concerns:
+topics:
   - infrastructure
   - environments
   - infrastructure-as-code

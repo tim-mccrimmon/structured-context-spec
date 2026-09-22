@@ -1,24 +1,24 @@
-# Concern Bundle Template: Company Context
-# Type: concern
+# Concept Bundle Template: Company Context
+# Type: concept
 # Owner: CEO
-# Purpose: Company-specific context that doesn't fit in other concerns
+# Purpose: Company-specific context that doesn't fit in other concepts
 #
-# This concern bundle contains company overview, values, stakeholders, and
+# This concept bundle contains company overview, values, stakeholders, and
 # business model information. It's imported by the company's Domain Bundle.
 #
-# BUNDLE TYPE RULES FOR CONCERNS:
+# BUNDLE TYPE RULES FOR CONCEPTS:
 # - MUST have at least one SCD in the 'scds' array
-# - MUST have empty 'imports' array (concerns are leaf nodes, don't import)
+# - MUST have empty 'imports' array (concepts are leaf nodes, don't import)
 # - All SCDs should be project-tier (scd:project:*)
 
 id: bundle:[company-name]-company-context
-type: concern
+type: concept
 version: "DRAFT"
 title: "[Company Name] - Company Context"
 description: >
   Company-specific context for [Company Name] including mission, vision,
-  values, stakeholders, and business model. This concern provides business
-  and organizational context that doesn't fit in technical concerns
+  values, stakeholders, and business model. This concept provides business
+  and organizational context that doesn't fit in technical concepts
   (Architecture, Security, etc.).
 
 # SCDs contained in this bundle
@@ -31,15 +31,15 @@ scds:
   # - scd:project:stakeholders
   # - scd:project:business-model
 
-# Imports: MUST be empty for concern bundles
-# Concerns are leaf nodes in the bundle hierarchy
+# Imports: MUST be empty for concept bundles
+# Concepts are leaf nodes in the bundle hierarchy
 imports: []
 
 provenance:
   created_by: "[CEO name/email]"
   created_at: "[ISO 8601 timestamp: YYYY-MM-DDTHH:MM:SSZ]"
   rationale: >
-    Company-context concern bundle for [Company Name]. This bundle is
+    Company-context concept bundle for [Company Name]. This bundle is
     imported by the [Company Name] domain bundle to provide company-specific
     context to all projects within the organization.
 

@@ -6,7 +6,7 @@ title: "SOC 2 Controls"
 description: "SOC 2 trust service criteria implementation and evidence collection"
 
 domain: compliance-governance
-concerns:
+topics:
   - compliance
   - audit-readiness
   - governance

@@ -6,7 +6,7 @@ title: "Model Bias Assessment"
 description: "Bias and fairness assessment, evaluation metrics, and mitigation strategies"
 
 domain: ethics-ai-accountability
-concerns:
+topics:
   - bias-mitigation
   - fairness
   - model-evaluation

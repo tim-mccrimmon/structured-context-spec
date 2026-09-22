@@ -6,7 +6,7 @@ title: "Component Model"
 description: "Logical and physical components, responsibilities, and communication patterns"
 
 domain: architecture
-concerns:
+topics:
   - component-structure
   - separation-of-concerns
 

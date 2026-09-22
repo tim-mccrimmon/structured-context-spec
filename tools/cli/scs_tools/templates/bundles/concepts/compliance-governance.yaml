@@ -1,7 +1,7 @@
 id: bundle:compliance-governance
-type: concern
-version: "1.0.0"
-title: "Compliance & Governance Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Compliance & Governance Concept Bundle"
 description: "Regulatory requirements and governance processes for {{ project_name }}"
 
 imports: []
@@ -21,4 +21,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Compliance & Governance concern bundle for {{ project_name }}"
+  rationale: "Compliance & Governance concept bundle for {{ project_name }}"

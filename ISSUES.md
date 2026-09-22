@@ -28,6 +28,10 @@ single-source MVP) deferred-open, not blocking.
   (no imports, ≥ 1 SCD).
 - Bundle schema: `provenance` gained required `version_approved_by` / `version_approved_at`
   (RFC-0001, Provenance and approval).
+- **Refined 2026-09-22 (during ISS-005b):** those two fields are only required when
+  `version` is a real semver, not `DRAFT` — via a new `allOf`/`if`/`then` block, same
+  pattern the type-specific rules already use. Unconditionally requiring them broke every
+  freshly-scaffolded (working, unapproved) bundle the CLI produces.
 - Also renamed: `schema/scd/meta-scd-template.json`'s `content.concerns[]` vocabulary block
   → `content.concepts[]` (`concern:` id pattern → `concept:`) — same residue, not called out
   in the original RFC checklist but caught during implementation.
@@ -63,7 +67,7 @@ manual CLI runs, not an automated regression suite.
 and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain-ontology.md`.
 
 ### ISS-005 — Domain Ontology: examples + templates + plugins
-**Status:** in-progress (examples done 2026-09-21; scs-tools + plugins remain)
+**Status:** in-progress (examples + scs-tools done; scs-vibe/scs-team plugins remain)
 - [x] Migrate example domains: `examples/medical-device-cdmo` and `examples/med-adherence`
   `concerns/` → `concepts/` (23 bundle files), `type: concern` → `type: concept`,
   `version_approved_by`/`version_approved_at` added to every bundle's provenance.
@@ -86,10 +90,45 @@ and the `Project → Domain → Concept → SCD` hierarchy. New `spec/0.5/domain
   (bundle-tree SCD loading never actually recurses into concept bundles, so full
   project-bundle validation doesn't exercise SCD-level checks), ISS-022 (a pre-existing XOR
   violation + malformed import in `examples/med-adherence/standards-bundle.yaml`).
-- [ ] `scs-tools`: `templates/bundles/concerns/` → `.../concepts/`; `scs new concept`;
-  domain-manifest scaffold emits `ontology`. (Not started - real Python logic in
-  `commands/new.py`/`utils/project_types.py`, not just template renames.)
-- [ ] `scs-vibe`, `scs-team`: update skill prompts and templates. (Not started.)
+
+**scs-tools done 2026-09-22:**
+- [x] `templates/bundles/concerns/` → `.../concepts/`; all 12 concept bundle templates
+  renamed (`type`, `title`, `rationale`); `meta-bundle.yaml`'s `scd:meta:concerns` →
+  `scd:meta:concepts`; `domains/software-development.yaml` renamed too.
+- [x] Real Python logic renamed, not just templates: `utils/project_types.py`
+  (`SOFTWARE_DEVELOPMENT_CONCERNS` → `_CONCEPTS`, `get_concerns_for_project_type` →
+  `get_concepts_for_project_type`, `minimal_concerns` → `minimal_concepts`, `"concerns"` key
+  in `AVAILABLE_DOMAINS` → `"concepts"`); `utils/files.py`; `commands/new.py` (functions,
+  variables, CLI messages); `commands/bundle.py` (display logic, `SOFTWARE_DEVELOPMENT_CONCEPTS`
+  import, a stale "10 domain bundles" count fixed to 11).
+- [x] **Found and fixed a real bug**, not just a rename: `bundle.py`'s `scs bundle version`
+  command wrote `approved_by`/`approved_at` to provenance - different field names than the
+  schema's required `version_approved_by`/`version_approved_at` (ISS-002). Fixed to match;
+  every bundle this command versions was previously going to fail validation.
+- [x] **Found and fixed a design gap**: the schema unconditionally required
+  `version_approved_by`/`version_approved_at` on every bundle, including fresh `DRAFT`
+  working bundles that haven't been approved yet by design - which meant every
+  freshly-scaffolded `scs new project` failed validation immediately. Fixed in the schema
+  (see ISS-002's refinement note above) and switched the CLI's scaffold templates from a
+  hardcoded `version: "1.0.0"` to `version: "DRAFT"`, with unversioned `imports:` to match
+  (a DRAFT bundle can't meaningfully import a pinned version of another DRAFT bundle).
+- [x] A third, distinct `concerns:` field found in the 41 SCD content templates
+  (`templates/scds/*.yaml`) - a free-text per-SCD topic-tag list, unrelated to the Domain
+  Ontology. Renamed to `topics:` rather than `concepts:` to avoid colliding with the new
+  formal `concept:` singular field on SCDs (ISS-002) - a judgment call, flagged here rather
+  than silently decided.
+- [x] Docs swept (`README.md`, `GETTING_STARTED.md`, `project-README.md`, the
+  `acme-health` example's README). `CLI-AUDIT-2026-01-01.md` deliberately left alone - a
+  dated historical audit report, same treatment as `examples/llm-portability/`.
+- [x] **Tested end-to-end**: set up a venv, ran `scs new project` for real, validated the
+  full output (`scs validate --bundle bundles/project-bundle.yaml` → 0 errors) including
+  every individual bundle; ran `scs bundle version` for real and confirmed the resulting
+  versioned bundle has correct field names and validates.
+- Found, not fixed (pre-existing, unrelated): `bundle.py`'s `_validate_bundle()` shells out
+  to a bare `scs` on `$PATH`, which silently fails outside an activated venv (`--no-validate`
+  works around it). Minor, not tracked as a numbered issue.
+
+**Still not started:** `scs-vibe`, `scs-team` plugin prompts/templates (ISS-005c).
 
 ---
 

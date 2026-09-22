@@ -6,7 +6,7 @@ title: "Observability"
 description: "Logging strategy, metrics collection, distributed tracing, and alerting"
 
 domain: deployment-operations
-concerns:
+topics:
   - logging
   - metrics
   - tracing

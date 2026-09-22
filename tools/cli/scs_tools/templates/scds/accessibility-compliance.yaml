@@ -6,7 +6,7 @@ title: "Accessibility Compliance"
 description: "Accessibility standards, assistive technology support, and testing requirements"
 
 domain: usability-accessibility
-concerns:
+topics:
   - accessibility
   - compliance
   - assistive-technology

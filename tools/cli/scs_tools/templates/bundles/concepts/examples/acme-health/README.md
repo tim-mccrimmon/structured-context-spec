@@ -1,12 +1,12 @@
 # Acme Health Corp - Company-Context Example
 
-This directory contains a **complete working example** of a company-context concern bundle for Acme Health Corp (a fictional healthcare technology company).
+This directory contains a **complete working example** of a company-context concept bundle for Acme Health Corp (a fictional healthcare technology company).
 
 ## Purpose
 
 This example demonstrates:
 1. How to structure a company-overview SCD
-2. How to create a company-context concern bundle
+2. How to create a company-context concept bundle
 3. The "Open CEO" approach (full disclosure)
 
 ## Files
@@ -16,7 +16,7 @@ acme-health/
 ├── scds/
 │   └── company-overview.yaml       # Company context SCD
 ├── bundles/
-│   └── company-context.yaml        # Concern bundle (DRAFT)
+│   └── company-context.yaml        # Concept bundle (DRAFT)
 └── README.md                        # This file
 ```
 
@@ -36,7 +36,7 @@ acme-health/
 
 ```bash
 # Copy the entire example
-cp -r cli/scs_tools/templates/bundles/concerns/examples/acme-health \
+cp -r cli/scs_tools/templates/bundles/concepts/examples/acme-health \
       my-company
 
 # Rename and customize
@@ -50,11 +50,11 @@ cd my-company
 ```bash
 # Validate the SCD
 python -m scs_validator \
-  cli/scs_tools/templates/bundles/concerns/examples/acme-health/scds/company-overview.yaml
+  cli/scs_tools/templates/bundles/concepts/examples/acme-health/scds/company-overview.yaml
 
 # Validate the bundle
 scs validate \
-  cli/scs_tools/templates/bundles/concerns/examples/acme-health/bundles/company-context.yaml
+  cli/scs_tools/templates/bundles/concepts/examples/acme-health/bundles/company-context.yaml
 ```
 
 ## Customization Guide
@@ -111,12 +111,12 @@ You can remove or add fields based on your disclosure preferences:
 1. **Test with your data**: Replace Acme Health info with your company
 2. **Validate**: Run validation to ensure structure is correct
 3. **Version**: When ready, version at 1.0.0
-4. **Create Domain Bundle**: Import this concern in your domain bundle
+4. **Create Domain Bundle**: Import this concept in your domain bundle
 
 ## Related Test Case
 
 See the full test case walkthrough:
-`/test-plan/concerns/company-concern/TC-001-company-context-acme.md`
+`/test-plan/concepts/company-concept/TC-001-company-context-acme.md`
 
 ## Questions?
 

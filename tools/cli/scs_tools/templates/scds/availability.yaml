@@ -6,7 +6,7 @@ title: "Availability Requirements"
 description: "Uptime targets, redundancy strategy, and disaster recovery"
 
 domain: performance-reliability
-concerns:
+topics:
   - availability
   - redundancy
   - disaster-recovery

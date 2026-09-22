@@ -1,17 +1,18 @@
 id: bundle:{{ project_name }}
 type: project
-version: "1.0.0"
+version: "DRAFT"
 title: "{{ project_name }} Complete Context Bundle"
 description: "Complete structured context for {{ project_name }}"
 
 imports:
-  # Foundation bundles
-  - bundle:meta:1.0.0
-  - bundle:standards:1.0.0
+  # Foundation bundles (unversioned - the imported bundles are DRAFT too,
+  # pin a real version once you've run `scs bundle version` on each)
+  - bundle:meta
+  - bundle:standards
 
   # Domain bundles
   {% for bundle in bundles -%}
-  - bundle:{{ bundle }}:1.0.0
+  - bundle:{{ bundle }}
   {% endfor %}
 
 scds: []  # All SCDs are in imported bundles

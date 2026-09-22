@@ -71,9 +71,9 @@ title: "Example SCD"
 description: "Description of what this SCD covers"
 
 domain: example-domain
-concerns:
-  - concern-1
-  - concern-2
+topics:
+  - topic-1
+  - topic-2
 
 content:
   # Your actual content goes here

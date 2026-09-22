@@ -1,7 +1,7 @@
 id: bundle:architecture
-type: concern
-version: "1.0.0"
-title: "Architecture Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Architecture Concept Bundle"
 description: "System architecture, components, and technical design for {{ project_name }}"
 
 imports: []
@@ -15,4 +15,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Architecture concern bundle for {{ project_name }}"
+  rationale: "Architecture concept bundle for {{ project_name }}"

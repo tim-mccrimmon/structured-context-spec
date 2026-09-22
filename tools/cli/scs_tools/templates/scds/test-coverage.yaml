@@ -6,7 +6,7 @@ title: "Test Coverage"
 description: "Coverage targets, critical path identification, and test metrics"
 
 domain: testing-validation
-concerns:
+topics:
   - test-coverage
   - quality-metrics
   - critical-paths

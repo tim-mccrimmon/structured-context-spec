@@ -6,7 +6,7 @@ title: "Scalability"
 description: "Horizontal and vertical scaling strategy, capacity planning, and resource limits"
 
 domain: performance-reliability
-concerns:
+topics:
   - scalability
   - capacity-planning
   - resource-management

@@ -6,7 +6,7 @@ title: "Constraints and Assumptions"
 description: "Non-technical constraints, organizational boundaries, and key assumptions"
 
 domain: business-context
-concerns:
+topics:
   - constraints
   - assumptions
 

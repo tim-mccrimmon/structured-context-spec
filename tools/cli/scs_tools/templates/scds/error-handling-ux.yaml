@@ -6,7 +6,7 @@ title: "Error Handling UX"
 description: "Error message guidelines, user feedback patterns, and recovery flows"
 
 domain: usability-accessibility
-concerns:
+topics:
   - error-handling
   - user-feedback
   - help-documentation

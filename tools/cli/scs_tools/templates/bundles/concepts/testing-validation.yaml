@@ -1,7 +1,7 @@
 id: bundle:testing-validation
-type: concern
-version: "1.0.0"
-title: "Testing & Validation Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Testing & Validation Concept Bundle"
 description: "Testing strategy, coverage requirements, and validation approach for {{ project_name }}"
 
 imports: []
@@ -14,4 +14,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Testing & Validation concern bundle for {{ project_name }}"
+  rationale: "Testing & Validation concept bundle for {{ project_name }}"

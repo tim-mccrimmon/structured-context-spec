@@ -6,7 +6,7 @@ title: "Response Time Requirements"
 description: "Latency targets, throughput requirements, and performance budgets"
 
 domain: performance-reliability
-concerns:
+topics:
   - latency
   - throughput
   - performance

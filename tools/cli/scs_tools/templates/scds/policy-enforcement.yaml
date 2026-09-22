@@ -6,7 +6,7 @@ title: "Policy Enforcement"
 description: "Mechanisms for enforcing compliance and security policies"
 
 domain: compliance-governance
-concerns:
+topics:
   - policy-enforcement
   - automated-controls
 

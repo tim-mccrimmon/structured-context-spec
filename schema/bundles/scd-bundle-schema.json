@@ -51,7 +51,7 @@
     },
     "provenance": {
       "type": "object",
-      "required": ["created_by", "created_at", "version_approved_by", "version_approved_at"],
+      "required": ["created_by", "created_at"],
       "properties": {
         "created_by": {
           "type": "string",
@@ -179,6 +179,23 @@
         "properties": {
           "scds": {
             "description": "Standards bundles may contain standards-tier SCDs or import other standards bundles"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "version": {
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provenance": {
+            "required": ["created_by", "created_at", "version_approved_by", "version_approved_at"],
+            "description": "A real (non-DRAFT) version requires approval (RFC-0001, Provenance and approval). DRAFT working bundles don't - approval only applies once you're cutting an actual version."
           }
         }
       }

@@ -8,10 +8,10 @@ from jinja2 import Template
 
 
 def create_directory_structure(base_path: Path, project_name: str):
-    """Create the SCS 0.3 project directory structure"""
+    """Create the SCS 0.5.0 project directory structure"""
     dirs = [
         "bundles/domains",     # Domain bundles (e.g., software-development)
-        "bundles/concerns",    # Concern bundles (e.g., architecture, security)
+        "bundles/concepts",    # Concept bundles (e.g., architecture, security)
         "context/project",     # Project-tier SCDs
         "docs",               # Documentation
         ".scs",                # Configuration

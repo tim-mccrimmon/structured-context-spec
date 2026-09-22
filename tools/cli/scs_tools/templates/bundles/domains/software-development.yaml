@@ -1,24 +1,25 @@
 id: bundle:software-development
 type: domain
-version: "1.0.0"
+version: "DRAFT"
 title: "Software Development Domain"
-description: "Software Development domain for {{ project_name }}, importing all software engineering concern bundles"
+description: "Software Development domain for {{ project_name }}, importing all software engineering concept bundles"
 
-# Domain bundles import concern bundles
+# Domain bundles import concept bundles (unversioned - these are DRAFT too,
+# pin a real version once you've run `scs bundle version` on each)
 imports:
-  - bundle:architecture:1.0.0
-  - bundle:security:1.0.0
-  - bundle:performance-reliability:1.0.0
-  - bundle:usability-accessibility:1.0.0
-  - bundle:compliance-governance:1.0.0
-  - bundle:data-provenance:1.0.0
-  - bundle:testing-validation:1.0.0
-  - bundle:deployment-operations:1.0.0
-  - bundle:safety-risk:1.0.0
-  - bundle:ethics-ai-accountability:1.0.0
-  - bundle:business-context:1.0.0
+  - bundle:architecture
+  - bundle:security
+  - bundle:performance-reliability
+  - bundle:usability-accessibility
+  - bundle:compliance-governance
+  - bundle:data-provenance
+  - bundle:testing-validation
+  - bundle:deployment-operations
+  - bundle:safety-risk
+  - bundle:ethics-ai-accountability
+  - bundle:business-context
 
-# Domain bundles don't contain SCDs directly - they import concerns
+# Domain bundles don't contain SCDs directly - they import concepts
 scds: []
 
 provenance:

@@ -6,7 +6,7 @@ title: "Problem Definition"
 description: "Core problem, affected populations, and root causes"
 
 domain: business-context
-concerns:
+topics:
   - problem-analysis
   - user-impact
 

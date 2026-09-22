@@ -1,7 +1,7 @@
 id: bundle:performance-reliability
-type: concern
-version: "1.0.0"
-title: "Performance & Reliability Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Performance & Reliability Concept Bundle"
 description: "Performance requirements, reliability targets, and resilience patterns for {{ project_name }}"
 
 imports: []
@@ -15,4 +15,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Performance & Reliability concern bundle for {{ project_name }}"
+  rationale: "Performance & Reliability concept bundle for {{ project_name }}"

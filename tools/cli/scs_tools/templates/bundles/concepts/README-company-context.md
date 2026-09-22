@@ -1,8 +1,8 @@
-# Company-Context Concern Bundle
+# Company-Context Concept Bundle
 
 ## Overview
 
-The **company-context** concern is a special concern bundle type that contains company-specific information that doesn't fit in other concerns like Architecture, Security, or Performance.
+The **company-context** concept is a special concept bundle type that contains company-specific information that doesn't fit in other concepts like Architecture, Security, or Performance.
 
 **Owner**: CEO (Chief Executive Officer)
 
@@ -14,7 +14,7 @@ The **company-context** concern is a special concern bundle type that contains c
 
 ## What Goes in Company-Context?
 
-Company-context should include information about **WHO the company is** and **HOW the company operates**, not technical details (those go in other concerns).
+Company-context should include information about **WHO the company is** and **HOW the company operates**, not technical details (those go in other concepts).
 
 ### Typical Contents
 
@@ -27,9 +27,9 @@ Company-context should include information about **WHO the company is** and **HO
 
 ### What Does NOT Go Here
 
-- **Technical Architecture** → Goes in Architecture concern
-- **Security Controls** → Goes in Security concern
-- **Data Schemas** → Goes in Data Provenance concern
+- **Technical Architecture** → Goes in Architecture concept
+- **Security Controls** → Goes in Security concept
+- **Data Schemas** → Goes in Data Provenance concept
 - **Compliance Rules** → Goes in Standards bundles (HIPAA, SOC2, etc.)
 
 ---
@@ -38,13 +38,13 @@ Company-context should include information about **WHO the company is** and **HO
 
 | Bundle | Owner | Relationship |
 |--------|-------|--------------|
-| **Company-Context Concern** | CEO | Creates and maintains |
-| **Domain Bundle** | CEO | Imports company-context + other concerns |
+| **Company-Context Concept** | CEO | Creates and maintains |
+| **Domain Bundle** | CEO | Imports company-context + other concepts |
 | **Project Bundles** | Product Managers | Import domain bundle (get company-context transitively) |
 
 The CEO owns both:
-1. The **Company-Context Concern Bundle** (this concern)
-2. The **Domain Bundle** (which imports this concern plus others)
+1. The **Company-Context Concept Bundle** (this concept)
+2. The **Domain Bundle** (which imports this concept plus others)
 
 ---
 
@@ -54,9 +54,9 @@ Company-context uses **loose validation** to support different levels of disclos
 
 ### What Validation Checks (Structure)
 ✅ YAML is well-formed
-✅ Bundle type is `concern`
+✅ Bundle type is `concept`
 ✅ Required bundle fields exist (`id`, `type`, `version`, `scds`, `imports`)
-✅ `imports` array is empty (concern bundles don't import)
+✅ `imports` array is empty (concept bundles don't import)
 ✅ `scds` array has at least one SCD
 ✅ SCD files exist and are well-formed
 
@@ -81,16 +81,16 @@ Every company is different, and CEOs have different comfort levels with disclosu
 ## File Structure
 
 ```
-company-context-concern/
+company-context-concept/
 ├── scds/
 │   └── company-overview.yaml       # Main company context SCD
 └── bundles/
-    └── company-context-bundle.yaml # Concern bundle referencing SCD
+    └── company-context-bundle.yaml # Concept bundle referencing SCD
 ```
 
 **Alternative (Multi-SCD Approach)**:
 ```
-company-context-concern/
+company-context-concept/
 ├── scds/
 │   ├── company-overview.yaml       # Basic company info
 │   ├── company-values.yaml         # Core values
@@ -112,7 +112,7 @@ cp cli/scs_tools/templates/scds/company-overview.yaml \
    my-company/scds/company-overview.yaml
 
 # Copy bundle template
-cp cli/scs_tools/templates/bundles/concerns/company-context.yaml \
+cp cli/scs_tools/templates/bundles/concepts/company-context.yaml \
    my-company/bundles/company-context-bundle.yaml
 ```
 
@@ -292,16 +292,16 @@ A: Yes, through versioning. Project A might use company-context:1.0.0 while Proj
 
 ## Related Documentation
 
-- **Test Plan**: `/test-plan/test-plan.md` - Phase 0: Company-Context Concern
-- **Test Case**: `/test-plan/concerns/company-concern/TC-001-company-context-acme.md`
+- **Test Plan**: `/test-plan/test-plan.md` - Phase 0: Company-Context Concept
+- **Test Case**: `/test-plan/concepts/company-concept/TC-001-company-context-acme.md`
 - **Bundle Format Spec**: `/base/spec/0.3/bundle-format.md`
-- **Concern Bundles**: `/cli/scs_tools/templates/bundles/concerns/`
+- **Concept Bundles**: `/cli/scs_tools/templates/bundles/concepts/`
 
 ---
 
 ## Support
 
-For questions or issues with company-context concerns:
+For questions or issues with company-context concepts:
 1. Review the test case: TC-001-company-context-acme.md
 2. Check validation errors: `scs validate --help`
 3. Review bundle format spec: `/base/spec/0.3/bundle-format.md`

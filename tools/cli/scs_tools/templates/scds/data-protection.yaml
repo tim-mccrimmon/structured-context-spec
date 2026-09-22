@@ -6,7 +6,7 @@ title: "Data Protection"
 description: "Encryption, key management, and cryptographic standards"
 
 domain: security
-concerns:
+topics:
   - encryption
   - key-management
   - data-security

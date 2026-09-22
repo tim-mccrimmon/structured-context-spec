@@ -37,7 +37,7 @@ This project follows the Structured Context Specification (SCS) for organizing p
 See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for detailed instructions on:
 - Understanding the SCS structure
 - Editing SCDs and bundles
-- Working with domains and concerns
+- Working with domains and concepts
 - Validating your context
 
 ## SCDs Included
@@ -45,7 +45,7 @@ See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for detailed instructions
 This project includes the minimum recommended set of SCDs for a {{ project_type }} project:
 
 {% for bundle in bundles -%}
-- **{{ bundle }}**: Domain bundle for {{ bundle }} concerns
+- **{{ bundle }}**: Domain bundle for {{ bundle }} concepts
 {% endfor %}
 
 ## Editing Context

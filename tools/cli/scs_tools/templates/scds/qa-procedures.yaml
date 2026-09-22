@@ -6,7 +6,7 @@ title: "QA Procedures"
 description: "Manual QA processes, acceptance criteria, and quality gates"
 
 domain: testing-validation
-concerns:
+topics:
   - quality-assurance
   - acceptance-testing
   - bug-management

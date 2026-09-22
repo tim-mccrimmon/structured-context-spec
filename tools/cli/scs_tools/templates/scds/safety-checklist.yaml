@@ -6,7 +6,7 @@ title: "Safety Checklist"
 description: "Safety limits, guardrails, pre-release checks, and safety incident response"
 
 domain: safety-risk
-concerns:
+topics:
   - safety
   - guardrails
   - safety-critical-systems

@@ -9,7 +9,7 @@ import hashlib
 import subprocess
 from datetime import datetime, timezone
 from scs_tools.utils.files import get_template_path
-from scs_tools.utils.project_types import SOFTWARE_DEVELOPMENT_CONCERNS, PROJECT_TYPES
+from scs_tools.utils.project_types import SOFTWARE_DEVELOPMENT_CONCEPTS, PROJECT_TYPES
 
 
 @click.group()
@@ -41,7 +41,7 @@ def list(available):
     """
     if available:
         click.echo("Available domain bundles:\n")
-        for bundle_name in SOFTWARE_DEVELOPMENT_CONCERNS:
+        for bundle_name in SOFTWARE_DEVELOPMENT_CONCEPTS:
             click.echo(f"  • {bundle_name}")
 
         click.echo("\nProject types and their bundles:\n")
@@ -51,7 +51,7 @@ def list(available):
             if config.get("minimal"):
                 click.echo(f"    Bundles: 3 minimal bundles (architecture, security, deployment-operations)")
             else:
-                click.echo(f"    Bundles: All 10 domain bundles")
+                click.echo(f"    Bundles: All 11 domain bundles")
         return
 
     # List bundles in current project
@@ -158,9 +158,15 @@ def info(bundle_name):
         click.echo(f"Domain: {data['domain']}")
 
     if 'concerns' in data:
-        click.echo(f"\nConcerns:")
+        click.echo(f"\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
         for concern in data['concerns']:
             click.echo(f"  • {concern}")
+
+    if 'ontology' in data:
+        concepts = data['ontology'].get('concepts', [])
+        click.echo(f"\nOntology concepts ({len(concepts)}):")
+        for concept in concepts:
+            click.echo(f"  • {concept.get('id', 'unknown')}")
 
     if 'scds' in data:
         scds = data['scds']
@@ -460,12 +466,14 @@ def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, fo
     # Get current timestamp
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    # Add approval metadata to provenance
+    # Add approval metadata to provenance. Field names match the schema's
+    # required version_approved_by/version_approved_at (RFC-0001, Provenance
+    # and approval) - this command is exactly what's meant to populate them.
     if "provenance" not in bundle_data:
         bundle_data["provenance"] = {}
 
-    bundle_data["provenance"]["approved_by"] = approved_by
-    bundle_data["provenance"]["approved_at"] = timestamp
+    bundle_data["provenance"]["version_approved_by"] = approved_by
+    bundle_data["provenance"]["version_approved_at"] = timestamp
     bundle_data["provenance"]["approval_status"] = "validated"
     bundle_data["provenance"]["validation_passed"] = True
     bundle_data["provenance"]["validation_date"] = timestamp

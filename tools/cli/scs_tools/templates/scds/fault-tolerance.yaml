@@ -6,7 +6,7 @@ title: "Fault Tolerance"
 description: "Error handling strategy, resilience patterns, and graceful degradation"
 
 domain: performance-reliability
-concerns:
+topics:
   - resilience
   - error-handling
   - graceful-degradation

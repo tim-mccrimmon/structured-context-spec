@@ -6,7 +6,7 @@ title: "Data Model"
 description: "Canonical data entities, schema definitions, and relationships"
 
 domain: data-provenance
-concerns:
+topics:
   - data-modeling
   - schema-management
   - data-relationships

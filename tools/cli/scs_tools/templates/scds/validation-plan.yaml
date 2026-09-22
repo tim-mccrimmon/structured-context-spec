@@ -6,7 +6,7 @@ title: "Validation Plan"
 description: "Validation scenarios, test environments, and release criteria"
 
 domain: testing-validation
-concerns:
+topics:
   - validation
   - test-environments
   - release-criteria

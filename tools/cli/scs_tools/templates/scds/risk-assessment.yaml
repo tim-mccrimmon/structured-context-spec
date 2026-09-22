@@ -6,7 +6,7 @@ title: "Risk Assessment"
 description: "Identified risks, likelihood and impact assessment, and mitigation strategies"
 
 domain: safety-risk
-concerns:
+topics:
   - risk-identification
   - risk-mitigation
   - risk-monitoring

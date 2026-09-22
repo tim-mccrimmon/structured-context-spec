@@ -1,7 +1,7 @@
 id: bundle:data-provenance
-type: concern
-version: "1.0.0"
-title: "Data & Provenance Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Data & Provenance Concept Bundle"
 description: "Data models, lineage tracking, and retention policies for {{ project_name }}"
 
 imports: []
@@ -14,4 +14,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Data & Provenance concern bundle for {{ project_name }}"
+  rationale: "Data & Provenance concept bundle for {{ project_name }}"

@@ -302,9 +302,12 @@ already tracked as multi-author provenance in `ISSUES.md` (ISS-011). Ship
 `version_approved_by` now; treat per-perspective attestation as a follow-on RFC once real
 usage shows whether a single approver is actually insufficient.
 
-`version_approved_by` / `version_approved_at` are required on every bundle version. SCDs'
-own `provenance` blocks are unchanged — authorship only; approval is a bundle-level event,
-not a per-SCD one.
+`version_approved_by` / `version_approved_at` are required on every real (non-`DRAFT`)
+bundle version — a `DRAFT` working bundle doesn't need them, since approval only makes
+sense once you're cutting an actual version (found during ISS-005b: the CLI scaffolds
+working bundles that aren't approved yet, and unconditionally requiring these fields made
+every freshly-generated project fail validation immediately). SCDs' own `provenance` blocks
+are unchanged — authorship only; approval is a bundle-level event, not a per-SCD one.
 
 ### Relationship semantics
 

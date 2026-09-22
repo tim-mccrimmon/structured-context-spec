@@ -6,7 +6,7 @@ title: "Technology Stack"
 description: "Programming languages, frameworks, databases, and infrastructure choices"
 
 domain: architecture
-concerns:
+topics:
   - technology-choices
   - dependencies
 

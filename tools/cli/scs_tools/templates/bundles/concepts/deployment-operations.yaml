@@ -1,7 +1,7 @@
 id: bundle:deployment-operations
-type: concern
-version: "1.0.0"
-title: "Deployment & Operations Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Deployment & Operations Concept Bundle"
 description: "Infrastructure, deployment processes, and operational practices for {{ project_name }}"
 
 imports: []
@@ -14,4 +14,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Deployment & Operations concern bundle for {{ project_name }}"
+  rationale: "Deployment & Operations concept bundle for {{ project_name }}"

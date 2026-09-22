@@ -1,5 +1,5 @@
 id: bundle:acme-company-context
-type: concern
+type: concept
 version: "DRAFT"
 title: "Acme Health - Company Context"
 description: >
@@ -15,6 +15,6 @@ provenance:
   created_by: "Dr. Sarah Chen (CEO) <sarah.chen@acmehealth.com>"
   created_at: "2025-12-26T10:00:00Z"
   rationale: >
-    Company-context concern bundle for Acme Health Corp. This bundle provides
-    business and organizational context that doesn't fit in technical concerns
+    Company-context concept bundle for Acme Health Corp. This bundle provides
+    business and organizational context that doesn't fit in technical concepts
     (Architecture, Security, etc.). Imported by the Acme Health domain bundle.

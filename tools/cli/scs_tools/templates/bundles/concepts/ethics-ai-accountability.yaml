@@ -1,7 +1,7 @@
 id: bundle:ethics-ai-accountability
-type: concern
-version: "1.0.0"
-title: "Ethics & AI Accountability Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Ethics & AI Accountability Concept Bundle"
 description: "Responsible AI use, accountability, and ethical guidelines for {{ project_name }}"
 
 imports: []
@@ -14,4 +14,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Ethics & AI Accountability concern bundle for {{ project_name }}"
+  rationale: "Ethics & AI Accountability concept bundle for {{ project_name }}"

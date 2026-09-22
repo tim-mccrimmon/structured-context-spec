@@ -1,4 +1,4 @@
-"""Project type configurations for SCS 0.3"""
+"""Project type configurations for SCS 0.5.0"""
 
 from typing import Dict, List
 
@@ -29,15 +29,15 @@ PROJECT_TYPES = {
         "exclude_scds": ["hipaa-compliance", "chai-adherence", "tefca-participation"],
     },
     "minimal": {
-        "description": "Minimal project (essential concerns only)",
-        "domains": ["software-development"],  # Still uses domain, but with fewer concerns
-        "minimal_concerns": ["architecture", "security", "deployment-operations"],
+        "description": "Minimal project (essential concepts only)",
+        "domains": ["software-development"],  # Still uses domain, but with fewer concepts
+        "minimal_concepts": ["architecture", "security", "deployment-operations"],
         "compliance_bundles": [],
         "exclude_scds": [],
         "minimal": True,
     },
     "standard": {
-        "description": "Standard software development project (all 11 concerns)",
+        "description": "Standard software development project (all 11 concepts)",
         "domains": ["software-development"],
         "compliance_bundles": ["soc2-controls"],
         "exclude_scds": ["hipaa-compliance", "chai-adherence", "tefca-participation"],
@@ -45,8 +45,8 @@ PROJECT_TYPES = {
 }
 
 
-# The 11 concerns within the Software Development domain
-SOFTWARE_DEVELOPMENT_CONCERNS = [
+# The 11 concepts within the Software Development domain (RFC-0001 Domain Ontology)
+SOFTWARE_DEVELOPMENT_CONCEPTS = [
     "business-context",
     "architecture",
     "security",
@@ -61,20 +61,20 @@ SOFTWARE_DEVELOPMENT_CONCERNS = [
 ]
 
 
-# Minimal set of concerns for early-stage projects
-MINIMAL_CONCERNS = [
+# Minimal set of concepts for early-stage projects
+MINIMAL_CONCEPTS = [
     "architecture",
     "security",
     "deployment-operations",
 ]
 
 
-# Available domains (SCS 0.3 - multi-domain architecture)
+# Available domains (SCS 0.5.0 - multi-domain architecture, RFC-0001 Domain Ontology)
 AVAILABLE_DOMAINS = {
     "software-development": {
         "name": "Software Development",
         "description": "Software engineering practices, architecture, testing, deployment",
-        "concerns": SOFTWARE_DEVELOPMENT_CONCERNS,
+        "concepts": SOFTWARE_DEVELOPMENT_CONCEPTS,
     },
     # Future domains to be added by domain experts:
     # "legal": {...},
@@ -86,27 +86,27 @@ AVAILABLE_DOMAINS = {
 def get_domains_for_project_type(project_type: str) -> List[str]:
     """Get the list of domain bundles for a project type.
 
-    In SCS 0.3, projects import domain bundles (e.g., software-development),
-    which in turn import concern bundles (e.g., architecture, security).
+    In SCS 0.5.0, projects import domain bundles (e.g., software-development),
+    which in turn import concept bundles (e.g., architecture, security).
     """
     config = PROJECT_TYPES.get(project_type, PROJECT_TYPES["standard"])
     return config.get("domains", ["software-development"])
 
 
-def get_concerns_for_project_type(project_type: str) -> List[str]:
-    """Get the list of concern bundles for a project type.
+def get_concepts_for_project_type(project_type: str) -> List[str]:
+    """Get the list of concept bundles for a project type.
 
-    This is used when generating concern bundles for a project.
-    For minimal projects, returns only essential concerns.
-    For full projects, returns all concerns in the software-development domain.
+    This is used when generating concept bundles for a project.
+    For minimal projects, returns only essential concepts.
+    For full projects, returns all concepts in the software-development domain.
     """
     config = PROJECT_TYPES.get(project_type, PROJECT_TYPES["standard"])
 
     if config.get("minimal"):
-        return config.get("minimal_concerns", MINIMAL_CONCERNS)
+        return config.get("minimal_concepts", MINIMAL_CONCEPTS)
 
-    # Default: all concerns in software-development domain
-    return SOFTWARE_DEVELOPMENT_CONCERNS
+    # Default: all concepts in software-development domain
+    return SOFTWARE_DEVELOPMENT_CONCEPTS
 
 
 def get_bundles_for_project_type(project_type: str) -> List[str]:
@@ -114,7 +114,7 @@ def get_bundles_for_project_type(project_type: str) -> List[str]:
 
     DEPRECATED in 0.3: Use get_domains_for_project_type() instead.
     This function is maintained for backward compatibility and returns
-    domain bundles, not concern bundles.
+    domain bundles, not concept bundles.
     """
     return get_domains_for_project_type(project_type)
 

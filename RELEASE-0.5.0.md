@@ -79,12 +79,22 @@ tested against real content.
         `scs validate --domain` (0 errors on both)
   - Found 3 pre-existing, unrelated bugs while testing — tracked as ISS-020, ISS-021,
     ISS-022, not fixed here
-- [ ] **ISS-005b — scs-tools** — not started
-  - [ ] `templates/bundles/concerns/` → `.../concepts/`; `scs new concept`; domain-manifest
-        scaffold emits `ontology`
-  - [ ] Real Python logic to rename too (`commands/new.py`, `utils/project_types.py`,
-        `utils/files.py`, `commands/bundle.py` all reference `concern` in variable/function
-        names, CLI messages, and file paths — not just template data)
+- [x] **ISS-005b — scs-tools** — done 2026-09-22
+  - [x] `templates/bundles/concerns/` → `.../concepts/`; all 12 templates + `meta-bundle.yaml`
+        + `domains/software-development.yaml` renamed
+  - [x] Real Python logic renamed: `commands/new.py`, `utils/project_types.py`,
+        `utils/files.py`, `commands/bundle.py`
+  - [x] Bonus fixes found while testing: `bundle.py`'s `scs bundle version` wrote the wrong
+        provenance field names (`approved_by` not `version_approved_by` — fixed to match
+        ISS-002's schema); the schema unconditionally required approval fields even on
+        fresh `DRAFT` bundles, breaking every `scs new project` scaffold immediately — fixed
+        the schema to exempt `DRAFT` and switched scaffold templates to `version: "DRAFT"`
+        with unversioned imports to match
+  - [x] Found a third, unrelated `concerns:` field (free-text topic tags on 41 SCD content
+        templates) — renamed to `topics:` rather than `concepts:` to avoid colliding with
+        the formal `concept:` singular field (judgment call, not a pure mechanical rename)
+  - [x] **Tested end-to-end**: real venv, real `scs new project` run, full output validated
+        (0 errors), real `scs bundle version` run, resulting versioned bundle validated
 - [ ] **ISS-005c — scs-vibe, scs-team plugins** — not started
   - [ ] Update skill prompts and templates referencing `concern`
 

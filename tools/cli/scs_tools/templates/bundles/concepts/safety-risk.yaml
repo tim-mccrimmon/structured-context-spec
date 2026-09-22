@@ -1,7 +1,7 @@
 id: bundle:safety-risk
-type: concern
-version: "1.0.0"
-title: "Safety & Risk Concern Bundle"
+type: concept
+version: "DRAFT"
+title: "Safety & Risk Concept Bundle"
 description: "Risk identification and management, safety concerns for {{ project_name }}"
 
 imports: []
@@ -13,4 +13,4 @@ scds:
 provenance:
   created_by: "{{ email }}"
   created_at: "{{ created_at }}"
-  rationale: "Safety & Risk concern bundle for {{ project_name }}"
+  rationale: "Safety & Risk concept bundle for {{ project_name }}"

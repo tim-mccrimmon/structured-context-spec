@@ -6,7 +6,7 @@ title: "Provenance Tracking"
 description: "Data origin tracking, lineage, transformation tracking, and audit trails"
 
 domain: data-provenance
-concerns:
+topics:
   - data-lineage
   - audit-trail
   - data-origin
