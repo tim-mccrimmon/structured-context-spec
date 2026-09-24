@@ -65,9 +65,7 @@ def _example_scds() -> list[Path]:
 KNOWN_INVALID_BUNDLES = {
     "examples/med-adherence/standards-bundle.yaml": "ISS-022",
 }
-KNOWN_INVALID_DOMAINS = {
-    "schema/domain/examples/healthcare-domain.yaml": "ISS-031",
-}
+KNOWN_INVALID_DOMAINS: dict[str, str] = {}
 
 
 def _param(path: Path, known: dict[str, str]):

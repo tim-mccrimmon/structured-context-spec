@@ -541,7 +541,7 @@ Also: the validator's legacy-`concerns` error message points at `docs/MIGRATION-
 does not exist yet (ISS-016). That file needs to land before release or the message points nowhere.
 
 ### ISS-031 — `schema/domain/examples/healthcare-domain.yaml` fails 0.5.0 validation (no `ontology`)
-**Status:** open
+**Status:** done (2026-09-24), removed
 `scs-validate --domain schema/domain/examples/healthcare-domain.yaml` fails with "Missing required
 field: 'ontology'". Missed by the ISS-005 sweep (it has no `concerns:` to rename, so it was not
 flagged). It is an old illustrative "commercial" healthcare domain (`license: commercial`, paths to
@@ -550,6 +550,9 @@ it clearly as an illustrative non-conformant sample and exclude it from validati
 `test_regression_050.py` marks it `xfail(strict=True)` so the marker must be removed when this is
 resolved.
 Related: ISS-005a, ISS-022.
+**Resolved:** removed at Tim's direction. It was an unreferenced 0.3-era illustrative "commercial"
+domain (nothing in the repo referenced it). Recoverable from git history. The `xfail` marker in
+`test_regression_050.py` is gone with it; the domain-example test now covers the remaining manifests.
 
 ### ISS-032 — Scaffolded SCD templates fail schema validation (`relationships:` is null)
 **Status:** done (2026-09-24)
