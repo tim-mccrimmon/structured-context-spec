@@ -424,3 +424,195 @@ To do:
    were edited 2026-09-24 with unverified dates).
 Related: ISS-024 (regulatory classification block, from SCP FR-014), ISS-009 (drift; Art. 72
 monitoring). To be picked up in the SCS refresh week of 2026-09-28.
+
+---
+
+## Tooling defects found while drafting the how-to-use material (2026-09-24)
+
+Found by installing both packages from the `0.5-dev` checkout into a clean venv
+(`pip install -e tools/scd-validator -e tools/cli`) and running the documented workflow end to
+end. All reproduced on 2026-09-24. None of these change the RFC-0001 design; they are tooling and
+documentation gaps.
+
+### ISS-026 — `scs validate` (scs-tools) is broken: imports the deleted `scs_validator.cli`
+**Status:** done (2026-09-24)
+`tools/cli/scs_tools/commands/validate.py` does `from scs_validator.cli import main`. Commit
+`2c31362` (console-script collision fix) deleted `scs_validator/cli.py`, so the `ImportError` is
+swallowed and every `scs validate` prints "Error: scs-validator is not installed" and exits 1,
+even when it is installed. Knock-on effects:
+- `scs bundle validate` calls the same command and fails the same way.
+- `scs bundle version` runs validation as a subprocess (`scs validate ...`, in `_validate_bundle`),
+  so versioning stops at step 1 ("Validation failed with 1 error(s)") unless `--no-validate` is
+  passed, even for a bundle the standalone validator accepts.
+- The standalone `scs-validate` works and is unaffected.
+Fix: point scs-tools at `scs_validator.commands.validate:validate` (what the `scs-validate` console
+script uses), make `_validate_bundle` use the same path, and add a test. Every doc that says
+`scs new project ...; scs validate` inherits this (README, quick-start, `tools/cli/README.md`, the
+CLI's own `--help`).
+Repro: fresh venv, install both, `scs new project my-app --type healthcare --no-interactive`,
+`cd my-app && scs validate`.
+Related: ISS-013 (CI would have caught this), ISS-005b (recorded an end-to-end `scs bundle version`
+run on 2026-09-22; worth checking what validator that run used).
+**Fixed:** `scs validate` is now the validator's own command object registered under the `scs` group
+(`scs_tools/commands/validate.py`), so its options, including `--domain` and `--checkpoint`, can no
+longer drift from `scs-validate`. `scs bundle validate` and `scs bundle version` work again;
+`_validate_bundle` now runs `python -m scs_validator` with the current interpreter (no PATH
+dependence) and reads the summary counts correctly. Also corrected the `scs --help` Quick Start,
+which advertised a no-argument `scs validate` (it exits 3 with "No files or bundle specified").
+Tests: `tools/cli/tests/test_scs_tools.py` (validate pass-through, bundle validate, versioning with
+validation on).
+
+### ISS-027 — `scs bundle version` leaves `version: DRAFT` inside the versioned snapshot
+**Status:** done (2026-09-24)
+`_create_versioned_bundle` (`tools/cli/scs_tools/commands/bundle.py`) adds the approval provenance
+(`version_approved_by`, `version_approved_at`, `approval_status`, ...) but never sets the bundle's
+`version`. The snapshot `<name>-v0.1.0.yaml` therefore still contains `version: DRAFT`; the version
+appears only in the filename and in `VERSION-<v>-MANIFEST.yaml`. Consequences: the schema's DRAFT
+exemption still applies to it (a bundle that carries an approval but is DRAFT), and it cannot be
+imported as `bundle:<name>:<version>`, which is what the versioning model (imports pin exact
+versions) depends on.
+Fix: set `bundle_data["version"] = version_number` before writing, validate the written snapshot,
+add a test. The `total_scds: 0` / empty `components` in the manifest for a concept bundle looks
+wrong too; check while here.
+Repro: in a scaffolded project, `scs bundle version --bundle bundles/concepts/security.yaml
+--version 0.1.0 --approved-by sam@example.com --no-git --no-validate`, then read the output.
+Related: ISS-002 and ISS-005b (approval fields and the DRAFT conditional), ISS-026 (why
+`--no-validate` was needed in the repro).
+**Fixed:** `_create_versioned_bundle` now sets `version` to the released version. Tests assert the
+snapshot says the released version inside, carries the approval fields, validates, leaves the working
+bundle untouched, and is rejected if its approval fields are stripped (the DRAFT exemption no longer
+applies to it). Manifest checksum is asserted against the snapshot. Not covered: the git commit/tag
+step (`--no-git` in tests).
+
+### ISS-028 — `scs-validate` cannot find the schema directory in a source checkout
+**Status:** done (2026-09-24), packaging follow-up in ISS-035
+With an editable install, running `scs-validate` from a project outside the repo fails with
+"Schema directory not found: <repo>/tools/schema" (it resolves relative to the package to
+`tools/schema`, not the repo-root `schema/`), so `--schema-dir <repo>/schema` is required on every
+call. `CLAUDE.md` documents this as a workaround; `scs bundle version` has its own separate search
+(`cwd/schema` or a sibling `scs-spec/` checkout, the old repo name). Also the banner still reads
+"SCS Validator v0.1.0". Decide the intended lookup order (packaged schemas, env var, `--schema-dir`)
+and confirm how a PyPI install would find the schemas at all.
+Related: ISS-014 (published releases: are the schemas packaged in the wheel?), ISS-026.
+**Fixed:** new `resolve_schema_dir()` in `scs_validator/utils.py`. Lookup order: `--schema-dir`,
+`$SCS_SCHEMA_DIR`, a `schema/` dir in the current directory or any parent, then the `schema/` of the
+source checkout the package is installed from (off-by-one in the old package-relative path fixed).
+Searched candidates must contain `bundles/` and `scd/`, so an unrelated `schema/` folder in a user's
+project is ignored; the error lists every location tried. `scs bundle version`'s private search
+(including the old `scs-spec` sibling path) is gone. Tests in `test_regression_050.py`.
+**Not solved here:** a wheel install has no schema directory at all, see ISS-035.
+
+### ISS-029 — `scs new project` scaffolds no Domain Ontology manifest and only the SDLC shape (proposed)
+**Status:** proposed - needs a scope decision (0.5.0 or later)
+The scaffold creates the 11 SDLC concept bundles and a domain *bundle*, but no domain manifest with
+an `ontology:` block. A new project therefore has nothing for `scs-validate --domain` to check, and
+the 0.5.0 anchor feature is not visible to a new user. All project types (healthcare, fintech,
+saas, government, minimal, standard) are SDLC variants; there is no CDMO or MCA option, although
+MCA is planned to ship with 0.5.0. `.scs/config` also writes `scs_version: 0.1.0`.
+Decide: generate an `ontology` manifest from the chosen Ontology Model, and add a model selector
+(for example `--ontology sdlc|cdmo|mca`) to `scs new project` / `scs init`.
+Related: ISS-005b (scs-tools migration, done), ISS-017 (`scs migrate` helper), the Ontology Model
+packaging question in `spec/0.5/domain-ontology.md` §10.
+
+### ISS-030 — Stale 0.3 content in user-facing docs
+**Status:** open
+Still describing 0.3, separate from ISS-023 (which covers only the docs website):
+- `README.md`: version badge 0.3.0, "Start with `spec/0.3/overview.md`", repo tree shows `spec/0.3/`,
+  "concern-specific context", "SCS is v0.3". ISS-006 rewrote only its "SCS and Claude Code" section.
+- `docs/quick-start-guide.md`: "Version 0.3", four bundle types, "11 prescribed domains" as
+  `type: domain` bundles, `scs-cli validate`.
+- `tools/cli/README.md`: documents `scs bundle create/update/check`, which do not exist (the real
+  subcommands are `info`, `list`, `validate`, `version`); "10 domain bundles"; OICP publishing
+  section; a project tree that does not match the scaffold (`bundles/concepts/` plus one domain
+  bundle).
+- `docs/concern-docs/` directory naming.
+Also: the validator's legacy-`concerns` error message points at `docs/MIGRATION-0.5.0.md`, which
+does not exist yet (ISS-016). That file needs to land before release or the message points nowhere.
+
+### ISS-031 — `schema/domain/examples/healthcare-domain.yaml` fails 0.5.0 validation (no `ontology`)
+**Status:** open
+`scs-validate --domain schema/domain/examples/healthcare-domain.yaml` fails with "Missing required
+field: 'ontology'". Missed by the ISS-005 sweep (it has no `concerns:` to rename, so it was not
+flagged). It is an old illustrative "commercial" healthcare domain (`license: commercial`, paths to
+`./healthcare/...` files that do not exist in the repo). Decide: give it a real Domain Ontology, mark
+it clearly as an illustrative non-conformant sample and exclude it from validation, or remove it.
+`test_regression_050.py` marks it `xfail(strict=True)` so the marker must be removed when this is
+resolved.
+Related: ISS-005a, ISS-022.
+
+### ISS-032 — Scaffolded SCD templates fail schema validation (`relationships:` is null)
+**Status:** done (2026-09-24)
+28 of the 42 SCD templates shipped with `relationships:` followed only by comments, which YAML reads
+as `null`; the SCD schema requires an array. A fresh `scs new project --type healthcare` therefore
+produced 24 SCDs that failed `scs-validate` out of the box (every project type is affected).
+**Fixed:** those 28 templates now say `relationships: []` (one-line change each; the 14 templates with
+real example relationships are untouched). Tests scaffold every project type and validate every
+generated SCD and bundle.
+
+### ISS-033 — `scs new project --type minimal` domain bundle imports concept bundles that were not generated
+**Status:** done (2026-09-24)
+The software-development domain bundle template hard-coded all 11 concept imports, but `minimal`
+generates only 3 concept bundles, leaving 8 dangling imports. The validator does not resolve imports
+(ISS-020), so nothing flagged it.
+**Fixed:** the template loops over the concepts actually generated; `scs new` passes them, and
+`scs add bundle software-development` uses the project's existing concept bundles (all 11 if none
+yet). Tests cover every project type.
+
+### ISS-034 — `scs add bundle`, `scs bundle list` and `scs bundle info` ignore concept bundles after the 0.5.0 rename
+**Status:** done (2026-09-24)
+After concern -> concept, the concept templates moved to `templates/bundles/concepts/`, but:
+- `scs add bundle security` failed ("Template for bundle 'security' not found"), although its help,
+  `scs bundle list --available` and the README advertise it;
+- `scs bundle list` showed only project and domain bundles (a full scaffold listed 4 bundles, none of
+  the 11 concept bundles) and printed a meaningless `Domain: unknown` for domain bundles;
+- `scs bundle info security` did not find concept bundles in the project or in the templates;
+- `scs bundle list --available` labelled concepts "domain bundles".
+**Fixed:** all three commands understand concept and domain bundles, with concept terminology in
+their help and output. Domain bundles now show their import count. Tests added for each. Not done:
+the README's `scs add bundle ... --with-scds` flag does not exist (README staleness is ISS-030).
+
+### ISS-035 — `scs-validator` wheel is unusable: `rules/` and `schema/` are not packaged
+**Status:** done (2026-09-24); unblocks ISS-014 (published releases)
+Installing the built wheel (non-editable, clean venv) and running the validator fails: "Rules
+directory not found: <venv>/lib/python3.12/rules/v0.5.0". `rules_loader.py` finds rules at
+`<package>/../../rules`, which is outside the package, and `pyproject.toml` ships no package data. The
+JSON Schemas live at the repo-root `schema/`, also outside the package, so even with rules fixed there
+is no schema directory to find (ISS-028's discovery only covers source checkouts, an env var and an
+explicit flag). Editable installs hide all of this, which is why the tests and `pip install -e` pass.
+The scs-tools wheel is fine (templates are packaged; a scaffold from the wheel works).
+Options to decide: (a) move `rules/` into `src/scs_validator/rules/` and vendor `schema/` into the
+package at build time, with a CI check that the vendored copy equals repo-root `schema/`;
+(b) restructure so `schema/` and `rules/` both live under the package and the repo root refers to
+them; (c) publish schemas as a separate distribution. Recommendation: (a).
+CI job `wheel-smoke` in `.github/workflows/tools-ci.yml` reproduces this and is informational until
+fixed.
+Related: ISS-014, ISS-015 (rules convergence), ISS-028.
+**Fixed** (option (a)):
+- `rules/` moved into the package (`git mv tools/scd-validator/rules -> src/scs_validator/rules`, all
+  three rule sets unchanged, so ISS-015's convergence work is unaffected); `rules_loader.py` defaults to
+  the packaged `rules/v0.5.0`.
+- The six JSON Schemas are vendored into `src/scs_validator/schemas/` by
+  `tools/scd-validator/scripts/sync_schemas.py` (`--check` reports drift). The repo-root `schema/`
+  stays the source of truth; **run the script after changing anything under `schema/`.**
+- `pyproject.toml` ships `rules/**` and `schemas/**` as package data.
+- Schema discovery (ISS-028) gained a last fallback to the packaged copy; a source checkout's
+  `schema/` still wins over it.
+- Tests (`tests/test_packaging.py`): rules and schemas present in the package, the vendored copy is
+  byte-identical to `schema/` (a one-byte change fails it), discovery falls back to the packaged copy,
+  validation works using only the packaged schemas, and the sync script reports no drift.
+- CI: the `wheel-smoke` job is now blocking. It builds both wheels, installs them non-editable, then
+  scaffolds, validates every generated file, versions a bundle and validates the snapshot, all away
+  from the source tree.
+- Verified locally: built wheels contain all rules and schemas; installed into a clean venv with no
+  environment variables, the full flow works, including the git commit and tag.
+Not changed: v0.1.0 and v0.3.0 rule sets still ship in the wheel until ISS-015 retires them.
+
+### ISS-036 — Lint and type-check baseline is not clean
+**Status:** open
+On 2026-09-24: `ruff check` reports 196 findings in `tools/scd-validator/src` (150 auto-fixable), 3 in
+its tests and 45 in `tools/cli`; `black --check` would reformat 9 of 16 validator files; `mypy src`
+(config has `disallow_untyped_defs`) reports 10 errors. CI (ISS-013) therefore runs lint as
+report-only. Auto-fixing is a large mechanical diff across the validator, so do it as one dedicated,
+separately reviewed change with the regression suites as the safety net, then make lint blocking.
+Related: ISS-013.
+

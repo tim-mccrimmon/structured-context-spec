@@ -60,7 +60,8 @@ structured-context-spec/
 
 Two **independent** Python packages live under `tools/` — there is no top-level build.
 Each has its own `pyproject.toml`; install and test them separately. Both require **Python ≥ 3.11**.
-There is no CI workflow yet, so run these locally before submitting.
+CI (`.github/workflows/tools-ci.yml`) runs both test suites on Python 3.11 and 3.12; run them locally
+before submitting.
 
 The two packages expose **distinct** console scripts — `scs` (scaffolding, `scs-tools`) and
 `scs-validate` (validation, `scs-validator`). Keep them distinct: both once declared `scs`,
@@ -75,7 +76,8 @@ Click-based CLI exposing the `scs` command (`scs_tools.cli:cli`). Subcommands: `
 cd tools/cli
 pip install -e .          # installs the `scs` command
 scs new project my-app    # scaffold a project
-scs validate              # validate within a project
+scs bundle validate       # validate the project bundle (scs validate <files> for SCDs)
+pytest                    # regression suite (needs `pip install pytest` and the validator installed)
 ```
 
 ### `tools/scd-validator/` — `scs-validator` (the validation engine)
@@ -83,9 +85,13 @@ scs validate              # validate within a project
 `src/`-layout package (`src/scs_validator/`). Validates SCDs and bundles in layered passes:
 syntax → schema → semantic → relationship → bundle/completeness (one module per pass,
 e.g. `schema_validator.py`, `semantic_validator.py`, `bundle_validator.py`). Validation
-**rules are data**, declared in `rules/v0.1.0/*.yaml` and loaded by `rules_loader.py` —
-prefer editing rule YAML over hardcoding checks. JSON Schemas it validates against live in
-the repo-root `schema/` directory (pass `--schema-dir ../../schema` if not auto-found).
+**rules are data**, declared in `src/scs_validator/rules/v0.5.0/*.yaml` and loaded by
+`rules_loader.py` — prefer editing rule YAML over hardcoding checks. The repo-root `schema/`
+directory is the source of truth for the JSON Schemas; a copy is vendored into the package at
+`src/scs_validator/schemas/` so the wheel is self-contained. **After changing anything under
+`schema/`, run `python scripts/sync_schemas.py`** (from `tools/scd-validator`); a test fails if the
+copies drift. The schema directory is found automatically (`--schema-dir`, then `$SCS_SCHEMA_DIR`,
+then a `schema/` dir from the current directory upward or in the checkout, then the packaged copy).
 
 ```bash
 cd tools/scd-validator
@@ -100,6 +106,7 @@ python -m scs_validator --bundle bundle.yaml  # equivalent, as a module
 pytest                                         # runs with coverage (addopts in pyproject)
 pytest tests/test_schema_validator.py          # single test file
 pytest -k semantic                             # single test by name
+python scripts/sync_schemas.py [--check]       # vendor schema/ into the package (ISS-035)
 black src/ tests/
 ruff check src/ tests/
 mypy src/                                       # disallow_untyped_defs is on
