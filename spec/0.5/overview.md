@@ -202,7 +202,7 @@ SCS 0.5.0 defines **five bundle types**:
 2. **Meta Bundle** - Universal vocabulary and semantic foundations
 3. **Standards Bundle** - Compliance and regulatory requirements
 4. **Concept Bundle** - A Domain Ontology concept, realized as SCDs (Architecture, Security, etc.)
-5. **Domain Bundle** - Industry vertical (Software Development, Medical-Device CDMO, Legal, etc.)
+5. **Domain Bundle** - Industry vertical (Software Development, Medical-Device CDMO, Merchant Cash Advance, Legal, etc.)
 
 Bundles enable:
 
@@ -239,9 +239,18 @@ A **domain** represents an industry vertical or professional practice area. Each
 - Shows what a domain looks like once "does our context cover regulation X?" needs to be a
   machine-answerable question, not just a functional grouping
 
+**Merchant Cash Advance (MCA) Domain** (Reference Ontology for business funding):
+- 16 concepts in three clusters: nine industry-native (origination, underwriting and
+  decisioning, contract characterization, servicing and collections, ...), three
+  infrastructure, and four universal AI-governance concepts
+- Ontology only, with a small set of `depends-on` / `relates-to` relationships; best-practice
+  AI governance, so it deliberately carries no regulatory `satisfies` mapping
+- Shows that the ontology follows the industry: the concepts an MCA funder needs have no home
+  in the software or medical-device shapes
+
 **Future Domains** (created by domain experts):
 - Legal, Clinical, Financial, Trading, Sales, Education, etc.
-- Each starts from an existing **Ontology Model** (`terminology.md` §2.14) — SDLC, CDMO, or
+- Each starts from an existing **Ontology Model** (`terminology.md` §2.14) — SDLC, CDMO, MCA, or
   a new one — rather than authoring an ontology from a blank page
 
 Tools built on SCS (e.g., Viewer/Editor, Evaluator, Validator) are domain-aware and operate at the bundle level.
@@ -260,11 +269,12 @@ architecture.
 - The **Domain Ontology**: concepts, optional taxonomy (`parent`), optional typed
   relationships (`depends-on`, `relates-to`, `satisfies`) — lives in the domain manifest's
   `ontology` block, replacing the flat `concerns` list
-- **Ontology Models**: a domain instantiates a reusable model (SDLC, CDMO, and eventually
+- **Ontology Models**: a domain instantiates a reusable model (SDLC, CDMO, MCA, and eventually
   others) rather than authoring an ontology from scratch
 - **Bundle approval provenance**: `version_approved_by` / `version_approved_at`, required
   once a bundle leaves `DRAFT` — a bundle is not just authored, it's approved
 - The **Medical-Device CDMO domain**, as the reference example for ontology depth
+- The **MCA (merchant cash advance) ontology**, as the reference for a third industry
 - Cross-domain concept sharing, which 0.3 assumed ("concerns are reusable across domains"),
   is explicitly not pursued — concepts are domain-scoped; Ontology Models are the reuse unit
 
@@ -377,7 +387,7 @@ The SCS 0.5.0 specification includes:
 These documents together form the complete SCS 0.5.0 specification.
 
 **For Domain Experts:**
-If you want to create a domain for your professional field (Legal, Clinical, Financial, etc.), start with `domain-ontology.md` and an existing Ontology Model (Software Development or Medical-Device CDMO) as a reference.
+If you want to create a domain for your professional field (Legal, Clinical, Financial, etc.), start with `domain-ontology.md` and an existing Ontology Model (Software Development, Medical-Device CDMO, or Merchant Cash Advance) as a reference.
 
 ---
 

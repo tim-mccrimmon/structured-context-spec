@@ -1,0 +1,163 @@
+domain:
+  id: "domain:merchant-cash-advance"
+  name: "Merchant Cash Advance (Business Funding)"
+  version: "0.1.0"
+  description: "Domain Ontology for merchant cash advance (MCA) and revenue-based business funding: the concepts an MCA funder's AI guardrails are organized around."
+  author: "Ohana Consulting"
+  license: "open"
+  homepage: "https://structuredcontext.dev/domains/merchant-cash-advance"
+
+  # The Domain Ontology (RFC-0001) for the MCA / business-funding market: 16 concepts in three
+  # clusters. The first is what makes this a business-funding ontology rather than a relabeled
+  # software or medical-device one, the concepts the SDLC and CDMO shapes have no home for. The
+  # second is infrastructure. The third is the AI-governance layer that looks similar in almost
+  # any domain, but is defined here because concepts are domain-scoped, not shared across domains.
+  #
+  # This is best-practice AI governance, not a compliance program: it carries no `satisfies`
+  # mapping to statutes. Regulatory obligations are owned by the funder's own legal and compliance
+  # function. Concept relationships are deliberately few and are recorded here, at the ontology,
+  # not on individual SCDs (an SCD relationship targets another SCD, not a concept).
+  #
+  # Ontology depth is flat plus relationships: no taxonomy (`parent`) is needed yet. The concepts
+  # are the baseline for the industry; a funder adds its own concepts and SCDs on top.
+  ontology:
+    concepts:
+      # ---- MCA-native ------------------------------------------------------------------------
+      - id: concept:origination
+        name: Origination
+        description: ISO/broker intake, lead qualification, and application intake.
+        relationships:
+          - type: depends-on
+            target: concept:data-provenance
+          - type: relates-to
+            target: concept:underwriting-decisioning
+
+      - id: concept:underwriting-decisioning
+        name: Underwriting & Decisioning
+        description: Cash-flow analysis, risk scoring, approve/decline/counter, and pricing and terms.
+        relationships:
+          - type: depends-on
+            target: concept:data-provenance
+          - type: relates-to
+            target: concept:contract-characterization
+          - type: relates-to
+            target: concept:portfolio-risk-management
+
+      - id: concept:contract-characterization
+        name: Contract Characterization
+        description: The true-sale and reconciliation-provision discipline that keeps a deal a purchase of receivables, not a loan.
+        relationships:
+          - type: relates-to
+            target: concept:disclosure-compliance
+
+      - id: concept:disclosure-compliance
+        name: Disclosure Compliance
+        description: State commercial-financing disclosure requirements.
+
+      - id: concept:security-interest-management
+        name: Security Interest Management
+        description: "UCC-1 filings and liens on receivables: perfection, and releases on payoff."
+        relationships:
+          - type: relates-to
+            target: concept:portfolio-risk-management
+
+      - id: concept:servicing-collections
+        name: Servicing & Collections
+        description: Daily or twice-monthly ACH debiting, NSF and returns, delinquency, restructuring, and confession-of-judgment posture.
+        relationships:
+          - type: depends-on
+            target: concept:security-interest-management
+          - type: relates-to
+            target: concept:contract-characterization
+
+      - id: concept:capital-funding
+        name: Capital & Funding
+        description: "Where the funder's own money comes from to fund merchants: credit facilities, warehouse lines, and Treasury."
+        relationships:
+          - type: relates-to
+            target: concept:portfolio-risk-management
+
+      - id: concept:portfolio-risk-management
+        name: Portfolio Risk Management
+        description: Aggregate credit and default risk across the book (distinct from AI operational risk, which lives under ai-accountability).
+
+      - id: concept:broker-partner-management
+        name: Broker & Partner Management
+        description: ISO and broker relationships, and oversight of what brokers represent to merchants.
+        relationships:
+          - type: relates-to
+            target: concept:origination
+          - type: relates-to
+            target: concept:disclosure-compliance
+
+      # ---- Infrastructure --------------------------------------------------------------------
+      - id: concept:data-provenance
+        name: Data & Provenance
+        description: "Bank-statement data, credit-bureau pulls, and ISO/broker-submitted application data: where it comes from and what AI may do with it."
+        relationships:
+          - type: depends-on
+            target: concept:systems-integration
+
+      # Named data-security, not security: in this business "security" natively means the UCC lien
+      # on receivables (security-interest-management), so reusing the word for infosec would collide.
+      - id: concept:data-security
+        name: Data Security
+        description: "Merchant PII, guarantor PII, and bank data: access boundaries at the AI layer."
+        relationships:
+          - type: depends-on
+            target: concept:systems-integration
+
+      - id: concept:systems-integration
+        name: Systems Integration
+        description: How AI plugs into the loan-origination, CRM, and ACH/servicing platforms, including how state data is looked up at the moment a prompt is assembled.
+
+      # ---- Universal AI governance -----------------------------------------------------------
+      - id: concept:governance
+        name: Governance
+        description: Which AI tools are sanctioned, the autonomy default for AI use, and the hard "never" prohibitions company-wide.
+
+      - id: concept:ai-accountability
+        name: AI Accountability
+        description: The company AI use policy. The human is the author of record, AI augments judgment and does not replace sign-off authority, chain of custody, and the human-review thresholds before an AI-assisted recommendation becomes an approve/decline/fund action.
+
+      - id: concept:training-competency
+        name: Training & Competency
+        description: Role-based training, meaning what leadership and staff need to know before using AI.
+
+      - id: concept:adoption-rollout
+        name: Adoption & Rollout
+        description: Phased AI rollout per department, with rollback triggers if a workflow is not working.
+        relationships:
+          - type: relates-to
+            target: concept:governance
+
+  # Shared base SCD schemas (inherited from the core spec, as in the sibling domains).
+  schemas:
+    meta:
+      content_schema: "../../scd/meta-scd-content-schema.json"
+      template: "../../scd/meta-scd-template.json"
+
+    standards:
+      content_schema: "../../scd/standards-scd-content-schema.json"
+      template: "../../scd/standards-scd-template.json"
+
+    project:
+      content_schema: "../../scd/project-scd-content-schema.json"
+      template: "../../scd/project-scd-template.json"
+
+  metadata:
+    tags:
+      - "merchant-cash-advance"
+      - "revenue-based-financing"
+      - "business-funding"
+      - "ai-governance"
+
+    industry:
+      - "Financial Services"
+      - "Small-Business Funding"
+
+    use_cases:
+      - "AI-assisted underwriting and decisioning with human sign-off"
+      - "Broker and ISO origination workflows"
+      - "Servicing and collections"
+      - "Governance of AI assistants across departments"

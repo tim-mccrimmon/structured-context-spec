@@ -657,3 +657,28 @@ is empty in a fresh project and ontology rules 6 and 7 have nothing to check. Fi
 concept from the scaffold's SCD-to-concept mapping (now local to `commands/new.py`) into each SCD, and
 by giving `scs add scd` the same reverse lookup. Related: ISS-029, ISS-005b.
 
+### ISS-039 - MCA (merchant cash advance / business funding) ontology ships with 0.5.0
+**Status:** in-progress: manifest, tests and spec text done (2026-09-24); client clearance open
+Decided by Tim: the third industry ontology, MCA, ships with the 0.5.0 release. Source: the
+business-funding engagement's ontology document (16 concepts, three clusters).
+**Done:** `schema/domain/examples/merchant-cash-advance-domain.yaml` (validates 0 errors, 0 warnings;
+15 `depends-on` / `relates-to` relationships; no `satisfies`; client-neutral wording: no client or
+people names, and no specific regulatory claims, e.g. the source's count of states with disclosure
+regimes was dropped); regression tests; `spec/0.5/domain-ontology.md`, `terminology.md` and
+`overview.md` updated. `rfcs/RFC-0001` is untouched (accepted record).
+**Open:** (a) clearance from the client to publish; (b) the `--ontology` selector on `scs new project`
+(ISS-029); (c) whether any MCA concept bundles or example SCDs should ship. The engagement's skeleton
+SCDs were deliberately not shipped: they carry customer owners and departments, i.e. the details, not
+the baseline.
+Related: ISS-029, RELEASE-0.5.0.md Phase 2b.
+
+### ISS-040 - Docs and validator message do not say that concept relationships belong in the ontology (proposed)
+**Status:** proposed
+Found while validating the MCA engagement's 16 skeleton SCDs: 12 failed because their SCD
+`relationships[].target` values are `concept:` ids, but an SCD relationship must target another SCD
+(`^scd:(meta|standards|project):...`). Concept-to-concept relationships belong in the domain
+manifest's ontology. The error only says the pattern did not match, and the spec does not spell out
+where concept links go, so the mistake is easy to make. Fix: state it in `domain-ontology.md` §3.3
+and `core-model.md` §6, and make the validator message point at the ontology when a relationship
+target starts with `concept:`. Related: RFC-0001, ISS-006.
+

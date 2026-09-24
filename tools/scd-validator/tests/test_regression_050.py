@@ -303,3 +303,83 @@ def test_schema_dir_env_var_is_honoured(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("SCS_SCHEMA_DIR", str(SCHEMA))
     result = run(str(FIXTURES / "valid" / "test-meta-roles.yaml"), schema=False)
     assert result.exit_code == 0, result.output
+
+
+# ----------------------------------------------------- MCA ontology (ships with 0.5.0)
+
+MCA_MANIFEST = DOMAIN_EXAMPLES / "merchant-cash-advance-domain.yaml"
+MCA_NATIVE = {
+    "origination",
+    "underwriting-decisioning",
+    "contract-characterization",
+    "disclosure-compliance",
+    "security-interest-management",
+    "servicing-collections",
+    "capital-funding",
+    "portfolio-risk-management",
+    "broker-partner-management",
+}
+MCA_INFRASTRUCTURE = {"data-provenance", "data-security", "systems-integration"}
+MCA_AI_GOVERNANCE = {"governance", "ai-accountability", "training-competency", "adoption-rollout"}
+MCA_EDGES = {
+    ("adoption-rollout", "relates-to", "governance"),
+    ("broker-partner-management", "relates-to", "origination"),
+    ("broker-partner-management", "relates-to", "disclosure-compliance"),
+    ("capital-funding", "relates-to", "portfolio-risk-management"),
+    ("contract-characterization", "relates-to", "disclosure-compliance"),
+    ("data-provenance", "depends-on", "systems-integration"),
+    ("data-security", "depends-on", "systems-integration"),
+    ("origination", "depends-on", "data-provenance"),
+    ("origination", "relates-to", "underwriting-decisioning"),
+    ("security-interest-management", "relates-to", "portfolio-risk-management"),
+    ("servicing-collections", "depends-on", "security-interest-management"),
+    ("servicing-collections", "relates-to", "contract-characterization"),
+    ("underwriting-decisioning", "depends-on", "data-provenance"),
+    ("underwriting-decisioning", "relates-to", "contract-characterization"),
+    ("underwriting-decisioning", "relates-to", "portfolio-risk-management"),
+}
+
+
+def _mca_ontology() -> dict:
+    import yaml
+
+    return yaml.safe_load(MCA_MANIFEST.read_text())["domain"]["ontology"]
+
+
+def test_mca_ontology_validates_clean():
+    result = run("--domain", str(MCA_MANIFEST))
+    assert result.exit_code == 0, result.output
+    assert "0 errors" in result.output and "0 warnings" in result.output
+
+
+def test_mca_ontology_has_the_sixteen_concepts():
+    ids = {c["id"].split(":", 1)[1] for c in _mca_ontology()["concepts"]}
+    assert ids == MCA_NATIVE | MCA_INFRASTRUCTURE | MCA_AI_GOVERNANCE
+    assert len(ids) == 16
+
+
+def test_mca_names_its_access_control_concept_data_security_not_security():
+    """In this business "security" natively means the lien on receivables."""
+    ids = {c["id"] for c in _mca_ontology()["concepts"]}
+    assert "concept:data-security" in ids and "concept:security-interest-management" in ids
+    assert "concept:security" not in ids
+
+
+def test_mca_concept_relationships_are_the_documented_set():
+    edges = {
+        (c["id"].split(":", 1)[1], r["type"], r["target"].split(":", 1)[1])
+        for c in _mca_ontology()["concepts"]
+        for r in c.get("relationships", [])
+    }
+    assert edges == MCA_EDGES
+
+
+def test_every_mca_concept_is_described():
+    for concept in _mca_ontology()["concepts"]:
+        assert concept.get("description", "").strip(), concept["id"]
+
+
+def test_mca_manifest_is_client_neutral():
+    text = MCA_MANIFEST.read_text().lower()
+    for term in ("everest", "whetstone", "alpine", "nextern"):
+        assert term not in text, term

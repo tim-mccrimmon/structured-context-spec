@@ -37,8 +37,8 @@ ways: a **Medical-Device CDMO** (Nextern) needed risk management, design control
 supplier qualification — concepts the SDLC list has no home for — and lost the regulatory
 mapping that mattered most in that market when forced into the SDLC shape. A **Business
 Funding** engagement (Everest) is a third, distinct market with no obvious existing
-framework to align to, not yet modeled. A single fixed ontology cannot serve every business
-type SCS is used in.
+framework to align to; it is now modeled as the **MCA** ontology (§4). A single fixed ontology
+cannot serve every business type SCS is used in.
 
 ---
 
@@ -171,8 +171,12 @@ not once per company. So far there are three:
   software development businesses.
 - **CDMO** — risk management, design controls, verification & validation, supplier
   qualification, …, for regulated medical-device contract manufacturers.
-- **Business Funding** — not yet modeled; a third market with no obvious existing framework
-  to align to.
+- **MCA** — merchant cash advance / business funding: origination, underwriting and decisioning,
+  contract characterization, disclosure compliance, servicing and collections, and more that
+  neither the SDLC nor the CDMO shape has a home for. 16 concepts in three clusters
+  (industry-native, infrastructure, and the AI-governance layer). Best-practice AI governance,
+  not a compliance mapping, so it carries relationships but no `satisfies`. Reference manifest:
+  `schema/domain/examples/merchant-cash-advance-domain.yaml`.
 
 The first step in adopting SCS is choosing your business's ontology, not writing one from a
 blank page: **use an existing model if one fits your market, or create a new one by

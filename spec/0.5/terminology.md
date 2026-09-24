@@ -167,6 +167,7 @@ An **organizational unit** for which SCS provides structured context aggregation
 The SCS reference implementation uses domains to represent **industry verticals** or **professional practice areas**:
 - **Software Development** - Software engineering practices, architecture, testing, deployment
 - **Medical-Device CDMO** - Regulated QMS work, computer-system validation, AI governance for medical-device contract manufacturers
+- **Merchant Cash Advance (MCA)** - Origination, underwriting, contract characterization, servicing and collections, AI governance for business-funding providers
 - **Legal** - Case management, legal research, document drafting, client communication
 - **Clinical** - Patient care workflows, clinical decision support, treatment protocols
 - **Financial** - Portfolio management, risk assessment, compliance
@@ -239,7 +240,9 @@ A Domain Ontology authored once per **type of business** (a market/industry vert
 once per company. So far there are three known: **SDLC** (the original "concerns" list,
 generalized software product-plan structure), **CDMO** (medical-device contract
 manufacturing — risk management, design controls, supplier qualification, and more that the
-SDLC shape has no home for), and **Business Funding** (not yet modeled).
+SDLC shape has no home for), and **MCA** (merchant cash advance / business funding:
+origination, underwriting and decisioning, contract characterization, servicing and
+collections, and more).
 
 Adopting SCS starts with choosing an Ontology Model — using an existing one if it fits, or
 adapting the nearest one — not authoring an ontology from a blank page. How a model is
@@ -273,7 +276,7 @@ SCS 0.5.0 defines five bundle types, each with distinct purpose and rules:
 - **Purpose**: A Domain Ontology concept, realized as SCDs
 - **Imports**: MUST NOT import other bundles (imports array MUST be empty)
 - **SCDs**: MUST contain at least one project-tier SCD
-- **Cardinality**: Variable (11 in Software Development domain, 12 in Medical-Device CDMO)
+- **Cardinality**: Variable (11 in Software Development domain, 12 in Medical-Device CDMO, 16 in MCA)
 - **Reusability**: Domain-scoped, not reusable across domains (2.12) — the reusable unit is
   the Ontology Model (2.14), not the concept bundle itself
 

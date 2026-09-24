@@ -138,6 +138,22 @@ tested against real content.
 
 See ISS-006 in `ISSUES.md` for the full design rationale and implementation detail.
 
+## Phase 2b — MCA ontology (ISS-039) — ships with 0.5.0
+
+- [x] Ontology defined: 16 concepts in three clusters (9 MCA-native, 3 infrastructure, 4 universal
+      AI-governance), from the business-funding engagement's ontology
+- [x] `schema/domain/examples/merchant-cash-advance-domain.yaml`: validates with 0 errors and 0
+      warnings; 15 concept relationships (`depends-on` / `relates-to`); no `satisfies` (best-practice
+      AI governance, not a compliance mapping); client-neutral
+- [x] Tests in `tools/scd-validator/tests/test_regression_050.py` (concepts, relationships, the
+      `data-security` naming, client neutrality)
+- [x] Spec text updated: `domain-ontology.md` §2 and §4, `terminology.md`, `overview.md`
+      (`rfcs/RFC-0001` is left as the accepted historical record and still says "not yet modeled")
+- [ ] **Client clearance** to publish the MCA ontology in the open-source repo (Tim)
+- [ ] `scs new project --ontology mca` (and cdmo): selector still open on ISS-029
+- Not shipped, on purpose: the engagement's 16 skeleton SCDs. They are the customer's details
+  (owners, departments), not the industry baseline.
+
 ## Phase 3 — Runtime decisions (ISS-007 – ISS-009)
 
 - [ ] ISS-007: normative decision on immutability scope (per execution/task/session)
