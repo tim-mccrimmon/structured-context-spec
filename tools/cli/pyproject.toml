@@ -44,3 +44,15 @@ packages = ["scs_tools", "scs_tools.commands", "scs_tools.templates", "scs_tools
 
 [tool.setuptools.package-data]
 scs_tools = ["templates/**/*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+# Explicit rule set so results do not change when ruff changes its defaults (ISS-036)
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]

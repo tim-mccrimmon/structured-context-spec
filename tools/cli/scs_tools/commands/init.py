@@ -3,13 +3,15 @@ Init command - initialize SCS in an existing project
 """
 
 import os
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
+
 import click
+
 from scs_tools.utils.files import (
+    copy_template,
     create_directory_structure,
     get_template_path,
-    copy_template,
     write_file,
 )
 from scs_tools.utils.project_types import PROJECT_TYPES
@@ -113,8 +115,8 @@ email: {email_info}
         if gitignore_template.exists():
             copy_template(gitignore_template, gitignore_file, variables)
 
-    click.echo(f"\n✓ SCS initialized successfully!")
-    click.echo(f"\nNext steps:")
+    click.echo("\n✓ SCS initialized successfully!")
+    click.echo("\nNext steps:")
     click.echo(f"  scs new project {project_name}  # Generate full project structure")
-    click.echo(f"  scs add scd <name>              # Add individual SCDs")
-    click.echo(f"  scs bundle list                 # List available bundles")
+    click.echo("  scs add scd <name>              # Add individual SCDs")
+    click.echo("  scs bundle list                 # List available bundles")

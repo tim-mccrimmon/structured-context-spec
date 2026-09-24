@@ -11,9 +11,9 @@ from pathlib import Path
 import pytest
 import yaml
 from click.testing import CliRunner
+from scs_validator.commands.validate import validate as validator_cmd
 
 from scs_tools.cli import cli
-from scs_validator.commands.validate import validate as validator_cmd
 
 REPO = Path(__file__).resolve().parents[3]
 SCHEMA = REPO / "schema"
@@ -444,7 +444,7 @@ def test_add_bundle_without_a_manifest_says_nothing_about_it(tmp_path: Path, mon
 
 @pytest.mark.parametrize("concept", sorted(CONCEPTS))
 def test_add_bundle_works_for_every_concept(tmp_path: Path, monkeypatch, concept: str):
-    """ISS-034 follow-up: compliance-governance crashed ('config' is undefined) under `add bundle`."""
+    """ISS-037: compliance-governance crashed ('config' is undefined) under `add bundle`."""
     root = _init_bare_project(tmp_path, monkeypatch)
     result = CliRunner().invoke(cli, ["add", "bundle", concept])
     assert result.exit_code == 0, result.output
@@ -453,7 +453,7 @@ def test_add_bundle_works_for_every_concept(tmp_path: Path, monkeypatch, concept
 
 
 def test_add_bundle_honours_the_project_types_compliance_settings(tmp_path: Path, monkeypatch):
-    """A healthcare project's compliance bundle lists the HIPAA SCDs; a standard project's does not."""
+    """A healthcare project's compliance bundle lists the HIPAA SCDs; a standard one does not."""
     for project_type, expect_hipaa in (("healthcare", True), ("standard", False)):
         root = scaffold(tmp_path / project_type, project_type)
         (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()

@@ -2,14 +2,16 @@
 Bundle command - manage SCS bundles
 """
 
-from pathlib import Path
-import yaml
-import click
 import hashlib
 import subprocess
 from datetime import datetime, timezone
+from pathlib import Path
+
+import click
+import yaml
+
 from scs_tools.utils.files import get_template_path
-from scs_tools.utils.project_types import SOFTWARE_DEVELOPMENT_CONCEPTS, PROJECT_TYPES
+from scs_tools.utils.project_types import PROJECT_TYPES, SOFTWARE_DEVELOPMENT_CONCEPTS
 
 
 @click.group()
@@ -53,11 +55,9 @@ def list(available):
             click.echo(f"  {ptype}:")
             click.echo(f"    Description: {config['description']}")
             if config.get("minimal"):
-                click.echo(
-                    f"    Concept bundles: 3 (architecture, security, deployment-operations)"
-                )
+                click.echo("    Concept bundles: 3 (architecture, security, deployment-operations)")
             else:
-                click.echo(f"    Concept bundles: all 11")
+                click.echo("    Concept bundles: all 11")
         return
 
     # List bundles in current project
@@ -154,7 +154,7 @@ def info(bundle_name):
                 break
         if template_path:
             bundle_path = template_path
-            click.echo(f"(Showing template bundle, not in current project)\n")
+            click.echo("(Showing template bundle, not in current project)\n")
         else:
             click.echo(
                 f"Error: Bundle '{bundle_name}' not found in project or templates.",
@@ -177,7 +177,7 @@ def info(bundle_name):
         click.echo(f"Domain: {data['domain']}")
 
     if "concerns" in data:
-        click.echo(f"\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
+        click.echo("\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
         for concern in data["concerns"]:
             click.echo(f"  • {concern}")
 
@@ -201,7 +201,7 @@ def info(bundle_name):
 
     if "provenance" in data:
         prov = data["provenance"]
-        click.echo(f"\nProvenance:")
+        click.echo("\nProvenance:")
         click.echo(f"  Created by: {prov.get('created_by', 'N/A')}")
         click.echo(f"  Created at: {prov.get('created_at', 'N/A')}")
         if "rationale" in prov:
@@ -292,7 +292,8 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
         scs bundle version --version 1.0.0
 
         # With approver and notes
-        scs bundle version --version 1.0.0 --approved-by "jane@example.com" --notes "Initial release"
+        scs bundle version --version 1.0.0 \
+            --approved-by "jane@example.com" --notes "Initial release"
 
         # Version a specific bundle
         scs bundle version --bundle bundles/custom-bundle.yaml --version 2.1.0

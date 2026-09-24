@@ -619,13 +619,23 @@ Related: ISS-014, ISS-015 (rules convergence), ISS-028.
 Not changed: v0.1.0 and v0.3.0 rule sets still ship in the wheel until ISS-015 retires them.
 
 ### ISS-036 — Lint and type-check baseline is not clean
-**Status:** open
+**Status:** done (2026-09-24)
 On 2026-09-24: `ruff check` reports 196 findings in `tools/scd-validator/src` (150 auto-fixable), 3 in
 its tests and 45 in `tools/cli`; `black --check` would reformat 9 of 16 validator files; `mypy src`
 (config has `disallow_untyped_defs`) reports 10 errors. CI (ISS-013) therefore runs lint as
 report-only. Auto-fixing is a large mechanical diff across the validator, so do it as one dedicated,
 separately reviewed change with the regression suites as the safety net, then make lint blocking.
 Related: ISS-013.
+**Fixed:** in three steps. (1) `black` formatting in its own commit (formatting only; black verifies
+AST equivalence). (2) Lint: the original counts were measured with ruff 0.16.8, whose default rule set
+is much broader than older versions (FURB, RUF, TRY, PLW...), so an unpinned `pip install ruff` would
+keep moving the baseline. Both `pyproject.toml` files now declare an explicit rule set
+(`select = ["E", "F", "W", "I"]`); the resulting 17 (validator) and 37 (scs-tools) findings were fixed:
+unused imports and variables, f-strings without placeholders, import order, long lines. (3) `mypy`
+(config already had `disallow_untyped_defs`): 8 errors fixed with annotations only, and type stubs
+(`types-colorama`, `-jsonschema`, `-PyYAML`, `-tabulate`) added to the `dev` extra. No behaviour
+changes; both regression suites pass unchanged. The CI `lint` job (ruff, black per package, mypy for
+scs-validator) is now blocking. scs-tools has no mypy configuration yet, so it is not type-checked.
 
 ### ISS-037 - `scs add bundle compliance-governance` crashed ("'config' is undefined")
 **Status:** done (2026-09-24)

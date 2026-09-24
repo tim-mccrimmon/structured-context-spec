@@ -57,7 +57,7 @@ def test_packaged_schema_dir_is_recognised_as_a_schema_dir():
 
 
 def test_packaged_schemas_match_the_repo_schema_source_of_truth():
-    """Drift check: run `python scripts/sync_schemas.py` from tools/scd-validator to fix a failure."""
+    """Drift check. To fix a failure run `python scripts/sync_schemas.py` in tools/scd-validator."""
     if not REPO_SCHEMA.is_dir():
         pytest.skip("repo-root schema/ not available (running from an sdist or installed copy)")
     source = {p.relative_to(REPO_SCHEMA).as_posix(): p for p in REPO_SCHEMA.rglob("*.json")}

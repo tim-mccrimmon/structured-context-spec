@@ -147,7 +147,7 @@ class RulesLoader:
             return data
 
     @staticmethod
-    def get_error_message(rules: Dict[str, Any], error_key: str, **kwargs) -> str:
+    def get_error_message(rules: Dict[str, Any], error_key: str, **kwargs: Any) -> str:
         """Get a formatted error message from rules.
 
         Args:
@@ -159,7 +159,7 @@ class RulesLoader:
             Formatted error message
         """
         error_messages = rules.get("error_messages", {})
-        template = error_messages.get(error_key, error_key)
+        template: str = error_messages.get(error_key, error_key)
 
         try:
             return template.format(**kwargs)
@@ -193,7 +193,7 @@ class RulesLoader:
         """
         # Navigate nested dictionaries to find severity
         keys = rule_key.split(".")
-        current = rules
+        current: Any = rules
 
         for key in keys:
             if isinstance(current, dict):
@@ -202,7 +202,8 @@ class RulesLoader:
                 return default
 
         if isinstance(current, dict):
-            return current.get("severity", default)
+            severity: str = current.get("severity", default)
+            return severity
         return default
 
 

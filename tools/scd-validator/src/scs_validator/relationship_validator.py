@@ -44,7 +44,7 @@ class RelationshipValidator:
         result = ValidationResult("relationships")
 
         # Build SCD lookup
-        scd_lookup = {scd.get("id"): scd for scd in scds if scd.get("id")}
+        scd_lookup: Dict[str, Dict[str, Any]] = {scd["id"]: scd for scd in scds if scd.get("id")}
 
         # Track validation mode (standalone vs complete)
         is_complete_project = bundle_type == "project"
@@ -147,7 +147,10 @@ class RelationshipValidator:
                 result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
             else:
                 # Warning for standalone domain bundles
-                warning_msg = f"Relationship target '{target_id}' not found in this bundle. May exist in another bundle."
+                warning_msg = (
+                    f"Relationship target '{target_id}' not found in this bundle. "
+                    "May exist in another bundle."
+                )
                 result.add_warning(
                     ValidationWarning(
                         warning_msg, level="relationships", scd_id=source_id, file_path=file_path

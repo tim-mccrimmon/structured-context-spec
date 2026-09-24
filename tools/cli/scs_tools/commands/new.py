@@ -3,22 +3,23 @@ New project command - scaffolds a new SCS project
 """
 
 import os
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
+
 import click
+
 from scs_tools.utils.files import (
+    copy_template,
     create_directory_structure,
     get_template_path,
-    copy_template,
     write_file,
 )
 from scs_tools.utils.project_types import (
-    get_bundles_for_project_type,
-    get_domains_for_project_type,
-    get_concepts_for_project_type,
-    get_project_type_config,
     PROJECT_TYPES,
     get_concept_info,
+    get_concepts_for_project_type,
+    get_domains_for_project_type,
+    get_project_type_config,
 )
 
 
@@ -84,7 +85,8 @@ def project(name, project_type, directory, author, email, interactive, no_intera
         scs new project                           # Interactive mode (default)
         scs new project medication-adherence      # Interactive for missing fields
         scs new project my-app --type healthcare  # Specify type
-        scs new project my-app --type healthcare --author "Jane Doe" --email "jane@example.com" --no-interactive
+        scs new project my-app --type healthcare --author "Jane Doe" \
+            --email "jane@example.com" --no-interactive
 
     See also: scs init (for adding SCS to existing projects)
     """
@@ -226,11 +228,11 @@ def project(name, project_type, directory, author, email, interactive, no_intera
     _create_supporting_files(base_path, variables)
 
     click.echo(f"\n✓ Project '{name}' created successfully!")
-    click.echo(f"\nNext steps:")
+    click.echo("\nNext steps:")
     click.echo(f"  cd {name}")
-    click.echo(f"  # Edit SCDs in context/project/")
-    click.echo(f"  # Edit bundles in bundles/")
-    click.echo(f"  # Review docs/GETTING_STARTED.md")
+    click.echo("  # Edit SCDs in context/project/")
+    click.echo("  # Edit bundles in bundles/")
+    click.echo("  # Review docs/GETTING_STARTED.md")
 
 
 def _create_domain_manifest(base_path: Path, concepts: list, variables: dict):

@@ -1,6 +1,5 @@
 """Bundle validation module for Level 5 validation."""
 
-from pathlib import Path
 from typing import Any, Dict, List
 
 from .rules_loader import RulesLoader

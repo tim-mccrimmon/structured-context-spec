@@ -43,7 +43,10 @@ from ..utils import SCHEMA_DIR_ENV_VAR, ValidationError, ValidationResult, resol
     "--schema-dir",
     "-s",
     type=click.Path(exists=True),
-    help="Directory containing JSON schema files (default: $SCS_SCHEMA_DIR, else a schema/ dir found from the current directory upward or in the source checkout)",
+    help=(
+        "Directory containing JSON schema files (default: $SCS_SCHEMA_DIR, else a schema/ dir "
+        "found from the current directory upward or in the source checkout, else the packaged copy)"
+    ),
 )
 @click.option(
     "--output",

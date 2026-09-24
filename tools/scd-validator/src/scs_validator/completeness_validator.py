@@ -1,6 +1,5 @@
 """Completeness validation module for Level 6 validation."""
 
-import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -404,7 +403,6 @@ class CompletenessValidator:
         for check in checks:
             check_type = check.get("check")
             check_severity = check.get("severity", "error")
-            description = check.get("description", "")
 
             if check_type == "standards_bundle_present":
                 # Check if at least one standards bundle is imported

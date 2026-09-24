@@ -3,12 +3,14 @@ Add command - add SCDs or bundles to an existing SCS project
 """
 
 import os
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
+
 import click
+
 from scs_tools.utils.files import (
-    get_template_path,
     copy_template,
+    get_template_path,
 )
 from scs_tools.utils.project_types import get_project_type_config
 

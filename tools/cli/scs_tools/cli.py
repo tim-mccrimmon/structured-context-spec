@@ -3,11 +3,12 @@ SCS CLI - Command-line interface for Structured Context Specification tools
 """
 
 import click
+
 from scs_tools import __version__
-from scs_tools.commands.new import new
-from scs_tools.commands.init import init
 from scs_tools.commands.add import add
 from scs_tools.commands.bundle import bundle
+from scs_tools.commands.init import init
+from scs_tools.commands.new import new
 from scs_tools.commands.validate import validate
 
 

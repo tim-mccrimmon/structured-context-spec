@@ -1,9 +1,8 @@
 """File and directory utilities"""
 
-import os
 from pathlib import Path
-from typing import Dict, Any
-import yaml
+from typing import Any, Dict
+
 from jinja2 import Template
 
 

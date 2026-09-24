@@ -7,7 +7,7 @@ import jsonschema
 from jsonschema import Draft202012Validator
 
 from .parser import Parser
-from .utils import ValidationError, ValidationResult, get_tier_from_id, find_schema_file
+from .utils import ValidationError, ValidationResult, find_schema_file, get_tier_from_id
 
 
 class SchemaValidator:

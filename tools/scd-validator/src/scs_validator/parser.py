@@ -123,7 +123,11 @@ class Parser:
             error_msg = f"Invalid YAML syntax: {e}"
             if hasattr(e, "problem_mark"):
                 mark = e.problem_mark
-                error_msg = f"Invalid YAML syntax at line {mark.line + 1}, column {mark.column + 1}: {e.problem}"
+                problem = getattr(e, "problem", None)
+                error_msg = (
+                    f"Invalid YAML syntax at line {mark.line + 1}, "
+                    f"column {mark.column + 1}: {problem}"
+                )
             raise ValidationError(error_msg, file_path=str(file_path))
 
     @staticmethod
@@ -169,7 +173,8 @@ class Parser:
 
         try:
             with open(schema_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                schema: Dict[str, Any] = json.load(f)
+                return schema
         except json.JSONDecodeError as e:
             raise ValidationError(
                 f"Invalid JSON schema at line {e.lineno}, column {e.colno}: {e.msg}",

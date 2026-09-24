@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Vendor the repo-root JSON Schemas into the scs-validator package (ISS-035).
 
-The repo-root ``schema/`` directory is the source of truth (the spec, examples and docs all point at
-it). The validator wheel has to carry its own copy, so this script mirrors every ``schema/**/*.json``
-into ``src/scs_validator/schemas/``. Run it after changing anything under ``schema/``.
+The repo-root ``schema/`` directory is the source of truth (the spec, examples and docs all point
+at it). The validator wheel has to carry its own copy, so this script mirrors every
+``schema/**/*.json`` into ``src/scs_validator/schemas/``. Run it after changing anything under
+``schema/``.
 
     python scripts/sync_schemas.py           # copy schema/ -> src/scs_validator/schemas/
     python scripts/sync_schemas.py --check   # exit 1 if the copy is out of date (used by tests/CI)

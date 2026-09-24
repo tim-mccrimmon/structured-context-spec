@@ -2,8 +2,8 @@
 
 Baseline captured 2026-09-24 against the 0.5-dev branch. These tests pin the behaviour delivered by
 ISS-002 to ISS-006 (Domain Ontology schema + validator, examples, checkpoint records) so later fixes
-cannot silently regress it. Known pre-existing failures are marked ``xfail(strict=True)`` with the ISS
-that tracks them, so the marker has to be removed when the underlying issue is fixed.
+cannot silently regress it. Known pre-existing failures are marked ``xfail(strict=True)`` with the
+ISS that tracks them, so the marker has to be removed when the underlying issue is fixed.
 """
 
 from __future__ import annotations
@@ -190,7 +190,8 @@ def _manifest_with(concept_block: str) -> str:
         ),
         (
             "      - id: concept:a\n        name: A\n"
-            "        relationships:\n          - type: depends-on\n            target: concept:missing\n",
+            "        relationships:\n          - type: depends-on\n"
+            "            target: concept:missing\n",
             "missing",
         ),
         (

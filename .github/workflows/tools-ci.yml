@@ -44,18 +44,27 @@ jobs:
         run: python -m pytest tests
 
   lint:
-    # Report-only until the existing baseline is cleaned up (ISS-036).
-    name: lint (report only)
+    # ruff (E, F, W, I), black and mypy, configured in each package's pyproject.toml (ISS-036)
+    name: lint and types
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install ruff black
-      - run: ruff check tools/scd-validator/src tools/scd-validator/tests tools/cli --exclude tools/cli/scs_tools/templates
-      - run: black --check -l 100 tools/scd-validator/src tools/scd-validator/tests
+      - name: Install
+        run: pip install -e "tools/scd-validator[dev]" -e tools/cli
+      - name: ruff
+        run: ruff check tools/scd-validator/src tools/scd-validator/tests tools/scd-validator/scripts tools/cli/scs_tools tools/cli/tests
+      - name: black (scs-validator)
+        working-directory: tools/scd-validator
+        run: black --check src tests scripts
+      - name: black (scs-tools)
+        working-directory: tools/cli
+        run: black --check scs_tools tests
+      - name: mypy (scs-validator)
+        working-directory: tools/scd-validator
+        run: mypy src
 
   wheel-smoke:
     # Installs the built wheels (not editable) into a clean environment and uses them away from the
