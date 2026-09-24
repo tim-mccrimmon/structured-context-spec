@@ -61,6 +61,55 @@ SOFTWARE_DEVELOPMENT_CONCEPTS = [
 ]
 
 
+# Names and descriptions of the 11 concepts, as in the reference ontology
+# (schema/domain/examples/software-development-domain.yaml; a test keeps them in step)
+SOFTWARE_DEVELOPMENT_CONCEPT_INFO = {
+    "business-context": ("Business Context", "Problem, stakeholders, objectives, and opportunity."),
+    "architecture": (
+        "Architecture",
+        "System structure, components, boundaries, and technical design.",
+    ),
+    "security": ("Security", "Authentication, authorization, encryption, and data protection."),
+    "performance-reliability": (
+        "Performance & Reliability",
+        "Performance requirements, reliability targets, and scalability.",
+    ),
+    "usability-accessibility": (
+        "Usability & Accessibility",
+        "User experience, interface design, and accessibility requirements.",
+    ),
+    "compliance-governance": (
+        "Compliance & Governance",
+        "Regulatory compliance, audit requirements, and governance policies.",
+    ),
+    "data-provenance": (
+        "Data & Provenance",
+        "Data models, data flow, data governance, and provenance tracking.",
+    ),
+    "testing-validation": (
+        "Testing & Validation",
+        "Testing strategy, validation approach, and quality assurance.",
+    ),
+    "deployment-operations": (
+        "Deployment & Operations",
+        "Deployment strategy, operational procedures, and monitoring.",
+    ),
+    "safety-risk": ("Safety & Risk", "Safety requirements, risk assessment, and hazard analysis."),
+    "ethics-ai-accountability": (
+        "Ethics & AI Accountability",
+        "Ethical considerations, AI/ML governance, and bias mitigation.",
+    ),
+}
+
+
+def get_concept_info(concepts):
+    """Ontology entries (id, name, description) for the given concept ids, in the order given"""
+    return [
+        {"id": c, "name": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][0], "description": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][1]}
+        for c in concepts
+    ]
+
+
 # Minimal set of concepts for early-stage projects
 MINIMAL_CONCEPTS = [
     "architecture",

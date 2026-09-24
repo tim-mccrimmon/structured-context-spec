@@ -12,6 +12,7 @@ def create_directory_structure(base_path: Path, project_name: str):
     dirs = [
         "bundles/domains",     # Domain bundles (e.g., software-development)
         "bundles/concepts",    # Concept bundles (e.g., architecture, security)
+        "domain",              # Domain Ontology manifest
         "context/project",     # Project-tier SCDs
         "docs",               # Documentation
         ".scs",                # Configuration

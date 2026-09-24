@@ -16,6 +16,14 @@ Bundles are collections of related SCDs (Structured Context Documents). Your pro
 2. **Meta Bundle** (`bundles/meta-bundle.yaml`): Contains core SCS vocabulary (imported from the SCS spec)
 3. **Domain Bundles** (`bundles/domains/*.yaml`): Organize SCDs by domain (architecture, security, etc.)
 
+### Domain Ontology
+
+`domain/domain-manifest.yaml` is your project's Domain Ontology: the concepts (categories) your
+guardrails are organized around, one per concept bundle in `bundles/concepts/`. It starts flat, using
+the Software Development reference ontology. Add depth as you need it (a taxonomy with `parent`,
+`depends-on` / `relates-to` relationships, and `satisfies` links to the standards a concept addresses),
+and check it with `scs validate --domain domain/domain-manifest.yaml`.
+
 ### SCDs (Structured Context Documents)
 
 SCDs are YAML files that contain specific project information. They live in `context/project/` and are organized into domains:

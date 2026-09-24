@@ -328,3 +328,101 @@ def test_add_scd_adds_a_template_scd_that_validates(tmp_path: Path, monkeypatch)
         result = CliRunner().invoke(cli, ["add", "scd", name, "--author", "Tim"])
         assert result.exit_code == 0, result.output
         assert validate_with_validator(str(root / "context" / "project" / f"{name}.yaml")).exit_code == 0
+
+
+# ------------------------------------------- Domain Ontology manifest in the scaffold (ISS-029)
+
+SDLC_ONTOLOGY_EXAMPLE = REPO / "schema" / "domain" / "examples" / "software-development-domain.yaml"
+MANIFEST = "domain/domain-manifest.yaml"
+
+
+def _manifest_concepts(root: Path) -> list[dict]:
+    return yaml.safe_load((root / MANIFEST).read_text())["domain"]["ontology"]["concepts"]
+
+
+@pytest.mark.parametrize("project_type", PROJECT_TYPES)
+def test_scaffold_generates_a_valid_domain_ontology_manifest(tmp_path: Path, project_type: str):
+    root = scaffold(tmp_path, project_type)
+    assert (root / MANIFEST).is_file()
+    result = validate_with_validator("--domain", str(root / MANIFEST))
+    assert result.exit_code == 0, result.output
+    assert "0 errors" in result.output and "0 warnings" in result.output
+
+
+@pytest.mark.parametrize("project_type", PROJECT_TYPES)
+def test_manifest_ontology_lists_exactly_the_generated_concepts(tmp_path: Path, project_type: str):
+    root = scaffold(tmp_path, project_type)
+    generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
+    assert {c["id"] for c in _manifest_concepts(root)} == {f"concept:{g}" for g in generated}
+
+
+def test_manifest_uses_the_reference_sdlc_ontology_wording(tmp_path: Path):
+    """Drift guard: names and descriptions come from the shipped SDLC reference ontology."""
+    if not SDLC_ONTOLOGY_EXAMPLE.is_file():
+        pytest.skip("reference ontology example not available")
+    reference = {
+        c["id"]: (c["name"], c.get("description"))
+        for c in yaml.safe_load(SDLC_ONTOLOGY_EXAMPLE.read_text())["domain"]["ontology"]["concepts"]
+    }
+    root = scaffold(tmp_path, "healthcare")
+    scaffolded = {c["id"]: (c["name"], c.get("description")) for c in _manifest_concepts(root)}
+    assert scaffolded == reference
+
+
+def test_manifest_declares_the_software_development_domain(tmp_path: Path):
+    root = scaffold(tmp_path, "standard")
+    domain = yaml.safe_load((root / MANIFEST).read_text())["domain"]
+    assert domain["id"] == "domain:software-development"
+    assert domain["version"] == "0.1.0"
+    assert "concerns" not in domain
+
+
+def test_getting_started_points_at_the_ontology_manifest(tmp_path: Path):
+    root = scaffold(tmp_path, "standard")
+    assert MANIFEST in (root / "docs" / "GETTING_STARTED.md").read_text()
+
+
+def test_add_bundle_reminds_you_to_add_the_concept_to_the_manifest(tmp_path: Path, monkeypatch):
+    root = scaffold(tmp_path, "minimal")
+    monkeypatch.chdir(root)
+    result = CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"])
+    assert result.exit_code == 0, result.output
+    assert MANIFEST in result.output
+    assert "concept:compliance-governance" in result.output
+
+
+def test_add_bundle_is_quiet_when_the_manifest_already_has_the_concept(tmp_path: Path, monkeypatch):
+    root = scaffold(tmp_path, "healthcare")
+    (root / "bundles" / "concepts" / "security.yaml").unlink()
+    monkeypatch.chdir(root)
+    result = CliRunner().invoke(cli, ["add", "bundle", "security"])
+    assert result.exit_code == 0, result.output
+    assert MANIFEST not in result.output
+
+
+def test_add_bundle_without_a_manifest_says_nothing_about_it(tmp_path: Path, monkeypatch):
+    _init_bare_project(tmp_path, monkeypatch)
+    result = CliRunner().invoke(cli, ["add", "bundle", "security"])
+    assert result.exit_code == 0, result.output
+    assert "domain-manifest" not in result.output
+
+
+@pytest.mark.parametrize("concept", sorted(CONCEPTS))
+def test_add_bundle_works_for_every_concept(tmp_path: Path, monkeypatch, concept: str):
+    """ISS-034 follow-up: compliance-governance crashed ('config' is undefined) under `add bundle`."""
+    root = _init_bare_project(tmp_path, monkeypatch)
+    result = CliRunner().invoke(cli, ["add", "bundle", concept])
+    assert result.exit_code == 0, result.output
+    target = root / "bundles" / "concepts" / f"{concept}.yaml"
+    assert validate_with_validator("--bundle", str(target)).exit_code == 0
+
+
+def test_add_bundle_honours_the_project_types_compliance_settings(tmp_path: Path, monkeypatch):
+    """A healthcare project's compliance bundle lists the HIPAA SCDs; a standard project's does not."""
+    for project_type, expect_hipaa in (("healthcare", True), ("standard", False)):
+        root = scaffold(tmp_path / project_type, project_type)
+        (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
+        monkeypatch.chdir(root)
+        assert CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"]).exit_code == 0
+        text = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
+        assert ("hipaa-compliance" in text) is expect_hipaa

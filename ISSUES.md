@@ -503,7 +503,7 @@ project is ignored; the error lists every location tried. `scs bundle version`'s
 **Not solved here:** a wheel install has no schema directory at all, see ISS-035.
 
 ### ISS-029 — `scs new project` scaffolds no Domain Ontology manifest and only the SDLC shape (proposed)
-**Status:** proposed - needs a scope decision (0.5.0 or later)
+**Status:** in-progress: ontology manifest done (2026-09-24); the `--ontology` model selector is still open
 The scaffold creates the 11 SDLC concept bundles and a domain *bundle*, but no domain manifest with
 an `ontology:` block. A new project therefore has nothing for `scs-validate --domain` to check, and
 the 0.5.0 anchor feature is not visible to a new user. All project types (healthcare, fintech,
@@ -513,6 +513,17 @@ Decide: generate an `ontology` manifest from the chosen Ontology Model, and add 
 (for example `--ontology sdlc|cdmo|mca`) to `scs new project` / `scs init`.
 Related: ISS-005b (scs-tools migration, done), ISS-017 (`scs migrate` helper), the Ontology Model
 packaging question in `spec/0.5/domain-ontology.md` §10.
+**Done (2026-09-24):** `scs new project` now generates `domain/domain-manifest.yaml`, a flat Domain
+Ontology of exactly the concepts it generated, using the Software Development reference ontology's
+names and descriptions (a test keeps them in step with `schema/domain/examples/`). It validates with
+0 errors and 0 warnings under `scs validate --domain`, and the getting-started doc points at it.
+`scs add bundle <concept>` reminds you to add the concept when the manifest lacks it (it does not edit
+the manifest). The concept's optional `bundle:` field is left out because the schema requires a pinned
+version and scaffolded bundles are DRAFT. The CI wheel smoke test validates the manifest.
+**Still open:** a model selector (`--ontology sdlc|cdmo|mca`) for `scs new project` / `scs init`. It
+needs CDMO and MCA concept-bundle templates in scs-tools (MCA is not in this repo yet) and the
+Ontology Model packaging decision (`spec/0.5/domain-ontology.md` §10). `.scs/config` still records
+`scs_version: 0.1.0`.
 
 ### ISS-030 — Stale 0.3 content in user-facing docs
 **Status:** open
@@ -615,4 +626,21 @@ its tests and 45 in `tools/cli`; `black --check` would reformat 9 of 16 validato
 report-only. Auto-fixing is a large mechanical diff across the validator, so do it as one dedicated,
 separately reviewed change with the regression suites as the safety net, then make lint blocking.
 Related: ISS-013.
+
+### ISS-037 - `scs add bundle compliance-governance` crashed ("'config' is undefined")
+**Status:** done (2026-09-24)
+Found while testing ISS-029. The compliance-governance concept template uses the project type's
+`config.exclude_scds`, which `scs new` passes but `scs add bundle` did not, so adding that concept to
+an existing project failed. (ISS-034's tests had only exercised `security`.)
+**Fixed:** `scs add bundle` reads the project type from `.scs/config` (falling back to `standard`) and
+passes its settings, so a healthcare project's compliance bundle lists the HIPAA SCDs and a standard
+one does not. Tests now run `scs add bundle` for every concept and validate the result.
+
+### ISS-038 - Scaffolded SCDs do not declare the ontology `concept` they belong to (proposed)
+**Status:** proposed
+`spec/0.5/domain-ontology.md` §3.3 expects an SCD in a concept bundle to carry `concept: concept:<id>`
+(optional in the schema). The scaffold's SCD templates omit it, so the link from an SCD to the ontology
+is empty in a fresh project and ontology rules 6 and 7 have nothing to check. Fix by injecting the
+concept from the scaffold's SCD-to-concept mapping (now local to `commands/new.py`) into each SCD, and
+by giving `scs add scd` the same reverse lookup. Related: ISS-029, ISS-005b.
 

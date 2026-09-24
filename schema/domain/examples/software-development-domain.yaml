@@ -10,7 +10,7 @@ domain:
   # The Domain Ontology (RFC-0001). Flat for now - this domain hasn't needed
   # taxonomy or relationships yet; add depth incrementally if that changes.
   # These 11 concepts are recommendations, not requirements (see
-  # tools/scd-validator/rules/v0.5.0/completeness-rules.yaml) - a project in
+  # tools/scd-validator/src/scs_validator/rules/v0.5.0/completeness-rules.yaml) - a project in
   # this domain uses whichever subset fits, as examples/med-adherence does.
   ontology:
     concepts:

@@ -18,6 +18,7 @@ from scs_tools.utils.project_types import (
     get_concepts_for_project_type,
     get_project_type_config,
     PROJECT_TYPES,
+    get_concept_info,
 )
 
 
@@ -208,6 +209,10 @@ def project(name, project_type, directory, author, email, interactive, no_intera
     click.echo("Creating bundle files...")
     _create_bundles(base_path, domains, concepts, variables)
 
+    # Create the Domain Ontology manifest (RFC-0001)
+    click.echo("Creating Domain Ontology manifest...")
+    _create_domain_manifest(base_path, concepts, variables)
+
     # Create SCD files
     click.echo("Creating SCD files...")
     _create_scds(base_path, concepts, variables, config)
@@ -226,6 +231,16 @@ def project(name, project_type, directory, author, email, interactive, no_intera
     click.echo(f"  # Edit SCDs in context/project/")
     click.echo(f"  # Edit bundles in bundles/")
     click.echo(f"  # Review docs/GETTING_STARTED.md")
+
+
+def _create_domain_manifest(base_path: Path, concepts: list, variables: dict):
+    """Create domain/domain-manifest.yaml: a flat Domain Ontology of the generated concepts"""
+    manifest_template = get_template_path() / "domain" / "domain-manifest.yaml"
+    copy_template(
+        manifest_template,
+        base_path / "domain" / "domain-manifest.yaml",
+        {**variables, "concept_info": get_concept_info(concepts)},
+    )
 
 
 def _create_bundles(base_path: Path, domains: list, concepts: list, variables: dict):

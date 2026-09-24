@@ -77,6 +77,7 @@ jobs:
           scs new project smoke --type healthcare --author CI --email ci@example.com --no-interactive
           cd smoke
           scs bundle validate
+          scs validate --domain domain/domain-manifest.yaml
           for f in context/project/*.yaml; do scs-validate "$f" > /dev/null; done
           git init -q .
           git config user.email ci@example.com

@@ -10,6 +10,7 @@ from scs_tools.utils.files import (
     get_template_path,
     copy_template,
 )
+from scs_tools.utils.project_types import get_project_type_config
 
 
 @click.group()
@@ -208,6 +209,8 @@ def bundle(bundle_name, author, email):
         "email": email_info,
         "created_at": now,
         "bundles": [],  # Not used in domain bundles
+        # Project-type settings (e.g. which compliance SCDs a concept bundle lists)
+        "config": get_project_type_config(_read_project_type(config_file)),
         # A domain bundle imports the concept bundles this project has; a project with none yet
         # gets the full reference set
         "concepts": _project_concepts(base_path),
@@ -219,6 +222,10 @@ def bundle(bundle_name, author, email):
     click.echo(f"✓ Bundle '{bundle_name}' added successfully!")
     click.echo(f"  Location: {bundle_file.relative_to(base_path)}")
 
+    # A concept added to the project also belongs in the Domain Ontology manifest
+    if kind == "concepts":
+        _remind_about_ontology(base_path, bundle_name)
+
 
 def _project_concepts(base_path: Path) -> list:
     """Concept bundles present in the project, in reference order (all of them if none exist yet)"""
@@ -228,3 +235,32 @@ def _project_concepts(base_path: Path) -> list:
     present = {p.stem for p in concepts_dir.glob("*.yaml")} if concepts_dir.is_dir() else set()
     ordered = [c for c in SOFTWARE_DEVELOPMENT_CONCEPTS if c in present]
     return ordered or list(SOFTWARE_DEVELOPMENT_CONCEPTS)
+
+
+def _remind_about_ontology(base_path: Path, concept: str):
+    """If the project has a Domain Ontology manifest that lacks this concept, say how to add it"""
+    manifest = base_path / "domain" / "domain-manifest.yaml"
+    if not manifest.is_file():
+        return
+    concept_id = f"concept:{concept}"
+    if f"id: {concept_id}" in manifest.read_text(encoding="utf-8"):
+        return
+    click.echo(
+        f"\nNote: {concept_id} is not in domain/domain-manifest.yaml yet. Add it under\n"
+        f"ontology.concepts so the ontology matches your concept bundles:\n"
+        f"  - id: {concept_id}\n"
+        f"    name: \"...\""
+    )
+
+
+def _read_project_type(config_file: Path) -> str:
+    """Project type recorded in .scs/config, or 'standard' if it is missing or unknown"""
+    from scs_tools.utils.project_types import PROJECT_TYPES
+
+    if config_file.exists():
+        for line in config_file.read_text(encoding="utf-8").splitlines():
+            if line.startswith("project_type:"):
+                value = line.split(":", 1)[1].strip()
+                if value in PROJECT_TYPES:
+                    return value
+    return "standard"
