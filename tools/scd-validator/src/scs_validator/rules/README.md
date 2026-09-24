@@ -124,7 +124,7 @@ scs-validate --bundle bundle.yaml --skip-completeness
 
 3. **Default** (fallback)
    ```
-   validator/rules/v0.1.0/completeness-rules.yaml
+   scs_validator/rules/v0.5.0/completeness-rules.yaml
    ```
 
 ## Common Customization Scenarios

@@ -52,6 +52,11 @@ Issues = "https://github.com/tim-mccrimmon/scs-spec/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# The validation rules and the vendored JSON Schemas ship inside the package (ISS-035). The schemas
+# are a copy of the repo-root schema/ made by scripts/sync_schemas.py; tests fail if they drift.
+[tool.setuptools.package-data]
+scs_validator = ["rules/**/*.yaml", "rules/**/*.md", "schemas/**/*.json"]
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]

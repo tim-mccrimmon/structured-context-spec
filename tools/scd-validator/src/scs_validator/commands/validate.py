@@ -16,7 +16,7 @@ from ..reporter import Reporter
 from ..rules_loader import RulesLoader
 from ..schema_validator import SchemaValidator
 from ..semantic_validator import SemanticValidator
-from ..utils import ValidationError, ValidationResult
+from ..utils import SCHEMA_DIR_ENV_VAR, ValidationError, ValidationResult, resolve_schema_dir
 
 
 @click.command()
@@ -43,7 +43,7 @@ from ..utils import ValidationError, ValidationResult
     "--schema-dir",
     "-s",
     type=click.Path(exists=True),
-    help="Directory containing JSON schema files (default: ../../schema relative to CWD)",
+    help="Directory containing JSON schema files (default: $SCS_SCHEMA_DIR, else a schema/ dir found from the current directory upward or in the source checkout)",
 )
 @click.option(
     "--output",
@@ -124,20 +124,15 @@ def validate(
         scs validate --bundle context/bundle.yaml --output json
     """
     try:
-        # Determine schema directory
-        if schema_dir:
-            schema_path = Path(schema_dir)
-        else:
-            # Default: ../../schema relative to CWD
-            schema_path = Path.cwd() / "schema"
-            if not schema_path.exists():
-                # Try relative to the validator location
-                schema_path = Path(__file__).parent.parent.parent.parent.parent / "schema"
+        # Determine schema directory (--schema-dir, $SCS_SCHEMA_DIR, then discovery)
+        schema_path, searched = resolve_schema_dir(schema_dir)
 
-        if not schema_path.exists():
+        if schema_path is None or not schema_path.exists():
+            looked = "\n".join(f"  {p}" for p in searched) if searched else f"  {schema_path}"
             click.echo(
-                f"Error: Schema directory not found: {schema_path}\n"
-                f"Use --schema-dir to specify the location",
+                "Error: Schema directory not found.\n"
+                f"Looked in:\n{looked}\n"
+                f"Use --schema-dir or set {SCHEMA_DIR_ENV_VAR} to specify the location",
                 err=True,
             )
             sys.exit(4)

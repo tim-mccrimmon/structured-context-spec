@@ -20,7 +20,7 @@ class RulesLoader:
         """
         if rules_dir is None:
             # Default: rules/v0.5.0 relative to this module
-            self.rules_dir = Path(__file__).parent.parent.parent / "rules" / "v0.5.0"
+            self.rules_dir = Path(__file__).parent / "rules" / "v0.5.0"
         else:
             self.rules_dir = Path(rules_dir)
 

@@ -1,7 +1,10 @@
 """Utility functions for SCS Validator."""
 
+import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional, Tuple
+
+SCHEMA_DIR_ENV_VAR = "SCS_SCHEMA_DIR"
 
 
 class ValidationError(Exception):
@@ -164,3 +167,71 @@ def find_checkpoint_record_schema(schema_dir: Path) -> Path:
     if not schema_file.exists():
         raise FileNotFoundError(f"Checkpoint record schema file not found: {schema_file}")
     return schema_file
+
+
+def _looks_like_schema_dir(path: Path) -> bool:
+    """A directory is the SCS schema dir if it has the ``bundles/`` and ``scd/`` schema folders."""
+    return (path / "bundles").is_dir() and (path / "scd").is_dir()
+
+
+def packaged_schema_dir() -> Path:
+    """The copy of the JSON Schemas vendored inside this package (see scripts/sync_schemas.py)."""
+    return Path(__file__).resolve().parent / "schemas"
+
+
+def _checkout_schema_dir(searched: List[Path]) -> Optional[Path]:
+    """The ``schema/`` directory of the source checkout this package is installed from, if any."""
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / "schema"
+        if candidate in searched:
+            continue
+        searched.append(candidate)
+        if _looks_like_schema_dir(candidate):
+            return candidate
+    return None
+
+
+def resolve_schema_dir(explicit: Optional[str] = None) -> Tuple[Optional[Path], List[Path]]:
+    """Locate the SCS JSON Schema directory.
+
+    Lookup order (first match wins):
+
+    1. ``explicit`` (the ``--schema-dir`` option), used as given
+    2. the ``SCS_SCHEMA_DIR`` environment variable, used as given
+    3. a ``schema/`` directory in the current directory or any parent
+    4. the ``schema/`` directory of the source checkout this package is installed from
+    5. the copy of the schemas packaged inside ``scs_validator`` (what an installed wheel uses)
+
+    Candidates found by search (3, 4) must look like the SCS schema directory, so an unrelated
+    ``schema/`` folder in a user's project is not picked up by mistake. In a source checkout the
+    repo-root ``schema/`` is the source of truth and wins over the packaged copy.
+
+    Returns ``(path, searched)``: ``path`` is ``None`` when nothing was found, and ``searched``
+    lists every location that was considered, for the error message.
+    """
+    searched: List[Path] = []
+
+    if explicit:
+        return Path(explicit), [Path(explicit)]
+
+    env_value = os.environ.get(SCHEMA_DIR_ENV_VAR)
+    if env_value:
+        return Path(env_value), [Path(env_value)]
+
+    here = Path.cwd().resolve()
+    for parent in [here, *here.parents]:
+        candidate = parent / "schema"
+        searched.append(candidate)
+        if _looks_like_schema_dir(candidate):
+            return candidate, searched
+
+    checkout = _checkout_schema_dir(searched)
+    if checkout is not None:
+        return checkout, searched
+
+    packaged = packaged_schema_dir()
+    searched.append(packaged)
+    if _looks_like_schema_dir(packaged):
+        return packaged, searched
+
+    return None, searched
