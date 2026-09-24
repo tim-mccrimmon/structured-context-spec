@@ -378,3 +378,49 @@ conceptually with `spec/` but is a distinct, separately-maintained tree - not to
 the ISS-004 `spec/0.3/` → `spec/0.5/` migration. Rename `docs/concern-docs/` →
 `docs/concept-docs/` (matches the `templates/docs/` rename pattern from ISS-005b) plus a
 full terminology sweep, whenever this gets picked up.
+
+### ISS-024 — Regulatory classification block on the Context of Use SCD (proposed)
+**Status:** proposed — **originated in the SCP repo, not SCS.** Source: SCP FR-014
+(`scp-2/docs/feature-requests/FR-014-regulatory-classification-adverse-determination-review.md`,
+draft, not approved by Tim; drafted by Claude 2026-09-24). Tim agreed 2026-09-24 that the SCS
+side should carry this; scope and naming still need an SCS decision. Depends on SCP FR-010's
+proposed Context of Use SCD (itself an unapproved SCP draft, not yet an SCS content pattern).
+Add an optional block to the Context of Use SCD:
+- `regulatory_classification[]`: `regime`, `reference` (customer-asserted, e.g. an EU AI Act
+  Annex III point), `declared_by`. SCS records the declaration and its approver; it does not
+  classify anything.
+- `determination_review`: which determination types (e.g. `adverse`) require human review,
+  reviewer qualification, review window. SCP reads this to report determinations lacking a
+  linked review record; SCP holds no rule of its own.
+Decide whether this belongs in 0.5.0 or later, and whether it needs an RFC. Related: ISS-007 to
+ISS-009 (runtime decisions). Expect to be revisited in the SCS refresh planned for the week of
+2026-09-28.
+
+### ISS-025 — EU AI Act baseline changed by the Digital Omnibus: re-verify before encoding (unverified)
+**Status:** open — **unverified input, added 2026-09-24 at Tim's request.** Origin: SCP-side
+review (Claude session in `scp-2`), not an SCS decision. A stated goal of the next SCS release is
+to support EU rules as far as possible, so the EU baseline the spec maps to must be checked
+against primary text first.
+What was found (secondary sources only; EUR-Lex pages returned empty content to the tools used,
+so **the legal text has not been read**):
+- Regulation (EU) 2026/1744 ("Digital Omnibus on AI"), reportedly adopted 2026-07-08, published
+  in the OJ 2026-07-24, in force 2026-07-27, amends Regulation (EU) 2024/1689.
+- Reported new application dates: stand-alone Annex III high-risk **2027-12-02** (was
+  2026-08-02); AI in regulated products, Annex I, **2028-08-02**. Medical-device AI is likely
+  under Annex I; not confirmed for any customer.
+- **Disputed:** whether a Commission-triggered earlier date remains. Gibson Dunn (dated
+  2026-05-27, pre-adoption) says fixed dates replaced the trigger; a Cloud Security Alliance note
+  says the trigger remains.
+- Unknown: what else the Omnibus amended. Article numbers and obligations SCS maps to may have
+  changed. Example already found: post-market monitoring is **Art. 72** in the adopted Act;
+  Art. 61 is 2021 proposal numbering.
+To do:
+1. Obtain the consolidated Regulation (EUR-Lex CELEX `02024R1689-20260727`) and the Omnibus text
+   into the repo or `~/kb/inbox/`.
+2. Confirm the application dates and the trigger question from the text.
+3. Re-check every EU AI Act Article/Annex reference in `spec/`, `docs/`, and any mapping or
+   standards bundle (Art. 9, 10, 11, 12, 13, 14, 72; Annex III).
+4. Update `~/.claude/rules/identity.md` and `~/Projects/work/CLAUDE.md` if the dates change (both
+   were edited 2026-09-24 with unverified dates).
+Related: ISS-024 (regulatory classification block, from SCP FR-014), ISS-009 (drift; Art. 72
+monitoring). To be picked up in the SCS refresh week of 2026-09-28.
