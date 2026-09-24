@@ -61,7 +61,7 @@ content:
     coverage_tool: "[Coverage.py|Istanbul|JaCoCo|etc]"
     e2e_testing: "[Selenium|Cypress|Playwright|etc]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

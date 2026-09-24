@@ -37,7 +37,7 @@ content:
       type: "[technical|organizational|partner]"
       criticality: "[high|medium|low]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

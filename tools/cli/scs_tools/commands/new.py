@@ -200,6 +200,7 @@ def project(name, project_type, directory, author, email, interactive, no_intera
         "email": email_info,
         "created_at": now,
         "bundles": bundles,
+        "concepts": concepts,
         "config": config,
     }
 

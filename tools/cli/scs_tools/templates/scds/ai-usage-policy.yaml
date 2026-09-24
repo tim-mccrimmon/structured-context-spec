@@ -63,7 +63,7 @@ content:
       purpose: "[What it protects against]"
       implementation: "[How implemented]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

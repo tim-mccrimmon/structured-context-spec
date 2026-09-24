@@ -38,7 +38,7 @@ content:
       - "[Recovery procedure 1]"
     testing_frequency: "[How often DR is tested]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

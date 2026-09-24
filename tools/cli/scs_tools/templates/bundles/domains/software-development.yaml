@@ -7,18 +7,8 @@ description: "Software Development domain for {{ project_name }}, importing all 
 # Domain bundles import concept bundles (unversioned - these are DRAFT too,
 # pin a real version once you've run `scs bundle version` on each)
 imports:
-  - bundle:architecture
-  - bundle:security
-  - bundle:performance-reliability
-  - bundle:usability-accessibility
-  - bundle:compliance-governance
-  - bundle:data-provenance
-  - bundle:testing-validation
-  - bundle:deployment-operations
-  - bundle:safety-risk
-  - bundle:ethics-ai-accountability
-  - bundle:business-context
-
+{% for concept in concepts %}  - bundle:{{ concept }}
+{% endfor %}
 # Domain bundles don't contain SCDs directly - they import concepts
 scds: []
 

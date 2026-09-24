@@ -64,7 +64,7 @@ content:
     access_to_history:
       - "[Who can access historical data]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

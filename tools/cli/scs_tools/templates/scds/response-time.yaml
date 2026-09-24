@@ -35,7 +35,7 @@ content:
       acceptable_impact: "[What level of degradation is acceptable]"
       recovery_time: "[How quickly to recover]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

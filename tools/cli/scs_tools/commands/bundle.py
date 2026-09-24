@@ -40,18 +40,22 @@ def list(available):
         scs bundle list --available  # List all available templates
     """
     if available:
-        click.echo("Available domain bundles:\n")
+        click.echo("Available concept bundles:\n")
         for bundle_name in SOFTWARE_DEVELOPMENT_CONCEPTS:
             click.echo(f"  • {bundle_name}")
+
+        click.echo("\nAvailable domain bundles:\n")
+        for domain_file in sorted((get_template_path() / "bundles" / "domains").glob("*.yaml")):
+            click.echo(f"  • {domain_file.stem}")
 
         click.echo("\nProject types and their bundles:\n")
         for ptype, config in PROJECT_TYPES.items():
             click.echo(f"  {ptype}:")
             click.echo(f"    Description: {config['description']}")
             if config.get("minimal"):
-                click.echo(f"    Bundles: 3 minimal bundles (architecture, security, deployment-operations)")
+                click.echo(f"    Concept bundles: 3 (architecture, security, deployment-operations)")
             else:
-                click.echo(f"    Bundles: All 11 domain bundles")
+                click.echo(f"    Concept bundles: all 11")
         return
 
     # List bundles in current project
@@ -83,22 +87,29 @@ def list(available):
                 click.echo(f"    Type: {bundle_type}")
                 click.echo(f"    Version: {version}\n")
 
+    # Check for concept bundles
+    concepts_dir = bundles_dir / "concepts"
+    if concepts_dir.exists():
+        click.echo("Concept bundles:\n")
+        for bundle_file in sorted(concepts_dir.glob("*.yaml")):
+            with open(bundle_file, 'r') as f:
+                data = yaml.safe_load(f) or {}
+            click.echo(f"  • {bundle_file.name}")
+            click.echo(f"    ID: {data.get('id', 'unknown')}")
+            click.echo(f"    Version: {data.get('version', 'unknown')}")
+            click.echo(f"    SCDs: {len(data.get('scds') or [])}\n")
+
     # Check for domain bundles
     domains_dir = bundles_dir / "domains"
     if domains_dir.exists():
         click.echo("Domain bundles:\n")
         for bundle_file in sorted(domains_dir.glob("*.yaml")):
             with open(bundle_file, 'r') as f:
-                data = yaml.safe_load(f)
-                bundle_id = data.get('id', 'unknown')
-                domain = data.get('domain', 'unknown')
-                version = data.get('version', 'unknown')
-                scds = data.get('scds', [])
-                click.echo(f"  • {bundle_file.name}")
-                click.echo(f"    ID: {bundle_id}")
-                click.echo(f"    Domain: {domain}")
-                click.echo(f"    Version: {version}")
-                click.echo(f"    SCDs: {len(scds)}\n")
+                data = yaml.safe_load(f) or {}
+            click.echo(f"  • {bundle_file.name}")
+            click.echo(f"    ID: {data.get('id', 'unknown')}")
+            click.echo(f"    Version: {data.get('version', 'unknown')}")
+            click.echo(f"    Imports: {len(data.get('imports') or [])} concept bundles\n")
 
 
 @bundle.command()
@@ -121,6 +132,7 @@ def info(bundle_name):
     # Try to find bundle in project first
     bundle_locations = [
         base_path / "bundles" / f"{bundle_name}.yaml",
+        base_path / "bundles" / "concepts" / f"{bundle_name}.yaml",
         base_path / "bundles" / "domains" / f"{bundle_name}.yaml",
     ]
 
@@ -132,8 +144,13 @@ def info(bundle_name):
 
     # If not found in project, check templates
     if not bundle_path:
-        template_path = get_template_path() / "bundles" / "domains" / f"{bundle_name}.yaml"
-        if template_path.exists():
+        template_path = None
+        for kind in ("concepts", "domains"):
+            candidate = get_template_path() / "bundles" / kind / f"{bundle_name}.yaml"
+            if candidate.exists():
+                template_path = candidate
+                break
+        if template_path:
             bundle_path = template_path
             click.echo(f"(Showing template bundle, not in current project)\n")
         else:
@@ -401,56 +418,33 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
 
 
 def _validate_bundle(bundle_path):
-    """Run validation on the bundle and return results."""
+    """Run validation on the bundle and return results.
+
+    Runs the validator as ``python -m scs_validator`` with this interpreter, so it works whether or
+    not the ``scs``/``scs-validate`` scripts are on PATH. Schema lookup is the validator's own
+    (``--schema-dir``, ``SCS_SCHEMA_DIR``, then discovery).
+    """
+    import re
+    import sys
+
     try:
-        # Try to find schema directory
-        schema_dir = None
-        possible_schema_paths = [
-            Path.cwd() / "schema",
-            Path.cwd().parent / "scs-spec" / "schema",
-            Path.cwd().parent.parent / "scs-spec" / "schema",
-        ]
-
-        for schema_path in possible_schema_paths:
-            if schema_path.exists():
-                schema_dir = schema_path
-                break
-
-        # Run scs validate command
-        cmd = ["scs", "validate", "--bundle", str(bundle_path), "--output", "json"]
-        if schema_dir:
-            cmd.extend(["--schema-dir", str(schema_dir)])
-
         result = subprocess.run(
-            cmd,
+            [sys.executable, "-m", "scs_validator", "--bundle", str(bundle_path), "--no-color"],
             capture_output=True,
             text=True,
             check=False,
         )
 
-        # Parse JSON output to get error/warning counts
-        if "Status: ✓ VALID" in result.stdout or result.returncode == 0:
-            # Try to extract counts from output
-            errors = 0
-            warnings = result.stdout.count("⚠")
+        # The summary block reads "  N errors" / "  M warnings"
+        error_match = re.search(r"^\s*(\d+) errors?", result.stdout, re.M)
+        warning_match = re.search(r"^\s*(\d+) warnings?", result.stdout, re.M)
+        errors = int(error_match.group(1)) if error_match else (0 if result.returncode == 0 else 1)
+        warnings = int(warning_match.group(1)) if warning_match else 0
 
-            return {
-                "passed": True,
-                "errors": errors,
-                "warnings": warnings,
-            }
-        else:
-            # Extract error count
-            import re
+        if result.returncode != 0 and result.stderr.strip():
+            click.echo(f"  {result.stderr.strip()}", err=True)
 
-            error_match = re.search(r"(\d+) errors?", result.stdout)
-            warning_match = re.search(r"(\d+) warnings?", result.stdout)
-
-            return {
-                "passed": False,
-                "errors": int(error_match.group(1)) if error_match else 1,
-                "warnings": int(warning_match.group(1)) if warning_match else 0,
-            }
+        return {"passed": result.returncode == 0, "errors": errors, "warnings": warnings}
 
     except Exception as e:
         click.echo(f"  Warning: Could not run validation: {e}")
@@ -465,6 +459,10 @@ def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, fo
 
     # Get current timestamp
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # The snapshot is the released bundle: it carries the released version (not DRAFT), which is
+    # what the approval fields below attest to and what `bundle:<name>:<version>` imports pin.
+    bundle_data["version"] = version_number
 
     # Add approval metadata to provenance. Field names match the schema's
     # required version_approved_by/version_approved_at (RFC-0001, Provenance

@@ -51,7 +51,7 @@ content:
       key_length: "[Key length]"
       rationale: "[Why this algorithm]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

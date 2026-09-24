@@ -45,7 +45,7 @@ content:
     feedback: "[How user feedback is provided]"
     consistency: "[Consistency guidelines]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #
