@@ -53,7 +53,9 @@ def list(available):
             click.echo(f"  {ptype}:")
             click.echo(f"    Description: {config['description']}")
             if config.get("minimal"):
-                click.echo(f"    Concept bundles: 3 (architecture, security, deployment-operations)")
+                click.echo(
+                    f"    Concept bundles: 3 (architecture, security, deployment-operations)"
+                )
             else:
                 click.echo(f"    Concept bundles: all 11")
         return
@@ -77,11 +79,11 @@ def list(available):
     for bundle_file in main_bundles:
         bundle_path = bundles_dir / bundle_file
         if bundle_path.exists():
-            with open(bundle_path, 'r') as f:
+            with open(bundle_path, "r") as f:
                 data = yaml.safe_load(f)
-                bundle_id = data.get('id', 'unknown')
-                bundle_type = data.get('type', 'unknown')
-                version = data.get('version', 'unknown')
+                bundle_id = data.get("id", "unknown")
+                bundle_type = data.get("type", "unknown")
+                version = data.get("version", "unknown")
                 click.echo(f"  • {bundle_file}")
                 click.echo(f"    ID: {bundle_id}")
                 click.echo(f"    Type: {bundle_type}")
@@ -92,7 +94,7 @@ def list(available):
     if concepts_dir.exists():
         click.echo("Concept bundles:\n")
         for bundle_file in sorted(concepts_dir.glob("*.yaml")):
-            with open(bundle_file, 'r') as f:
+            with open(bundle_file, "r") as f:
                 data = yaml.safe_load(f) or {}
             click.echo(f"  • {bundle_file.name}")
             click.echo(f"    ID: {data.get('id', 'unknown')}")
@@ -104,7 +106,7 @@ def list(available):
     if domains_dir.exists():
         click.echo("Domain bundles:\n")
         for bundle_file in sorted(domains_dir.glob("*.yaml")):
-            with open(bundle_file, 'r') as f:
+            with open(bundle_file, "r") as f:
                 data = yaml.safe_load(f) or {}
             click.echo(f"  • {bundle_file.name}")
             click.echo(f"    ID: {data.get('id', 'unknown')}")
@@ -161,7 +163,7 @@ def info(bundle_name):
             raise click.Abort()
 
     # Load and display bundle info
-    with open(bundle_path, 'r') as f:
+    with open(bundle_path, "r") as f:
         data = yaml.safe_load(f)
 
     click.echo(f"Bundle: {bundle_name}\n")
@@ -171,38 +173,38 @@ def info(bundle_name):
     click.echo(f"Title: {data.get('title', 'N/A')}")
     click.echo(f"Description: {data.get('description', 'N/A')}")
 
-    if 'domain' in data:
+    if "domain" in data:
         click.echo(f"Domain: {data['domain']}")
 
-    if 'concerns' in data:
+    if "concerns" in data:
         click.echo(f"\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
-        for concern in data['concerns']:
+        for concern in data["concerns"]:
             click.echo(f"  • {concern}")
 
-    if 'ontology' in data:
-        concepts = data['ontology'].get('concepts', [])
+    if "ontology" in data:
+        concepts = data["ontology"].get("concepts", [])
         click.echo(f"\nOntology concepts ({len(concepts)}):")
         for concept in concepts:
             click.echo(f"  • {concept.get('id', 'unknown')}")
 
-    if 'scds' in data:
-        scds = data['scds']
+    if "scds" in data:
+        scds = data["scds"]
         click.echo(f"\nSCDs ({len(scds)}):")
         for scd in scds:
             click.echo(f"  • {scd}")
 
-    if 'imports' in data:
-        imports = data['imports']
+    if "imports" in data:
+        imports = data["imports"]
         click.echo(f"\nImports ({len(imports)}):")
         for imp in imports:
             click.echo(f"  • {imp}")
 
-    if 'provenance' in data:
-        prov = data['provenance']
+    if "provenance" in data:
+        prov = data["provenance"]
         click.echo(f"\nProvenance:")
         click.echo(f"  Created by: {prov.get('created_by', 'N/A')}")
         click.echo(f"  Created at: {prov.get('created_at', 'N/A')}")
-        if 'rationale' in prov:
+        if "rationale" in prov:
             click.echo(f"  Rationale: {prov['rationale']}")
 
 

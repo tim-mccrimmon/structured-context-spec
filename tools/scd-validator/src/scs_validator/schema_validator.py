@@ -22,9 +22,7 @@ class SchemaValidator:
         self.schema_dir = schema_dir
         self._schema_cache: Dict[str, Dict[str, Any]] = {}
 
-    def validate_scd(
-        self, scd: Dict[str, Any], file_path: str | None = None
-    ) -> ValidationResult:
+    def validate_scd(self, scd: Dict[str, Any], file_path: str | None = None) -> ValidationResult:
         """Validate an SCD against its tier-specific schema.
 
         Args:
@@ -39,9 +37,7 @@ class SchemaValidator:
         # Extract SCD ID and tier
         scd_id = scd.get("id")
         if not scd_id:
-            result.add_error(
-                ValidationError("Missing required field 'id'", file_path=file_path)
-            )
+            result.add_error(ValidationError("Missing required field 'id'", file_path=file_path))
             return result
 
         # Get tier from ID
@@ -71,9 +67,7 @@ class SchemaValidator:
             if errors:
                 for error in errors:
                     error_msg = self._format_schema_error(error)
-                    result.add_error(
-                        ValidationError(error_msg, scd_id=scd_id, file_path=file_path)
-                    )
+                    result.add_error(ValidationError(error_msg, scd_id=scd_id, file_path=file_path))
         except Exception as e:
             result.add_error(
                 ValidationError(

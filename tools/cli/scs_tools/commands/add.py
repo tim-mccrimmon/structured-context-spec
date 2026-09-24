@@ -86,7 +86,7 @@ def scd(scd_name, author, email):
     config_file = base_path / ".scs" / "config"
     project_name = base_path.name
     if config_file.exists():
-        with open(config_file, 'r') as f:
+        with open(config_file, "r") as f:
             for line in f:
                 if line.startswith("project_name:"):
                     project_name = line.split(":", 1)[1].strip()
@@ -160,7 +160,11 @@ def bundle(bundle_name, author, email):
     # Find the template: a concept bundle or a domain bundle
     templates_root = get_template_path() / "bundles"
     kind = next(
-        (k for k in ("concepts", "domains") if (templates_root / k / f"{bundle_name}.yaml").exists()),
+        (
+            k
+            for k in ("concepts", "domains")
+            if (templates_root / k / f"{bundle_name}.yaml").exists()
+        ),
         None,
     )
     if kind is None:
@@ -197,7 +201,7 @@ def bundle(bundle_name, author, email):
     config_file = base_path / ".scs" / "config"
     project_name = base_path.name
     if config_file.exists():
-        with open(config_file, 'r') as f:
+        with open(config_file, "r") as f:
             for line in f:
                 if line.startswith("project_name:"):
                     project_name = line.split(":", 1)[1].strip()
@@ -249,7 +253,7 @@ def _remind_about_ontology(base_path: Path, concept: str):
         f"\nNote: {concept_id} is not in domain/domain-manifest.yaml yet. Add it under\n"
         f"ontology.concepts so the ontology matches your concept bundles:\n"
         f"  - id: {concept_id}\n"
-        f"    name: \"...\""
+        f'    name: "..."'
     )
 
 

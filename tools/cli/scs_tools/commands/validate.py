@@ -24,8 +24,7 @@ except ImportError:
     def validate(**_):
         """Validate SCS documents and bundles (requires scs-validator)."""
         click.echo(
-            "Error: scs-validator is not installed.\n"
-            "Install it with: pip install scs-validator",
+            "Error: scs-validator is not installed.\n" "Install it with: pip install scs-validator",
             err=True,
         )
         sys.exit(1)

@@ -2,12 +2,16 @@
 
 from typing import Dict, List
 
-
 PROJECT_TYPES = {
     "healthcare": {
         "description": "Healthcare application (HIPAA, CHAI, TEFCA)",
         "domains": ["software-development"],  # Can add clinical domain later
-        "compliance_bundles": ["hipaa-compliance", "chai-adherence", "soc2-controls", "tefca-participation"],
+        "compliance_bundles": [
+            "hipaa-compliance",
+            "chai-adherence",
+            "soc2-controls",
+            "tefca-participation",
+        ],
         "exclude_scds": [],
     },
     "fintech": {
@@ -105,7 +109,11 @@ SOFTWARE_DEVELOPMENT_CONCEPT_INFO = {
 def get_concept_info(concepts):
     """Ontology entries (id, name, description) for the given concept ids, in the order given"""
     return [
-        {"id": c, "name": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][0], "description": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][1]}
+        {
+            "id": c,
+            "name": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][0],
+            "description": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][1],
+        }
         for c in concepts
     ]
 

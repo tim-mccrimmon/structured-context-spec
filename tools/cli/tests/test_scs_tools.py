@@ -38,8 +38,18 @@ def scaffold(tmp_path: Path, project_type: str) -> Path:
     result = CliRunner().invoke(
         cli,
         [
-            "new", "project", "demo", "--type", project_type, "--dir", str(tmp_path),
-            "--author", "Test Author", "--email", "test@example.com", "--no-interactive",
+            "new",
+            "project",
+            "demo",
+            "--type",
+            project_type,
+            "--dir",
+            str(tmp_path),
+            "--author",
+            "Test Author",
+            "--email",
+            "test@example.com",
+            "--no-interactive",
         ],
     )
     assert result.exit_code == 0, result.output
@@ -47,7 +57,9 @@ def scaffold(tmp_path: Path, project_type: str) -> Path:
 
 
 def validate_with_validator(*args: str):
-    return CliRunner().invoke(validator_cmd, list(args) + ["--no-color", "--schema-dir", str(SCHEMA)])
+    return CliRunner().invoke(
+        validator_cmd, list(args) + ["--no-color", "--schema-dir", str(SCHEMA)]
+    )
 
 
 @pytest.fixture(scope="module")
@@ -153,9 +165,18 @@ def _version_security_bundle(project: Path, monkeypatch, *extra: str):
     return CliRunner().invoke(
         cli,
         [
-            "bundle", "version", "--bundle", "bundles/concepts/security.yaml",
-            "--version", "0.1.0", "--approved-by", "sam@example.com",
-            "--notes", "First approved cut", "--no-git", *extra,
+            "bundle",
+            "version",
+            "--bundle",
+            "bundles/concepts/security.yaml",
+            "--version",
+            "0.1.0",
+            "--approved-by",
+            "sam@example.com",
+            "--notes",
+            "First approved cut",
+            "--no-git",
+            *extra,
         ],
     )
 
@@ -212,7 +233,9 @@ def test_manifest_checksum_matches_the_snapshot(tmp_path: Path, monkeypatch):
     project = scaffold(tmp_path, "healthcare")
     assert _version_security_bundle(project, monkeypatch, "--no-validate").exit_code == 0
     snapshot = project / "bundles/concepts/security-v0.1.0.yaml"
-    manifest = yaml.safe_load((project / "bundles/concepts/VERSION-0.1.0-MANIFEST.yaml").read_text())
+    manifest = yaml.safe_load(
+        (project / "bundles/concepts/VERSION-0.1.0-MANIFEST.yaml").read_text()
+    )
     assert manifest["bundle"]["sha256"] == hashlib.sha256(snapshot.read_bytes()).hexdigest()
     assert manifest["approval"]["approved_by"] == "sam@example.com"
 
@@ -229,7 +252,9 @@ def test_versioning_refuses_to_overwrite_without_force(tmp_path: Path, monkeypat
 
 
 @pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_domain_bundle_imports_exactly_the_concept_bundles_generated(tmp_path: Path, project_type: str):
+def test_domain_bundle_imports_exactly_the_concept_bundles_generated(
+    tmp_path: Path, project_type: str
+):
     root = scaffold(tmp_path, project_type)
     generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
     domain = yaml.safe_load((root / "bundles/domains/software-development.yaml").read_text())
@@ -245,11 +270,16 @@ def test_add_domain_bundle_imports_the_projects_concept_bundles(tmp_path: Path, 
     assert result.exit_code == 0, result.output
     domain = yaml.safe_load((root / "bundles/domains/software-development.yaml").read_text())
     assert {ref.split(":")[1] for ref in domain["imports"]} == {
-        "architecture", "security", "deployment-operations"
+        "architecture",
+        "security",
+        "deployment-operations",
     }
-    assert validate_with_validator(
-        "--bundle", str(root / "bundles/domains/software-development.yaml")
-    ).exit_code == 0
+    assert (
+        validate_with_validator(
+            "--bundle", str(root / "bundles/domains/software-development.yaml")
+        ).exit_code
+        == 0
+    )
 
 
 # ------------------------------------ concept bundles in add / list / info (ISS-034)
@@ -259,7 +289,9 @@ def _init_bare_project(tmp_path: Path, monkeypatch) -> Path:
     root = tmp_path / "existing"
     root.mkdir()
     monkeypatch.chdir(root)
-    result = CliRunner().invoke(cli, ["init", "--type", "minimal", "--author", "T", "--email", "t@e.com"])
+    result = CliRunner().invoke(
+        cli, ["init", "--type", "minimal", "--author", "T", "--email", "t@e.com"]
+    )
     assert result.exit_code == 0, result.output
     return root
 
@@ -327,7 +359,10 @@ def test_add_scd_adds_a_template_scd_that_validates(tmp_path: Path, monkeypatch)
     for name in ["system-context", "risk-assessment", "threat-model"]:
         result = CliRunner().invoke(cli, ["add", "scd", name, "--author", "Tim"])
         assert result.exit_code == 0, result.output
-        assert validate_with_validator(str(root / "context" / "project" / f"{name}.yaml")).exit_code == 0
+        assert (
+            validate_with_validator(str(root / "context" / "project" / f"{name}.yaml")).exit_code
+            == 0
+        )
 
 
 # ------------------------------------------- Domain Ontology manifest in the scaffold (ISS-029)

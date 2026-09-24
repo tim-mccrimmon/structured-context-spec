@@ -10,12 +10,12 @@ from jinja2 import Template
 def create_directory_structure(base_path: Path, project_name: str):
     """Create the SCS 0.5.0 project directory structure"""
     dirs = [
-        "bundles/domains",     # Domain bundles (e.g., software-development)
-        "bundles/concepts",    # Concept bundles (e.g., architecture, security)
-        "domain",              # Domain Ontology manifest
-        "context/project",     # Project-tier SCDs
-        "docs",               # Documentation
-        ".scs",                # Configuration
+        "bundles/domains",  # Domain bundles (e.g., software-development)
+        "bundles/concepts",  # Concept bundles (e.g., architecture, security)
+        "domain",  # Domain Ontology manifest
+        "context/project",  # Project-tier SCDs
+        "docs",  # Documentation
+        ".scs",  # Configuration
     ]
 
     for dir_path in dirs:
@@ -32,13 +32,13 @@ def render_template(template_content: str, variables: Dict[str, Any]) -> str:
 def write_file(file_path: Path, content: str):
     """Write content to a file"""
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(file_path, 'w', encoding='utf-8') as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
 
 
 def copy_template(template_path: Path, dest_path: Path, variables: Dict[str, Any] = None):
     """Copy a template file, optionally rendering it with variables"""
-    with open(template_path, 'r', encoding='utf-8') as f:
+    with open(template_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     if variables:

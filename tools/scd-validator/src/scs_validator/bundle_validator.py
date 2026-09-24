@@ -63,9 +63,7 @@ class BundleValidator:
         self._validate_xor_constraint(bundle, bundle_id, bundle_type, result, file_path)
 
         # Validate bundle type-specific rules
-        self._validate_bundle_type_rules(
-            bundle, bundle_id, bundle_type, result, file_path
-        )
+        self._validate_bundle_type_rules(bundle, bundle_id, bundle_type, result, file_path)
 
         # Validate meta bundle requirements
         if bundle_type == "meta":

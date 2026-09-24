@@ -11,9 +11,7 @@ from .utils import ValidationError, ValidationResult, ValidationWarning
 class CompletenessValidator:
     """Validator for project completeness and compliance (Level 6)."""
 
-    def __init__(
-        self, rules_loader: RulesLoader, custom_rules_path: Optional[Path] = None
-    ):
+    def __init__(self, rules_loader: RulesLoader, custom_rules_path: Optional[Path] = None):
         """Initialize completeness validator.
 
         Args:
@@ -53,9 +51,7 @@ class CompletenessValidator:
 
         # Load completeness rules (with priority resolution)
         try:
-            rules = self.rules_loader.load_completeness_rules(
-                self.custom_rules_path, project_root
-            )
+            rules = self.rules_loader.load_completeness_rules(self.custom_rules_path, project_root)
         except ValidationError as e:
             result.add_error(e)
             return result
@@ -372,9 +368,13 @@ class CompletenessValidator:
             # If enough indicators, warn about stub
             if len(stub_indicators) >= threshold:
                 warning_msg = stub_config.get("warning_message", "SCD appears to be a stub")
-                warning_msg = warning_msg.format(scd_id=scd_id, indicators="; ".join(stub_indicators))
+                warning_msg = warning_msg.format(
+                    scd_id=scd_id, indicators="; ".join(stub_indicators)
+                )
                 result.add_warning(
-                    ValidationWarning(warning_msg, level="completeness", scd_id=scd_id, file_path=file_path)
+                    ValidationWarning(
+                        warning_msg, level="completeness", scd_id=scd_id, file_path=file_path
+                    )
                 )
 
     def _validate_compliance(
@@ -410,9 +410,7 @@ class CompletenessValidator:
                 # Check if at least one standards bundle is imported
                 has_standards = any("bundle:standards:" in imp for imp in imports)
                 if not has_standards:
-                    error_msg = self.rules_loader.get_error_message(
-                        rules, "no_standards_bundle"
-                    )
+                    error_msg = self.rules_loader.get_error_message(rules, "no_standards_bundle")
                     self._add_result(check_severity, error_msg, result, file_path)
 
     def _add_result(

@@ -63,8 +63,7 @@ def init(project_type, author, email, force):
     scs_config = base_path / ".scs" / "config"
     if scs_config.exists() and not force:
         click.echo(
-            f"Error: SCS already initialized in {base_path}\n"
-            f"Use --force to reinitialize",
+            f"Error: SCS already initialized in {base_path}\n" f"Use --force to reinitialize",
             err=True,
         )
         raise click.Abort()

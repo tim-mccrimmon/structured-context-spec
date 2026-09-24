@@ -136,9 +136,7 @@ def test_cdmo_ontology_only_warns_about_unresolved_satisfies_targets():
 
 
 def test_strict_mode_turns_warnings_into_exit_code_2():
-    result = run(
-        "--domain", str(DOMAIN_EXAMPLES / "medical-device-cdmo-domain.yaml"), "--strict"
-    )
+    result = run("--domain", str(DOMAIN_EXAMPLES / "medical-device-cdmo-domain.yaml"), "--strict")
     assert result.exit_code == 2
 
 
@@ -284,7 +282,9 @@ def test_policy_scd_validates_as_an_ordinary_project_scd(tmp_path: Path):
 
 def test_nonexistent_explicit_schema_dir_is_rejected(tmp_path: Path):
     result = run(
-        str(FIXTURES / "valid" / "test-meta-roles.yaml"), "--schema-dir", str(tmp_path / "nope"),
+        str(FIXTURES / "valid" / "test-meta-roles.yaml"),
+        "--schema-dir",
+        str(tmp_path / "nope"),
         schema=False,
     )
     assert result.exit_code != 0

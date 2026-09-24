@@ -61,7 +61,9 @@ def test_packaged_schemas_match_the_repo_schema_source_of_truth():
     if not REPO_SCHEMA.is_dir():
         pytest.skip("repo-root schema/ not available (running from an sdist or installed copy)")
     source = {p.relative_to(REPO_SCHEMA).as_posix(): p for p in REPO_SCHEMA.rglob("*.json")}
-    vendored = {p.relative_to(PACKAGED_SCHEMAS).as_posix(): p for p in PACKAGED_SCHEMAS.rglob("*.json")}
+    vendored = {
+        p.relative_to(PACKAGED_SCHEMAS).as_posix(): p for p in PACKAGED_SCHEMAS.rglob("*.json")
+    }
     assert set(vendored) == set(source), (
         f"only in schema/: {sorted(set(source) - set(vendored))}; "
         f"only in package: {sorted(set(vendored) - set(source))}"
@@ -98,7 +100,9 @@ def test_validation_works_using_only_the_packaged_schemas():
         assert _run("--domain", str(domain), "--schema-dir", str(PACKAGED_SCHEMAS)).exit_code == 0
     checkpoint = REPO / "examples" / "med-adherence" / "project-bundle.yaml"
     if checkpoint.is_file():
-        assert _run("--bundle", str(checkpoint), "--schema-dir", str(PACKAGED_SCHEMAS)).exit_code == 0
+        assert (
+            _run("--bundle", str(checkpoint), "--schema-dir", str(PACKAGED_SCHEMAS)).exit_code == 0
+        )
 
 
 def test_the_sync_script_reports_no_drift():
@@ -108,5 +112,7 @@ def test_the_sync_script_reports_no_drift():
     import subprocess
     import sys
 
-    result = subprocess.run([sys.executable, str(script), "--check"], capture_output=True, text=True)
+    result = subprocess.run(
+        [sys.executable, str(script), "--check"], capture_output=True, text=True
+    )
     assert result.returncode == 0, result.stdout + result.stderr

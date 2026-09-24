@@ -38,7 +38,9 @@ def main() -> int:
     vendored = _files(TARGET) if TARGET.is_dir() else {}
     missing = sorted(set(source) - set(vendored))
     extra = sorted(set(vendored) - set(source))
-    stale = sorted(r for r in set(source) & set(vendored) if source[r].read_bytes() != vendored[r].read_bytes())
+    stale = sorted(
+        r for r in set(source) & set(vendored) if source[r].read_bytes() != vendored[r].read_bytes()
+    )
 
     if args.check:
         if missing or extra or stale:

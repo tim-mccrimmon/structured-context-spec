@@ -175,9 +175,7 @@ def validate(
             results = validate_checkpoint(checkpoint, parser, schema_validator, verbose)
         elif files:
             # Validate individual files
-            results = validate_files(
-                files, parser, schema_validator, semantic_validator, verbose
-            )
+            results = validate_files(files, parser, schema_validator, semantic_validator, verbose)
         else:
             click.echo("Error: No files or bundle specified\n", err=True)
             click.echo(click.get_current_context().get_help())
@@ -345,8 +343,8 @@ def validate_bundle(
     try:
         # Level 1: Parse bundle (syntax validation)
         bundle = parser.load_bundle(Path(bundle_path))
-        bundle_id = bundle.get('id', 'unknown')
-        bundle_type = bundle.get('type', 'unknown')
+        bundle_id = bundle.get("id", "unknown")
+        bundle_type = bundle.get("type", "unknown")
 
         if verbose:
             click.echo(f"Bundle ID: {bundle_id}")

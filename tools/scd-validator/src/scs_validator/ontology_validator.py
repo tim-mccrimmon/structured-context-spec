@@ -95,9 +95,7 @@ class OntologyValidator:
             if severity == "error":
                 result.add_error(ValidationError(msg, file_path=file_path))
             else:
-                result.add_warning(
-                    ValidationWarning(msg, level="ontology", file_path=file_path)
-                )
+                result.add_warning(ValidationWarning(msg, level="ontology", file_path=file_path))
 
     def _validate_ids_and_uniqueness(
         self,
@@ -205,16 +203,28 @@ class OntologyValidator:
                 if not rel_type or not target:
                     continue  # caught by schema validation
                 self._validate_single_relationship(
-                    concept_id, rel_type, target, concept_ids, relationship_types,
-                    domain_id, result, file_path,
+                    concept_id,
+                    rel_type,
+                    target,
+                    concept_ids,
+                    relationship_types,
+                    domain_id,
+                    result,
+                    file_path,
                 )
 
             for target in concept.get("satisfies", []):
                 if not target:
                     continue
                 self._validate_single_relationship(
-                    concept_id, "satisfies", target, concept_ids, relationship_types,
-                    domain_id, result, file_path,
+                    concept_id,
+                    "satisfies",
+                    target,
+                    concept_ids,
+                    relationship_types,
+                    domain_id,
+                    result,
+                    file_path,
                 )
 
     def _validate_single_relationship(
@@ -282,9 +292,7 @@ class OntologyValidator:
                     concept_id=concept_id,
                     target=target,
                 )
-                result.add_warning(
-                    ValidationWarning(msg, level="ontology", file_path=file_path)
-                )
+                result.add_warning(ValidationWarning(msg, level="ontology", file_path=file_path))
 
     def _validate_depends_on_acyclic(
         self,
