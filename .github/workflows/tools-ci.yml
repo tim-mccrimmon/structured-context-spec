@@ -1,0 +1,88 @@
+name: tools-ci
+
+# CI for tools/scd-validator (scs-validator) and tools/cli (scs-tools). ISS-013.
+# The regression suites also validate every shipped example, ontology manifest and scaffold, so a
+# change to schema/, rules/, templates or examples that breaks 0.5.0 behaviour fails here.
+
+on:
+  push:
+    branches: [main, 0.5-dev]
+    paths:
+      - "tools/**"
+      - "schema/**"
+      - "examples/**"
+      - ".github/workflows/tools-ci.yml"
+  pull_request:
+    paths:
+      - "tools/**"
+      - "schema/**"
+      - "examples/**"
+      - ".github/workflows/tools-ci.yml"
+
+jobs:
+  test:
+    name: tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install both packages (editable) and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e tools/scd-validator -e tools/cli pytest pytest-cov
+      - name: scs-validator tests
+        working-directory: tools/scd-validator
+        run: python -m pytest tests
+      - name: scs-tools tests
+        working-directory: tools/cli
+        run: python -m pytest tests
+
+  lint:
+    # Report-only until the existing baseline is cleaned up (ISS-036).
+    name: lint (report only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff black
+      - run: ruff check tools/scd-validator/src tools/scd-validator/tests tools/cli --exclude tools/cli/scs_tools/templates
+      - run: black --check -l 100 tools/scd-validator/src tools/scd-validator/tests
+
+  wheel-smoke:
+    # Installs the built wheels (not editable) into a clean environment and uses them away from the
+    # source tree. Guards ISS-035: rules/ and schemas/ must ship inside the scs-validator wheel.
+    name: wheel install smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build and install the wheels (non-editable)
+        run: |
+          pip wheel --no-deps -w dist ./tools/scd-validator ./tools/cli
+          pip install dist/*.whl
+      - name: Scaffold, validate and version outside the source tree
+        run: |
+          cd "$(mktemp -d)"
+          scs new project smoke --type healthcare --author CI --email ci@example.com --no-interactive
+          cd smoke
+          scs bundle validate
+          for f in context/project/*.yaml; do scs-validate "$f" > /dev/null; done
+          git init -q .
+          git config user.email ci@example.com
+          git config user.name CI
+          git add -A
+          git commit -q -m init
+          scs bundle version --bundle bundles/concepts/security.yaml --version 0.1.0 \
+            --approved-by ci@example.com --notes "ci smoke"
+          scs-validate --bundle bundles/concepts/security-v0.1.0.yaml
