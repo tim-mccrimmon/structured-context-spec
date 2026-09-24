@@ -606,7 +606,7 @@ pip install scs-tools
 scs new project my-app --type healthcare
 ```
 
-- Creates 11 concept bundles, a domain bundle, project, meta and standards bundles
+- Creates 11 concept bundles, a domain bundle, project, meta and standards bundles, and a Domain Ontology manifest (`domain/domain-manifest.yaml`)
 - About 40 SCD templates in `context/project/`, each with placeholder text to replace
 - Project types: healthcare, fintech, saas, government, standard, minimal
 - All bundles start at `version: DRAFT`, so no approval is required yet
@@ -655,7 +655,7 @@ scs new project my-app --type healthcare
 ```bash
 scs-validate context/project/threat-model.yaml            # an SCD
 scs-validate --bundle bundles/project-bundle.yaml         # a bundle
-scs-validate --domain domain-manifest.yaml                # a Domain Ontology
+scs-validate --domain domain/domain-manifest.yaml         # a Domain Ontology
 scs-validate --checkpoint checkpoint.yaml                 # a checkpoint record
 ```
 

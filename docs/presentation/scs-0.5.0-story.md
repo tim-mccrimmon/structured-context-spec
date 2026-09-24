@@ -614,8 +614,8 @@ into a clean venv and the workflow was run end to end, then re-run after the too
 ISS-028, ISS-032 to ISS-034, all done the same day and covered by the regression suites in
 `tools/*/tests`). Commands below are marked **verified** or **not run** (the Claude Code plugins).
 ISS-035 (the `scs-validator` wheel could not run) is also fixed: a non-editable install works from a
-clean venv. Still open and relevant here: **ISS-029** (scaffold has no ontology manifest) and
-**ISS-030** (stale docs). Nothing has been published to PyPI yet (ISS-014).
+clean venv. ISS-029 is partly done: the scaffold now generates a Domain Ontology manifest. Still open and
+relevant here: **ISS-029's** `--ontology` selector for CDMO/MCA and **ISS-030** (stale docs). Nothing has been published to PyPI yet (ISS-014).
 
 ## Slide 3.1 — The Path
 
@@ -673,8 +673,9 @@ one. The baseline gives you the categories an organization in your industry is e
 **Status:**
 - SDLC and CDMO manifests are in `schema/domain/examples/`. MCA ships with the release but is not in the repo yet.
 - "Add but do not remove" is the intended model; it is not enforced (see slide 2.10 notes).
-- **Open ISS-029:** `scs new project` scaffolds only the SDLC shape and does **not** generate a
-  domain manifest with an `ontology` block. Today you copy an example manifest and edit it.
+- `scs new project` generates `domain/domain-manifest.yaml`, a flat SDLC Domain Ontology of the concepts it
+  created (verified; ISS-029). It scaffolds only the SDLC shape: **open ISS-029** is a `--ontology` selector
+  for CDMO and MCA, which needs scaffold templates for them (MCA is not in the repo yet).
 
 ## Slide 3.4 — Step 2: Scaffold a Project
 
@@ -685,7 +686,7 @@ one. The baseline gives you the categories an organization in your industry is e
 pip install scs-tools
 scs new project my-app --type healthcare
 ```
-- Creates 11 concept bundles, a domain bundle, project, meta and standards bundles
+- Creates 11 concept bundles, a domain bundle, project, meta and standards bundles, and a Domain Ontology manifest (`domain/domain-manifest.yaml`)
 - About 40 SCD templates in `context/project/`, each with placeholder text to replace
 - Project types: healthcare, fintech, saas, government, standard, minimal
 - All bundles start at `version: DRAFT`, so no approval is required yet
@@ -698,7 +699,7 @@ the threat model literally reads `"[STRIDE|PASTA|Attack Trees|etc]"` until someo
 39 SCD templates, all of which now validate: ISS-032; minimal generates 3 concept bundles and the domain
 bundle imports only those: ISS-033). `pip install scs-tools` from PyPI is **not available yet**
 (ISS-014: nothing is published); installing the built wheels works (ISS-035 fixed), so demo from source or from wheels. `.scs/config`
-records `scs_version: 0.1.0` (ISS-029).
+records `scs_version: 0.1.0`.
 
 ## Slide 3.5 — Step 3: Author SCDs
 
@@ -743,7 +744,7 @@ the skill was **not run**.
 ```bash
 scs-validate context/project/threat-model.yaml            # an SCD
 scs-validate --bundle bundles/project-bundle.yaml         # a bundle
-scs-validate --domain domain-manifest.yaml                # a Domain Ontology
+scs-validate --domain domain/domain-manifest.yaml         # a Domain Ontology
 scs-validate --checkpoint checkpoint.yaml                 # a checkpoint record
 ```
 - `--strict` fails on warnings (exit 2); `--output json` for tooling
@@ -904,7 +905,7 @@ written yet** (ISS-016). The validator error for `concerns` is **verified**.
 Be direct about it: the specification and validator for the ontology are in place, and the surrounding
 tooling and documentation are being brought up to match before the tag.
 
-**Note:** Phases 3 to 9 in `RELEASE-0.5.0.md` are still open as of this draft, and the open tooling items are ISS-029, ISS-030, ISS-031, ISS-035 and ISS-036; recheck before presenting.
+**Note:** Phases 3 to 9 in `RELEASE-0.5.0.md` are still open as of this draft, and the open tooling items are ISS-029 (selector only), ISS-030, ISS-031 and ISS-038; recheck before presenting.
 
 ## Slide 3.15 — Get Involved
 
@@ -957,9 +958,9 @@ All five steps run cleanly.
 
 1. **Nothing is published to PyPI yet (ISS-014).** Slides 3.4 and 3.7 show `pip install scs-tools`;
    either publish first or say "from source" / "from the release wheels".
-2. **ISS-029 (no ontology manifest from the scaffold)** undercuts the "ontology is the anchor" message
-   in the how-to: decide whether the scaffold gains an ontology option for 0.5.0, or the slides show
-   copying an example manifest.
+2. **Scaffold ontology selector (rest of ISS-029).** A new project now gets an SDLC ontology manifest;
+   choosing CDMO or MCA at scaffold time is not possible yet. Say so on slide 3.3, or decide whether
+   it is needed for 0.5.0. Related: ISS-038 (scaffolded SCDs do not yet declare their `concept`).
 3. **Plugins were not run.** If the plugin flow is the recommended path, run `/scs-vibe:init` and
    `/scs-team:init` once and capture real output for slides 3.2 and 3.10.
 4. **MCA** is not usable from the CLI or in the repo yet; slide 3.3 should say so or wait for it to ship.
