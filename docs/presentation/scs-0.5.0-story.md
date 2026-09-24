@@ -406,14 +406,12 @@ instead. Good evidence for why one shared list does not work.
 **Status notes (not for the slide):**
 - **SCS 0.5 is still a draft**, and **MCA ships with the 0.5 release** (decided by Tim). Present all
   three ontologies as part of 0.5, and say the release is in progress if presenting before the tag.
-- Today SDLC and CDMO are in this repo (`schema/domain/examples/`); **MCA is not yet.** Its source is a
-  working draft in the Everest engagement repo (`everest/docs/ontology.md`, `status: draft`,
-  2026-09-23): 16 concepts and 16 placeholder SCD skeletons with no real decisions yet. So the concept
-  list on this slide may still change before release; recheck the count and names at release.
-- To ship it: add an MCA domain manifest (and, like CDMO, decide whether to include example concept
-  bundles) to this repo, and update the spec lines that still say Business Funding is "not yet modeled"
-  (`domain-ontology.md` §2 and §4, `terminology.md` §2.14, `rfcs/RFC-0001`). `RELEASE-0.5.0.md` has no
-  MCA item today.
+- All three manifests are in this repo (`schema/domain/examples/`): `software-development-domain.yaml`,
+  `medical-device-cdmo-domain.yaml` and `merchant-cash-advance-domain.yaml` (ISS-039; validates clean,
+  16 concepts, 15 relationships, no `satisfies`). It comes from a working draft in the engagement repo
+  (`everest/docs/ontology.md`, `status: draft`, 2026-09-23), so recheck the concept list if that
+  document changes before release. The spec text now describes three models (`rfcs/RFC-0001` is left as
+  the accepted record). The engagement's 16 skeleton SCDs were deliberately not shipped.
 - MCA was derived from a client engagement. Confirm the client is comfortable with it being published
   in an open-source repo, and with any wording that could identify them. Slide 2.8 uses no client or
   people names.
@@ -581,9 +579,8 @@ Walking `depends-on` edges to pull in related concepts automatically is a future
 
 # Open items for Section 2
 
-1. **MCA release work.** MCA ships with 0.5 (decided), but it is not in the SCS repo yet. Needs a
-   domain manifest under `schema/domain/examples/`, updated "not yet modeled" spec text, and a line in
-   `RELEASE-0.5.0.md`. Recheck slide 2.8's concept count when it lands.
+1. **MCA release work.** Done: manifest, tests, spec text and a release-checklist entry (ISS-039).
+   Recheck slide 2.8's concept count if the source ontology changes.
 2. **Client clearance.** MCA was derived from a client engagement and will be published in an
    open-source repo. Confirm with the client before release; slide 2.8 uses no client or people names.
 3. **"Add, don't subtract" (slide 2.10) is not specified or enforced.** Needs a decision, probably an
@@ -671,11 +668,11 @@ This is the decision that shapes everything after it, and it is a business decis
 one. The baseline gives you the categories an organization in your industry is expected to cover.
 
 **Status:**
-- SDLC and CDMO manifests are in `schema/domain/examples/`. MCA ships with the release but is not in the repo yet.
+- SDLC, CDMO and MCA manifests are all in `schema/domain/examples/` (MCA: ISS-039).
 - "Add but do not remove" is the intended model; it is not enforced (see slide 2.10 notes).
 - `scs new project` generates `domain/domain-manifest.yaml`, a flat SDLC Domain Ontology of the concepts it
   created (verified; ISS-029). It scaffolds only the SDLC shape: **open ISS-029** is a `--ontology` selector
-  for CDMO and MCA, which needs scaffold templates for them (MCA is not in the repo yet).
+  for CDMO and MCA, which needs scaffold templates for them.
 
 ## Slide 3.4 — Step 2: Scaffold a Project
 
@@ -963,9 +960,9 @@ All five steps run cleanly.
    it is needed for 0.5.0. Related: ISS-038 (scaffolded SCDs do not yet declare their `concept`).
 3. **Plugins were not run.** If the plugin flow is the recommended path, run `/scs-vibe:init` and
    `/scs-team:init` once and capture real output for slides 3.2 and 3.10.
-4. **MCA** is not usable from the CLI or in the repo yet; slide 3.3 should say so or wait for it to ship.
+4. **MCA** is in the repo but cannot be chosen from the CLI yet (rest of ISS-029); slide 3.3 should say so.
 5. **Slide 3.14** must be re-checked against `RELEASE-0.5.0.md` and `ISSUES.md` right before presenting.
-6. The tooling fixes are uncommitted in the working tree (see `git status`); they are not released.
+6. The tooling fixes are committed on `0.5-dev` but not released or tagged.
 
 ---
 

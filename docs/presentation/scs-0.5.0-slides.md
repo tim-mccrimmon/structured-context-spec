@@ -13,7 +13,8 @@ SCS 0.5 is still a draft, so these depend on work in flight. Recheck each right 
 
 - [x] Tooling fixes verified 2026-09-24 (ISS-026, 027, 028 and related; rerun the demo script in `scs-0.5.0-story.md`); confirm they are committed and released
 - [x] ISS-035 fixed (the validator wheel now works when installed); confirm the changes are committed
-- [ ] MCA ontology added to the repo (slide 2.8, 3.3) and the client has cleared publication
+- [x] MCA ontology added to the repo (slide 2.8, 3.3)
+- [ ] The client has cleared publishing the MCA ontology
 - [ ] Packages published to PyPI (ISS-014), or say "from source" on slides 3.4 and 3.7
 - [ ] `docs/MIGRATION-0.5.0.md` exists (slide 3.13)
 - [ ] Concept counts on slide 2.8 still match the shipped ontologies
