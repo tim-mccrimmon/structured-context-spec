@@ -225,10 +225,13 @@ See ISS-006 in `ISSUES.md` for the full design rationale and implementation deta
 - [x] `RELEASE-NOTES-0.5.0.md` written — covers the Domain Ontology, the any-AI-actor model
       and its §5 runtime decisions, tooling fixes, migration, and what's deferred; concept
       counts (11/12/16) verified against the actual files, not stated from memory
-- [ ] Merge `0.5-dev` → `main`
-- [ ] Tag `v0.5.0`, push tag to origin
-- [ ] Update `ROADMAP.md`: move "Active development" line to whatever's next
-- [ ] Close TaskWarrior task 61
+- [x] Merge `0.5-dev` → `main` — done 2026-09-27, no-ff merge, clean (no conflicts); verified
+      the merged tree byte-identical to the already-validated `0.5-dev` tree before tagging
+- [x] Tag `v0.5.0`, push tag to origin — pushed; `main` and `0.5-dev` both pushed to origin
+- [x] Update `ROADMAP.md`: move "Active development" line to whatever's next — no branch is
+      currently active; points at "Beyond 0.5.0" for candidates, none scheduled
+- [x] Close TaskWarrior task 61 — task ID had renumbered to 60 (IDs renumber, ref field
+      doesn't); found by matching `ref` to this file, confirmed, closed
 
 ---
 
