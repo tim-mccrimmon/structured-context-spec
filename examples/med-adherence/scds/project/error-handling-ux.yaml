@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: usability-accessibility
 title: "Error Handling UX"
 description: "User-facing error handling guidelines"
+concept: concept:usability-accessibility
 
 content:
   summary: "Clear, helpful error messages that guide users"

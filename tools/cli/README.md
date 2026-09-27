@@ -253,7 +253,7 @@ Projects include 10 domain bundles covering:
 Each SCD template includes:
 
 - Proper YAML structure with id, type, version, status
-- Domain and concern tags
+- Domain and topic tags
 - Comprehensive content placeholders with examples
 - Provenance tracking
 - Inline documentation and guidance

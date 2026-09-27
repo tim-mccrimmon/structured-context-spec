@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: architecture
 title: "Integration Map"
 description: "External system integrations and data flows"
+concept: concept:architecture
 
 content:
   summary: "Key integrations for medication reminders and healthcare provider access"

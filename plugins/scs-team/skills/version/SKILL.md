@@ -17,7 +17,7 @@ You are helping the user version their structured context, locking it for use.
 
 ## Versioning Philosophy
 
-**Version bottom-up**: Concern bundles first, then domain/project bundles.
+**Version bottom-up**: Concept bundles first, then domain/project bundles.
 
 **Semantic versioning**:
 - **MAJOR** (1.0.0 → 2.0.0): Breaking changes, removed SCDs, changed structure
@@ -49,8 +49,8 @@ Ask the user:
 ### Step 3: Version Bottom-Up
 
 Order of operations:
-1. Version concern bundles first (they have no imports)
-2. Update project bundle to reference versioned concerns
+1. Version concept bundles first (they have no imports)
+2. Update project bundle to reference versioned concepts
 3. Version project bundle last
 
 ### Step 4: Update Files
@@ -73,23 +73,25 @@ version: "DRAFT"
 version: "1.0.0"
 ```
 
-Update provenance:
+Update provenance. Field names must match the schema's required fields for a
+non-DRAFT version (RFC-0001, Provenance and approval) - `version_approved_by`
+and `version_approved_at`, not `versioned_by`/`versioned_at`:
 ```yaml
 provenance:
-  versioned_by: "<User>"
-  versioned_at: "<ISO timestamp>"
-  version_rationale: "<Why this version>"
+  version_approved_by: "<User>"
+  version_approved_at: "<ISO timestamp>"
+  rationale: "<Why this version>"
 ```
 
 ### Step 5: Recompile to Claude Code Format
 
 After versioning, recompile `.scs/` source to `.claude/rules/` output to reflect the new version:
 
-1. Read all SCDs in `.scs/scds/` and all concern bundles in `.scs/concerns/`
-2. For each concern that has SCDs:
+1. Read all SCDs in `.scs/scds/` and all concept bundles in `.scs/concepts/`
+2. For each concept that has SCDs:
    a. Compress the SCD content to actionable rules (constraints, boundaries, patterns - NOT documentation)
-   b. Target 300-500 tokens per concern file
-   c. Write to `.claude/rules/<concern-name>.md`
+   b. Target 300-500 tokens per concept file
+   c. Write to `.claude/rules/<concept-name>.md`
    d. Add header: `<!-- scs-team:managed -->` and footer with source SCD attribution including version
 3. Generate/update the scs-team section in CLAUDE.md:
    a. If CLAUDE.md exists, find `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers
@@ -169,9 +171,9 @@ Proceed? (This will modify files)
 ### Versioning Complete
 
 **Updated files:**
-- `.scs/concerns/architecture.yaml` → 1.0.0
-- `.scs/concerns/security.yaml` → 1.0.0
-- `.scs/concerns/compliance.yaml` → 1.0.0
+- `.scs/concepts/architecture.yaml` → 1.0.0
+- `.scs/concepts/security.yaml` → 1.0.0
+- `.scs/concepts/compliance.yaml` → 1.0.0
 - `.scs/project.yaml` → 1.0.0
 - 8 SCDs updated to 1.0.0
 

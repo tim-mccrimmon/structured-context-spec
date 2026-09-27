@@ -6,7 +6,7 @@ title: "Opportunity Analysis"
 description: "Market context, competitive landscape, and timing factors"
 
 domain: business-context
-concerns:
+topics:
   - market-analysis
   - competitive-positioning
 
@@ -41,7 +41,7 @@ content:
     - value: "[Type of value created]"
       description: "[How this value is realized]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

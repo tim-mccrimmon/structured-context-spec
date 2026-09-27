@@ -7,26 +7,165 @@ domain:
   license: "open"
   homepage: "https://structuredcontext.dev/domains/medical-device-cdmo"
 
-  # The 12 concerns of this domain. Derived by adapting the software-development
-  # reference set to a regulated medical-device CDMO: concerns kept where they fit,
-  # renamed where the meaning shifts (e.g. architecture -> system-architecture,
-  # testing-validation -> verification-validation), and added where the domain has
-  # needs the software set has no home for (qms-records, supplier-qualification,
-  # training-competency). Inclusion rule: a concern belongs here only where AI
-  # agents actually operate.
-  concerns:
-    - "bundle:compliance-governance:0.1.0"
-    - "bundle:data-provenance:0.1.0"
-    - "bundle:security:0.1.0"
-    - "bundle:business-context:0.1.0"
-    - "bundle:system-architecture:0.1.0"
-    - "bundle:verification-validation:0.1.0"
-    - "bundle:risk-management:0.1.0"
-    - "bundle:implementation-cutover:0.1.0"
-    - "bundle:ai-accountability:0.1.0"
-    - "bundle:training-competency:0.1.0"
-    - "bundle:qms-records:0.1.0"
-    - "bundle:supplier-qualification:0.1.0"
+  # The Domain Ontology (RFC-0001): 12 concepts, derived by adapting the
+  # software-development reference set to a regulated medical-device CDMO -
+  # concepts kept where they fit, renamed where the meaning shifts (e.g.
+  # architecture -> system-architecture, testing-validation ->
+  # verification-validation), and added where the domain has needs the
+  # software set has no home for (qms-records, supplier-qualification,
+  # training-competency). Inclusion rule: a concept belongs here only where
+  # AI agents actually operate.
+  #
+  # This is the reference example for depth: relationships trace how the
+  # concepts actually connect in CDMO work (e.g. verification-validation
+  # depends on both risk-management and system-architecture; cutover can't
+  # happen until validation and training are done), and satisfies maps each
+  # concept to the regulatory clause it exists to address, in a market where
+  # that mapping is the whole point. business-context and compliance-
+  # governance have no outgoing edges - they're the foundation other
+  # concepts point to, not concepts that depend on something else.
+  ontology:
+    concepts:
+      - id: concept:business-context
+        name: Business Context
+        description: >
+          Objectives and business case, scope boundaries, measurable success
+          criteria, and client/program context for a CDMO engagement.
+        bundle: bundle:business-context:0.1.0
+
+      - id: concept:compliance-governance
+        name: Compliance & Governance
+        description: >
+          Which regulations bind the work, AI deployment-tier and autonomy
+          rules, and the overall QMS governance framework.
+        satisfies:
+          - scd:standards:iso-13485
+          - scd:standards:cfr-820-qmsr
+        bundle: bundle:compliance-governance:0.1.0
+
+      - id: concept:risk-management
+        name: Risk Management
+        description: >
+          The risk register, risk-to-requirement-to-controlling-deliverable
+          traceability, data-integrity risk controls, and risk-acceptability
+          criteria per ISO 14971.
+        relationships:
+          - type: relates-to
+            target: concept:compliance-governance
+        satisfies:
+          - scd:standards:iso-14971
+        bundle: bundle:risk-management:0.1.0
+
+      - id: concept:system-architecture
+        name: System Architecture
+        description: >
+          Target system design and configuration, integration topology, and
+          target data/system boundaries for a CDMO program.
+        relationships:
+          - type: relates-to
+            target: concept:business-context
+        bundle: bundle:system-architecture:0.1.0
+
+      - id: concept:security
+        name: Security
+        description: >
+          Access-control model and the boundaries an assistant may touch in
+          validated/QMS systems.
+        relationships:
+          - type: relates-to
+            target: concept:system-architecture
+        bundle: bundle:security:0.1.0
+
+      - id: concept:verification-validation
+        name: Verification & Validation
+        description: >
+          Computer-system validation: the validation approach (GAMP
+          category; IQ/OQ/PQ) and requirements (URS) for a CDMO program.
+        relationships:
+          - type: depends-on
+            target: concept:risk-management
+          - type: depends-on
+            target: concept:system-architecture
+        satisfies:
+          - scd:standards:iec-62304
+          - scd:standards:cfr-part-11
+        bundle: bundle:verification-validation:0.1.0
+
+      - id: concept:qms-records
+        name: QMS Records
+        description: >
+          Document hierarchy and control rules, record-retention rules, and
+          CAPA triggers.
+        relationships:
+          - type: relates-to
+            target: concept:compliance-governance
+        satisfies:
+          - scd:standards:iso-13485-clause-4.2
+        bundle: bundle:qms-records:0.1.0
+
+      - id: concept:supplier-qualification
+        name: Supplier Qualification
+        description: >
+          GAMP supplier assessment for platform vendors and per-tier vendor
+          approval.
+        relationships:
+          - type: relates-to
+            target: concept:compliance-governance
+          - type: relates-to
+            target: concept:verification-validation
+        satisfies:
+          - scd:standards:iso-13485-clause-7.4
+        bundle: bundle:supplier-qualification:0.1.0
+
+      - id: concept:training-competency
+        name: Training & Competency
+        description: >
+          Role-to-required-competency matrix and the definition of a
+          qualified operator for a CDMO program.
+        relationships:
+          - type: relates-to
+            target: concept:qms-records
+        satisfies:
+          - scd:standards:iso-13485-clause-6.2
+        bundle: bundle:training-competency:0.1.0
+
+      - id: concept:data-provenance
+        name: Data & Provenance
+        description: >
+          Classification scheme, source-to-target lineage, ALCOA+ integrity,
+          and RAG source-precedence rules.
+        relationships:
+          - type: relates-to
+            target: concept:risk-management
+          - type: relates-to
+            target: concept:qms-records
+        satisfies:
+          - scd:standards:cfr-part-11
+        bundle: bundle:data-provenance:0.1.0
+
+      - id: concept:ai-accountability
+        name: AI Accountability
+        description: >
+          Human decision authority and sign-off gates, and the
+          non-decision principle for automated controls.
+        relationships:
+          - type: depends-on
+            target: concept:compliance-governance
+          - type: relates-to
+            target: concept:risk-management
+        bundle: bundle:ai-accountability:0.1.0
+
+      - id: concept:implementation-cutover
+        name: Implementation & Cutover
+        description: >
+          The cutover plan and sequence, and multi-site rollout including
+          role/licensing readiness.
+        relationships:
+          - type: depends-on
+            target: concept:verification-validation
+          - type: depends-on
+            target: concept:training-competency
+        bundle: bundle:implementation-cutover:0.1.0
 
   # Shared base SCD schemas (inherited from the core spec, as in the sibling domains).
   schemas:
@@ -82,4 +221,4 @@ domain:
 #   - ai_governance: [EU AI Act, ISO/IEC 42001, NIST AI RMF, FDA AI guidances]
 #
 # Project-tier content (per-program implementation):
-#   - the SCDs declared by each concern bundle in examples/medical-device-cdmo/concerns/
+#   - the SCDs declared by each concept bundle in examples/medical-device-cdmo/concepts/

@@ -1,0 +1,29 @@
+# ================================================================
+# Concept Bundle: Security
+# ================================================================
+# Access model and the validated-system boundaries an AI assistant
+# must respect. Generic SCD slots.
+# ================================================================
+
+id: bundle:security
+type: concept
+version: "0.1.0"
+title: "Security Concept Bundle"
+description: >
+  Security context for a medical-device CDMO: access-control model,
+  the boundaries an assistant may touch in validated/QMS systems, and
+  data-loss-prevention controls at the AI boundary.
+
+imports: []
+
+scds:
+  - scd:project:access-control-model
+  - scd:project:validated-system-boundaries
+  - scd:project:data-loss-prevention
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  version_approved_by: "info@ohana-tech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
+  rationale: "Generic security concept for the Medical-Device CDMO domain"

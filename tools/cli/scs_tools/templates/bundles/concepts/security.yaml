@@ -1,0 +1,18 @@
+id: bundle:security
+type: concept
+version: "DRAFT"
+title: "Security Concept Bundle"
+description: "Security controls, data protection, and threat management for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:authn-authz
+  - scd:project:data-protection
+  - scd:project:data-handling
+  - scd:project:threat-model
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Security concept bundle for {{ project_name }}"

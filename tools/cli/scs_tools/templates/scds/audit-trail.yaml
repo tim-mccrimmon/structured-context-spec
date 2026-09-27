@@ -6,7 +6,7 @@ title: "Audit Trail"
 description: "Decision logging, data access logging, and audit log retention"
 
 domain: ethics-ai-accountability
-concerns:
+topics:
   - audit-logging
   - accountability
   - traceability

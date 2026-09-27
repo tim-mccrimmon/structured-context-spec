@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: security
 title: "Authentication and Authorization"
 description: "Authentication and authorization requirements"
+concept: concept:security
 
 content:
   summary: "OAuth 2.0 / OIDC with role-based access control"

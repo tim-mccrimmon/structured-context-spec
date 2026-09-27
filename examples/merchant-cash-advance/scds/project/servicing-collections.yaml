@@ -1,0 +1,36 @@
+# Skeleton SCD. Every TODO is a decision that someone with standing over this concept still has
+# to make. Once real decisions exist, expect this concept to split into several small SCDs.
+# Links between concepts live in the domain ontology, not in `relationships` (an SCD
+# relationship must point at another SCD).
+id: scd:project:servicing-collections
+type: project
+title: Servicing & Collections
+version: 0.1.0
+description: Daily or twice-monthly ACH debiting, NSF and returns, delinquency, restructuring, and confession-of-judgment
+  posture.
+concept: concept:servicing-collections
+content:
+  summary: TODO
+  scope:
+  - TODO — e.g., AI may flag/prioritize delinquent accounts, draft merchant communication for review
+  prohibited_uses:
+  - AI must never auto-send default/collection communications without human review — TODO confirm
+  decision_authority:
+  - action: Delinquent-account flagging/prioritization
+    authority: TODO
+  - action: Internal vs. outsource referral decision
+    authority: TODO
+  - action: Restructure terms
+    authority: TODO
+  human_oversight:
+  - TODO
+  data_boundary:
+  - TODO
+  transparency_requirements:
+  - TODO — e.g., new-vs-repeat customer treatment, if it affects collections
+relationships: []
+provenance:
+  created_by: ohana-consulting
+  created_at: '2026-09-24'
+  rationale: Skeleton generated from the MCA ontology; awaiting real decisions from the person with standing
+    over this concept before it can be approved.

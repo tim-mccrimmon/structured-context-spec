@@ -110,7 +110,7 @@ ls .claude/rules/
 
 ## SEGMENT 3: OUTRO (Can be live or recorded separately, ~15 seconds)
 
-> "SCS Vibe is open source. Link in the description. If your project grows into a team effort, check out SCS Team for the full workflow with 11 concern areas, compliance standards, and versioning.
+> "SCS Vibe is open source. Link in the description. If your project grows into a team effort, check out SCS Team for the full workflow with 11 concept areas, compliance standards, and versioning.
 >
 > Thanks for watching."
 

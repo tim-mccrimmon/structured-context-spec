@@ -23,7 +23,7 @@ You are helping the user transform an existing document into structured context 
 First, read the document the user provided:
 - Identify the document type (PRD, MRD, architecture, security, compliance, etc.)
 - Understand its structure and content
-- Note which of the 11 concerns it addresses
+- Note which of the 11 concepts it addresses
 
 ### Step 2: Identify Extractable Information
 
@@ -80,11 +80,11 @@ Based on the document type, look for:
 - Bias detection approach
 - Audit trail requirements
 
-### Step 3: Map to Concerns
+### Step 3: Map to Concepts
 
-Map extracted information to the 11 concern areas:
+Map extracted information to the 11 concept areas:
 
-| # | Concern | SCDs |
+| # | Concept | SCDs |
 |---|---------|------|
 | 1 | Architecture | system-context, tech-stack, integration-map, component-model |
 | 2 | Security | authn-authz, data-protection, data-handling, threat-model |
@@ -124,18 +124,18 @@ provenance:
 
 1. Create `.scs/scds/` directory if it doesn't exist
 2. Name files descriptively: `problem-definition.yaml`, `system-context.yaml`, etc.
-3. **Update the relevant concern bundle** in `.scs/concerns/` to include the new SCD in its `scds:` array
-   - If the concern bundle doesn't exist, create it following the standard format
+3. **Update the relevant concept bundle** in `.scs/concepts/` to include the new SCD in its `scds:` array
+   - If the concept bundle doesn't exist, create it following the standard format
 
 ### Step 6: Compile to Claude Code Format
 
 After creating/modifying SCDs, compile the `.scs/` source to `.claude/rules/` output:
 
-1. Read all SCDs in `.scs/scds/` and all concern bundles in `.scs/concerns/`
-2. For each concern that has SCDs:
+1. Read all SCDs in `.scs/scds/` and all concept bundles in `.scs/concepts/`
+2. For each concept that has SCDs:
    a. Compress the SCD content to actionable rules (constraints, boundaries, patterns - NOT documentation)
-   b. Target 300-500 tokens per concern file
-   c. Write to `.claude/rules/<concern-name>.md`
+   b. Target 300-500 tokens per concept file
+   c. Write to `.claude/rules/<concept-name>.md`
    d. Add header: `<!-- scs-team:managed -->` and footer with source SCD attribution
 3. Generate/update the scs-team section in CLAUDE.md:
    a. If CLAUDE.md exists, find `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers
@@ -152,7 +152,7 @@ After creating/modifying SCDs, compile the `.scs/` source to `.claude/rules/` ou
 Tell the user:
 1. What document type was detected
 2. What SCDs were generated
-3. What concern bundles were updated
+3. What concept bundles were updated
 4. What `.claude/rules/` files were compiled
 5. What might be missing or need human review
 
@@ -196,7 +196,7 @@ You: "This is a Product Requirements Document for a patient scheduling system. I
 4. `constraints-and-assumptions.yaml` - Boundaries and limits
 
 **Updated Bundles:**
-- `concerns/business.yaml` - Added 4 SCDs
+- `concepts/business.yaml` - Added 4 SCDs
 
 **Compiled to Claude Code:**
 - `.claude/rules/business.md` - Business context rules

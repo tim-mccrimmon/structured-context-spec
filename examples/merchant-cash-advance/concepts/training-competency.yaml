@@ -1,0 +1,12 @@
+id: bundle:training-competency
+type: concept
+version: DRAFT
+title: Training & Competency Concept Bundle
+description: Role-based training, meaning what leadership and staff need to know before using AI.
+imports: []
+scds:
+- scd:project:training-competency
+provenance:
+  created_by: ohana-consulting
+  created_at: '2026-09-24'
+  rationale: 'Concept bundle for the MCA reference ontology: Training & Competency.'

@@ -6,7 +6,7 @@ title: "Model Bias Assessment"
 description: "Bias and fairness assessment, evaluation metrics, and mitigation strategies"
 
 domain: ethics-ai-accountability
-concerns:
+topics:
   - bias-mitigation
   - fairness
   - model-evaluation
@@ -98,7 +98,7 @@ content:
         - "[Bias findings]"
         - "[Mitigation actions]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

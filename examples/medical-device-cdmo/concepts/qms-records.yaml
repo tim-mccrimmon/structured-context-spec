@@ -1,0 +1,30 @@
+# ================================================================
+# Concept Bundle: QMS Records
+# ================================================================
+# ADDED concept (no home in the software-dev set): document control,
+# CAPA, retention, systems of record. Generic SCD slots.
+# ================================================================
+
+id: bundle:qms-records
+type: concept
+version: "0.1.0"
+title: "QMS Records Concept Bundle"
+description: >
+  QMS records management for a medical-device CDMO: document hierarchy
+  and control rules, record-retention rules, CAPA triggers, and which
+  records are authoritative systems of record (AI output is never one).
+
+imports: []
+
+scds:
+  - scd:project:document-control
+  - scd:project:record-retention
+  - scd:project:capa-triggers
+  - scd:project:system-of-record-designation
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  version_approved_by: "info@ohana-tech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
+  rationale: "Generic qms-records concept (added) for the Medical-Device CDMO domain"

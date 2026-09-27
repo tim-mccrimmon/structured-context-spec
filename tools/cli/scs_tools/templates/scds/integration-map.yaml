@@ -6,7 +6,7 @@ title: "Integration Map"
 description: "External system interfaces, API protocols, and data exchange patterns"
 
 domain: architecture
-concerns:
+topics:
   - external-integrations
   - api-contracts
 

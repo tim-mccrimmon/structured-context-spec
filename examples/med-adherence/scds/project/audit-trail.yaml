@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: data-provenance
 title: "Audit Trail"
 description: "Audit trail implementation for data access and modifications"
+concept: concept:ethics-ai-accountability
 
 content:
   summary: "Immutable audit log for all PHI access and system changes"

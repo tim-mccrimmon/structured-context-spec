@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: business-context
 title: "Opportunity Analysis"
 description: "Market opportunity and competitive positioning"
+concept: concept:business-context
 
 content:
   summary: "Large addressable market with fragmented competition and clear differentiation path"

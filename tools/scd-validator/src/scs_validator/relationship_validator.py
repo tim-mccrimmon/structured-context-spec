@@ -44,7 +44,7 @@ class RelationshipValidator:
         result = ValidationResult("relationships")
 
         # Build SCD lookup
-        scd_lookup = {scd.get("id"): scd for scd in scds if scd.get("id")}
+        scd_lookup: Dict[str, Dict[str, Any]] = {scd["id"]: scd for scd in scds if scd.get("id")}
 
         # Track validation mode (standalone vs complete)
         is_complete_project = bundle_type == "project"
@@ -121,9 +121,7 @@ class RelationshipValidator:
                     [rt.get("type") for rt in self.rules.get("relationship_types", [])]
                 ),
             )
-            result.add_error(
-                ValidationError(error_msg, scd_id=source_id, file_path=file_path)
-            )
+            result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
             return
 
         # Validate no self-reference
@@ -131,9 +129,7 @@ class RelationshipValidator:
             error_msg = self.rules_loader.get_error_message(
                 self.rules, "self_reference", scd_id=source_id, type=rel_type
             )
-            result.add_error(
-                ValidationError(error_msg, scd_id=source_id, file_path=file_path)
-            )
+            result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
             return
 
         # Validate target exists
@@ -148,12 +144,13 @@ class RelationshipValidator:
                     source=source_id,
                     type=rel_type,
                 )
-                result.add_error(
-                    ValidationError(error_msg, scd_id=source_id, file_path=file_path)
-                )
+                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
             else:
                 # Warning for standalone domain bundles
-                warning_msg = f"Relationship target '{target_id}' not found in this bundle. May exist in another bundle."
+                warning_msg = (
+                    f"Relationship target '{target_id}' not found in this bundle. "
+                    "May exist in another bundle."
+                )
                 result.add_warning(
                     ValidationWarning(
                         warning_msg, level="relationships", scd_id=source_id, file_path=file_path
@@ -178,9 +175,7 @@ class RelationshipValidator:
                     to_tier=target_tier,
                     allowed=", ".join(allowed),
                 )
-                result.add_error(
-                    ValidationError(error_msg, scd_id=source_id, file_path=file_path)
-                )
+                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
 
     def _detect_circular_dependencies(
         self,
@@ -243,9 +238,7 @@ class RelationshipValidator:
                         self.rules, "circular_dependency", cycle=cycle_str
                     )
                     result.add_warning(
-                        ValidationWarning(
-                            error_msg, level="relationships", file_path=file_path
-                        )
+                        ValidationWarning(error_msg, level="relationships", file_path=file_path)
                     )
                     return True
 

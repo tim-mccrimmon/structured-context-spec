@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: compliance-governance
 title: "HIPAA Compliance"
 description: "HIPAA Privacy and Security Rule compliance requirements"
+concept: concept:compliance-governance
 
 content:
   summary: "System handles PHI and must comply with HIPAA Privacy and Security Rules"

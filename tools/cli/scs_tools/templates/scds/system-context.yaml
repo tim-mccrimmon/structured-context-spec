@@ -6,7 +6,7 @@ title: "System Context"
 description: "System boundaries, external actors, and key interactions"
 
 domain: architecture
-concerns:
+topics:
   - system-boundaries
   - external-integrations
 

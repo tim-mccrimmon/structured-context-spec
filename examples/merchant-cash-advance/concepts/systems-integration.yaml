@@ -1,0 +1,13 @@
+id: bundle:systems-integration
+type: concept
+version: DRAFT
+title: Systems Integration Concept Bundle
+description: How AI plugs into the loan-origination, CRM, and ACH/servicing platforms, including how state
+  data is looked up at the moment a prompt is assembled.
+imports: []
+scds:
+- scd:project:systems-integration
+provenance:
+  created_by: ohana-consulting
+  created_at: '2026-09-24'
+  rationale: 'Concept bundle for the MCA reference ontology: Systems Integration.'

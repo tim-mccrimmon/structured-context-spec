@@ -33,7 +33,7 @@ The bundle structure follows the **container model** (similar to Docker):
 
 2. **Meta Bundle** (`meta-bundle.yaml`)
    - Provided by SCS specification
-   - Contains: Standard vocabulary (roles, capabilities, domains, concerns)
+   - Contains: Standard vocabulary (roles, capabilities, domains, concepts)
    - Imported by every project
 
 3. **Standards Bundle** (`standards-bundle.yaml`)
@@ -42,7 +42,7 @@ The bundle structure follows the **container model** (similar to Docker):
    - Contains: HIPAA SCDs (project interpretations)
 
 4. **Domain Bundles** (`domains/*.yaml`)
-   - 10 domain-specific bundles (one per major concern area)
+   - 11 domain-specific bundles (one per major concept area)
    - Each contains 2-4 SCDs for that domain
    - Domain bundles DO NOT import other bundles - they contain only SCDs
 

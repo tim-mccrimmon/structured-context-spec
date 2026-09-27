@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: ethics-ai-accountability
 title: "AI Usage Policy"
 description: "Policies governing AI/ML usage in the system"
+concept: concept:ethics-ai-accountability
 
 content:
   summary: "AI assists but does not replace clinical judgment"

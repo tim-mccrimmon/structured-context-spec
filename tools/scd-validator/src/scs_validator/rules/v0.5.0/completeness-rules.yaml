@@ -1,0 +1,465 @@
+# Completeness Validation Rules v0.5.0
+#
+# Domain-aware completeness rules for SCS 0.5.0 multi-domain architecture
+# Projects can OPT-IN to completeness checking by creating .scs/completeness-rules.yaml
+# Based on SCS 0.5.0 / RFC-0001 (Domain Ontology) with domain bundles and concept bundles
+#
+# PHILOSOPHY: SCS validates STRUCTURE, not CONTENT COMPLETENESS.
+# You can version bundles with whatever context you have.
+# If your context is incomplete, that's your problem - not a validation failure.
+# Completeness checking is available for teams who want it (opt-in).
+
+version: "0.5.0"
+description: "Optional completeness rules for SCS 0.5.0 multi-domain projects (opt-in)"
+profile: "permissive"  # No required concepts - create what you need
+
+# Validation Level 6: Completeness/Compliance
+# DISABLED BY DEFAULT - opt-in only
+level: 6
+enabled: false  # Set to true in .scs/completeness-rules.yaml to enable
+severity: "warning"  # When enabled, issues are warnings not errors
+
+# Required Bundle Types - NONE BY DEFAULT
+# Uncomment in your .scs/completeness-rules.yaml if you want to enforce these
+required_bundles: []
+#  - type: "meta"
+#    count: 1
+#    message: "Project must import exactly 1 meta bundle"
+#
+#  - type: "standards"
+#    min: 1
+#    message: "Project must import at least 1 standards bundle"
+#
+#  - type: "domain"
+#    min: 1
+#    message: "Project must import at least 1 domain bundle"
+
+# Domain-Specific Completeness Rules
+# The Software Development domain defines 11 concepts as RECOMMENDATIONS, not requirements
+# Teams can opt-in to enforcement via .scs/completeness-rules.yaml
+domains:
+  software-development:
+    id: "domain:software-development"
+    name: "Software Development"
+    description: "Software engineering domain with 11 concept areas (all optional)"
+
+    # NO REQUIRED CONCEPTS - create what you need
+    # To enforce specific concepts, add required_concepts in .scs/completeness-rules.yaml:
+    # required_concepts:
+    #   - architecture
+    #   - security
+    required_concepts: []
+
+    concepts:
+      - id: "business-context"
+        name: "Business Context"
+        description: "Foundational business and product context (problem, stakeholders, objectives, opportunity)"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "problem|problem-definition|root-cause"
+            name: "Problem definition"
+            description: "Core problem, affected populations, pain points, root causes"
+            severity: "warning"
+
+          - pattern: "stakeholder|stakeholders"
+            name: "Stakeholder analysis"
+            description: "Stakeholder groups, roles, needs, goals, constraints"
+            severity: "warning"
+
+          - pattern: "business-objective|objectives|goals"
+            name: "Business objectives"
+            description: "Strategic objectives, measurable outcomes, KPIs"
+            severity: "warning"
+
+          - pattern: "opportunity|market|opportunity-analysis"
+            name: "Opportunity analysis"
+            description: "Market context, competitive landscape, why now"
+            severity: "warning"
+
+        key_concepts:
+          - "Problem definition"
+          - "Stakeholder alignment"
+          - "Business value"
+          - "Success measurement"
+
+      - id: "architecture"
+        name: "Architecture"
+        description: "System structure, components, boundaries, and technical design"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "system-context|system-boundary|context"
+            name: "System context and boundaries"
+            description: "Defines system boundaries and external integrations"
+            severity: "warning"
+
+          - pattern: "tech-stack|technology|stack"
+            name: "Technology stack"
+            description: "Technologies, frameworks, and platforms used"
+            severity: "warning"
+
+          - pattern: "component|architecture-model|components"
+            name: "Component model"
+            description: "System components and their relationships"
+            severity: "warning"
+
+        key_concepts:
+          - "System boundaries"
+          - "Component relationships"
+          - "Technology choices"
+
+      - id: "security"
+        name: "Security"
+        description: "Security architecture, threat models, authentication, authorization, data protection"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "auth|authn|authz|authentication|authorization|access-control"
+            name: "Authentication and authorization"
+            description: "How users are authenticated and authorized"
+            severity: "warning"
+
+          - pattern: "data-protection|encryption|data-security"
+            name: "Data protection"
+            description: "How sensitive data is protected"
+            severity: "warning"
+
+          - pattern: "threat|security-risks|threat-model"
+            name: "Threat model"
+            description: "Identified threats and mitigation strategies"
+            severity: "warning"
+
+        key_concepts:
+          - "Authentication/Authorization"
+          - "Data encryption"
+          - "Threat mitigation"
+
+      - id: "performance-reliability"
+        name: "Performance & Reliability"
+        description: "Performance requirements, reliability targets, scalability, availability"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "performance|perf-requirements"
+            name: "Performance requirements"
+            description: "Response time, throughput, and resource usage targets"
+            severity: "warning"
+
+          - pattern: "scalability|scaling"
+            name: "Scalability approach"
+            description: "How system scales to handle load"
+            severity: "warning"
+
+        key_concepts:
+          - "Response times"
+          - "Throughput"
+          - "Uptime targets"
+
+      - id: "usability-accessibility"
+        name: "Usability & Accessibility"
+        description: "User experience, interface design, accessibility requirements"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "ux|user-experience|usability"
+            name: "User experience approach"
+            description: "UX principles and design philosophy"
+            severity: "warning"
+
+          - pattern: "accessibility|a11y|wcag"
+            name: "Accessibility requirements"
+            description: "Accessibility standards and compliance (WCAG, etc.)"
+            severity: "warning"
+
+        key_concepts:
+          - "User experience"
+          - "Accessibility standards"
+
+      - id: "compliance-governance"
+        name: "Compliance & Governance"
+        description: "Regulatory compliance, audit requirements, governance policies"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "compliance|regulatory|compliance-mapping"
+            name: "Compliance mapping"
+            description: "How project satisfies regulatory requirements"
+            severity: "warning"
+
+          - pattern: "audit|audit-requirements"
+            name: "Audit requirements"
+            description: "Audit trail and evidence collection"
+            severity: "warning"
+
+        key_concepts:
+          - "Regulatory compliance"
+          - "Audit trails"
+          - "Policy enforcement"
+
+      - id: "data-provenance"
+        name: "Data & Provenance"
+        description: "Data models, data flow, data governance, provenance tracking"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "data-model|data-models|schema"
+            name: "Data model"
+            description: "Core data structures and relationships"
+            severity: "warning"
+
+          - pattern: "data-flow|data-pipeline"
+            name: "Data flow"
+            description: "How data moves through the system"
+            severity: "warning"
+
+        key_concepts:
+          - "Data models"
+          - "Data lineage"
+          - "Data quality"
+
+      - id: "testing-validation"
+        name: "Testing & Validation"
+        description: "Testing strategy, validation approach, quality assurance"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "testing|test-strategy"
+            name: "Testing strategy"
+            description: "Overall testing approach and methodology"
+            severity: "warning"
+
+          - pattern: "test-coverage|coverage"
+            name: "Test coverage requirements"
+            description: "Required test coverage levels"
+            severity: "warning"
+
+        key_concepts:
+          - "Test coverage"
+          - "Validation methods"
+          - "Quality gates"
+
+      - id: "deployment-operations"
+        name: "Deployment & Operations"
+        description: "Deployment strategy, operational procedures, monitoring, incident response"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "deployment|deploy-strategy|cicd"
+            name: "Deployment strategy"
+            description: "How software is deployed to environments"
+            severity: "warning"
+
+          - pattern: "monitoring|observability"
+            name: "Monitoring approach"
+            description: "System monitoring and observability"
+            severity: "warning"
+
+        key_concepts:
+          - "Deployment pipeline"
+          - "Monitoring"
+          - "Incident management"
+
+      - id: "safety-risk"
+        name: "Safety & Risk"
+        description: "Safety requirements, risk assessment, hazard analysis"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "risk|risk-assessment"
+            name: "Risk assessment"
+            description: "Identified risks and mitigation strategies"
+            severity: "warning"
+
+          - pattern: "safety|safety-requirements"
+            name: "Safety requirements"
+            description: "Safety-critical requirements and controls"
+            severity: "warning"
+
+        key_concepts:
+          - "Safety-critical functions"
+          - "Risk assessment"
+          - "Hazard mitigation"
+
+      - id: "ethics-ai-accountability"
+        name: "Ethics & AI Accountability"
+        description: "Ethical considerations, AI/ML governance, bias mitigation, explainability"
+        minimum_scds: 0  # No minimum - create what you need
+
+        recommended_scds:
+          - pattern: "ethics|ai-ethics|ethical"
+            name: "AI ethics framework"
+            description: "Ethical principles for AI/ML usage"
+            severity: "warning"
+
+          - pattern: "bias|bias-mitigation|fairness"
+            name: "Bias mitigation"
+            description: "How bias is detected and mitigated"
+            severity: "warning"
+
+        key_concepts:
+          - "Ethical AI use"
+          - "Bias detection/mitigation"
+          - "Explainability"
+
+  # Placeholder for other domains (Legal, Clinical, etc.)
+  # Domain experts will define their own concept completeness rules
+  legal:
+    id: "domain:legal"
+    name: "Legal Practice"
+    description: "Legal domain with case management, research, and drafting concepts"
+    enabled: false
+    note: "Domain-specific rules to be defined by legal domain experts"
+
+  clinical:
+    id: "domain:clinical"
+    name: "Clinical Practice"
+    description: "Clinical domain with patient care and treatment concepts"
+    enabled: false
+    note: "Domain-specific rules to be defined by clinical domain experts"
+
+# Stub Detection Configuration - DISABLED BY DEFAULT
+stub_detection:
+  enabled: false  # Opt-in: set to true in .scs/completeness-rules.yaml
+  description: "Detect placeholder/stub SCDs that lack real content (opt-in)"
+
+  indicators:
+    - check: "short_description"
+      threshold: 50  # Characters
+      message: "SCD description is very short (< 50 chars)"
+
+    - check: "minimal_content"
+      threshold: 2  # Fields
+      message: "SCD content has fewer than 2 fields"
+
+    - check: "generic_title"
+      patterns: ["tbd", "todo", "placeholder", "stub", "example", "template"]
+      message: "SCD title appears to be a placeholder"
+
+    - check: "no_relationships"
+      message: "SCD has no relationships defined"
+
+  stub_threshold: 2  # If 2+ indicators trigger, warn about stub
+  severity: "warning"
+
+  warning_message: >
+    SCD '{scd_id}' appears to be a stub or placeholder.
+    Consider adding more detailed content before versioning.
+
+# Compliance Validation - DISABLED BY DEFAULT
+compliance_validation:
+  enabled: false  # Opt-in: set to true in .scs/completeness-rules.yaml
+  severity: "warning"  # When enabled, issues are warnings not errors
+
+  checks:
+    - check: "standards_bundle_present"
+      description: "Project must import at least one standards bundle"
+      severity: "warning"
+
+    - check: "standards_satisfied"
+      description: "All standards SCDs should be satisfied by project SCDs"
+      severity: "warning"
+      relationship_type: "satisfies"
+
+# Customization Guidance
+customization:
+  description: "Completeness validation is OPT-IN. Create .scs/completeness-rules.yaml to enable."
+
+  philosophy: |
+    SCS validates STRUCTURE, not CONTENT COMPLETENESS.
+    - You can version bundles with whatever context you have
+    - If your context is incomplete, that's your choice
+    - Completeness checking exists for teams who want guardrails
+    - Enable it by creating .scs/completeness-rules.yaml with enabled: true
+
+  opt_in_examples:
+    - scenario: "Strict enterprise project"
+      suggestion: "Enable completeness validation with required concepts"
+      example: |
+        # .scs/completeness-rules.yaml
+        enabled: true
+        severity: "error"
+        domains:
+          software-development:
+            required_concepts:
+              - architecture
+              - security
+              - compliance-governance
+
+    - scenario: "Team wants recommendations only"
+      suggestion: "Enable with warnings (no blocking errors)"
+      example: |
+        # .scs/completeness-rules.yaml
+        enabled: true
+        severity: "warning"
+
+    - scenario: "Regulated industry (healthcare, fintech)"
+      suggestion: "Enable with compliance validation"
+      example: |
+        # .scs/completeness-rules.yaml
+        enabled: true
+        compliance_validation:
+          enabled: true
+          severity: "error"
+
+  override_location: ".scs/completeness-rules.yaml"
+
+  priority:
+    - "1. Explicit --completeness-rules flag (highest)"
+    - "2. Project .scs/completeness-rules.yaml"
+    - "3. This default file (fallback - permissive)"
+
+# Error Messages
+error_messages:
+  missing_domain:
+    "Required domain bundle '{domain}' not found in project. Expected: bundle:{domain}"
+
+  missing_concept:
+    "Required concept '{concept}' not found in domain '{domain}'. Expected: bundle:{concept}"
+
+  insufficient_scds_in_concept:
+    "Concept '{concept}' bundle has {actual} SCD(s) but requires at least {required}"
+
+  missing_recommended_scd:
+    "Concept '{concept}' is missing recommended SCD matching pattern '{pattern}': {name}"
+
+  no_standards_bundle:
+    "Project must import at least one standards bundle for compliance tracking"
+
+  stub_detected:
+    "SCD '{scd_id}' appears to be a stub. {indicators}"
+
+  no_domain_bundle:
+    "Project must import at least one domain bundle (e.g., bundle:software-development:1.0.0)"
+
+# Reporting
+reporting:
+  summary_format: "text"  # or "json"
+  show_recommendations: true
+  show_satisfied_concepts: true
+  show_missing_recommended: true
+  show_domain_summary: true
+
+# Validation Strategy for 0.5.0
+validation_strategy:
+  description: "Level 6 (completeness) is OPT-IN. When enabled, here's how it works:"
+
+  default_behavior: |
+    By default, Level 6 validation is DISABLED.
+    Levels 1-5 (syntax, semantics, references, versioning, bundle structure) still run.
+    You can version bundles with any amount of content.
+
+  when_enabled:
+    steps:
+      1: "Verify project bundle imports required bundle types (if configured)"
+      2: "For each imported domain, check required concepts (if configured)"
+      3: "Verify each concept bundle has minimum SCDs (if configured)"
+      4: "Check for recommended SCDs in each concept (warnings only)"
+      5: "Detect stub/placeholder SCDs (if enabled)"
+      6: "Validate standards compliance (if enabled)"
+
+  notes:
+    - "Completeness validation is OPT-IN via .scs/completeness-rules.yaml"
+    - "By default, you can version whatever you want"
+    - "Teams can enforce their own completeness standards"
+    - "This supports the spectrum from 'minimal disclosure' to 'full transparency'"

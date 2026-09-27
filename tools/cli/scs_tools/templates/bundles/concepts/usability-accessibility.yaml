@@ -1,0 +1,17 @@
+id: bundle:usability-accessibility
+type: concept
+version: "DRAFT"
+title: "Usability & Accessibility Concept Bundle"
+description: "User experience principles and accessibility requirements for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:ux-principles
+  - scd:project:accessibility-compliance
+  - scd:project:error-handling-ux
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Usability & Accessibility concept bundle for {{ project_name }}"

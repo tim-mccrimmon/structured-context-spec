@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: testing-validation
 title: "Test Coverage"
 description: "Test coverage requirements and strategy"
+concept: concept:testing-validation
 
 content:
   summary: "Comprehensive testing with 80% code coverage target"

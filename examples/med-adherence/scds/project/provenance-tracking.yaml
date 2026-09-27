@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: data-provenance
 title: "Provenance Tracking"
 description: "Data lineage and provenance requirements"
+concept: concept:data-provenance
 
 content:
   summary: "Track origin and transformations of all patient data"

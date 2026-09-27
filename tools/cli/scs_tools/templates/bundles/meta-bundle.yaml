@@ -1,6 +1,6 @@
 id: bundle:meta
 type: meta
-version: "1.0.0"
+version: "DRAFT"
 title: "SCS Meta Vocabulary Bundle"
 description: "Core SCS vocabulary, domains, roles, and capabilities"
 
@@ -14,7 +14,7 @@ scds:
   - scd:meta:domains
   - scd:meta:roles
   - scd:meta:capabilities
-  - scd:meta:concerns
+  - scd:meta:concepts
 
 provenance:
   created_by: "scs-spec"

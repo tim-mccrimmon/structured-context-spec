@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: compliance-governance
 title: "Audit Requirements"
 description: "Audit logging and compliance reporting requirements"
+concept: concept:compliance-governance
 
 content:
   summary: "Comprehensive audit trail for HIPAA and SOC2 compliance"

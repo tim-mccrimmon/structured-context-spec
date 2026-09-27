@@ -6,7 +6,7 @@ title: "HIPAA Compliance"
 description: "HIPAA applicability, safeguards implementation, and mapped controls"
 
 domain: compliance-governance
-concerns:
+topics:
   - healthcare-compliance
   - phi-protection
   - regulatory-adherence

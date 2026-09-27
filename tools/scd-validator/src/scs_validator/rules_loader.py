@@ -19,8 +19,8 @@ class RulesLoader:
             rules_dir: Directory containing rules files. If None, uses default location.
         """
         if rules_dir is None:
-            # Default: rules/v0.3.0 relative to this module
-            self.rules_dir = Path(__file__).parent.parent.parent / "rules" / "v0.3.0"
+            # Default: rules/v0.5.0 relative to this module
+            self.rules_dir = Path(__file__).parent / "rules" / "v0.5.0"
         else:
             self.rules_dir = Path(rules_dir)
 
@@ -52,6 +52,14 @@ class RulesLoader:
             Dictionary containing relationship rules
         """
         return self._load_rules_file("relationship-rules.yaml")
+
+    def load_domain_ontology_rules(self) -> Dict[str, Any]:
+        """Load Domain Ontology validation rules (RFC-0001).
+
+        Returns:
+            Dictionary containing domain ontology rules
+        """
+        return self._load_rules_file("domain-ontology-rules.yaml")
 
     def load_completeness_rules(
         self, custom_rules_path: Optional[Path] = None, project_root: Optional[Path] = None
@@ -139,7 +147,7 @@ class RulesLoader:
             return data
 
     @staticmethod
-    def get_error_message(rules: Dict[str, Any], error_key: str, **kwargs) -> str:
+    def get_error_message(rules: Dict[str, Any], error_key: str, **kwargs: Any) -> str:
         """Get a formatted error message from rules.
 
         Args:
@@ -151,7 +159,7 @@ class RulesLoader:
             Formatted error message
         """
         error_messages = rules.get("error_messages", {})
-        template = error_messages.get(error_key, error_key)
+        template: str = error_messages.get(error_key, error_key)
 
         try:
             return template.format(**kwargs)
@@ -185,7 +193,7 @@ class RulesLoader:
         """
         # Navigate nested dictionaries to find severity
         keys = rule_key.split(".")
-        current = rules
+        current: Any = rules
 
         for key in keys:
             if isinstance(current, dict):
@@ -194,7 +202,8 @@ class RulesLoader:
                 return default
 
         if isinstance(current, dict):
-            return current.get("severity", default)
+            severity: str = current.get("severity", default)
+            return severity
         return default
 
 

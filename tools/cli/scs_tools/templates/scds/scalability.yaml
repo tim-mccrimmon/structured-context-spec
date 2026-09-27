@@ -6,7 +6,7 @@ title: "Scalability"
 description: "Horizontal and vertical scaling strategy, capacity planning, and resource limits"
 
 domain: performance-reliability
-concerns:
+topics:
   - scalability
   - capacity-planning
   - resource-management
@@ -52,7 +52,7 @@ content:
     health_checks:
       - "[Health check 1]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

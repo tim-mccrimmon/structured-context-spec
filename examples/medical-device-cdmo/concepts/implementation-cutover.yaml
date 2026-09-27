@@ -1,0 +1,31 @@
+# ================================================================
+# Concept Bundle: Implementation & Cutover
+# ================================================================
+# RENAMED from `deployment-operations`: migration, multi-site rollout,
+# rollback, hypercare. Generic SCD slots.
+# ================================================================
+
+id: bundle:implementation-cutover
+type: concept
+version: "0.1.0"
+title: "Implementation & Cutover Concept Bundle"
+description: >
+  Implementation and cutover for a medical-device CDMO program: the
+  cutover plan and sequence, multi-site rollout (including role/licensing
+  differences), rollback triggers and procedure, and hypercare / go-live
+  criteria.
+
+imports: []
+
+scds:
+  - scd:project:cutover-plan
+  - scd:project:rollout-sequence
+  - scd:project:rollback-criteria
+  - scd:project:hypercare-plan
+
+provenance:
+  created_by: "info@ohana-tech.com"
+  created_at: "2026-06-04T00:00:00Z"
+  version_approved_by: "info@ohana-tech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
+  rationale: "Generic implementation-cutover concept (renamed from deployment-operations) for the Medical-Device CDMO domain"

@@ -6,7 +6,7 @@ title: "TEFCA Participation"
 description: "Trusted Exchange Framework and Common Agreement participation and interoperability"
 
 domain: compliance-governance
-concerns:
+topics:
   - health-information-exchange
   - interoperability
   - trust-framework
@@ -47,7 +47,7 @@ content:
       status: "[Implemented|Planned|Not applicable]"
       implementation: "[How implemented]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

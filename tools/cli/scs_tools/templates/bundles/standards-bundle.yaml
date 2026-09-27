@@ -1,6 +1,6 @@
 id: bundle:standards
 type: standards
-version: "1.0.0"
+version: "DRAFT"
 title: "Compliance Standards Bundle"
 description: "Regulatory and industry standards for {{ project_name }}"
 

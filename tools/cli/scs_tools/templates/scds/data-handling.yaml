@@ -6,7 +6,7 @@ title: "Data Handling"
 description: "Data classification, retention, deletion, and privacy controls"
 
 domain: security
-concerns:
+topics:
   - data-classification
   - privacy
   - data-lifecycle

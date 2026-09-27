@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: safety-risk
 title: "Risk Assessment"
 description: "System risks and mitigation strategies"
+concept: concept:safety-risk
 
 content:
   summary: "Key risks identified and mitigated for healthcare context"

@@ -99,7 +99,7 @@ Idea Discussion → RFC Written → PR Submitted → Community Review (2+ weeks)
 
 | Number | Title | Author | Accepted Date | Tracking Issue |
 |--------|-------|--------|---------------|----------------|
-| (None currently) | | | | |
+| 0001 | Domain Ontology (replaces "Concern") | @tim-mccrimmon | 2026-09-21 | ISS-001 – ISS-005 |
 
 ### Implemented
 

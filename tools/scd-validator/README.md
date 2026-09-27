@@ -84,7 +84,7 @@ python -m scs_validator --bundle context/bundle.yaml
 ### Text Output (Default)
 
 ```
-SCS Validator v0.1.0
+SCS Validator v0.5.0
 
 ✓ Syntax validation passed (3 files)
 ✓ Schema validation passed (3 files)
@@ -103,7 +103,7 @@ Status: ✓ VALID
 ### Error Output
 
 ```
-SCS Validator v0.1.0
+SCS Validator v0.5.0
 
 ✓ Syntax validation passed (2 files)
 ✗ Schema validation failed
@@ -239,10 +239,15 @@ fi
 
 ### Schema Not Found
 
-If you see "Schema directory not found", specify the schema directory:
+The schema directory is found automatically, in this order: `--schema-dir`, the `SCS_SCHEMA_DIR`
+environment variable, a `schema/` directory in the current directory or any parent, the `schema/` of
+the source checkout the package is installed from, and finally the copy of the schemas packaged
+inside `scs_validator`. If you still see "Schema directory not found", point at one explicitly:
 
 ```bash
-scs-validate --bundle context/bundle.yaml --schema-dir /path/to/scs-spec/schema
+scs-validate --bundle context/bundle.yaml --schema-dir /path/to/schema
+# or
+export SCS_SCHEMA_DIR=/path/to/schema
 ```
 
 ### Invalid YAML Syntax

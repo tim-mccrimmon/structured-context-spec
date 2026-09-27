@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: testing-validation
 title: "Validation Plan"
 description: "System validation approach for healthcare software"
+concept: concept:testing-validation
 
 content:
   summary: "Validation ensuring system meets clinical and business requirements"

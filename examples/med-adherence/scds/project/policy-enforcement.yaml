@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: compliance-governance
 title: "Policy Enforcement"
 description: "Mechanisms for enforcing compliance and security policies"
+concept: concept:compliance-governance
 
 content:
   summary: "Automated and manual controls for policy enforcement"

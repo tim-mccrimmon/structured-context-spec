@@ -6,7 +6,7 @@ title: "Retention Policy"
 description: "Data retention periods, archival strategy, and deletion rules"
 
 domain: data-provenance
-concerns:
+topics:
   - data-retention
   - data-lifecycle
   - compliance
@@ -55,7 +55,7 @@ content:
       supported: "[yes|no]"
       format: "[Export format]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

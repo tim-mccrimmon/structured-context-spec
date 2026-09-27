@@ -6,7 +6,7 @@ title: "CHAI Adherence"
 description: "Coalition for Health AI (CHAI) criteria applicability and validation"
 
 domain: compliance-governance
-concerns:
+topics:
   - healthcare-ai
   - responsible-ai
   - assurance
@@ -53,7 +53,7 @@ content:
       metrics:
         - "[Validation metric 1]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

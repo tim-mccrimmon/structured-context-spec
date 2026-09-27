@@ -1,0 +1,17 @@
+id: bundle:testing-validation
+type: concept
+version: "DRAFT"
+title: "Testing & Validation Concept Bundle"
+description: "Testing strategy, coverage requirements, and validation approach for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:test-coverage
+  - scd:project:validation-plan
+  - scd:project:qa-procedures
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Testing & Validation concept bundle for {{ project_name }}"

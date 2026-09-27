@@ -1,0 +1,798 @@
+# SCS Issues
+
+Working backlog for SCS **0.5.0** (branch `0.5-dev`). See `ROADMAP.md` for the theme and
+workstreams, `rfcs/` for design proposals.
+
+Status: `open` · `in-progress` · `blocked` · `done`
+
+---
+
+## Anchor
+
+### ISS-001 — Domain Ontology: accept RFC-0001
+**Status:** done (2026-09-21)
+Reviewed and accepted `rfcs/RFC-0001-domain-ontology.md`. Decisions: `type: concept`;
+`satisfies[]` sugar kept; minimal relationship set `{depends-on, relates-to, satisfies}`
+(no `part-of` yet); migration guide-only (no `scs migrate` helper); `concept` optional on
+SCDs. Cross-domain concepts parked indefinitely; approval model (`version_approved_by`
+single-source MVP) deferred-open, not blocking.
+
+### ISS-002 — Domain Ontology: schema changes
+**Status:** done (2026-09-21)
+- `schema/domain/domain-manifest-schema.json`: `concerns` removed, `domain.ontology` added
+  (`concepts[]` with `id` / `name` / `description` / `parent` / `relationships[]` /
+  `satisfies[]` / `bundle`; optional `relationship_types[]`).
+- `concept:` id pattern added (domain manifest, all three SCD tier schemas).
+- SCD schema(s) (project/meta/standards): optional `concept` field added.
+- Bundle schema: `type: concern` → `type: concept`; structural rules carried over
+  (no imports, ≥ 1 SCD).
+- Bundle schema: `provenance` gained required `version_approved_by` / `version_approved_at`
+  (RFC-0001, Provenance and approval).
+- **Refined 2026-09-22 (during ISS-005b):** those two fields are only required when
+  `version` is a real semver, not `DRAFT` — via a new `allOf`/`if`/`then` block, same
+  pattern the type-specific rules already use. Unconditionally requiring them broke every
+  freshly-scaffolded (working, unapproved) bundle the CLI produces.
+- Also renamed: `schema/scd/meta-scd-template.json`'s `content.concerns[]` vocabulary block
+  → `content.concepts[]` (`concern:` id pattern → `concept:`) — same residue, not called out
+  in the original RFC checklist but caught during implementation.
+- Not yet migrated (ISS-005): `schema/domain/examples/medical-device-cdmo-domain.yaml` and
+  the `examples/` domains still use `concerns:` and will fail validation against the new
+  schema until ISS-005 lands.
+
+### ISS-003 — Domain Ontology: validator
+**Status:** done (2026-09-21)
+New `rules/v0.5.0/` rule set (seeded from v0.3.0, `concern` -> `concept` renamed throughout;
+new `domain-ontology-rules.yaml`). New `OntologyValidator` (`ontology_validator.py`)
+implementing all 8 RFC-0001 rules: concept id format + uniqueness; acyclic `parent`;
+allowed relationship types (covers both `relationships[]` and the `satisfies[]` shorthand);
+target resolution; acyclic `depends-on`; SCD `concept` resolves (best-effort, needs SCDs
+passed in); concept-bundle SCD/concept agreement as a warning (best-effort, needs SCDs +
+bundles passed in); `concern` residue as an error with a migration hint (both
+`domain.concerns` and bundle `type: concern`). New `scs validate --domain <manifest>` CLI
+path (schema + ontology rules). `rules_loader.py` default path repointed to `rules/v0.5.0/`.
+
+Tested against hand-built valid/invalid fixtures (all 8 rules fire correctly, including
+both cycle detections) and against the existing `tests/fixtures/` and `examples/`
+content — confirms existing valid SCDs still pass, and that unmigrated `examples/*`
+bundles now correctly fail on the new `version_approved_by`/`version_approved_at`
+requirement (expected; ISS-005's job to fix).
+
+Note: `tools/scd-validator/tests/` has no actual test functions today (only fixture data,
+0 items collected by pytest) - matches ISS-013 ("No CI today"). All verification above was
+manual CLI runs, not an automated regression suite.
+
+### ISS-004 — Domain Ontology: spec text
+**Status:** done (2026-09-22)
+Scope ended up larger than written here: all 8 files in `spec/0.3/` (not just the 3 named)
+reference `concern`, and `spec/0.5/` didn't exist yet, so this was a full-directory
+migration, not an edit of 3 files. Tim decided: do `spec/0.3/` → `spec/0.5/` fully, defer
+the separate `docs/` website (see ISS-023).
+
+- `core-model.md`, `meta-tier.md`, `project-tier.md`, `standards-tier.md`,
+  `governance-and-compliance.md`: light touch — version labels fixed (also resolves
+  ISS-018's stale "0.1"/"0.3" internal labels across the whole directory, not just
+  `core-model.md`), a few terminology fixes, `concept:` field added to `project-tier.md`
+  §4.2, cross-reference to `domain-ontology.md` added to `core-model.md` §6.
+- `terminology.md`: heavy rewrite — §2.12 Concern → Concept (full RFC-0001 definition, not
+  just a rename: domain-scoped not cross-domain reusable), new §2.13 Domain Ontology, new
+  §2.14 Ontology Model, new §2.16 DRAFT/Approved Versions, §2.15 Bundle Types table updated.
+- `bundle-format.md`: heavy rewrite — §3.4 Concept Bundle examples rebuilt with correct
+  schema fields (DRAFT + versioned-with-approval cases), §3.6 guidance corrected (used to
+  say "concerns should be composable across domains" — now correctly says concepts are
+  domain-scoped), §9/§10 got the DRAFT-approval-exemption documented, §16 Key Takeaways
+  updated.
+- New `domain-ontology.md`: the normative spec translation of RFC-0001 — Domain Ontology
+  structure, Ontology Models, concept bundles, bundle validity properties, provenance/
+  approval (including the DRAFT exemption), all 8 validation rules restated normatively,
+  migration guide, open questions, future extensions.
+- **Tested, not just written**: extracted every YAML code block from all 9 files (42 total)
+  and confirmed they parse; ran the schema-relevant examples through the real
+  `scs-validate` CLI. Found and fixed 3 real bugs this way: `domain-ontology.md`'s example
+  had `parent: null` (schema types `parent` as string, not nullable — omit the field
+  instead) and a relationship targeting an undefined concept; `bundle-format.md`'s
+  pre-existing §3.3 Standards Bundle example violated the XOR constraint (imports + scds
+  both set) - same class of bug as ISS-022, but in the spec document itself, so fixed here
+  rather than just tracked; and two of my own new §3.4 examples were missing the required
+  `description` field.
+
+### ISS-005 — Domain Ontology: examples + templates + plugins
+**Status:** done (2026-09-22)
+- [x] Migrate example domains: `examples/medical-device-cdmo` and `examples/med-adherence`
+  `concerns/` → `concepts/` (23 bundle files), `type: concern` → `type: concept`,
+  `version_approved_by`/`version_approved_at` added to every bundle's provenance.
+- [x] Domain manifests: `schema/domain/examples/medical-device-cdmo-domain.yaml` got the
+  reference-depth ontology (12 concepts, relationships, `satisfies` mapped to ISO 13485 /
+  IEC 62304 / 21 CFR 820 / ISO 14971 / 21 CFR Part 11 - illustrative ids, not researched
+  clause citations); `software-development-domain.yaml` got a flat ontology (11 concepts,
+  matching what `examples/med-adherence` actually imports - it was missing `concerns`
+  entirely before, so this is new content, not just a rename).
+- [x] `examples/med-adherence`'s 39 project-tier SCDs got an optional `concept:` field,
+  derived mechanically from each concept bundle's own `scds:` list (1:1 mapping, no
+  orphans). Domain bundles and top-level meta/standards/project bundles updated too.
+- [x] Docs swept for stray `concern` text (`README.md`s, `context-intake-template.md`,
+  `chai-standards-bundle/README.md`); `examples/llm-portability/` deliberately left alone -
+  it's a frozen historical experiment snapshot, not living reference content.
+- [x] Tested: every migrated bundle validates individually (`scs validate --bundle`), both
+  domain manifests validate via the new `--domain` path (CDMO's `satisfies` targets get the
+  expected "unresolved in this context" warnings, 0 errors on both).
+- Found and tracked, not fixed here (pre-existing, unrelated to the rename): ISS-020, ISS-021
+  (bundle-tree SCD loading never actually recurses into concept bundles, so full
+  project-bundle validation doesn't exercise SCD-level checks), ISS-022 (a pre-existing XOR
+  violation + malformed import in `examples/med-adherence/standards-bundle.yaml`).
+
+**scs-tools done 2026-09-22:**
+- [x] `templates/bundles/concerns/` → `.../concepts/`; all 12 concept bundle templates
+  renamed (`type`, `title`, `rationale`); `meta-bundle.yaml`'s `scd:meta:concerns` →
+  `scd:meta:concepts`; `domains/software-development.yaml` renamed too.
+- [x] Real Python logic renamed, not just templates: `utils/project_types.py`
+  (`SOFTWARE_DEVELOPMENT_CONCERNS` → `_CONCEPTS`, `get_concerns_for_project_type` →
+  `get_concepts_for_project_type`, `minimal_concerns` → `minimal_concepts`, `"concerns"` key
+  in `AVAILABLE_DOMAINS` → `"concepts"`); `utils/files.py`; `commands/new.py` (functions,
+  variables, CLI messages); `commands/bundle.py` (display logic, `SOFTWARE_DEVELOPMENT_CONCEPTS`
+  import, a stale "10 domain bundles" count fixed to 11).
+- [x] **Found and fixed a real bug**, not just a rename: `bundle.py`'s `scs bundle version`
+  command wrote `approved_by`/`approved_at` to provenance - different field names than the
+  schema's required `version_approved_by`/`version_approved_at` (ISS-002). Fixed to match;
+  every bundle this command versions was previously going to fail validation.
+- [x] **Found and fixed a design gap**: the schema unconditionally required
+  `version_approved_by`/`version_approved_at` on every bundle, including fresh `DRAFT`
+  working bundles that haven't been approved yet by design - which meant every
+  freshly-scaffolded `scs new project` failed validation immediately. Fixed in the schema
+  (see ISS-002's refinement note above) and switched the CLI's scaffold templates from a
+  hardcoded `version: "1.0.0"` to `version: "DRAFT"`, with unversioned `imports:` to match
+  (a DRAFT bundle can't meaningfully import a pinned version of another DRAFT bundle).
+- [x] A third, distinct `concerns:` field found in the 41 SCD content templates
+  (`templates/scds/*.yaml`) - a free-text per-SCD topic-tag list, unrelated to the Domain
+  Ontology. Renamed to `topics:` rather than `concepts:` to avoid colliding with the new
+  formal `concept:` singular field on SCDs (ISS-002) - a judgment call, flagged here rather
+  than silently decided.
+- [x] Docs swept (`README.md`, `GETTING_STARTED.md`, `project-README.md`, the
+  `acme-health` example's README). `CLI-AUDIT-2026-01-01.md` deliberately left alone - a
+  dated historical audit report, same treatment as `examples/llm-portability/`.
+- [x] **Tested end-to-end**: set up a venv, ran `scs new project` for real, validated the
+  full output (`scs validate --bundle bundles/project-bundle.yaml` → 0 errors) including
+  every individual bundle; ran `scs bundle version` for real and confirmed the resulting
+  versioned bundle has correct field names and validates.
+- Found, not fixed (pre-existing, unrelated): `bundle.py`'s `_validate_bundle()` shells out
+  to a bare `scs` on `$PATH`, which silently fails outside an activated venv (`--no-validate`
+  works around it). Minor, not tracked as a numbered issue.
+
+**scs-vibe / scs-team plugins done 2026-09-22 (ISS-005c):**
+- [x] `scs-team`: all 7 skill files (`init`, `draft`, `validate`, `status`, `use`, `add`,
+  `version`), `README.md`, `demo/README.md`, `demo/DEMO-SCRIPT.md` renamed (124
+  replacements) - directory paths (`.scs/concerns/` → `.scs/concepts/`), `type: concern` →
+  `type: concept`, and all prose. One generic-English "concerned about" correctly preserved.
+- [x] `scs-vibe`: `scs-vibe-plugin-overview.md` and `demo/DEMO-SCRIPT.md` renamed (5
+  replacements). `spec/examples/care-plan-tracker/` left alone - its 5 `concern(s)` hits are
+  all generic English ("separation of concerns," "any issues or concerns," "concurrent
+  access concerns"), not the SCS term.
+- [x] **Found a third variant of the ISS-005b provenance field bug**: `scs-team`'s `version`
+  skill (the plugin equivalent of `scs bundle version`) told the model to write
+  `versioned_by`/`versioned_at`/`version_rationale` — none of which match the schema's
+  `version_approved_by`/`version_approved_at`/`rationale`. Fixed. This is the third distinct
+  naming attempt found across the codebase for the same concept (CLI's original
+  `approved_by`/`approved_at`, this plugin's `versioned_by`/`versioned_at`, and the actual
+  schema) - worth remembering when touching any other approval-writing code path.
+- [x] Verified: all 7 `SKILL.md` YAML frontmatter blocks still parse after the bulk rename.
+- Not deeply tested end-to-end (these are Claude Code skill prompts, not executable code -
+  no venv/CLI to run them through the way ISS-005a/b were tested).
+
+**ISS-005 (examples + templates + plugins) is now fully done.**
+
+---
+
+## Reframe
+
+### ISS-006 — "Any AI actor" model rewrite
+**Status:** done (2026-09-22)
+Reframe the spec so structured context is defined for any AI runtime (agent, MCP tool,
+workflow step), chat as one case. Concretely: context scoped to **agent + intent**;
+**policy-as-context** (a tool/MCP-server's permitted operations as governed context);
+context that **flows through a workflow** with a version pinned at a checkpoint. Rewrite
+the "SCS maps onto `CLAUDE.md` / `.claude/rules/`" framing to "one consumer among many".
+
+**Design converged via discussion, resolving the three open questions this ticket
+originally carried (see the retired `OPEN_QUESTIONS.md` items) around a single
+distinction:** context is a guardrail/decision (domain-invariant, worth versioning); state
+is a fact looked up because a specific prompt's wording demands it (prompt-contingent,
+never worth diffing); a prompt is the literal ask - a third, distinct thing. This directly
+resolved all three sub-questions:
+- **Scope key**: not session-scoped (sessions are paepae's/the runtime's concern, not
+  SCS's) - context is selected by **`(agent, intent)`**, the same pair a checkpoint record
+  later reuses to record which version governed a given point.
+- **Policy-as-context**: a tool/MCP server's permitted operations are a governed decision
+  (who may use what capability, under what constraint), the same as any other guardrail -
+  modeled as a **Policy SCD** (project-tier content pattern, not a new schema type,
+  following the existing convention for Architecture/Security/Governance SCDs). Tools are
+  named by **capability class** (`fetch-data`, `execute-code`, `query-db`, `write-data`,
+  `send-communication`, domain-extensible), not by protocol/MCP-endpoint - the binding to
+  an actual implementation is a runtime concern, not part of the decision the SCD records.
+  Enforcement is explicitly out of scope: SCS declares the policy; a runtime-specific
+  compilation step (an MCP gateway, a LangGraph guard, whatever) enforces it.
+- **Checkpoint-pinning**: SCS does not model workflows (that's paepae's domain) - it
+  defines only the **checkpoint record** shape, a small non-SCD, runtime-generated audit
+  artifact recording which `bundle` version was in effect for a given `(agent, intent)` at
+  a given `timestamp`, with an opaque `workflow_ref` so it can be traced back to whatever
+  the runtime calls "the workflow" without SCS needing a model of what that is.
+
+**Implemented:**
+- [x] `spec/0.5/any-ai-actor-model.md` (new) - the normative doc: §2 context scoped to
+  agent+intent (incl. the context-vs-state table from the design discussion), §3
+  policy-as-context (incl. the capability-class tool taxonomy and the enforcement
+  boundary), §4 the checkpoint record (incl. field table), §5 "consumers, not targets".
+- [x] `spec/0.5/project-tier.md` §5.7 - new Policy SCD content pattern, with a worked YAML
+  example (`applies_to_roles`, `permitted_operations[].capability`/`resource`/
+  `requires_approval`).
+- [x] `spec/0.5/core-model.md` - cross-reference to `any-ai-actor-model.md` added after the
+  Purpose section.
+- [x] `README.md` - "SCS and Claude Code" section rewritten: kept the CLAUDE.md/
+  `.claude/rules/`/`.claude/agents` mapping table, but reframed the surrounding text from
+  "SCS maps directly onto Claude Code's native context hierarchy" to Claude Code as "one
+  consumer of SCS content, not the target it's designed around", closing with a pointer to
+  `any-ai-actor-model.md` and other valid composition targets (an MCP permission gate, a
+  LangGraph node, a checkpoint record).
+- [x] `schema/checkpoint/checkpoint-record-schema.json` (new) - the only piece of this
+  design needing a schema, since it's a genuinely new artifact type (not an SCD, not a
+  bundle). Policy SCDs needed no new schema - they use the existing permissive project-tier
+  `content:` object, same as other documented-not-enforced content patterns.
+- [x] Validator/CLI support mirroring the existing `--domain` pattern:
+  `schema_validator.py`'s `validate_checkpoint_record()`/`_load_checkpoint_record_schema()`,
+  `utils.py`'s `find_checkpoint_record_schema()`, `parser.py`'s `load_checkpoint_record()`,
+  and `commands/validate.py`'s `--checkpoint`/`-c` option and `validate_checkpoint()`
+  dispatch (schema-only - a checkpoint record has no relationships/completeness/ontology
+  dimension to check).
+- [x] **Tested end-to-end** with the real `scs-validate` CLI: a valid checkpoint record
+  passes cleanly; an invalid one (bad bundle-id pattern, missing `intent`/`timestamp`)
+  fails with three clear, correctly-targeted errors; the §5.7 Policy SCD example validates
+  as a normal project-tier SCD (0 errors, 1 expected warning for the optional
+  `provenance.rationale` field).
+
+### ISS-007 — Runtime decisions: immutability scope
+**Status:** done (2026-09-27)
+Make a normative decision: is a context version immutable per execution, per task, or per
+session? Document the rule and its rationale. (`OPEN_QUESTIONS.md` → spec.)
+**Done:** `any-ai-actor-model.md` §5.1 — immutable per single execution/step, not per task
+or session; follows from §2.1 (session is state, not context) and the checkpoint record
+already being generated per-execution (§4.2), not per-task.
+
+### ISS-008 — Runtime decisions: versioning ↔ runtime behaviour
+**Status:** done (2026-09-27)
+Specify how a context version "in effect" is selected, pinned, and superseded at runtime,
+and how a consumer records which version governed a request.
+**Done:** `any-ai-actor-model.md` §5.2 — "in effect" is the latest bundle version with
+`version_approved_by`/`version_approved_at` set (RFC-0001); a deployment may pin an older
+approved version (storage mechanism left open, candidate for a future meta-tier field);
+supersession is immediate for future resolutions and never rewrites past checkpoint
+records. Recording is already covered by the checkpoint record (§4.2).
+
+### ISS-009 — Runtime decisions: context drift
+**Status:** done (2026-09-27)
+Normative definition of "context drift" and the signal a consumer uses to detect it (the
+input a reconciliation/attestation process needs).
+**Done:** `any-ai-actor-model.md` §5.3 — drift is two checkpoint records sharing a
+`workflow_ref` that resolve the same concept to different bundle versions; detectable by
+grouping checkpoint records by `workflow_ref` and comparing `bundle` per concept. Whether
+drift requires reconciliation or blocks a workflow is left to the runtime, consistent with
+§4.1 (SCS does not model workflow control flow).
+
+---
+
+## Metadata
+
+### ISS-010 — Model-routing metadata
+**Status:** deferred, post-0.5.0 (2026-09-27)
+Add bundle/SCD metadata expressing which model(s) a governed workload should route to, so
+routing is governed rather than hardcoded downstream. Define the field, its scope
+(bundle-level / SCD-level), and precedence.
+**Why deferred:** not blocking anything else in 0.5.0, and routing is runtime/orchestration
+behavior — the same class of thing `any-ai-actor-model.md` §4.1 already keeps out of SCS's
+scope for workflows. See `ROADMAP.md` "Beyond 0.5.0."
+
+### ISS-011 — Multi-author provenance
+**Status:** deferred, post-0.5.0 (2026-09-27)
+Provenance that names the real per-perspective owner (compliance, IT, engineering, …), not
+a single source. Extend the provenance schema; define an authoring/review/approval
+workflow (who approves, recorded how). Check what the current `provenance` block already
+supports.
+**Why deferred:** the original ticket already scoped this as conditional — "only pursue if
+single-source approval proves insufficient" (RFC-0001, extending the Phase 1
+`version_approved_by` MVP). Nobody has hit that limit yet. See `ROADMAP.md` "Beyond 0.5.0."
+
+---
+
+## Structure
+
+### ISS-012 — Tier stack: Corporate / Project only
+**Status:** done (2026-09-27)
+0.5.0 ships Corporate and Project tiers; Personal is deferred. Reconcile spec text and
+schemas (the current tier names in `core-model.md` are meta / standards / project — align
+tier naming with the Corporate/Project framing, or document the mapping).
+**Done:** documented the mapping rather than renaming the schema tiers (a rename would ripple
+across every doc, schema, and example that uses `tier: meta/standards/project`, which are the
+load-bearing type names). `core-model.md` §5.4 (new) and `terminology.md` §3.4 (new) state:
+"Corporate" = Meta-Tier + Standards-Tier together; "Project" = Project-Tier; "Personal"
+(individual-level context) has no schema tier and is out of 0.5.0 scope; "departmental," used
+in some engagement docs, is an audience/scope description, not a tier. Presentation deck's two
+open-item callouts (`docs/presentation/scs-0.5.0-story.md`) updated to point at the resolution.
+
+---
+
+## Tooling & release engineering
+
+### ISS-013 — CI for scs-tools and scs-validator
+**Status:** done (2026-09-24)
+No CI today. Add lint + test + schema-validation CI for both `tools/cli` and
+`tools/scd-validator`.
+**Done:** `.github/workflows/tools-ci.yml` runs on push and pull request: both test suites on Python 3.11 and
+3.12 (which also validate every shipped example, ontology manifest and scaffold), ruff, black and mypy, and a
+non-editable wheel install smoke test. First GitHub run 2026-09-24: all four jobs green. See ISS-035
+(packaging) and ISS-036 (lint and types) for how it got there.
+
+### ISS-014 — Published, pinned releases
+**Status:** deferred, post-0.5.0 (2026-09-27) — build/verification work stays done, the
+actual PyPI publish is cut for this release
+Publish `scs-tools` and `scs-validator` (PyPI or equivalent) with versioned releases, so
+downstream builds can pin a fixed version. Verify current PyPI state first.
+**Why deferred:** Tim's own use is via editable installs from this checkout, which needs no
+PyPI involvement; publishing only matters for a `pip install` user with no local clone, and
+there's no such demand yet. Publishing is also outward-facing and, once a version succeeds,
+irreversible (can't re-upload the same version number) — not something to do speculatively.
+Tagging `v0.5.0` does not depend on this either; publishing is a separate distribution
+channel from the release itself. Revisit when someone outside actually needs a pinned
+`pip install`. See `ROADMAP.md` "Beyond 0.5.0."
+**Verified current PyPI state (2026-09-27, via live lookup, not assumed):** `scs-tools` is
+already published at `0.1.0` (that version predates the concern→concept rename and is
+incompatible with 0.5.0 content — owner `tim.mccrimmon`, confirmed via the PyPI JSON API).
+`scs-validator` has never been published (404). Re-uploading version `0.1.0` for either
+package is not possible on PyPI, so a version bump was required regardless of 0.5.0.
+**Done:** both packages bumped to `0.5.0` (`tools/scd-validator/pyproject.toml`,
+`scs_validator/__init__.py`, `tools/cli/pyproject.toml`), aligning the package version with
+the SCS spec version they implement, consistent with how `__version__` was already being
+used before it went stale. `scs-tools`' `validator` extra bumped to `scs-validator>=0.5.0`
+(the old `>=0.1.0` bound would accept an incompatible pre-rename validator). Fixed a real
+bug found while doing this: `bundle.py`'s versioned-bundle manifest hardcoded
+`"validator_version": "0.1.0"` regardless of what actually validated it — now reads the
+installed `scs-validator` version via `importlib.metadata`, so it can't go stale on the next
+bump either. Verified end-to-end: both regression suites pass (146 + 79), both packages
+build clean sdists/wheels, `twine check` passes on all four artifacts, and a fresh venv
+install from the built wheels (not editable) scaffolds a project, validates it, and reports
+the correct versions via both the CLI banner and `importlib.metadata`.
+**Not done, cut for 0.5.0:** the actual `twine upload` to PyPI — deferred per above, not
+just postponed for lack of credentials. Artifacts remain built at
+`tools/scd-validator/dist/` and `tools/cli/dist/` (gitignored, not committed) if a real
+need shows up before this is picked back up properly.
+
+### ISS-015 — Converge validator rules on v0.5.0
+**Status:** done (2026-09-27)
+Retire `rules/v0.1.0/` and `rules/v0.3.0/`; single `rules/v0.5.0/` set.
+**Done:** confirmed nothing in code selected rules by version name (`rules_loader.py` only
+ever defaulted to `rules/v0.5.0`; the only other references were stale docs), then removed
+`tools/scd-validator/src/scs_validator/rules/v0.1.0/` and `.../v0.3.0/` (`git rm`). Updated
+`rules/README.md` (was still calling `v0.1.0` current, including a `cp .../v0.1.0/...`
+example that would have silently pointed at a now-deleted path) and the two stale "SCS
+Validator v0.1.0" example-output lines in `tools/scd-validator/README.md` and
+`VALIDATOR_OVERVIEW.md`. Regression suite still passes (146 tests). **Left alone,
+out of scope for this issue:** `rules/README.md` still says "7 relationship types" (RFC-0001
+narrowed this to a minimal 3) and references "11 prescribed domains" and a
+`docs/scs-v0.1-design-decisions.md` file — pre-existing staleness that belongs to ISS-030
+(stale 0.3 content in user-facing docs), not this issue.
+
+---
+
+## Migration
+
+### ISS-016 — 0.3 → 0.5.0 migration guide
+**Status:** done (2026-09-27)
+`docs/MIGRATION-0.5.0.md`: the concern → concept rename, the domain-manifest `ontology`
+conversion, incremental depth, SCD `concept` field.
+**Done:** written, covering the bundle type rename, the domain manifest `concerns:` →
+`ontology.concepts[]` conversion (the real, non-mechanical step) with a genuine before/after
+pulled from this repo's own migration (`schema/domain/examples/medical-device-cdmo-domain.yaml`,
+still validates 0 errors), the new provenance approval-field requirement, the SCD `concept`
+field, and the easy-to-miss second `concerns:` (free-text topics, renamed to `topics:`, not
+`concept:`). Both embedded YAML examples parse. This file was already a dead link from three
+places before it existed: the validator's own `legacy_concerns_field` and `legacy_concern_type`
+error messages (`domain-ontology-rules.yaml`) and `ISS-030`'s note both point at it.
+
+### ISS-017 — `scs migrate` helper
+**Status:** done — already decided at RFC-0001 acceptance (2026-09-21), this ticket just
+hadn't been closed to reflect it
+Decide whether to ship an automated helper for the mechanical parts of the 0.3 → 0.5.0
+migration (concern → concept rename, flat `concerns[]` → flat `ontology.concepts[]`), or
+keep migration guide-only.
+**Decided (RFC-0001, "Migration tooling"):** guide-only for 0.5.0, no automated `scs migrate`
+helper — Tim is the only consumer of 0.3 content today, so manual migration is cheap. Revisit
+if a third party (e.g. Nextern) has real 0.3 content to migrate. `docs/MIGRATION-0.5.0.md`
+(ISS-016) offers two one-line `sed`/`git mv` commands for the purely mechanical renames as a
+convenience, not a supported tool — the actual ontology-structure step can't be mechanically
+derived from a flat list regardless of tooling.
+
+---
+
+## Housekeeping (not 0.5.0-blocking)
+
+### ISS-018 — Spec file version labels
+**Status:** done (2026-09-22, resolved as a side effect of ISS-004)
+All `spec/0.5/` files now consistently say 0.5.0 — headers and every internal "SCS 0.1" /
+"SCS 0.3" / "in 0.1" / "for 0.3" mention (not just `core-model.md`; all 8 files had at
+least one).
+
+### ISS-019 — `.claude/` and scaffold files in the repo
+**Status:** done (2026-09-27)
+`.claude/` (machine-local `settings.local.json`) and `project-starter.md` are untracked in
+the working tree. Decide: `.gitignore` them (likely) or commit intentionally. `.gitignore`
+also has an uncommitted `.envrc` line.
+**Correction:** first pass of this review checked the `0.5-dev` worktree
+(`structured-context-spec-0.5.0/`) and found neither file, and wrongly concluded the issue
+was stale. This repo is checked out as two worktrees of the same clone — `main` lives at a
+separate path (`structured-context-spec/`) — and both files are live there: `.claude/`
+holds `settings.local.json` and `rules/scs.md`; `project-starter.md` is confirmed to be
+exactly the Kahuna `project new` scaffold artifact suspected (its own header: "Project
+Brief — scs", `created: 2026-06-26`), not part of `scs-tools`' own templates. The `main`
+worktree's local `.gitignore` also already had an `.envrc` line added by hand, never
+committed — confirming the pattern below was already wanted, just never landed.
+**Done:** added `.claude/` and `.envrc` to `.gitignore` on this branch, so neither gets
+committed by accident once merged to `main` — matches house convention in sibling repos
+(`.claude/` is gitignored wholesale in Kahuna; `.envrc` is gitignored for direnv-scoped
+GitHub tokens in
+`nextern-2h26` and `claude-enterprise`). This repo has no `.envrc` today either; the entry
+is precautionary, not fixing a leak.
+
+---
+
+## Validator engine gaps (found during ISS-005 testing, pre-existing, not RFC-0001 scope)
+
+### ISS-020 — Bundle-tree SCD loading never recurses into concept bundles
+**Status:** open
+`commands/validate.py`'s `validate_bundle()` resolves project bundle -> domain bundle, then
+reads `domain_bundle.get("scds", [])` directly - but domain bundles are required to have an
+*empty* `scds` array by design (they aggregate concept bundles via `imports`). This means
+`--bundle` on a project bundle has never actually loaded real SCDs through a correctly
+structured domain hierarchy; it silently reports "0 SCDs loaded" instead of erroring. Fix:
+recurse one more level - read the domain bundle's `imports`, load each concept bundle, and
+collect *their* `scds`.
+
+### ISS-021 — Hardcoded SCD file path template doesn't match example layouts
+**Status:** open
+The same code resolves an SCD reference to `project_root / "context" / <tier> / <name>.yaml`.
+`examples/med-adherence`'s actual SCDs live under `scds/project/`, not `context/project/` -
+so even with ISS-020 fixed, SCD files wouldn't resolve for this example. Needs either a
+configurable path convention or a documented one the examples are made to match.
+
+### ISS-022 — `examples/med-adherence/standards-bundle.yaml` pre-existing violations
+**Status:** done (2026-09-27), found during the Phase 9 full validate pass
+Two bugs unrelated to the concern->concept rename, confirmed present before this session's
+changes (only `provenance` was touched here for ISS-005): the `imports` entry
+`bundle:standards:soc2-type2:2023.1` doesn't match the bundle reference pattern (extra
+segment, non-semver version `2023.1`), and the bundle has both `imports` and `scds` set,
+violating the standards-bundle XOR rule. `scs validate --bundle` fails on this file.
+**Fixed:** the SOC2 import never resolved to anything real (no `soc2-type2` bundle exists
+anywhere in this repo; the file's own comment called it aspirational, "in production, this
+might reference a registry"). Dropped it and kept the bundle's real content — three actual
+HIPAA SCDs — as an `scds`-only standards bundle with an explicit `imports: []` (the schema
+requires the key present even when empty). Validates clean; the `xfail(strict=True)` marker
+in `test_regression_050.py` (`KNOWN_INVALID_BUNDLES`) is removed. Both regression suites
+pass fully clean (147 + 79, zero xfail).
+
+### ISS-023 — `docs/` documentation website: migrate to concept terminology
+**Status:** open (deferred, scoped out of ISS-004 by Tim 2026-09-22)
+A separate tree from `spec/` - the mkdocs-built site (`mkdocs.yml`, `docs_dir: docs`).
+45 files, ~9,300 lines, 15 referencing `concern`. Has its own **"Concern Docs" nav section**
+(11 subdirectories, `docs/concern-docs/<concept>/README.md`, one per concept) plus
+`quick-start-guide.md`, `scd-guide.md`, `validation-guide.md`, `FAQ.md`,
+`MIGRATION-0.3.md`, `bundle-lifecycle.md`, `scs-overview.md`, `glossary.yaml`. Overlaps
+conceptually with `spec/` but is a distinct, separately-maintained tree - not touched by
+the ISS-004 `spec/0.3/` → `spec/0.5/` migration. Rename `docs/concern-docs/` →
+`docs/concept-docs/` (matches the `templates/docs/` rename pattern from ISS-005b) plus a
+full terminology sweep, whenever this gets picked up.
+
+### ISS-024 — Regulatory classification block on the Context of Use SCD (proposed)
+**Status:** proposed — **originated in the SCP repo, not SCS.** Source: SCP FR-014
+(`scp-2/docs/feature-requests/FR-014-regulatory-classification-adverse-determination-review.md`,
+draft, not approved by Tim; drafted by Claude 2026-09-24). Tim agreed 2026-09-24 that the SCS
+side should carry this; scope and naming still need an SCS decision. Depends on SCP FR-010's
+proposed Context of Use SCD (itself an unapproved SCP draft, not yet an SCS content pattern).
+Add an optional block to the Context of Use SCD:
+- `regulatory_classification[]`: `regime`, `reference` (customer-asserted, e.g. an EU AI Act
+  Annex III point), `declared_by`. SCS records the declaration and its approver; it does not
+  classify anything.
+- `determination_review`: which determination types (e.g. `adverse`) require human review,
+  reviewer qualification, review window. SCP reads this to report determinations lacking a
+  linked review record; SCP holds no rule of its own.
+Decide whether this belongs in 0.5.0 or later, and whether it needs an RFC. Related: ISS-007 to
+ISS-009 (runtime decisions). Expect to be revisited in the SCS refresh planned for the week of
+2026-09-28.
+
+### ISS-025 — EU AI Act baseline changed by the Digital Omnibus: re-verify before encoding (unverified)
+**Status:** open — **unverified input, added 2026-09-24 at Tim's request.** Origin: SCP-side
+review (Claude session in `scp-2`), not an SCS decision. A stated goal of the next SCS release is
+to support EU rules as far as possible, so the EU baseline the spec maps to must be checked
+against primary text first.
+What was found (secondary sources only; EUR-Lex pages returned empty content to the tools used,
+so **the legal text has not been read**):
+- Regulation (EU) 2026/1744 ("Digital Omnibus on AI"), reportedly adopted 2026-07-08, published
+  in the OJ 2026-07-24, in force 2026-07-27, amends Regulation (EU) 2024/1689.
+- Reported new application dates: stand-alone Annex III high-risk **2027-12-02** (was
+  2026-08-02); AI in regulated products, Annex I, **2028-08-02**. Medical-device AI is likely
+  under Annex I; not confirmed for any customer.
+- **Disputed:** whether a Commission-triggered earlier date remains. Gibson Dunn (dated
+  2026-05-27, pre-adoption) says fixed dates replaced the trigger; a Cloud Security Alliance note
+  says the trigger remains.
+- Unknown: what else the Omnibus amended. Article numbers and obligations SCS maps to may have
+  changed. Example already found: post-market monitoring is **Art. 72** in the adopted Act;
+  Art. 61 is 2021 proposal numbering.
+To do:
+1. Obtain the consolidated Regulation (EUR-Lex CELEX `02024R1689-20260727`) and the Omnibus text
+   into the repo or `~/kb/inbox/`.
+2. Confirm the application dates and the trigger question from the text.
+3. Re-check every EU AI Act Article/Annex reference in `spec/`, `docs/`, and any mapping or
+   standards bundle (Art. 9, 10, 11, 12, 13, 14, 72; Annex III).
+4. Update `~/.claude/rules/identity.md` and `~/Projects/work/CLAUDE.md` if the dates change (both
+   were edited 2026-09-24 with unverified dates).
+Related: ISS-024 (regulatory classification block, from SCP FR-014), ISS-009 (drift; Art. 72
+monitoring). To be picked up in the SCS refresh week of 2026-09-28.
+
+---
+
+## Tooling defects found while drafting the how-to-use material (2026-09-24)
+
+Found by installing both packages from the `0.5-dev` checkout into a clean venv
+(`pip install -e tools/scd-validator -e tools/cli`) and running the documented workflow end to
+end. All reproduced on 2026-09-24. None of these change the RFC-0001 design; they are tooling and
+documentation gaps.
+
+### ISS-026 — `scs validate` (scs-tools) is broken: imports the deleted `scs_validator.cli`
+**Status:** done (2026-09-24)
+`tools/cli/scs_tools/commands/validate.py` does `from scs_validator.cli import main`. Commit
+`2c31362` (console-script collision fix) deleted `scs_validator/cli.py`, so the `ImportError` is
+swallowed and every `scs validate` prints "Error: scs-validator is not installed" and exits 1,
+even when it is installed. Knock-on effects:
+- `scs bundle validate` calls the same command and fails the same way.
+- `scs bundle version` runs validation as a subprocess (`scs validate ...`, in `_validate_bundle`),
+  so versioning stops at step 1 ("Validation failed with 1 error(s)") unless `--no-validate` is
+  passed, even for a bundle the standalone validator accepts.
+- The standalone `scs-validate` works and is unaffected.
+Fix: point scs-tools at `scs_validator.commands.validate:validate` (what the `scs-validate` console
+script uses), make `_validate_bundle` use the same path, and add a test. Every doc that says
+`scs new project ...; scs validate` inherits this (README, quick-start, `tools/cli/README.md`, the
+CLI's own `--help`).
+Repro: fresh venv, install both, `scs new project my-app --type healthcare --no-interactive`,
+`cd my-app && scs validate`.
+Related: ISS-013 (CI would have caught this), ISS-005b (recorded an end-to-end `scs bundle version`
+run on 2026-09-22; worth checking what validator that run used).
+**Fixed:** `scs validate` is now the validator's own command object registered under the `scs` group
+(`scs_tools/commands/validate.py`), so its options, including `--domain` and `--checkpoint`, can no
+longer drift from `scs-validate`. `scs bundle validate` and `scs bundle version` work again;
+`_validate_bundle` now runs `python -m scs_validator` with the current interpreter (no PATH
+dependence) and reads the summary counts correctly. Also corrected the `scs --help` Quick Start,
+which advertised a no-argument `scs validate` (it exits 3 with "No files or bundle specified").
+Tests: `tools/cli/tests/test_scs_tools.py` (validate pass-through, bundle validate, versioning with
+validation on).
+
+### ISS-027 — `scs bundle version` leaves `version: DRAFT` inside the versioned snapshot
+**Status:** done (2026-09-24)
+`_create_versioned_bundle` (`tools/cli/scs_tools/commands/bundle.py`) adds the approval provenance
+(`version_approved_by`, `version_approved_at`, `approval_status`, ...) but never sets the bundle's
+`version`. The snapshot `<name>-v0.1.0.yaml` therefore still contains `version: DRAFT`; the version
+appears only in the filename and in `VERSION-<v>-MANIFEST.yaml`. Consequences: the schema's DRAFT
+exemption still applies to it (a bundle that carries an approval but is DRAFT), and it cannot be
+imported as `bundle:<name>:<version>`, which is what the versioning model (imports pin exact
+versions) depends on.
+Fix: set `bundle_data["version"] = version_number` before writing, validate the written snapshot,
+add a test. The `total_scds: 0` / empty `components` in the manifest for a concept bundle looks
+wrong too; check while here.
+Repro: in a scaffolded project, `scs bundle version --bundle bundles/concepts/security.yaml
+--version 0.1.0 --approved-by sam@example.com --no-git --no-validate`, then read the output.
+Related: ISS-002 and ISS-005b (approval fields and the DRAFT conditional), ISS-026 (why
+`--no-validate` was needed in the repro).
+**Fixed:** `_create_versioned_bundle` now sets `version` to the released version. Tests assert the
+snapshot says the released version inside, carries the approval fields, validates, leaves the working
+bundle untouched, and is rejected if its approval fields are stripped (the DRAFT exemption no longer
+applies to it). Manifest checksum is asserted against the snapshot. Not covered: the git commit/tag
+step (`--no-git` in tests).
+
+### ISS-028 — `scs-validate` cannot find the schema directory in a source checkout
+**Status:** done (2026-09-24), packaging follow-up in ISS-035
+With an editable install, running `scs-validate` from a project outside the repo fails with
+"Schema directory not found: <repo>/tools/schema" (it resolves relative to the package to
+`tools/schema`, not the repo-root `schema/`), so `--schema-dir <repo>/schema` is required on every
+call. `CLAUDE.md` documents this as a workaround; `scs bundle version` has its own separate search
+(`cwd/schema` or a sibling `scs-spec/` checkout, the old repo name). Also the banner still reads
+"SCS Validator v0.1.0". Decide the intended lookup order (packaged schemas, env var, `--schema-dir`)
+and confirm how a PyPI install would find the schemas at all.
+Related: ISS-014 (published releases: are the schemas packaged in the wheel?), ISS-026.
+**Fixed:** new `resolve_schema_dir()` in `scs_validator/utils.py`. Lookup order: `--schema-dir`,
+`$SCS_SCHEMA_DIR`, a `schema/` dir in the current directory or any parent, then the `schema/` of the
+source checkout the package is installed from (off-by-one in the old package-relative path fixed).
+Searched candidates must contain `bundles/` and `scd/`, so an unrelated `schema/` folder in a user's
+project is ignored; the error lists every location tried. `scs bundle version`'s private search
+(including the old `scs-spec` sibling path) is gone. Tests in `test_regression_050.py`.
+**Not solved here:** a wheel install has no schema directory at all, see ISS-035.
+
+### ISS-029 — `scs new project` scaffolds no Domain Ontology manifest and only the SDLC shape (proposed)
+**Status:** in-progress: ontology manifest done (2026-09-24); the `--ontology` model selector is still open
+The scaffold creates the 11 SDLC concept bundles and a domain *bundle*, but no domain manifest with
+an `ontology:` block. A new project therefore has nothing for `scs-validate --domain` to check, and
+the 0.5.0 anchor feature is not visible to a new user. All project types (healthcare, fintech,
+saas, government, minimal, standard) are SDLC variants; there is no CDMO or MCA option, although
+MCA is planned to ship with 0.5.0. `.scs/config` also writes `scs_version: 0.1.0`.
+Decide: generate an `ontology` manifest from the chosen Ontology Model, and add a model selector
+(for example `--ontology sdlc|cdmo|mca`) to `scs new project` / `scs init`.
+Related: ISS-005b (scs-tools migration, done), ISS-017 (`scs migrate` helper), the Ontology Model
+packaging question in `spec/0.5/domain-ontology.md` §10.
+**Done (2026-09-24):** `scs new project` now generates `domain/domain-manifest.yaml`, a flat Domain
+Ontology of exactly the concepts it generated, using the Software Development reference ontology's
+names and descriptions (a test keeps them in step with `schema/domain/examples/`). It validates with
+0 errors and 0 warnings under `scs validate --domain`, and the getting-started doc points at it.
+`scs add bundle <concept>` reminds you to add the concept when the manifest lacks it (it does not edit
+the manifest). The concept's optional `bundle:` field is left out because the schema requires a pinned
+version and scaffolded bundles are DRAFT. The CI wheel smoke test validates the manifest.
+**Still open:** a model selector (`--ontology sdlc|cdmo|mca`) for `scs new project` / `scs init`. It
+needs CDMO and MCA concept-bundle templates in scs-tools (MCA is not in this repo yet) and the
+Ontology Model packaging decision (`spec/0.5/domain-ontology.md` §10). `.scs/config` still records
+`scs_version: 0.1.0`.
+
+### ISS-030 — Stale 0.3 content in user-facing docs
+**Status:** open
+Still describing 0.3, separate from ISS-023 (which covers only the docs website):
+- `README.md`: version badge 0.3.0, "Start with `spec/0.3/overview.md`", repo tree shows `spec/0.3/`,
+  "concern-specific context", "SCS is v0.3". ISS-006 rewrote only its "SCS and Claude Code" section.
+- `docs/quick-start-guide.md`: "Version 0.3", four bundle types, "11 prescribed domains" as
+  `type: domain` bundles, `scs-cli validate`.
+- `tools/cli/README.md`: documents `scs bundle create/update/check`, which do not exist (the real
+  subcommands are `info`, `list`, `validate`, `version`); "10 domain bundles"; OICP publishing
+  section; a project tree that does not match the scaffold (`bundles/concepts/` plus one domain
+  bundle).
+- `docs/concern-docs/` directory naming.
+Also: the validator's legacy-`concerns` error message points at `docs/MIGRATION-0.5.0.md`, which
+does not exist yet (ISS-016). That file needs to land before release or the message points nowhere.
+
+### ISS-031 — `schema/domain/examples/healthcare-domain.yaml` fails 0.5.0 validation (no `ontology`)
+**Status:** done (2026-09-24), removed
+`scs-validate --domain schema/domain/examples/healthcare-domain.yaml` fails with "Missing required
+field: 'ontology'". Missed by the ISS-005 sweep (it has no `concerns:` to rename, so it was not
+flagged). It is an old illustrative "commercial" healthcare domain (`license: commercial`, paths to
+`./healthcare/...` files that do not exist in the repo). Decide: give it a real Domain Ontology, mark
+it clearly as an illustrative non-conformant sample and exclude it from validation, or remove it.
+`test_regression_050.py` marks it `xfail(strict=True)` so the marker must be removed when this is
+resolved.
+Related: ISS-005a, ISS-022.
+**Resolved:** removed at Tim's direction. It was an unreferenced 0.3-era illustrative "commercial"
+domain (nothing in the repo referenced it). Recoverable from git history. The `xfail` marker in
+`test_regression_050.py` is gone with it; the domain-example test now covers the remaining manifests.
+
+### ISS-032 — Scaffolded SCD templates fail schema validation (`relationships:` is null)
+**Status:** done (2026-09-24)
+28 of the 42 SCD templates shipped with `relationships:` followed only by comments, which YAML reads
+as `null`; the SCD schema requires an array. A fresh `scs new project --type healthcare` therefore
+produced 24 SCDs that failed `scs-validate` out of the box (every project type is affected).
+**Fixed:** those 28 templates now say `relationships: []` (one-line change each; the 14 templates with
+real example relationships are untouched). Tests scaffold every project type and validate every
+generated SCD and bundle.
+
+### ISS-033 — `scs new project --type minimal` domain bundle imports concept bundles that were not generated
+**Status:** done (2026-09-24)
+The software-development domain bundle template hard-coded all 11 concept imports, but `minimal`
+generates only 3 concept bundles, leaving 8 dangling imports. The validator does not resolve imports
+(ISS-020), so nothing flagged it.
+**Fixed:** the template loops over the concepts actually generated; `scs new` passes them, and
+`scs add bundle software-development` uses the project's existing concept bundles (all 11 if none
+yet). Tests cover every project type.
+
+### ISS-034 — `scs add bundle`, `scs bundle list` and `scs bundle info` ignore concept bundles after the 0.5.0 rename
+**Status:** done (2026-09-24)
+After concern -> concept, the concept templates moved to `templates/bundles/concepts/`, but:
+- `scs add bundle security` failed ("Template for bundle 'security' not found"), although its help,
+  `scs bundle list --available` and the README advertise it;
+- `scs bundle list` showed only project and domain bundles (a full scaffold listed 4 bundles, none of
+  the 11 concept bundles) and printed a meaningless `Domain: unknown` for domain bundles;
+- `scs bundle info security` did not find concept bundles in the project or in the templates;
+- `scs bundle list --available` labelled concepts "domain bundles".
+**Fixed:** all three commands understand concept and domain bundles, with concept terminology in
+their help and output. Domain bundles now show their import count. Tests added for each. Not done:
+the README's `scs add bundle ... --with-scds` flag does not exist (README staleness is ISS-030).
+
+### ISS-035 — `scs-validator` wheel is unusable: `rules/` and `schema/` are not packaged
+**Status:** done (2026-09-24); unblocks ISS-014 (published releases)
+Installing the built wheel (non-editable, clean venv) and running the validator fails: "Rules
+directory not found: <venv>/lib/python3.12/rules/v0.5.0". `rules_loader.py` finds rules at
+`<package>/../../rules`, which is outside the package, and `pyproject.toml` ships no package data. The
+JSON Schemas live at the repo-root `schema/`, also outside the package, so even with rules fixed there
+is no schema directory to find (ISS-028's discovery only covers source checkouts, an env var and an
+explicit flag). Editable installs hide all of this, which is why the tests and `pip install -e` pass.
+The scs-tools wheel is fine (templates are packaged; a scaffold from the wheel works).
+Options to decide: (a) move `rules/` into `src/scs_validator/rules/` and vendor `schema/` into the
+package at build time, with a CI check that the vendored copy equals repo-root `schema/`;
+(b) restructure so `schema/` and `rules/` both live under the package and the repo root refers to
+them; (c) publish schemas as a separate distribution. Recommendation: (a).
+CI job `wheel-smoke` in `.github/workflows/tools-ci.yml` reproduces this and is informational until
+fixed.
+Related: ISS-014, ISS-015 (rules convergence), ISS-028.
+**Fixed** (option (a)):
+- `rules/` moved into the package (`git mv tools/scd-validator/rules -> src/scs_validator/rules`, all
+  three rule sets unchanged, so ISS-015's convergence work is unaffected); `rules_loader.py` defaults to
+  the packaged `rules/v0.5.0`.
+- The six JSON Schemas are vendored into `src/scs_validator/schemas/` by
+  `tools/scd-validator/scripts/sync_schemas.py` (`--check` reports drift). The repo-root `schema/`
+  stays the source of truth; **run the script after changing anything under `schema/`.**
+- `pyproject.toml` ships `rules/**` and `schemas/**` as package data.
+- Schema discovery (ISS-028) gained a last fallback to the packaged copy; a source checkout's
+  `schema/` still wins over it.
+- Tests (`tests/test_packaging.py`): rules and schemas present in the package, the vendored copy is
+  byte-identical to `schema/` (a one-byte change fails it), discovery falls back to the packaged copy,
+  validation works using only the packaged schemas, and the sync script reports no drift.
+- CI: the `wheel-smoke` job is now blocking. It builds both wheels, installs them non-editable, then
+  scaffolds, validates every generated file, versions a bundle and validates the snapshot, all away
+  from the source tree.
+- Verified locally: built wheels contain all rules and schemas; installed into a clean venv with no
+  environment variables, the full flow works, including the git commit and tag.
+Not changed: v0.1.0 and v0.3.0 rule sets still ship in the wheel until ISS-015 retires them.
+
+### ISS-036 — Lint and type-check baseline is not clean
+**Status:** done (2026-09-24)
+On 2026-09-24: `ruff check` reports 196 findings in `tools/scd-validator/src` (150 auto-fixable), 3 in
+its tests and 45 in `tools/cli`; `black --check` would reformat 9 of 16 validator files; `mypy src`
+(config has `disallow_untyped_defs`) reports 10 errors. CI (ISS-013) therefore runs lint as
+report-only. Auto-fixing is a large mechanical diff across the validator, so do it as one dedicated,
+separately reviewed change with the regression suites as the safety net, then make lint blocking.
+Related: ISS-013.
+**Fixed:** in three steps. (1) `black` formatting in its own commit (formatting only; black verifies
+AST equivalence). (2) Lint: the original counts were measured with ruff 0.16.8, whose default rule set
+is much broader than older versions (FURB, RUF, TRY, PLW...), so an unpinned `pip install ruff` would
+keep moving the baseline. Both `pyproject.toml` files now declare an explicit rule set
+(`select = ["E", "F", "W", "I"]`); the resulting 17 (validator) and 37 (scs-tools) findings were fixed:
+unused imports and variables, f-strings without placeholders, import order, long lines. (3) `mypy`
+(config already had `disallow_untyped_defs`): 8 errors fixed with annotations only, and type stubs
+(`types-colorama`, `-jsonschema`, `-PyYAML`, `-tabulate`) added to the `dev` extra. No behaviour
+changes; both regression suites pass unchanged. The CI `lint` job (ruff, black per package, mypy for
+scs-validator) is now blocking. scs-tools has no mypy configuration yet, so it is not type-checked.
+
+### ISS-037 - `scs add bundle compliance-governance` crashed ("'config' is undefined")
+**Status:** done (2026-09-24)
+Found while testing ISS-029. The compliance-governance concept template uses the project type's
+`config.exclude_scds`, which `scs new` passes but `scs add bundle` did not, so adding that concept to
+an existing project failed. (ISS-034's tests had only exercised `security`.)
+**Fixed:** `scs add bundle` reads the project type from `.scs/config` (falling back to `standard`) and
+passes its settings, so a healthcare project's compliance bundle lists the HIPAA SCDs and a standard
+one does not. Tests now run `scs add bundle` for every concept and validate the result.
+
+### ISS-038 - Scaffolded SCDs do not declare the ontology `concept` they belong to (proposed)
+**Status:** proposed
+`spec/0.5/domain-ontology.md` §3.3 expects an SCD in a concept bundle to carry `concept: concept:<id>`
+(optional in the schema). The scaffold's SCD templates omit it, so the link from an SCD to the ontology
+is empty in a fresh project and ontology rules 6 and 7 have nothing to check. Fix by injecting the
+concept from the scaffold's SCD-to-concept mapping (now local to `commands/new.py`) into each SCD, and
+by giving `scs add scd` the same reverse lookup. Related: ISS-029, ISS-005b.
+
+### ISS-039 - MCA (merchant cash advance / business funding) ontology ships with 0.5.0
+**Status:** in-progress: manifest, tests, spec text and client clearance done; only the
+`--ontology` selector (ISS-029) remains open, tracked separately
+Decided by Tim: the third industry ontology, MCA, ships with the 0.5.0 release. Source: the
+business-funding engagement's ontology document (16 concepts, three clusters).
+**Done:** `schema/domain/examples/merchant-cash-advance-domain.yaml` and, in `examples/merchant-cash-advance/`, 16
+customer-neutral skeleton SCDs, 16 concept bundles and a domain bundle (all `DRAFT`, all validating; the
+generic skeletons replace the customer's own decisions and policy references with neutral `TODO`s and
+keep only industry-level `e.g.` hints). The manifest (validates 0 errors, 0 warnings;
+15 `depends-on` / `relates-to` relationships; no `satisfies`; client-neutral wording: no client or
+people names, and no specific regulatory claims, e.g. the source's count of states with disclosure
+regimes was dropped); regression tests; `spec/0.5/domain-ontology.md`, `terminology.md` and
+`overview.md` updated. `rfcs/RFC-0001` is untouched (accepted record).
+**Resolved 2026-09-27:** clearance from the client to publish — Tim's own IP, no third-party
+clearance needed.
+**Still open:** the `--ontology` selector on `scs new project` (ISS-029), which can now build
+on the generic skeletons — tracked separately, not a 0.5.0 release blocker (the default SDLC
+scaffold path is unaffected). The engagement's own skeleton pages were fixed separately in the
+engagement repo (their SCD `relationships` no longer target `concept:` ids; the links moved to
+a visible "Related concepts" section) and keep their owners and departments.
+Related: ISS-029, RELEASE-0.5.0.md Phase 2b.
+
+### ISS-040 - Docs and validator message do not say that concept relationships belong in the ontology (proposed)
+**Status:** proposed
+Found while validating the MCA engagement's 16 skeleton SCDs: 12 failed because their SCD
+`relationships[].target` values are `concept:` ids, but an SCD relationship must target another SCD
+(`^scd:(meta|standards|project):...`). Concept-to-concept relationships belong in the domain
+manifest's ontology. The error only says the pattern did not match, and the spec does not spell out
+where concept links go, so the mistake is easy to make. Fix: state it in `domain-ontology.md` §3.3
+and `core-model.md` §6, and make the validator message point at the ontology when a relationship
+target starts with `concept:`. Related: RFC-0001, ISS-006.
+

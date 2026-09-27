@@ -6,7 +6,7 @@ title: "Safety Checklist"
 description: "Safety limits, guardrails, pre-release checks, and safety incident response"
 
 domain: safety-risk
-concerns:
+topics:
   - safety
   - guardrails
   - safety-critical-systems
@@ -87,7 +87,7 @@ content:
       behavior: "[Safe state behavior]"
       recovery: "[How to recover]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

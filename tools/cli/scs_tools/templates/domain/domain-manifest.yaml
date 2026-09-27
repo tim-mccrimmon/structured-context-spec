@@ -1,0 +1,33 @@
+# Domain Ontology manifest for {{ project_name }} (SCS 0.5.0, RFC-0001).
+#
+# The ontology is the industry baseline: the concepts (categories) your guardrails are organized
+# around. This project starts with the Software Development reference ontology, one concept per
+# concept bundle in bundles/concepts/. It is deliberately flat; add depth as you need it:
+#   parent: concept:<id>                        a taxonomy (a concept under another concept)
+#   relationships: [{type: depends-on, target: concept:<id>}]      (also: relates-to)
+#   satisfies: [scd:standards:<id>]             the standards a concept exists to address
+# Once a concept bundle has a released version, add `bundle: bundle:<name>:<version>` to its entry.
+#
+# Check it with:  scs validate --domain domain/domain-manifest.yaml
+
+domain:
+  id: "domain:software-development"
+  name: "Software Development"
+  version: "0.1.0"
+  description: "Domain Ontology for {{ project_name }}: the software development concepts its structured context is organized around"
+  author: "{{ author }}"
+
+  ontology:
+    concepts:
+{% for concept in concept_info %}      - id: concept:{{ concept.id }}
+        name: "{{ concept.name }}"
+        description: "{{ concept.description }}"
+{% endfor %}
+  # Shared base SCD schemas from the core spec, as in the reference domains.
+  schemas:
+    meta:
+      content_schema: "../../scd/meta-scd-content-schema.json"
+    standards:
+      content_schema: "../../scd/standards-scd-content-schema.json"
+    project:
+      content_schema: "../../scd/project-scd-content-schema.json"

@@ -20,11 +20,11 @@ It adapts the software-development reference domain to a regulated medical-devic
   - `supplier-qualification` (GAMP supplier assessment; AI-vendor qualification)
 - **Dropped**: `performance-reliability`, `usability-accessibility` (device human factors has no AI agent in it).
 
-**Inclusion rule:** a concern belongs in this domain only where an AI agent actually operates.
+**Inclusion rule:** a concept belongs in this domain only where an AI agent actually operates.
 
 ## Generic, not customer-specific
 
-This directory contains the **generic** domain structure only — concern definitions and the SCD
+This directory contains the **generic** domain structure only — concept definitions and the SCD
 *slots* a CDMO program would fill. It contains **no** organization-specific rules, values, or data.
 A specific CDMO's actual context (its tier definitions, its retention periods, its program data) is
 authored as project-tier SCDs in that organization's **own private workspace**, which imports this
@@ -34,9 +34,12 @@ domain by version. The structure is generic; the values are the organization's.
 
 ```
 medical-device-cdmo/
-├── domains/medical-device-cdmo.yaml   ← domain bundle (imports the 12 concerns)
-└── concerns/                          ← the 12 concern bundles (generic SCD slots)
+├── domains/medical-device-cdmo.yaml   ← domain bundle (imports the 12 concepts)
+└── concepts/                          ← the 12 concept bundles (generic SCD slots)
 ```
+
+The Domain Ontology itself (the concepts' relationships and their mapping to ISO 13485 / IEC 62304 /
+21 CFR 820 clauses) lives in the domain manifest, not here — see below.
 
 Domain manifest: `schema/domain/examples/medical-device-cdmo-domain.yaml`.
 

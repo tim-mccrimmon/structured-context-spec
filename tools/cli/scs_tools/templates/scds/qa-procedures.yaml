@@ -6,7 +6,7 @@ title: "QA Procedures"
 description: "Manual QA processes, acceptance criteria, and quality gates"
 
 domain: testing-validation
-concerns:
+topics:
   - quality-assurance
   - acceptance-testing
   - bug-management
@@ -76,7 +76,7 @@ content:
       - "[Area to explore]"
     time_boxed: "[Duration per session]"
 
-relationships:
+relationships: []
   # Define how this SCD relates to others in your project.
   # Relationship types: depends-on, satisfies, constrains, refines, extends, conflicts-with, implements
   #

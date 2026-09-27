@@ -26,9 +26,7 @@ class Parser:
             ValidationError: If file cannot be loaded or parsed
         """
         if not file_path.exists():
-            raise ValidationError(
-                f"File not found: {file_path}", file_path=str(file_path)
-            )
+            raise ValidationError(f"File not found: {file_path}", file_path=str(file_path))
 
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -49,10 +47,7 @@ class Parser:
         except ValidationError:
             raise
         except Exception as e:
-            raise ValidationError(
-                f"Failed to load file: {e}",
-                file_path=str(file_path)
-            )
+            raise ValidationError(f"Failed to load file: {e}", file_path=str(file_path))
 
     @staticmethod
     def load_bundle(file_path: Path) -> Dict[str, Any]:
@@ -68,6 +63,38 @@ class Parser:
             ValidationError: If file cannot be loaded or parsed
         """
         # Bundle loading is the same as SCD loading
+        return Parser.load_scd(file_path)
+
+    @staticmethod
+    def load_domain_manifest(file_path: Path) -> Dict[str, Any]:
+        """Load a domain manifest file (YAML or JSON).
+
+        Args:
+            file_path: Path to the domain manifest file
+
+        Returns:
+            Parsed domain manifest as dictionary
+
+        Raises:
+            ValidationError: If file cannot be loaded or parsed
+        """
+        # Domain manifest loading is the same as SCD loading (generic YAML/JSON)
+        return Parser.load_scd(file_path)
+
+    @staticmethod
+    def load_checkpoint_record(file_path: Path) -> Dict[str, Any]:
+        """Load a checkpoint record file (YAML or JSON).
+
+        Args:
+            file_path: Path to the checkpoint record file
+
+        Returns:
+            Parsed checkpoint record as dictionary
+
+        Raises:
+            ValidationError: If file cannot be loaded or parsed
+        """
+        # Checkpoint record loading is the same as SCD loading (generic YAML/JSON)
         return Parser.load_scd(file_path)
 
     @staticmethod
@@ -88,8 +115,7 @@ class Parser:
             data = yaml.safe_load(content)
             if not isinstance(data, dict):
                 raise ValidationError(
-                    "YAML content must be an object/dictionary",
-                    file_path=str(file_path)
+                    "YAML content must be an object/dictionary", file_path=str(file_path)
                 )
             return data
         except yaml.YAMLError as e:
@@ -97,7 +123,11 @@ class Parser:
             error_msg = f"Invalid YAML syntax: {e}"
             if hasattr(e, "problem_mark"):
                 mark = e.problem_mark
-                error_msg = f"Invalid YAML syntax at line {mark.line + 1}, column {mark.column + 1}: {e.problem}"
+                problem = getattr(e, "problem", None)
+                error_msg = (
+                    f"Invalid YAML syntax at line {mark.line + 1}, "
+                    f"column {mark.column + 1}: {problem}"
+                )
             raise ValidationError(error_msg, file_path=str(file_path))
 
     @staticmethod
@@ -117,15 +147,12 @@ class Parser:
         try:
             data = json.loads(content)
             if not isinstance(data, dict):
-                raise ValidationError(
-                    "JSON content must be an object",
-                    file_path=str(file_path)
-                )
+                raise ValidationError("JSON content must be an object", file_path=str(file_path))
             return data
         except json.JSONDecodeError as e:
             raise ValidationError(
                 f"Invalid JSON syntax at line {e.lineno}, column {e.colno}: {e.msg}",
-                file_path=str(file_path)
+                file_path=str(file_path),
             )
 
     @staticmethod
@@ -146,14 +173,12 @@ class Parser:
 
         try:
             with open(schema_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                schema: Dict[str, Any] = json.load(f)
+                return schema
         except json.JSONDecodeError as e:
             raise ValidationError(
                 f"Invalid JSON schema at line {e.lineno}, column {e.colno}: {e.msg}",
-                file_path=str(schema_path)
+                file_path=str(schema_path),
             )
         except Exception as e:
-            raise ValidationError(
-                f"Failed to load schema: {e}",
-                file_path=str(schema_path)
-            )
+            raise ValidationError(f"Failed to load schema: {e}", file_path=str(schema_path))

@@ -3,11 +3,12 @@ SCS CLI - Command-line interface for Structured Context Specification tools
 """
 
 import click
+
 from scs_tools import __version__
-from scs_tools.commands.new import new
-from scs_tools.commands.init import init
 from scs_tools.commands.add import add
 from scs_tools.commands.bundle import bundle
+from scs_tools.commands.init import init
+from scs_tools.commands.new import new
 from scs_tools.commands.validate import validate
 
 
@@ -27,7 +28,8 @@ def cli():
     Quick Start:
         scs new project my-app              # Create a new project interactively
         cd my-app
-        scs validate                        # Validate all SCDs
+        scs bundle validate                 # Validate the project bundle
+        scs validate context/project/*.yaml # Validate SCDs
         scs bundle version --version 1.0.0  # Create versioned snapshot
 
     \b
@@ -35,7 +37,8 @@ def cli():
         1. Create or initialize project     → scs new project / scs init
         2. Add domains as needed            → scs add bundle [domain]
         3. Edit SCDs in context/project/    → (manual editing)
-        4. Validate before versioning       → scs validate / scs bundle validate
+        4. Validate before versioning       → scs bundle validate / scs validate
+           (also: scs validate --domain <manifest>, --checkpoint <record>)
         5. Create immutable version         → scs bundle version
 
     For detailed help on any command, use: scs [command] --help

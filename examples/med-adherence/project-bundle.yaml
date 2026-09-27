@@ -25,7 +25,7 @@ imports:
   - bundle:standards:0.1.0
 
   # Domain bundles: Industry vertical context
-  # Software Development domain imports 11 concern bundles (architecture, security, etc.)
+  # Software Development domain imports 11 concept bundles (architecture, security, etc.)
   - bundle:software-development:0.1.0
 
 # This bundle doesn't directly list SCDs - they're all in imported bundles
@@ -36,4 +36,6 @@ provenance:
   created_at: "2025-11-01T09:00:00Z"
   updated_by: "sarah.chen@medtech.com"
   updated_at: "2025-11-20T14:00:00Z"
+  version_approved_by: "sarah.chen@medtech.com"
+  version_approved_at: "2026-09-21T00:00:00Z"
   rationale: "Version 1.0.0 release - complete context contract for development phase"

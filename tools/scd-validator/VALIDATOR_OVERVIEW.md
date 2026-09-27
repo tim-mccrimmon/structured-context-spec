@@ -161,7 +161,7 @@ scs-validate --bundle context/bundle.yaml --level all  # default
 ### Text Output (Default)
 
 ```
-SCS Validator v0.1.0
+SCS Validator v0.5.0
 
 Validating bundle: bundle:healthcare-platform
 
@@ -251,7 +251,7 @@ Status: ✓ VALID
 ### Error Output Example
 
 ```
-SCS Validator v0.1.0
+SCS Validator v0.5.0
 
 Validating bundle: bundle:healthcare-platform
 

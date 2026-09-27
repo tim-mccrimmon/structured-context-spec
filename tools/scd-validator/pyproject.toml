@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scs-validator"
-version = "0.1.0"
+version = "0.5.0"
 description = "Validator for Structured Context Specification (SCS) documents and bundles"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -39,6 +39,10 @@ dev = [
     "black>=23.0",
     "mypy>=1.7",
     "ruff>=0.1",
+    "types-colorama",
+    "types-jsonschema",
+    "types-PyYAML",
+    "types-tabulate",
 ]
 
 [project.scripts]
@@ -52,6 +56,11 @@ Issues = "https://github.com/tim-mccrimmon/scs-spec/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# The validation rules and the vendored JSON Schemas ship inside the package (ISS-035). The schemas
+# are a copy of the repo-root schema/ made by scripts/sync_schemas.py; tests fail if they drift.
+[tool.setuptools.package-data]
+scs_validator = ["rules/**/*.yaml", "rules/**/*.md", "schemas/**/*.json"]
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]
@@ -59,6 +68,10 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+# Explicit rule set so results do not change when ruff changes its defaults (ISS-036)
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
 
 [tool.mypy]
 python_version = "3.11"

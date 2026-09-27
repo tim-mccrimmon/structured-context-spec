@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: data-provenance
 title: "Retention Policy"
 description: "Data retention and deletion policies"
+concept: concept:data-provenance
 
 content:
   summary: "HIPAA-compliant retention with patient deletion rights"

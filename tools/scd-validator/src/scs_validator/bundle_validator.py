@@ -1,6 +1,5 @@
 """Bundle validation module for Level 5 validation."""
 
-from pathlib import Path
 from typing import Any, Dict, List
 
 from .rules_loader import RulesLoader
@@ -50,13 +49,20 @@ class BundleValidator:
             )
             return result
 
+        # RFC-0001 Validation rule 8: 'concern' residue is an error, with a
+        # migration hint (not just the generic "unknown bundle type" warning).
+        if bundle_type == "concern":
+            error_msg = self.rules_loader.get_error_message(
+                self.rules, "legacy_concern_type", bundle_id=bundle_id
+            )
+            result.add_error(ValidationError(error_msg, file_path=file_path))
+            return result
+
         # Validate XOR constraint
         self._validate_xor_constraint(bundle, bundle_id, bundle_type, result, file_path)
 
         # Validate bundle type-specific rules
-        self._validate_bundle_type_rules(
-            bundle, bundle_id, bundle_type, result, file_path
-        )
+        self._validate_bundle_type_rules(bundle, bundle_id, bundle_type, result, file_path)
 
         # Validate meta bundle requirements
         if bundle_type == "meta":

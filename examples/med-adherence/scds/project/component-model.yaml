@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: architecture
 title: "Component Model"
 description: "Internal system components and their responsibilities"
+concept: concept:architecture
 
 content:
   summary: "Modular architecture with clear separation of concerns"

@@ -1,0 +1,18 @@
+id: bundle:performance-reliability
+type: concept
+version: "DRAFT"
+title: "Performance & Reliability Concept Bundle"
+description: "Performance requirements, reliability targets, and resilience patterns for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:response-time
+  - scd:project:availability
+  - scd:project:fault-tolerance
+  - scd:project:scalability
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Performance & Reliability concept bundle for {{ project_name }}"

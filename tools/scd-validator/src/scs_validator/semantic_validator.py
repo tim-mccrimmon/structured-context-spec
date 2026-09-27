@@ -103,9 +103,7 @@ class SemanticValidator:
                     version=version,
                     pattern=version_pattern,
                 )
-                result.add_error(
-                    ValidationError(error_msg, scd_id=scd_id, file_path=file_path)
-                )
+                result.add_error(ValidationError(error_msg, scd_id=scd_id, file_path=file_path))
                 return
 
         # If not DRAFT, validate as semver
@@ -154,16 +152,12 @@ class SemanticValidator:
         # Check created_at timestamp
         created_at = provenance.get("created_at")
         if created_at:
-            self._validate_timestamp(
-                created_at, "created_at", scd_id, result, file_path
-            )
+            self._validate_timestamp(created_at, "created_at", scd_id, result, file_path)
 
         # Check updated_at timestamp if present
         updated_at = provenance.get("updated_at")
         if updated_at:
-            self._validate_timestamp(
-                updated_at, "updated_at", scd_id, result, file_path
-            )
+            self._validate_timestamp(updated_at, "updated_at", scd_id, result, file_path)
 
         # Warn if rationale is missing
         rationale = provenance.get("rationale")
@@ -179,7 +173,11 @@ class SemanticValidator:
 
     def _validate_timestamp(
         self,
-        timestamp: str, field_name: str, scd_id: str, result: ValidationResult, file_path: str | None
+        timestamp: str,
+        field_name: str,
+        scd_id: str,
+        result: ValidationResult,
+        file_path: str | None,
     ) -> None:
         """Validate timestamp is ISO8601 format."""
         try:
@@ -193,7 +191,9 @@ class SemanticValidator:
                 )
             )
 
-    def _validate_id_format(self, scd_id: str, result: ValidationResult, file_path: str | None) -> None:
+    def _validate_id_format(
+        self, scd_id: str, result: ValidationResult, file_path: str | None
+    ) -> None:
         """Validate ID follows proper format."""
         # Get pattern from rules
         id_pattern = self.rules.get("id_pattern", {}).get("pattern")
@@ -208,13 +208,10 @@ class SemanticValidator:
                 scd_id=scd_id,
                 pattern=id_pattern,
             )
-            result.add_error(
-                ValidationError(error_msg, scd_id=scd_id, file_path=file_path)
-            )
+            result.add_error(ValidationError(error_msg, scd_id=scd_id, file_path=file_path))
 
     def _validate_required_strings(
-        self,
-        scd: Dict[str, Any], scd_id: str, result: ValidationResult, file_path: str | None
+        self, scd: Dict[str, Any], scd_id: str, result: ValidationResult, file_path: str | None
     ) -> None:
         """Validate required string fields are not empty."""
         required_fields = ["title", "description"]

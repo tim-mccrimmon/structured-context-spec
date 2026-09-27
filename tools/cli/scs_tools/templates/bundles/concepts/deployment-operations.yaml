@@ -1,0 +1,17 @@
+id: bundle:deployment-operations
+type: concept
+version: "DRAFT"
+title: "Deployment & Operations Concept Bundle"
+description: "Infrastructure, deployment processes, and operational practices for {{ project_name }}"
+
+imports: []
+
+scds:
+  - scd:project:infrastructure-definition
+  - scd:project:observability
+  - scd:project:incident-response
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Deployment & Operations concept bundle for {{ project_name }}"

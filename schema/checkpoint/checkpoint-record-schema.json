@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://structuredcontext.dev/schema/checkpoint-record.schema.json",
+  "title": "SCS Checkpoint Record",
+  "description": "Schema for a checkpoint record: a small, normative shape recording which bundle version governed a given point in a workflow's execution (any-ai-actor-model.md, RFC-0001/ISS-006). Not an SCD - generated at runtime, not authored, carries no tier/content-schema/relationships. Any orchestrator can emit one; any tool can read one.",
+  "type": "object",
+  "required": ["checkpoint"],
+  "properties": {
+    "checkpoint": {
+      "type": "object",
+      "required": ["bundle", "agent", "intent", "timestamp"],
+      "properties": {
+        "bundle": {
+          "type": "string",
+          "pattern": "^bundle:[a-zA-Z0-9._-]+:(\\d+\\.\\d+\\.\\d+|DRAFT)$",
+          "description": "The exact bundle id + version that was in effect at this checkpoint."
+        },
+        "concept": {
+          "type": "string",
+          "pattern": "^concept:[a-z][a-z0-9-]*$",
+          "description": "Optional: which concept's context this checkpoint reflects."
+        },
+        "agent": {
+          "type": "string",
+          "description": "The role (or equivalent actor identity) this checkpoint applies to (any-ai-actor-model.md §2.3). Conventionally a role: id, but not restricted to the meta-tier role vocabulary."
+        },
+        "intent": {
+          "type": "string",
+          "description": "The task/step being performed - the same value used to select this context in the first place (any-ai-actor-model.md §2.3)."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO-8601 timestamp of when this checkpoint was recorded."
+        },
+        "workflow_ref": {
+          "type": "string",
+          "description": "Opaque, orchestrator-defined reference back to whatever the runtime calls 'the workflow'. SCS does not interpret this value - it exists purely so a checkpoint record can be traced back to its execution context without SCS needing a model of what a workflow is."
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: deployment-operations
 title: "Observability"
 description: "Monitoring, logging, and alerting strategy"
+concept: concept:deployment-operations
 
 content:
   summary: "Comprehensive observability for reliability and compliance"

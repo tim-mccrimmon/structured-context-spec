@@ -6,7 +6,7 @@ title: "Incident Response"
 description: "Runbooks, severity levels, on-call procedures, and post-incident review"
 
 domain: deployment-operations
-concerns:
+topics:
   - incident-management
   - on-call
   - post-mortems

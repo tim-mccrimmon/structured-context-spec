@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: performance-reliability
 title: "Fault Tolerance"
 description: "Fault tolerance and graceful degradation strategies"
+concept: concept:performance-reliability
 
 content:
   summary: "System continues operating despite component failures"

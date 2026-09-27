@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: performance-reliability
 title: "Scalability"
 description: "Scalability requirements and architecture"
+concept: concept:performance-reliability
 
 content:
   summary: "Horizontal scaling to support 100K+ patients"

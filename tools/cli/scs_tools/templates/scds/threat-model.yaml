@@ -6,7 +6,7 @@ title: "Threat Model"
 description: "Identified threats, attack vectors, mitigations, and security assumptions"
 
 domain: security
-concerns:
+topics:
   - threat-identification
   - risk-mitigation
   - security-assumptions

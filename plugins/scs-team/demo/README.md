@@ -38,7 +38,7 @@ Watch it scan the project - it should find:
 /scs-team:add docs/security-requirements.md
 ```
 
-Each command extracts structured context, creates SCDs, updates concern bundles, and compiles to `.claude/rules/`.
+Each command extracts structured context, creates SCDs, updates concept bundles, and compiles to `.claude/rules/`.
 
 ### 4. Add compliance standards
 
@@ -54,7 +54,7 @@ Copies pre-built HIPAA standards SCDs from the plugin's library.
 /scs-team:status
 ```
 
-See the 11-concern coverage table. Which concerns are covered? Which have gaps? The PRD covers business context. The architecture doc covers architecture and deployment. The security doc covers security. What's missing? (Data, testing, performance, usability, safety, ethics...)
+See the 11-concept coverage table. Which concepts are covered? Which have gaps? The PRD covers business context. The architecture doc covers architecture and deployment. The security doc covers security. What's missing? (Data, testing, performance, usability, safety, ethics...)
 
 ### 6. Draft what's missing
 

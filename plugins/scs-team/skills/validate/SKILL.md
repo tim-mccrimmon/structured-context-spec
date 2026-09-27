@@ -1,6 +1,6 @@
 ---
 name: validate
-description: Check structure and surface issues for human review. Validates YAML, references, concern coverage, and compilation status.
+description: Check structure and surface issues for human review. Validates YAML, references, concept coverage, and compilation status.
 allowed-tools: Read, Glob, Grep
 ---
 
@@ -38,16 +38,16 @@ You are validating the user's structured context and surfacing issues that need 
 - TBD items that need resolution
 
 ### Level 5: Compilation Check
-- Compiled output exists in `.claude/rules/` for each concern with SCDs
+- Compiled output exists in `.claude/rules/` for each concept with SCDs
 - Compiled files have `<!-- scs-team:managed -->` ownership header
 - CLAUDE.md has `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers
-- Compiled output is not stale (all concerns with SCDs have corresponding rules files)
+- Compiled output is not stale (all concepts with SCDs have corresponding rules files)
 
-## Concern Coverage Assessment
+## Concept Coverage Assessment
 
-Assess coverage across all 11 concerns:
+Assess coverage across all 11 concepts:
 
-| # | Concern | Expected SCDs |
+| # | Concept | Expected SCDs |
 |---|---------|---------------|
 | 1 | Architecture | system-context, tech-stack, integration-map, component-model |
 | 2 | Security | authn-authz, data-protection, data-handling, threat-model |
@@ -67,7 +67,7 @@ Assess coverage across all 11 concerns:
 
 Scan for:
 - `.scs/project.yaml`
-- `.scs/concerns/*.yaml`
+- `.scs/concepts/*.yaml`
 - `.scs/scds/*.yaml`
 - `.claude/rules/*.md`
 - `CLAUDE.md`
@@ -98,11 +98,11 @@ Flag things that need human attention:
 ### Step 4: Check Compilation (Level 5)
 
 Verify compiled output:
-- For each concern bundle with SCDs, check if `.claude/rules/<concern>.md` exists
+- For each concept bundle with SCDs, check if `.claude/rules/<concept>.md` exists
 - Verify `<!-- scs-team:managed -->` header is present in each managed file
 - Check CLAUDE.md for `<!-- scs-team:start -->` / `<!-- scs-team:end -->` markers
 - Identify any `.claude/rules/` files without the managed header (developer-owned)
-- Flag if any concern has SCDs but no compiled output
+- Flag if any concept has SCDs but no compiled output
 
 ### Step 5: Provide Clear Report
 
@@ -160,8 +160,8 @@ These items need your judgment:
    - No security-related SCDs found
    - Question: Is security context needed for this project?
 
-### Concern Coverage
-| # | Concern | SCDs | Status |
+### Concept Coverage
+| # | Concept | SCDs | Status |
 |---|---------|------|--------|
 | 1 | Architecture | 2/4 | Partial |
 | 2 | Security | 0/4 | Missing |
@@ -181,7 +181,7 @@ These items need your judgment:
 |-------|--------|
 | .claude/rules/ exists | Yes |
 | Managed files present | 2 of 3 expected |
-| Missing compilation | business concern (has SCDs but no rules file) |
+| Missing compilation | business concept (has SCDs but no rules file) |
 | CLAUDE.md markers | Present |
 | Unmanaged rules files | 1 (my-custom-rules.md - developer-owned, untouched) |
 

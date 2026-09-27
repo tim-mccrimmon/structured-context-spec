@@ -4,6 +4,7 @@ version: "0.1.0"
 domain: architecture
 title: "Technology Stack"
 description: "Technology choices and rationale for the Medication Adherence system"
+concept: concept:architecture
 
 content:
   summary: "Modern cloud-native stack optimized for healthcare compliance and mobile-first UX"
