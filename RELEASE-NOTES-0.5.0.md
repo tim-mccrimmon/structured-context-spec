@@ -37,6 +37,12 @@ original baseline), **medical-device CDMO** (12 concepts, regulated-manufacturin
 and **merchant cash advance / business funding** (16 concepts across MCA-native,
 infrastructure, and universal AI-governance clusters).
 
+`scs new project --ontology mca` scaffolds the full MCA ontology directly - 16 concept
+bundles, 16 SCDs, and a domain manifest with real `depends-on`/`relates-to` relationships,
+not just names. `--ontology sdlc` (the default) is unchanged. CDMO scaffolding isn't wired
+up yet (see Deferred, below) even though its reference ontology ships; the software-
+development and MCA reference ontologies were both real, existing content this drew from.
+
 ### Structured context for any AI actor, not just chat
 
 New normative doc: [`spec/0.5/any-ai-actor-model.md`](spec/0.5/any-ai-actor-model.md).
@@ -116,9 +122,10 @@ reasoning behind each:
 - **Publishing `scs-tools`/`scs-validator` to PyPI** — the packages are built, version-bumped,
   and verified; the publish itself waits for real demand from a `pip install`-without-a-clone
   user. Local editable installs cover current use today.
-- **The `--ontology` model selector** (`scs new project --ontology mca|cdmo`, ISS-029) — the
-  ontology manifests exist and scaffold correctly via the default path; the convenience flag
-  is still open.
+- **CDMO scaffolding** (`scs new project --ontology cdmo`, ISS-029) — the MCA half of this
+  shipped (above); CDMO's concept bundles reference SCD content that was never actually
+  authored (unlike MCA, there's no existing skeleton to adapt), so it needs real content
+  written before the same `--ontology` support can extend to it.
 
 ## Governance
 
