@@ -610,7 +610,8 @@ project is ignored; the error lists every location tried. `scs bundle version`'s
 **Not solved here:** a wheel install has no schema directory at all, see ISS-035.
 
 ### ISS-029 — `scs new project` scaffolds no Domain Ontology manifest and only the SDLC shape (proposed)
-**Status:** in-progress: ontology manifest done (2026-09-24); the `--ontology` model selector is still open
+**Status:** in-progress: ontology manifest done (2026-09-24); `--ontology` selector done for
+sdlc/mca (2026-09-27); cdmo still open
 The scaffold creates the 11 SDLC concept bundles and a domain *bundle*, but no domain manifest with
 an `ontology:` block. A new project therefore has nothing for `scs-validate --domain` to check, and
 the 0.5.0 anchor feature is not visible to a new user. All project types (healthcare, fintech,
@@ -627,10 +628,40 @@ names and descriptions (a test keeps them in step with `schema/domain/examples/`
 `scs add bundle <concept>` reminds you to add the concept when the manifest lacks it (it does not edit
 the manifest). The concept's optional `bundle:` field is left out because the schema requires a pinned
 version and scaffolded bundles are DRAFT. The CI wheel smoke test validates the manifest.
-**Still open:** a model selector (`--ontology sdlc|cdmo|mca`) for `scs new project` / `scs init`. It
-needs CDMO and MCA concept-bundle templates in scs-tools (MCA is not in this repo yet) and the
-Ontology Model packaging decision (`spec/0.5/domain-ontology.md` §10). `.scs/config` still records
-`scs_version: 0.1.0`.
+**Done (2026-09-27):** `--ontology sdlc|mca` selector added to `scs new project`. `--type`
+applies to sdlc only; a non-sdlc model scaffolds its full, fixed concept set and ignores
+`--type`. Template layout changed from flat (`templates/bundles/concepts/<name>.yaml`,
+`templates/scds/<name>.yaml`) to per-model subdirectories (`.../concepts/sdlc/...`,
+`.../concepts/mca/...`) - required because sdlc and mca both have a `data-provenance`
+concept with different content, which a flat namespace can't hold at once. `scs add
+bundle`/`scs add scd`/`scs bundle list --available`/`scs bundle info` all updated to read
+the target project's `ontology_model` from `.scs/config` (defaulting to `sdlc` for
+projects scaffolded before this existed) and search the right subdirectory; `bundle info`'s
+outside-a-project fallback searches every model. The domain manifest template gained a
+`relationships` block (rendered only when a concept has any) and a `yaml_dq` Jinja filter
+(`scs_tools/utils/files.py`) for safe YAML double-quote escaping - needed because one MCA
+concept description contains literal quotes, which broke the old `"{{ description }}"`
+unescaped-substitution pattern. Also fixed, found while doing this: `scs_tools/__init__.py`'s
+`__version__` was still hardcoded `"0.1.0"`, separately from the `pyproject.toml` bump in
+ISS-014; `.scs/config`'s `scs_version` now reads the real installed package version via
+`importlib.metadata` instead of a hardcoded string (same pattern as the `bundle.py` fix in
+ISS-014), and gained a new `ontology_model` line.
+MCA templates (16 concept bundles, 16 SCDs, 1 domain bundle) adapted from the already-shipped
+`examples/merchant-cash-advance/` skeleton content (Phase 2b) and the concept/relationship data
+in `schema/domain/examples/merchant-cash-advance-domain.yaml`; a new regression test
+(`test_mca_reference_data_matches_the_shipped_ontology_example`) keeps `project_types.py`'s
+`MCA_CONCEPTS`/`MCA_CONCEPT_INFO`/`MCA_CONCEPT_RELATIONSHIPS` in step with that file, the same
+pattern already used for the sdlc reference ontology. 15 new tests added (94 total, was 79);
+CI's `wheel-smoke` job extended to scaffold and validate an mca project from the installed
+wheel, not just sdlc. Verified against a real non-editable wheel install, not just editable.
+**Still open:** cdmo. Its concept bundles in `examples/medical-device-cdmo/concepts/*.yaml`
+reference SCD ids (e.g. `scd:project:access-control-model`) that were never actually
+authored anywhere - unlike mca, there is no existing skeleton content to adapt; cdmo needs
+real SCD content written from scratch (~30+ files) before it can follow the same pattern.
+The Ontology Model packaging decision (`spec/0.5/domain-ontology.md` §10) also remains
+unresolved - this implementation is scs-tools-internal tooling (a template selector, same
+class of thing as `--type`), not a resolution of that spec-level question about packaging
+an Ontology Model as a first-class, versioned, referenceable SCS artifact.
 
 ### ISS-030 — Stale 0.3 content in user-facing docs
 **Status:** open

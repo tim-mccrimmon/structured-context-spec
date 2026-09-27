@@ -1,8 +1,8 @@
 # Domain Ontology manifest for {{ project_name }} (SCS 0.5.0, RFC-0001).
 #
 # The ontology is the industry baseline: the concepts (categories) your guardrails are organized
-# around. This project starts with the Software Development reference ontology, one concept per
-# concept bundle in bundles/concepts/. It is deliberately flat; add depth as you need it:
+# around. This project starts with the {{ domain_name }} reference ontology, one concept per
+# concept bundle in bundles/concepts/. Add depth as you need it beyond what's here:
 #   parent: concept:<id>                        a taxonomy (a concept under another concept)
 #   relationships: [{type: depends-on, target: concept:<id>}]      (also: relates-to)
 #   satisfies: [scd:standards:<id>]             the standards a concept exists to address
@@ -11,17 +11,21 @@
 # Check it with:  scs validate --domain domain/domain-manifest.yaml
 
 domain:
-  id: "domain:software-development"
-  name: "Software Development"
+  id: "domain:{{ domain_id }}"
+  name: "{{ domain_name }}"
   version: "0.1.0"
-  description: "Domain Ontology for {{ project_name }}: the software development concepts its structured context is organized around"
+  description: "Domain Ontology for {{ project_name }}: the {{ domain_name|lower }} concepts its structured context is organized around"
   author: "{{ author }}"
 
   ontology:
     concepts:
 {% for concept in concept_info %}      - id: concept:{{ concept.id }}
-        name: "{{ concept.name }}"
-        description: "{{ concept.description }}"
+        name: {{ concept.name | yaml_dq }}
+        description: {{ concept.description | yaml_dq }}
+{% if concept.relationships %}        relationships:
+{% for rel in concept.relationships %}          - type: {{ rel.type }}
+            target: {{ rel.target }}
+{% endfor %}{% endif %}
 {% endfor %}
   # Shared base SCD schemas from the core spec, as in the reference domains.
   schemas:

@@ -1,0 +1,32 @@
+# Skeleton SCD. Every TODO is a decision that someone with standing over this concept still has
+# to make. Once real decisions exist, expect this concept to split into several small SCDs.
+# Links between concepts live in the domain ontology, not in `relationships` (an SCD
+# relationship must point at another SCD).
+id: scd:project:data-security
+type: project
+title: Data Security
+version: 0.1.0
+description: 'Merchant PII, guarantor PII, and bank data: access boundaries at the AI layer.'
+concept: concept:data-security
+content:
+  summary: TODO
+  scope:
+  - TODO
+  prohibited_uses:
+  - TODO
+  decision_authority:
+  - action: TODO
+    authority: TODO
+  human_oversight:
+  - TODO
+  data_boundary:
+  - TODO — the data classification scheme, e.g., public/internal, merchant-confidential, guarantor-PII,
+    high-sensitivity
+  transparency_requirements:
+  - TODO
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: Skeleton generated from the MCA ontology; awaiting real decisions from the person with standing
+    over this concept before it can be approved.

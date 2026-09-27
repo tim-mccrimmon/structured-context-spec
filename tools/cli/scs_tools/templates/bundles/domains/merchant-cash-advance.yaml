@@ -1,0 +1,18 @@
+id: bundle:merchant-cash-advance
+type: domain
+version: "DRAFT"
+title: "Merchant Cash Advance Domain"
+description: "Merchant Cash Advance / business funding domain for {{ project_name }}, importing all MCA concept bundles"
+
+# Domain bundles import concept bundles (unversioned - these are DRAFT too,
+# pin a real version once you've run `scs bundle version` on each)
+imports:
+{% for concept in concepts %}  - bundle:{{ concept }}
+{% endfor %}
+# Domain bundles don't contain SCDs directly - they import concepts
+scds: []
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Merchant Cash Advance domain bundle for {{ project_name }}"

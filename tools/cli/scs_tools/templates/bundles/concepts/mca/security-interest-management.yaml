@@ -1,0 +1,12 @@
+id: bundle:security-interest-management
+type: concept
+version: DRAFT
+title: Security Interest Management Concept Bundle
+description: 'UCC-1 filings and liens on receivables: perfection, and releases on payoff.'
+imports: []
+scds:
+- scd:project:security-interest-management
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Security Interest Management.'

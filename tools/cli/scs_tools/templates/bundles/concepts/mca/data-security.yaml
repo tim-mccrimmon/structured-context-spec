@@ -1,0 +1,12 @@
+id: bundle:data-security
+type: concept
+version: DRAFT
+title: Data Security Concept Bundle
+description: 'Merchant PII, guarantor PII, and bank data: access boundaries at the AI layer.'
+imports: []
+scds:
+- scd:project:data-security
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Data Security.'

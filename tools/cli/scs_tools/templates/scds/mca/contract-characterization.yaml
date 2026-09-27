@@ -1,0 +1,34 @@
+# Skeleton SCD. Every TODO is a decision that someone with standing over this concept still has
+# to make. Once real decisions exist, expect this concept to split into several small SCDs.
+# Links between concepts live in the domain ontology, not in `relationships` (an SCD
+# relationship must point at another SCD).
+id: scd:project:contract-characterization
+type: project
+title: Contract Characterization
+version: 0.1.0
+description: The true-sale and reconciliation-provision discipline that keeps a deal a purchase of receivables,
+  not a loan.
+concept: concept:contract-characterization
+content:
+  summary: TODO — one-sentence guardrail summary once decided
+  scope:
+  - TODO
+  prohibited_uses:
+  - 'AI must never describe a transaction as a ''loan,'' quote an ''interest rate'' or ''APR,'' or imply
+    a fixed unconditional repayment obligation, without required disclosure caveats — TODO: confirm exact
+    language with Legal'
+  decision_authority:
+  - action: Drafting merchant-facing or internal language about deal structure
+    authority: TODO — Legal review required before use
+  human_oversight:
+  - TODO — named escalation contact for any characterization question
+  data_boundary:
+  - TODO
+  transparency_requirements:
+  - TODO — ties to state disclosure-compliance requirements
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: Skeleton generated from the MCA ontology; awaiting real decisions from the person with standing
+    over this concept before it can be approved.

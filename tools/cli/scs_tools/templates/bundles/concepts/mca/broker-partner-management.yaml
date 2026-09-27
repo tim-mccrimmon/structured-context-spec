@@ -1,0 +1,12 @@
+id: bundle:broker-partner-management
+type: concept
+version: DRAFT
+title: Broker & Partner Management Concept Bundle
+description: ISO and broker relationships, and oversight of what brokers represent to merchants.
+imports: []
+scds:
+- scd:project:broker-partner-management
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Broker & Partner Management.'

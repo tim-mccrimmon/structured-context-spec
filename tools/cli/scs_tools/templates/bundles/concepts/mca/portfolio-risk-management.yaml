@@ -1,0 +1,13 @@
+id: bundle:portfolio-risk-management
+type: concept
+version: DRAFT
+title: Portfolio Risk Management Concept Bundle
+description: Aggregate credit and default risk across the book (distinct from AI operational risk, which
+  lives under ai-accountability).
+imports: []
+scds:
+- scd:project:portfolio-risk-management
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Portfolio Risk Management.'

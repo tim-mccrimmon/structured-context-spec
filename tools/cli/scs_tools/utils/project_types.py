@@ -106,13 +106,189 @@ SOFTWARE_DEVELOPMENT_CONCEPT_INFO = {
 }
 
 
-def get_concept_info(concepts):
-    """Ontology entries (id, name, description) for the given concept ids, in the order given"""
+# The 16 concepts within the Merchant Cash Advance domain (RFC-0001 Domain Ontology).
+# Auto-generated from schema/domain/examples/merchant-cash-advance-domain.yaml;
+# a test keeps this in step with that file.
+MCA_CONCEPTS = [
+    "origination",
+    "underwriting-decisioning",
+    "contract-characterization",
+    "disclosure-compliance",
+    "security-interest-management",
+    "servicing-collections",
+    "capital-funding",
+    "portfolio-risk-management",
+    "broker-partner-management",
+    "data-provenance",
+    "data-security",
+    "systems-integration",
+    "governance",
+    "ai-accountability",
+    "training-competency",
+    "adoption-rollout",
+]
+
+MCA_CONCEPT_INFO = {
+    "origination": (
+        "Origination",
+        "ISO/broker intake, lead qualification, and application intake.",
+    ),
+    "underwriting-decisioning": (
+        "Underwriting & Decisioning",
+        "Cash-flow analysis, risk scoring, approve/decline/counter, and pricing and terms.",
+    ),
+    "contract-characterization": (
+        "Contract Characterization",
+        "The true-sale and reconciliation-provision discipline that keeps a deal a purchase of "
+        "receivables, not a loan.",
+    ),
+    "disclosure-compliance": (
+        "Disclosure Compliance",
+        "State commercial-financing disclosure requirements.",
+    ),
+    "security-interest-management": (
+        "Security Interest Management",
+        "UCC-1 filings and liens on receivables: perfection, and releases on payoff.",
+    ),
+    "servicing-collections": (
+        "Servicing & Collections",
+        "Daily or twice-monthly ACH debiting, NSF and returns, delinquency, restructuring, and "
+        "confession-of-judgment posture.",
+    ),
+    "capital-funding": (
+        "Capital & Funding",
+        "Where the funder's own money comes from to fund merchants: credit facilities, warehouse "
+        "lines, and Treasury.",
+    ),
+    "portfolio-risk-management": (
+        "Portfolio Risk Management",
+        "Aggregate credit and default risk across the book (distinct from AI operational risk, "
+        "which lives under ai-accountability).",
+    ),
+    "broker-partner-management": (
+        "Broker & Partner Management",
+        "ISO and broker relationships, and oversight of what brokers represent to merchants.",
+    ),
+    "data-provenance": (
+        "Data & Provenance",
+        "Bank-statement data, credit-bureau pulls, and ISO/broker-submitted application data: "
+        "where it comes from and what AI may do with it.",
+    ),
+    "data-security": (
+        "Data Security",
+        "Merchant PII, guarantor PII, and bank data: access boundaries at the AI layer.",
+    ),
+    "systems-integration": (
+        "Systems Integration",
+        "How AI plugs into the loan-origination, CRM, and ACH/servicing platforms, including how "
+        "state data is looked up at the moment a prompt is assembled.",
+    ),
+    "governance": (
+        "Governance",
+        'Which AI tools are sanctioned, the autonomy default for AI use, and the hard "never" '
+        "prohibitions company-wide.",
+    ),
+    "ai-accountability": (
+        "AI Accountability",
+        "The company AI use policy. The human is the author of record, AI augments judgment and "
+        "does not replace sign-off authority, chain of custody, and the human-review thresholds "
+        "before an AI-assisted recommendation becomes an approve/decline/fund action.",
+    ),
+    "training-competency": (
+        "Training & Competency",
+        "Role-based training, meaning what leadership and staff need to know before using AI.",
+    ),
+    "adoption-rollout": (
+        "Adoption & Rollout",
+        "Phased AI rollout per department, with rollback triggers if a workflow is not working.",
+    ),
+}
+
+# Concept id -> its outgoing relationships (depends-on / relates-to), matching the domain
+# manifest exactly. No satisfies (best-practice AI governance, not a compliance mapping -
+# see the source ontology).
+MCA_CONCEPT_RELATIONSHIPS: Dict[str, List[Dict[str, str]]] = {
+    "origination": [
+        {"type": "depends-on", "target": "concept:data-provenance"},
+        {"type": "relates-to", "target": "concept:underwriting-decisioning"},
+    ],
+    "underwriting-decisioning": [
+        {"type": "depends-on", "target": "concept:data-provenance"},
+        {"type": "relates-to", "target": "concept:contract-characterization"},
+        {"type": "relates-to", "target": "concept:portfolio-risk-management"},
+    ],
+    "contract-characterization": [
+        {"type": "relates-to", "target": "concept:disclosure-compliance"},
+    ],
+    "security-interest-management": [
+        {"type": "relates-to", "target": "concept:portfolio-risk-management"},
+    ],
+    "servicing-collections": [
+        {"type": "depends-on", "target": "concept:security-interest-management"},
+        {"type": "relates-to", "target": "concept:contract-characterization"},
+    ],
+    "capital-funding": [
+        {"type": "relates-to", "target": "concept:portfolio-risk-management"},
+    ],
+    "broker-partner-management": [
+        {"type": "relates-to", "target": "concept:origination"},
+        {"type": "relates-to", "target": "concept:disclosure-compliance"},
+    ],
+    "data-provenance": [
+        {"type": "depends-on", "target": "concept:systems-integration"},
+    ],
+    "data-security": [
+        {"type": "depends-on", "target": "concept:systems-integration"},
+    ],
+    "adoption-rollout": [
+        {"type": "relates-to", "target": "concept:governance"},
+    ],
+}
+
+
+# Ontology models a project can be scaffolded against. "sdlc" is the default and the only
+# one PROJECT_TYPES variants (healthcare/fintech/saas/government/minimal) apply to - they're
+# all software-development-flavored. "mca" has one shape: all 16 concepts, no variants yet.
+ONTOLOGY_MODELS = {
+    "sdlc": {
+        "description": "Software Development (default) - supports --type variants",
+        "domain": "software-development",
+        "domain_name": "Software Development",
+        "concepts": SOFTWARE_DEVELOPMENT_CONCEPTS,
+        "concept_info": SOFTWARE_DEVELOPMENT_CONCEPT_INFO,
+        "relationships": {},
+    },
+    "mca": {
+        "description": "Merchant Cash Advance / business funding - all 16 concepts, no --type"
+        " variants",
+        "domain": "merchant-cash-advance",
+        "domain_name": "Merchant Cash Advance",
+        "concepts": MCA_CONCEPTS,
+        "concept_info": MCA_CONCEPT_INFO,
+        "relationships": MCA_CONCEPT_RELATIONSHIPS,
+    },
+}
+
+
+def get_ontology_model_config(model: str) -> Dict:
+    """Get the configuration for an ontology model ('sdlc', 'mca', ...)."""
+    return ONTOLOGY_MODELS.get(model, ONTOLOGY_MODELS["sdlc"])
+
+
+def get_concept_info(concepts, concept_info_map=None, relationships_map=None):
+    """Ontology entries (id, name, description, and optional relationships) for the given
+    concept ids, in the order given. Defaults to the Software Development concept info for
+    backwards compatibility; pass concept_info_map/relationships_map for another model."""
+    info_map = (
+        concept_info_map if concept_info_map is not None else SOFTWARE_DEVELOPMENT_CONCEPT_INFO
+    )
+    rel_map = relationships_map or {}
     return [
         {
             "id": c,
-            "name": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][0],
-            "description": SOFTWARE_DEVELOPMENT_CONCEPT_INFO[c][1],
+            "name": info_map[c][0],
+            "description": info_map[c][1],
+            "relationships": rel_map.get(c, []),
         }
         for c in concepts
     ]

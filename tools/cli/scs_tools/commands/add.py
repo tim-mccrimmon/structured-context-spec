@@ -101,12 +101,13 @@ def scd(scd_name, author, email):
         "created_at": now,
     }
 
-    # Find and copy template
-    template_path = get_template_path() / "scds" / f"{scd_name}.yaml"
+    # Find and copy template - from the project's own ontology model
+    ontology = _read_ontology_model(config_file)
+    template_path = get_template_path() / "scds" / ontology / f"{scd_name}.yaml"
     if not template_path.exists():
         click.echo(
-            f"Error: Template for '{scd_name}' not found.\n"
-            f"Available templates are in: {get_template_path() / 'scds'}",
+            f"Error: Template for '{scd_name}' not found in the '{ontology}' ontology model.\n"
+            f"Available templates are in: {get_template_path() / 'scds' / ontology}",
             err=True,
         )
         raise click.Abort()
@@ -159,27 +160,31 @@ def bundle(bundle_name, author, email):
         )
         raise click.Abort()
 
-    # Find the template: a concept bundle or a domain bundle
+    # Find the template: a concept bundle (from the project's own ontology model) or a
+    # domain bundle (domain bundles aren't namespaced per model - no name collides today)
+    config_file = base_path / ".scs" / "config"
+    ontology = _read_ontology_model(config_file)
     templates_root = get_template_path() / "bundles"
-    kind = next(
-        (
-            k
-            for k in ("concepts", "domains")
-            if (templates_root / k / f"{bundle_name}.yaml").exists()
-        ),
-        None,
-    )
+
+    def _candidate(k: str) -> Path:
+        return (
+            templates_root / k / ontology / f"{bundle_name}.yaml"
+            if k == "concepts"
+            else (templates_root / k / f"{bundle_name}.yaml")
+        )
+
+    kind = next((k for k in ("concepts", "domains") if _candidate(k).exists()), None)
     if kind is None:
-        available = sorted(
-            p.stem for k in ("concepts", "domains") for p in (templates_root / k).glob("*.yaml")
+        available = sorted((templates_root / "concepts" / ontology).glob("*.yaml")) + sorted(
+            (templates_root / "domains").glob("*.yaml")
         )
         click.echo(
-            f"Error: Bundle '{bundle_name}' not found.\n"
-            f"Available bundles: {', '.join(available)}",
+            f"Error: Bundle '{bundle_name}' not found in the '{ontology}' ontology model.\n"
+            f"Available bundles: {', '.join(p.stem for p in available)}",
             err=True,
         )
         raise click.Abort()
-    template_path = templates_root / kind / f"{bundle_name}.yaml"
+    template_path = _candidate(kind)
 
     # Check if the destination directory exists
     bundles_dir = base_path / "bundles" / kind
@@ -199,8 +204,7 @@ def bundle(bundle_name, author, email):
     author_info = author or os.getenv("USER", "developer")
     email_info = email or f"{author_info}@example.com"
 
-    # Read project name from config
-    config_file = base_path / ".scs" / "config"
+    # Read project name from config (config_file and ontology already read above)
     project_name = base_path.name
     if config_file.exists():
         with open(config_file, "r") as f:
@@ -215,11 +219,13 @@ def bundle(bundle_name, author, email):
         "email": email_info,
         "created_at": now,
         "bundles": [],  # Not used in domain bundles
-        # Project-type settings (e.g. which compliance SCDs a concept bundle lists)
-        "config": get_project_type_config(_read_project_type(config_file)),
+        # Project-type settings (e.g. which compliance SCDs a concept bundle lists) - sdlc only
+        "config": (
+            get_project_type_config(_read_project_type(config_file)) if ontology == "sdlc" else {}
+        ),
         # A domain bundle imports the concept bundles this project has; a project with none yet
-        # gets the full reference set
-        "concepts": _project_concepts(base_path),
+        # gets this ontology model's full reference set
+        "concepts": _project_concepts(base_path, ontology),
     }
 
     click.echo(f"Adding bundle: {bundle_name}")
@@ -233,14 +239,16 @@ def bundle(bundle_name, author, email):
         _remind_about_ontology(base_path, bundle_name)
 
 
-def _project_concepts(base_path: Path) -> list:
-    """Concept bundles present in the project, in reference order (all of them if none exist yet)"""
-    from scs_tools.utils.project_types import SOFTWARE_DEVELOPMENT_CONCEPTS
+def _project_concepts(base_path: Path, ontology: str) -> list:
+    """Concept bundles present in the project, in reference order for its ontology model
+    (all of that model's concepts if none exist yet)"""
+    from scs_tools.utils.project_types import get_ontology_model_config
 
+    reference_concepts = get_ontology_model_config(ontology)["concepts"]
     concepts_dir = base_path / "bundles" / "concepts"
     present = {p.stem for p in concepts_dir.glob("*.yaml")} if concepts_dir.is_dir() else set()
-    ordered = [c for c in SOFTWARE_DEVELOPMENT_CONCEPTS if c in present]
-    return ordered or list(SOFTWARE_DEVELOPMENT_CONCEPTS)
+    ordered = [c for c in reference_concepts if c in present]
+    return ordered or list(reference_concepts)
 
 
 def _remind_about_ontology(base_path: Path, concept: str):
@@ -270,3 +278,18 @@ def _read_project_type(config_file: Path) -> str:
                 if value in PROJECT_TYPES:
                     return value
     return "standard"
+
+
+def _read_ontology_model(config_file: Path) -> str:
+    """Ontology model recorded in .scs/config, or 'sdlc' if missing or unknown. Projects
+    scaffolded before the --ontology selector existed have no ontology_model line at all -
+    'sdlc' is also the correct default for those."""
+    from scs_tools.utils.project_types import ONTOLOGY_MODELS
+
+    if config_file.exists():
+        for line in config_file.read_text(encoding="utf-8").splitlines():
+            if line.startswith("ontology_model:"):
+                value = line.split(":", 1)[1].strip()
+                if value in ONTOLOGY_MODELS:
+                    return value
+    return "sdlc"

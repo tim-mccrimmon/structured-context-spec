@@ -153,7 +153,8 @@ See ISS-006 in `ISSUES.md` for the full design rationale and implementation deta
 - [x] **Client clearance** to publish the MCA ontology in the open-source repo (Tim) —
       resolved 2026-09-27: Tim's own IP, no third-party clearance needed ("it's all mine, I
       can do whatever I want")
-- [ ] `scs new project --ontology mca` (and cdmo): selector still open on ISS-029
+- [x] `scs new project --ontology mca` (and cdmo): selector done for mca 2026-09-27
+      (ISS-029); cdmo still open, needs real SCD content authored first
 - [x] `examples/merchant-cash-advance/`: customer-neutral skeleton SCDs (16), concept bundles (16) and a
       domain bundle, all `DRAFT` and validating; tests cover consistency with the ontology and client
       neutrality

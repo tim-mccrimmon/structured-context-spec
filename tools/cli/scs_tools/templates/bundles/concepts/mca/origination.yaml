@@ -1,0 +1,12 @@
+id: bundle:origination
+type: concept
+version: DRAFT
+title: Origination Concept Bundle
+description: ISO/broker intake, lead qualification, and application intake.
+imports: []
+scds:
+- scd:project:origination
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Origination.'

@@ -1,9 +1,26 @@
 """File and directory utilities"""
 
+import json
 from pathlib import Path
 from typing import Any, Dict
 
-from jinja2 import Template
+from jinja2 import Environment
+
+
+def yaml_dq(value: str) -> str:
+    """Render a string as a double-quoted YAML scalar, safely escaped.
+
+    A YAML double-quoted scalar's escaping rules are a superset of JSON's, so json.dumps
+    produces a valid, correctly escaped result for any string - including embedded double
+    quotes (e.g. concept descriptions quoting a term) that would otherwise break templates
+    doing `"{{ value }}"` unescaped. Includes the surrounding quotes; use as
+    `{{ value | yaml_dq }}`, not `"{{ value }}"`.
+    """
+    return json.dumps(value)
+
+
+_JINJA_ENV = Environment()
+_JINJA_ENV.filters["yaml_dq"] = yaml_dq
 
 
 def create_directory_structure(base_path: Path, project_name: str):
@@ -23,8 +40,9 @@ def create_directory_structure(base_path: Path, project_name: str):
 
 
 def render_template(template_content: str, variables: Dict[str, Any]) -> str:
-    """Render a Jinja2 template with the given variables"""
-    template = Template(template_content)
+    """Render a Jinja2 template with the given variables. The `yaml_dq` filter is available
+    for values (e.g. free-text descriptions) that need safe YAML double-quoted escaping."""
+    template = _JINJA_ENV.from_string(template_content)
     return template.render(**variables)
 
 
