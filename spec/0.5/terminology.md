@@ -1,7 +1,7 @@
 # SCS 0.5.0 — Terminology
 **Version:** 0.5.0 (Draft)
 **Status:** Work in Progress
-**Last Updated:** 2026-09-22  
+**Last Updated:** 2026-09-27  
 
 ---
 
@@ -351,6 +351,17 @@ Project-tier SCDs include:
 - compliance mappings  
 
 This tier is unique per project.
+
+---
+
+### **3.4 "Corporate / Project / Personal" is Shorthand, Not a Fourth Tier**
+
+Some material (`ROADMAP.md`, engagement-facing docs) describes coverage as Corporate and
+Project context, with Personal deferred. "Corporate" means Meta-Tier + Standards-Tier
+together; "Project" means Project-Tier; "Personal" (individual-level context) has no
+schema tier yet and is out of 0.5.0's scope. See `core-model.md` §5.4 for the full mapping,
+including why a "departmental" layer some engagements describe is a scope/audience
+distinction, not a tier.
 
 ---
 

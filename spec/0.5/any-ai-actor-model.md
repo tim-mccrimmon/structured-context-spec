@@ -1,8 +1,9 @@
 # SCS 0.5.0 — The "Any AI Actor" Model
 **Version:** 0.5.0 (Draft)
 **Status:** Work in Progress
-**Last Updated:** 2026-09-22
-**Tracking:** `ISSUES.md` ISS-006 (ROADMAP.md workstream 2)
+**Last Updated:** 2026-09-27
+**Tracking:** `ISSUES.md` ISS-006 (ROADMAP.md workstream 2); §5 tracks ISS-007, ISS-008,
+ISS-009 (ROADMAP.md workstream 3)
 
 ---
 
@@ -197,7 +198,71 @@ rather than to its authoring.
 
 ---
 
-## 5. Consumers, Not Targets
+## 5. Runtime Decisions: Immutability, Versioning, and Drift
+
+The checkpoint record (§4) answers *what was recorded*. This section answers the three
+normative questions that determine *what gets recorded and when*: how long a resolved
+context stays fixed, how a runtime picks which version is "in effect," and what counts as
+the context having drifted underneath a running task.
+
+### 5.1 Immutability Scope
+
+A resolved context version is immutable **for the duration of a single execution** — one
+resolution of `(agent, intent)` to a governed bundle, covering one governed call or one
+workflow step. It is not guaranteed immutable across a whole task or session.
+
+This follows from what's already normative elsewhere: §2.1 already rejects "session" as a
+context-lifecycle boundary (a session is state, not context), and the checkpoint record is
+"generated fresh on every execution, potentially in high volume" (§4.2) — not once per task.
+A multi-step task is therefore free to re-resolve context at each step. If a bundle is
+approved to a new version mid-task, earlier steps keep the checkpoint record of the version
+that actually governed them; later steps may resolve the newer version. This is intentional,
+not a gap: it is what makes §5.3's drift definition meaningful rather than tautological.
+
+A runtime that needs a whole task pinned to one version regardless of mid-task approvals may
+still do so — that is a runtime/orchestration choice (§4.1), not something SCS forbids. What
+SCS does not do is guarantee that pin by default.
+
+### 5.2 Version Resolution: In Effect, Pinning, Supersession
+
+**In effect.** For a given `(agent, intent)` resolving to a concept and its bundle, the
+version "in effect" is the latest **approved** version of that bundle — i.e. the highest
+semver version whose `provenance.version_approved_by` / `version_approved_at` are set (RFC-0001).
+A `DRAFT` bundle is never "in effect" for a governed call; it is a working version only.
+
+**Pinning.** A deployment may override this default by pinning an older approved version
+for a given bundle. SCS 0.5.0 does not define the pin's storage mechanism (a candidate for a
+future meta-tier field, deployment config, or runtime-specific setting) — only that if a pin
+exists, it takes precedence over "latest approved" when resolving what's in effect.
+
+**Supersession.** When a new version of a bundle is approved, it becomes "in effect" for
+every subsequent resolution immediately — there is no rollout delay defined by SCS itself.
+Supersession is strictly forward: approving a new version never rewrites the historical
+record of what governed past executions. Checkpoint records already written keep pointing
+at whatever version actually governed them at the time (§4.2); only future resolutions see
+the new version.
+
+### 5.3 Context Drift
+
+**Definition.** Context drift is when two checkpoint records sharing the same
+`workflow_ref` resolve the same `(agent, intent)` — equivalently, the same concept — to
+**different bundle versions**. It is a property of a task's checkpoint history, not of a
+single checkpoint.
+
+**Detection signal.** Group checkpoint records by `workflow_ref`; within each group, compare
+the `bundle` field across records sharing the same `concept` (or the same `agent` +
+`intent` pair, where `concept` is absent). A version mismatch is a drift event. This is
+mechanically checkable from the checkpoint record shape alone (§4.2) — no additional schema
+or metadata is required to detect it.
+
+**What SCS does not define.** Whether drift is acceptable, requires reconciliation, or
+should block a workflow from proceeding is a runtime/policy decision, not a normative SCS
+rule. SCS defines the signal; what a consumer does with it is out of scope, consistent with
+§4.1 (SCS does not model workflows or their control flow).
+
+---
+
+## 6. Consumers, Not Targets
 
 Claude Code's `.claude/rules/` is one consumer of SCS content — a composition step that
 turns governed context into the shape one specific tool expects. It is not the model SCS is
@@ -214,7 +279,7 @@ consumer.
 
 ---
 
-## 6. Open Questions
+## 7. Open Questions
 
 - **Capability-class taxonomy governance** — whether the default set (§3.3) should live in
   a formal registry SCS maintains, or purely as spec-documented convention that domains
@@ -226,7 +291,7 @@ consumer.
 
 ---
 
-## 7. Feedback
+## 8. Feedback
 
 Feedback on the Any AI Actor model should be submitted via GitHub Issues, referencing
 ISS-006.

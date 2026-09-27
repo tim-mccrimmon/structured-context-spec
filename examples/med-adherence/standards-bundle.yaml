@@ -2,8 +2,11 @@
 # SCS Bundle: Standards Bundle - Medication Adherence System
 # ================================================================
 # Contains compliance and regulatory standards applicable to this project.
-# Imports SOC2 standard bundle and includes HIPAA-specific SCDs.
-# Standards may be imported from external sources or defined locally.
+# Includes HIPAA-specific SCDs, defined locally.
+# A standards bundle contains imports OR scds, not both (XOR constraint) - this one
+# defines its SCDs directly rather than importing an external standards bundle. A prior
+# version of this file imported a SOC2 bundle that never existed anywhere in this repo
+# alongside these SCDs, which is invalid; fixed 2026-09-27 (ISS-022).
 # ================================================================
 
 id: bundle:standards
@@ -12,16 +15,11 @@ version: "0.1.0"
 title: "Medication Adherence System - Standards Bundle"
 description: >
   Standards and compliance requirements bundle for the Medication Adherence system.
-  Includes SOC2 Trust Services Criteria (imported bundle) and HIPAA requirements
-  (project-specific interpretations and mappings).
+  Includes HIPAA requirements (project-specific interpretations and mappings).
 
-# Import standard bundles from external sources
-imports:
-  # SOC2 Type II Trust Services Criteria
-  - bundle:standards:soc2-type2:2023.1
-
-  # Note: In production, this might reference a registry:
-  # - registry://standards.ohana.ai/bundles/soc2-type2:2023.1
+# No external standards bundles imported (see note above) - the schema requires this key
+# present even when empty.
+imports: []
 
 # HIPAA-specific SCDs (project interpretations and mappings)
 scds:
@@ -36,4 +34,4 @@ provenance:
   updated_at: "2025-11-15T16:00:00Z"
   version_approved_by: "compliance-team@medtech.com"
   version_approved_at: "2026-09-21T00:00:00Z"
-  rationale: "Standards bundle for healthcare compliance - SOC2 + HIPAA requirements"
+  rationale: "Standards bundle for healthcare compliance - HIPAA requirements"

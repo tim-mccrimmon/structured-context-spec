@@ -176,7 +176,8 @@ not once per company. So far there are three:
   neither the SDLC nor the CDMO shape has a home for. 16 concepts in three clusters
   (industry-native, infrastructure, and the AI-governance layer). Best-practice AI governance,
   not a compliance mapping, so it carries relationships but no `satisfies`. Reference manifest:
-  `schema/domain/examples/merchant-cash-advance-domain.yaml`.
+  `schema/domain/examples/merchant-cash-advance-domain.yaml`; customer-neutral skeleton SCDs and
+  concept bundles: `examples/merchant-cash-advance/`.
 
 The first step in adopting SCS is choosing your business's ontology, not writing one from a
 blank page: **use an existing model if one fits your market, or create a new one by

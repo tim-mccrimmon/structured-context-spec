@@ -62,9 +62,7 @@ def _example_scds() -> list[Path]:
     ]
 
 
-KNOWN_INVALID_BUNDLES = {
-    "examples/med-adherence/standards-bundle.yaml": "ISS-022",
-}
+KNOWN_INVALID_BUNDLES: dict[str, str] = {}
 KNOWN_INVALID_DOMAINS: dict[str, str] = {}
 
 
@@ -383,3 +381,55 @@ def test_mca_manifest_is_client_neutral():
     text = MCA_MANIFEST.read_text().lower()
     for term in ("everest", "whetstone", "alpine", "nextern"):
         assert term not in text, term
+
+
+# ------------------------------------------- MCA generic skeleton example (ISS-039)
+
+MCA_EXAMPLE = EXAMPLES / "merchant-cash-advance"
+
+
+def _mca_concept_slugs() -> set[str]:
+    return {c["id"].split(":", 1)[1] for c in _mca_ontology()["concepts"]}
+
+
+def test_mca_example_has_one_skeleton_scd_and_one_concept_bundle_per_concept():
+    import yaml
+
+    slugs = _mca_concept_slugs()
+    scds = {p.stem for p in (MCA_EXAMPLE / "scds" / "project").glob("*.yaml")}
+    bundles = {p.stem for p in (MCA_EXAMPLE / "concepts").glob("*.yaml")}
+    assert scds == slugs and bundles == slugs
+    for slug in slugs:
+        scd = yaml.safe_load((MCA_EXAMPLE / "scds" / "project" / f"{slug}.yaml").read_text())
+        bundle = yaml.safe_load((MCA_EXAMPLE / "concepts" / f"{slug}.yaml").read_text())
+        assert scd["id"] == f"scd:project:{slug}" and scd["concept"] == f"concept:{slug}"
+        assert bundle["type"] == "concept" and bundle["scds"] == [scd["id"]]
+
+
+def test_mca_domain_bundle_imports_every_concept_bundle():
+    import yaml
+
+    domain = yaml.safe_load((MCA_EXAMPLE / "domains" / "merchant-cash-advance.yaml").read_text())
+    assert domain["type"] == "domain" and domain["scds"] == []
+    assert {ref.split(":", 1)[1] for ref in domain["imports"]} == _mca_concept_slugs()
+
+
+def test_mca_skeletons_are_unfilled_and_carry_no_concept_relationships():
+    """Skeletons: substantive fields start with TODO; concept links live in the ontology."""
+    import yaml
+
+    for path in sorted((MCA_EXAMPLE / "scds" / "project").glob("*.yaml")):
+        scd = yaml.safe_load(path.read_text())
+        assert scd["relationships"] == [], path.name
+        assert scd["content"]["summary"].startswith("TODO"), path.name
+
+
+def test_mca_example_is_client_neutral():
+    for path in MCA_EXAMPLE.rglob("*"):
+        if not path.is_file():
+            continue
+        text = path.read_text()
+        for term in ("everest", "whetstone", "alpine", "nextern"):
+            assert term not in text.lower(), (path.name, term)
+        for title in ("Company AI Use Policy", "Departmental Context", "Company Overview"):
+            assert title not in text, (path.name, title)

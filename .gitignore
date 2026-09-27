@@ -48,6 +48,17 @@ Thumbs.db
 # Personal notes and conversation logs
 *-convo*.md
 *-notes*.md
+# ...but not a real deliverable that happens to match case-insensitively on macOS, e.g.
+# RELEASE-NOTES-0.5.0.md (silently caught and dropped from a commit once already - if you add
+# a new file whose name contains "notes" and it isn't showing up in `git status`, check here
+# first)
+!RELEASE-NOTES*.md
 
 # Temporary docs and internal materials
 temp-docs/
+
+# Claude Code machine-local settings (ISS-019)
+.claude/
+
+# direnv (per-directory GITHUB_TOKEN scoping, matching other Ohana repos - never commit; ISS-019)
+.envrc

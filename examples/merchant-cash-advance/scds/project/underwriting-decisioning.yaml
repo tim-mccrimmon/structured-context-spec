@@ -1,0 +1,33 @@
+# Skeleton SCD. Every TODO is a decision that someone with standing over this concept still has
+# to make. Once real decisions exist, expect this concept to split into several small SCDs.
+# Links between concepts live in the domain ontology, not in `relationships` (an SCD
+# relationship must point at another SCD).
+id: scd:project:underwriting-decisioning
+type: project
+title: Underwriting & Decisioning
+version: 0.1.0
+description: Cash-flow analysis, risk scoring, approve/decline/counter, and pricing and terms.
+concept: concept:underwriting-decisioning
+content:
+  summary: TODO — one-sentence guardrail summary once decided
+  scope:
+  - TODO — e.g., AI may draft a cash-flow summary from bank statements
+  prohibited_uses:
+  - TODO — e.g., AI must never independently approve, decline, or counter-offer
+  decision_authority:
+  - action: Cash-flow summary drafting
+    authority: Recommendation only — underwriter reviews
+  - action: Approve / decline / counter-offer
+    authority: TODO — confirm deal-size threshold that escalates above underwriting-manager level
+  human_oversight:
+  - TODO — e.g., a human checkpoint after risk assessment
+  data_boundary:
+  - TODO — bank-statement data, credit-bureau pulls; confirm against data-provenance
+  transparency_requirements:
+  - TODO — e.g., any difference in how new and repeat customers are treated, once decided
+relationships: []
+provenance:
+  created_by: ohana-consulting
+  created_at: '2026-09-24'
+  rationale: Skeleton generated from the MCA ontology; awaiting real decisions from the person with standing
+    over this concept before it can be approved.

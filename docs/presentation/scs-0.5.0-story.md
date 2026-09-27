@@ -84,9 +84,9 @@ Guardrails are not invented by the AI team. They restate what leadership, depart
 owners have already decided. That is why they are stable, and also why they do change from time to
 time when a policy changes.
 
-**Note:** the spec's tiers are meta / standards / project. The roadmap describes Corporate / Project
-and the mapping is an open item (ISS-012). Keep this slide at the policy level and do not draw the
-tier names here.
+**Note:** the spec's tiers are meta / standards / project. The roadmap's Corporate / Project /
+Personal framing is documented shorthand now (ISS-012, `core-model.md` §5.4), not an open item.
+Keep this slide at the policy level and do not draw the tier names here.
 
 ## Slide 1.5 — SCS Focuses on Guardrail Context
 
@@ -324,8 +324,10 @@ context small and what makes each guardrail reviewable and replaceable on its ow
 Meta defines the words. Standards holds requirements someone else already wrote. Project holds what is
 specific to this system. Keeping them apart means a standard can be updated once and imported many times.
 
-**Note:** ISS-012 (open) will reconcile these names with a Corporate/Project framing. Keep the slide to
-the three names and the plain-language purpose until that resolves.
+**Note:** ISS-012 (done) reconciled these names with the Corporate/Project/Personal framing —
+documented in `core-model.md` §5.4, not a rename. Keep the slide to the three schema names and the
+plain-language purpose; "Corporate" is explanatory shorthand for Meta + Standards together, not a
+name to put on this slide.
 
 ## Slide 2.5 — Bundles and the Hierarchy
 
@@ -411,7 +413,7 @@ instead. Good evidence for why one shared list does not work.
   16 concepts, 15 relationships, no `satisfies`). It comes from a working draft in the engagement repo
   (`everest/docs/ontology.md`, `status: draft`, 2026-09-23), so recheck the concept list if that
   document changes before release. The spec text now describes three models (`rfcs/RFC-0001` is left as
-  the accepted record). The engagement's 16 skeleton SCDs were deliberately not shipped.
+  the accepted record). Customer-neutral skeleton SCDs and concept bundles ship in `examples/merchant-cash-advance/`; the engagement's own skeletons do not.
 - MCA was derived from a client engagement. Confirm the client is comfortable with it being published
   in an open-source repo, and with any wording that could identify them. Slide 2.8 uses no client or
   people names.

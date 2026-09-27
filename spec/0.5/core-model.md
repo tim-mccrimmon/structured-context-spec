@@ -1,7 +1,7 @@
 # SCS 0.5.0 — Core Model  
 **Version:** 0.5.0 (Draft)  
 **Status:** Work in Progress  
-**Last Updated:** 2026-09-22  
+**Last Updated:** 2026-09-27  
 
 ---
 
@@ -145,6 +145,33 @@ Includes:
 	•	performance targets
 	•	compliance mappings
 	•	operational constraints
+
+### 5.4 Terminology Note: Corporate / Project / Personal
+
+`ROADMAP.md` and engagement-facing material sometimes describe SCS coverage as
+**Corporate** and **Project** context, with a **Personal** layer deferred (ISS-012). This is
+audience-facing shorthand, not a fourth schema tier — it maps onto the three tiers above as
+follows:
+
+- **"Corporate"** covers **Meta-Tier** and **Standards-Tier** together — conceptual
+  foundation plus imported external standards and policy, both org-wide rather than
+  specific to one project.
+- **"Project"** maps directly to **Project-Tier**.
+- **"Personal"** — individual-level context, as opposed to corporate or project-level — has
+  no schema tier today. It is out of scope for 0.5.0 (ROADMAP.md workstream 5) and is not a
+  fourth entry in §5's tier list; it names a scope SCS does not yet model, not a tier
+  waiting to be renamed.
+
+A **"departmental"** layer appears in some engagement narratives (policy that applies to
+one department rather than the whole org). This is a description of a bundle's audience and
+governance scope, not a tier: a department-specific policy is still authored as an ordinary
+Meta-Tier or Standards-Tier SCD, scoped by its content and provenance, not by a schema field
+that names "department."
+
+The three tier names in §5.1–5.3 (Meta / Standards / Project) remain the normative schema
+vocabulary — `tier:` values, file paths, and validator rules all use these names. Corporate,
+Project, Personal, and departmental are explanatory framing for non-technical audiences,
+not an alternate or competing tier taxonomy.
 
 ---
 

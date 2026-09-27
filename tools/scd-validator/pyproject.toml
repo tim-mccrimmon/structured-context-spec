@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scs-validator"
-version = "0.1.0"
+version = "0.5.0"
 description = "Validator for Structured Context Specification (SCS) documents and bundles"
 readme = "README.md"
 requires-python = ">=3.11"

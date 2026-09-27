@@ -1,0 +1,12 @@
+id: bundle:underwriting-decisioning
+type: concept
+version: DRAFT
+title: Underwriting & Decisioning Concept Bundle
+description: Cash-flow analysis, risk scoring, approve/decline/counter, and pricing and terms.
+imports: []
+scds:
+- scd:project:underwriting-decisioning
+provenance:
+  created_by: ohana-consulting
+  created_at: '2026-09-24'
+  rationale: 'Concept bundle for the MCA reference ontology: Underwriting & Decisioning.'

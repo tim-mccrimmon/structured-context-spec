@@ -1,0 +1,29 @@
+# Domain bundles import concept bundles and contain no SCDs of their own.
+id: bundle:merchant-cash-advance
+type: domain
+version: DRAFT
+title: Merchant Cash Advance Domain
+description: 'Domain bundle for the MCA (merchant cash advance / business funding) reference ontology:
+  imports the 16 concept bundles, each holding one skeleton SCD.'
+imports:
+- bundle:origination
+- bundle:underwriting-decisioning
+- bundle:contract-characterization
+- bundle:disclosure-compliance
+- bundle:security-interest-management
+- bundle:servicing-collections
+- bundle:capital-funding
+- bundle:portfolio-risk-management
+- bundle:broker-partner-management
+- bundle:data-provenance
+- bundle:data-security
+- bundle:systems-integration
+- bundle:governance
+- bundle:ai-accountability
+- bundle:training-competency
+- bundle:adoption-rollout
+scds: []
+provenance:
+  created_by: ohana-consulting
+  created_at: '2026-09-24'
+  rationale: Domain bundle for the MCA reference skeletons.

@@ -1,7 +1,7 @@
 # SCS Roadmap
 
-Current stable: **0.3** (tagged `v0.3.0`). Active development: **0.5.0** on the `0.5-dev`
-branch.
+Current stable: **0.5.0** (tagged `v0.5.0`). No active development branch is open right now —
+see "Beyond 0.5.0," below, for candidate next work; none of it is scheduled yet.
 
 This document supersedes the forward-looking "Roadmap" section of
 `RELEASE-NOTES-0.3.md` for 0.5.0 and beyond. Granular backlog: `ISSUES.md`.
@@ -47,12 +47,16 @@ Turn the runtime-blocking items in `OPEN_QUESTIONS.md` into normative spec decis
   and superseded
 - **context drift** — a normative definition and the signal a consumer uses to detect it
 
-### 4. Metadata additions
+### 4. Metadata additions — deferred out of 0.5.0 (2026-09-27)
 
 - **Model-routing metadata** — bundle / SCD metadata expressing which model(s) a governed
   workload should route to, so routing is governed rather than hardcoded downstream.
+  Deferred: not blocking, and routing is runtime/orchestration behavior, out of scope on
+  the same grounds as workflow modeling (see workstream 2).
 - **Multi-author provenance** — provenance that names the real per-perspective owner
   (compliance, IT, engineering …), not a single source, with a review/approval workflow.
+  Deferred: conditional from the start on single-source approval proving insufficient,
+  which hasn't happened. See "Beyond 0.5.0."
 
 ### 5. Tier stack
 
@@ -85,3 +89,17 @@ Carried forward from the 0.3 roadmap, not scheduled:
 - Legal, Clinical, Financial and other expert-authored domains
 - Cross-domain dependency management; shared/importable concept libraries
 - Public working group formation and the community-governance transition
+
+Deferred out of 0.5.0's workstream 4 (2026-09-27), not scheduled:
+
+- **Model-routing metadata** (ISS-010) — not blocking, and routing is runtime/orchestration
+  behavior, the same class of thing SCS already keeps out of scope for workflows.
+- **Multi-author provenance** (ISS-011) — conditional from the start ("only pursue if
+  single-source approval proves insufficient"); revisit if that limit is actually hit.
+
+Deferred out of workstream 6 (2026-09-27), not scheduled:
+
+- **Publishing `scs-tools`/`scs-validator` to PyPI** (ISS-014) — the version-bump and
+  packaging/bug-fix work is done, but the actual publish is cut: local editable installs
+  cover current use, and the release tag does not depend on it. Revisit when a `pip
+  install`-without-a-clone user actually shows up.

@@ -8,7 +8,8 @@ check this first when picking up 0.5.0 work.
 **Target:** `v0.5.0`, tagged and pushed to origin, before 2026-12-01 (TaskWarrior task 61,
 gates GTC DC attendance).
 
-**Current phase:** 3 — Runtime decisions (Phase 2, the "Any AI actor" reframe, is fully done)
+**Current phase:** 9 — Ship (Phases 0–3 and 5–8 are fully done; Phase 4 and ISS-014 are
+deferred, not in 0.5.0)
 
 ---
 
@@ -149,51 +150,81 @@ See ISS-006 in `ISSUES.md` for the full design rationale and implementation deta
       `data-security` naming, client neutrality)
 - [x] Spec text updated: `domain-ontology.md` §2 and §4, `terminology.md`, `overview.md`
       (`rfcs/RFC-0001` is left as the accepted historical record and still says "not yet modeled")
-- [ ] **Client clearance** to publish the MCA ontology in the open-source repo (Tim)
+- [x] **Client clearance** to publish the MCA ontology in the open-source repo (Tim) —
+      resolved 2026-09-27: Tim's own IP, no third-party clearance needed ("it's all mine, I
+      can do whatever I want")
 - [ ] `scs new project --ontology mca` (and cdmo): selector still open on ISS-029
-- Not shipped, on purpose: the engagement's 16 skeleton SCDs. They are the customer's details
-  (owners, departments), not the industry baseline.
+- [x] `examples/merchant-cash-advance/`: customer-neutral skeleton SCDs (16), concept bundles (16) and a
+      domain bundle, all `DRAFT` and validating; tests cover consistency with the ontology and client
+      neutrality
+- Not shipped, on purpose: the engagement's own skeletons. They carry the customer's owners, departments
+  and policy decisions (the details), not the industry baseline.
 
-## Phase 3 — Runtime decisions (ISS-007 – ISS-009)
+## Phase 3 — Runtime decisions (ISS-007 – ISS-009) — DONE 2026-09-27
 
-- [ ] ISS-007: normative decision on immutability scope (per execution/task/session)
-- [ ] ISS-008: how a context version "in effect" is chosen, pinned, superseded
-- [ ] ISS-009: normative definition of context drift + detection signal
+- [x] ISS-007: normative decision on immutability scope (per execution/task/session) —
+      per single execution/step; `any-ai-actor-model.md` §5.1
+- [x] ISS-008: how a context version "in effect" is chosen, pinned, superseded —
+      `any-ai-actor-model.md` §5.2
+- [x] ISS-009: normative definition of context drift + detection signal —
+      `any-ai-actor-model.md` §5.3
 
-## Phase 4 — Metadata additions (ISS-010 – ISS-011)
+## Phase 4 — Metadata additions (ISS-010 – ISS-011) — DEFERRED 2026-09-27, not in 0.5.0
 
-- [ ] ISS-010: model-routing metadata field, scope, precedence
-- [ ] ISS-011: per-perspective/multi-author attestation — extends the Phase 1
-      `version_approved_by` MVP; only pursue if single-source approval proves insufficient
-      (see RFC-0001, Provenance and approval)
+- [x] ISS-010: model-routing metadata field, scope, precedence — deferred, not blocking and
+      out of SCS's runtime/orchestration scope; see `ROADMAP.md` "Beyond 0.5.0"
+- [x] ISS-011: per-perspective/multi-author attestation — deferred; conditional from the
+      start on single-source approval proving insufficient, which hasn't happened; see
+      `ROADMAP.md` "Beyond 0.5.0"
 
-## Phase 5 — Tier stack (ISS-012)
+## Phase 5 — Tier stack (ISS-012) — DONE 2026-09-27
 
-- [ ] Reconcile `core-model.md` tier naming (meta/standards/project) with Corporate/Project
-      framing, or document the mapping
+- [x] Reconcile `core-model.md` tier naming (meta/standards/project) with Corporate/Project
+      framing, or document the mapping — documented (not renamed): `core-model.md` §5.4,
+      `terminology.md` §3.4
 
-## Phase 6 — Tooling & release engineering (ISS-013 – ISS-015)
+## Phase 6 — Tooling & release engineering (ISS-013 – ISS-015) — DONE 2026-09-27
+(ISS-014 deferred, not cutting the release)
 
-- [ ] ISS-013: CI for `scs-tools` and `scs-validator` (lint + test + schema validation)
-- [ ] ISS-014: verify current PyPI state; publish pinned releases
-- [ ] ISS-015: converge validator rules on `rules/v0.5.0/`; retire `v0.1.0`, `v0.3.0`
+- [x] ISS-013: CI for `scs-tools` and `scs-validator` (lint + test + schema validation) —
+      done 2026-09-24, `.github/workflows/tools-ci.yml`
+- [x] ISS-014: verify current PyPI state; publish pinned releases — **deferred**: publish
+      itself cut (no external `pip install` demand yet, and it does not gate the `v0.5.0`
+      tag), but the version-bump and bug-fix work stays. Both packages bumped to `0.5.0`
+      (existing `scs-tools==0.1.0` on PyPI predates the concept rename and can't be
+      re-uploaded under the same version anyway); wheels/sdists built and `twine check`-clean
+      at `tools/scd-validator/dist/`, `tools/cli/dist/` (gitignored) if needed later.
+- [x] ISS-015: converge validator rules on `rules/v0.5.0/`; retire `v0.1.0`, `v0.3.0` — done
+      2026-09-27
 
-## Phase 7 — Migration (ISS-016 – ISS-017)
+## Phase 7 — Migration (ISS-016 – ISS-017) — DONE 2026-09-27
 
-- [ ] ISS-016: `docs/MIGRATION-0.5.0.md`
-- [ ] ISS-017: decide + ship (or explicitly skip) the `scs migrate` helper
+- [x] ISS-016: `docs/MIGRATION-0.5.0.md` — written; this closes a dead link the validator's
+      own error messages already pointed at
+- [x] ISS-017: decide + ship (or explicitly skip) the `scs migrate` helper — already decided
+      guide-only at RFC-0001 acceptance (Phase 0); this ticket just hadn't been closed
 
-## Phase 8 — Housekeeping (ISS-018 – ISS-019, not release-blocking)
+## Phase 8 — Housekeeping (ISS-018 – ISS-019, not release-blocking) — DONE
 
-- [ ] ISS-018: fix stale "0.1" version labels under `spec/0.3/`
-- [ ] ISS-019: decide `.claude/` / `project-starter.md` — gitignore or commit
+- [x] ISS-018: fix stale "0.1"/"0.3" version labels — done 2026-09-22 as a side effect of
+      ISS-004 (all `spec/0.5/` files now consistently say 0.5.0); this checklist line was
+      never updated to match `ISSUES.md`
+- [x] ISS-019: decide `.claude/` / `project-starter.md` — gitignore or commit — reconciled
+      2026-09-27: neither file was actually present in the working tree (whatever prompted
+      this had already been cleaned up); added `.claude/` and `.envrc` to `.gitignore`
+      anyway, matching house convention, so neither leaks in later
 
 ---
 
 ## Phase 9 — Ship
 
-- [ ] Full `scs validate` pass across all examples on `0.5-dev`
-- [ ] `RELEASE-NOTES-0.5.0.md` written
+- [x] Full `scs validate` pass across all examples on `0.5-dev` — done 2026-09-27: all 3
+      domain manifests, all domain/concept/project/meta bundles, and every individual SCD
+      validate 0 errors. Found and fixed one pre-existing failure along the way (ISS-022,
+      unrelated to 0.5.0). Both regression suites fully clean (147 + 79, zero xfail).
+- [x] `RELEASE-NOTES-0.5.0.md` written — covers the Domain Ontology, the any-AI-actor model
+      and its §5 runtime decisions, tooling fixes, migration, and what's deferred; concept
+      counts (11/12/16) verified against the actual files, not stated from memory
 - [ ] Merge `0.5-dev` → `main`
 - [ ] Tag `v0.5.0`, push tag to origin
 - [ ] Update `ROADMAP.md`: move "Active development" line to whatever's next

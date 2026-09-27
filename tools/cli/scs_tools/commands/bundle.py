@@ -5,6 +5,7 @@ Bundle command - manage SCS bundles
 import hashlib
 import subprocess
 from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version as pkg_version
 from pathlib import Path
 
 import click
@@ -454,6 +455,20 @@ def _validate_bundle(bundle_path):
         return {"passed": False, "errors": 1, "warnings": 0}
 
 
+def _validator_version():
+    """Return the installed scs-validator package version, or "unknown" if it can't be read.
+
+    `_validate_bundle` runs the validator as a subprocess of this same interpreter (see above),
+    so if that call produced a real result, scs-validator is installed in this environment and
+    this lookup should succeed. Read from package metadata rather than hardcoding a version
+    string, which goes stale the moment either package is re-versioned.
+    """
+    try:
+        return pkg_version("scs-validator")
+    except PackageNotFoundError:
+        return "unknown"
+
+
 def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, force):
     """Create versioned bundle with approval metadata."""
     # Load original bundle
@@ -570,7 +585,7 @@ def _create_version_manifest(
 
     if validation_result:
         manifest["validation"] = {
-            "validator_version": "0.1.0",
+            "validator_version": _validator_version(),
             "validation_date": timestamp,
             "passed": validation_result["passed"],
             "errors": validation_result["errors"],

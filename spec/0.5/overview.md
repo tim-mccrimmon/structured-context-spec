@@ -243,8 +243,10 @@ A **domain** represents an industry vertical or professional practice area. Each
 - 16 concepts in three clusters: nine industry-native (origination, underwriting and
   decisioning, contract characterization, servicing and collections, ...), three
   infrastructure, and four universal AI-governance concepts
-- Ontology only, with a small set of `depends-on` / `relates-to` relationships; best-practice
-  AI governance, so it deliberately carries no regulatory `satisfies` mapping
+- A small set of `depends-on` / `relates-to` relationships; best-practice AI governance, so it
+  deliberately carries no regulatory `satisfies` mapping
+- A customer-neutral skeleton SCD and concept bundle for each concept, under
+  `examples/merchant-cash-advance/`: every field a `TODO`, ready to be filled with real decisions
 - Shows that the ontology follows the industry: the concepts an MCA funder needs have no home
   in the software or medical-device shapes
 

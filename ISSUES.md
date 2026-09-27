@@ -248,79 +248,164 @@ resolved all three sub-questions:
   `provenance.rationale` field).
 
 ### ISS-007 — Runtime decisions: immutability scope
-**Status:** open
+**Status:** done (2026-09-27)
 Make a normative decision: is a context version immutable per execution, per task, or per
 session? Document the rule and its rationale. (`OPEN_QUESTIONS.md` → spec.)
+**Done:** `any-ai-actor-model.md` §5.1 — immutable per single execution/step, not per task
+or session; follows from §2.1 (session is state, not context) and the checkpoint record
+already being generated per-execution (§4.2), not per-task.
 
 ### ISS-008 — Runtime decisions: versioning ↔ runtime behaviour
-**Status:** open
+**Status:** done (2026-09-27)
 Specify how a context version "in effect" is selected, pinned, and superseded at runtime,
 and how a consumer records which version governed a request.
+**Done:** `any-ai-actor-model.md` §5.2 — "in effect" is the latest bundle version with
+`version_approved_by`/`version_approved_at` set (RFC-0001); a deployment may pin an older
+approved version (storage mechanism left open, candidate for a future meta-tier field);
+supersession is immediate for future resolutions and never rewrites past checkpoint
+records. Recording is already covered by the checkpoint record (§4.2).
 
 ### ISS-009 — Runtime decisions: context drift
-**Status:** open
+**Status:** done (2026-09-27)
 Normative definition of "context drift" and the signal a consumer uses to detect it (the
 input a reconciliation/attestation process needs).
+**Done:** `any-ai-actor-model.md` §5.3 — drift is two checkpoint records sharing a
+`workflow_ref` that resolve the same concept to different bundle versions; detectable by
+grouping checkpoint records by `workflow_ref` and comparing `bundle` per concept. Whether
+drift requires reconciliation or blocks a workflow is left to the runtime, consistent with
+§4.1 (SCS does not model workflow control flow).
 
 ---
 
 ## Metadata
 
 ### ISS-010 — Model-routing metadata
-**Status:** open
+**Status:** deferred, post-0.5.0 (2026-09-27)
 Add bundle/SCD metadata expressing which model(s) a governed workload should route to, so
 routing is governed rather than hardcoded downstream. Define the field, its scope
 (bundle-level / SCD-level), and precedence.
+**Why deferred:** not blocking anything else in 0.5.0, and routing is runtime/orchestration
+behavior — the same class of thing `any-ai-actor-model.md` §4.1 already keeps out of SCS's
+scope for workflows. See `ROADMAP.md` "Beyond 0.5.0."
 
 ### ISS-011 — Multi-author provenance
-**Status:** open
+**Status:** deferred, post-0.5.0 (2026-09-27)
 Provenance that names the real per-perspective owner (compliance, IT, engineering, …), not
 a single source. Extend the provenance schema; define an authoring/review/approval
 workflow (who approves, recorded how). Check what the current `provenance` block already
 supports.
+**Why deferred:** the original ticket already scoped this as conditional — "only pursue if
+single-source approval proves insufficient" (RFC-0001, extending the Phase 1
+`version_approved_by` MVP). Nobody has hit that limit yet. See `ROADMAP.md` "Beyond 0.5.0."
 
 ---
 
 ## Structure
 
 ### ISS-012 — Tier stack: Corporate / Project only
-**Status:** open
+**Status:** done (2026-09-27)
 0.5.0 ships Corporate and Project tiers; Personal is deferred. Reconcile spec text and
 schemas (the current tier names in `core-model.md` are meta / standards / project — align
 tier naming with the Corporate/Project framing, or document the mapping).
+**Done:** documented the mapping rather than renaming the schema tiers (a rename would ripple
+across every doc, schema, and example that uses `tier: meta/standards/project`, which are the
+load-bearing type names). `core-model.md` §5.4 (new) and `terminology.md` §3.4 (new) state:
+"Corporate" = Meta-Tier + Standards-Tier together; "Project" = Project-Tier; "Personal"
+(individual-level context) has no schema tier and is out of 0.5.0 scope; "departmental," used
+in some engagement docs, is an audience/scope description, not a tier. Presentation deck's two
+open-item callouts (`docs/presentation/scs-0.5.0-story.md`) updated to point at the resolution.
 
 ---
 
 ## Tooling & release engineering
 
 ### ISS-013 — CI for scs-tools and scs-validator
-**Status:** open
+**Status:** done (2026-09-24)
 No CI today. Add lint + test + schema-validation CI for both `tools/cli` and
 `tools/scd-validator`.
+**Done:** `.github/workflows/tools-ci.yml` runs on push and pull request: both test suites on Python 3.11 and
+3.12 (which also validate every shipped example, ontology manifest and scaffold), ruff, black and mypy, and a
+non-editable wheel install smoke test. First GitHub run 2026-09-24: all four jobs green. See ISS-035
+(packaging) and ISS-036 (lint and types) for how it got there.
 
 ### ISS-014 — Published, pinned releases
-**Status:** open
+**Status:** deferred, post-0.5.0 (2026-09-27) — build/verification work stays done, the
+actual PyPI publish is cut for this release
 Publish `scs-tools` and `scs-validator` (PyPI or equivalent) with versioned releases, so
 downstream builds can pin a fixed version. Verify current PyPI state first.
+**Why deferred:** Tim's own use is via editable installs from this checkout, which needs no
+PyPI involvement; publishing only matters for a `pip install` user with no local clone, and
+there's no such demand yet. Publishing is also outward-facing and, once a version succeeds,
+irreversible (can't re-upload the same version number) — not something to do speculatively.
+Tagging `v0.5.0` does not depend on this either; publishing is a separate distribution
+channel from the release itself. Revisit when someone outside actually needs a pinned
+`pip install`. See `ROADMAP.md` "Beyond 0.5.0."
+**Verified current PyPI state (2026-09-27, via live lookup, not assumed):** `scs-tools` is
+already published at `0.1.0` (that version predates the concern→concept rename and is
+incompatible with 0.5.0 content — owner `tim.mccrimmon`, confirmed via the PyPI JSON API).
+`scs-validator` has never been published (404). Re-uploading version `0.1.0` for either
+package is not possible on PyPI, so a version bump was required regardless of 0.5.0.
+**Done:** both packages bumped to `0.5.0` (`tools/scd-validator/pyproject.toml`,
+`scs_validator/__init__.py`, `tools/cli/pyproject.toml`), aligning the package version with
+the SCS spec version they implement, consistent with how `__version__` was already being
+used before it went stale. `scs-tools`' `validator` extra bumped to `scs-validator>=0.5.0`
+(the old `>=0.1.0` bound would accept an incompatible pre-rename validator). Fixed a real
+bug found while doing this: `bundle.py`'s versioned-bundle manifest hardcoded
+`"validator_version": "0.1.0"` regardless of what actually validated it — now reads the
+installed `scs-validator` version via `importlib.metadata`, so it can't go stale on the next
+bump either. Verified end-to-end: both regression suites pass (146 + 79), both packages
+build clean sdists/wheels, `twine check` passes on all four artifacts, and a fresh venv
+install from the built wheels (not editable) scaffolds a project, validates it, and reports
+the correct versions via both the CLI banner and `importlib.metadata`.
+**Not done, cut for 0.5.0:** the actual `twine upload` to PyPI — deferred per above, not
+just postponed for lack of credentials. Artifacts remain built at
+`tools/scd-validator/dist/` and `tools/cli/dist/` (gitignored, not committed) if a real
+need shows up before this is picked back up properly.
 
 ### ISS-015 — Converge validator rules on v0.5.0
-**Status:** blocked (ISS-003)
+**Status:** done (2026-09-27)
 Retire `rules/v0.1.0/` and `rules/v0.3.0/`; single `rules/v0.5.0/` set.
+**Done:** confirmed nothing in code selected rules by version name (`rules_loader.py` only
+ever defaulted to `rules/v0.5.0`; the only other references were stale docs), then removed
+`tools/scd-validator/src/scs_validator/rules/v0.1.0/` and `.../v0.3.0/` (`git rm`). Updated
+`rules/README.md` (was still calling `v0.1.0` current, including a `cp .../v0.1.0/...`
+example that would have silently pointed at a now-deleted path) and the two stale "SCS
+Validator v0.1.0" example-output lines in `tools/scd-validator/README.md` and
+`VALIDATOR_OVERVIEW.md`. Regression suite still passes (146 tests). **Left alone,
+out of scope for this issue:** `rules/README.md` still says "7 relationship types" (RFC-0001
+narrowed this to a minimal 3) and references "11 prescribed domains" and a
+`docs/scs-v0.1-design-decisions.md` file — pre-existing staleness that belongs to ISS-030
+(stale 0.3 content in user-facing docs), not this issue.
 
 ---
 
 ## Migration
 
 ### ISS-016 — 0.3 → 0.5.0 migration guide
-**Status:** blocked (ISS-002, ISS-004)
+**Status:** done (2026-09-27)
 `docs/MIGRATION-0.5.0.md`: the concern → concept rename, the domain-manifest `ontology`
 conversion, incremental depth, SCD `concept` field.
+**Done:** written, covering the bundle type rename, the domain manifest `concerns:` →
+`ontology.concepts[]` conversion (the real, non-mechanical step) with a genuine before/after
+pulled from this repo's own migration (`schema/domain/examples/medical-device-cdmo-domain.yaml`,
+still validates 0 errors), the new provenance approval-field requirement, the SCD `concept`
+field, and the easy-to-miss second `concerns:` (free-text topics, renamed to `topics:`, not
+`concept:`). Both embedded YAML examples parse. This file was already a dead link from three
+places before it existed: the validator's own `legacy_concerns_field` and `legacy_concern_type`
+error messages (`domain-ontology-rules.yaml`) and `ISS-030`'s note both point at it.
 
-### ISS-017 — `scs migrate` helper (open)
-**Status:** open
+### ISS-017 — `scs migrate` helper
+**Status:** done — already decided at RFC-0001 acceptance (2026-09-21), this ticket just
+hadn't been closed to reflect it
 Decide whether to ship an automated helper for the mechanical parts of the 0.3 → 0.5.0
 migration (concern → concept rename, flat `concerns[]` → flat `ontology.concepts[]`), or
 keep migration guide-only.
+**Decided (RFC-0001, "Migration tooling"):** guide-only for 0.5.0, no automated `scs migrate`
+helper — Tim is the only consumer of 0.3 content today, so manual migration is cheap. Revisit
+if a third party (e.g. Nextern) has real 0.3 content to migrate. `docs/MIGRATION-0.5.0.md`
+(ISS-016) offers two one-line `sed`/`git mv` commands for the purely mechanical renames as a
+convenience, not a supported tool — the actual ontology-structure step can't be mechanically
+derived from a flat list regardless of tooling.
 
 ---
 
@@ -333,10 +418,25 @@ All `spec/0.5/` files now consistently say 0.5.0 — headers and every internal 
 least one).
 
 ### ISS-019 — `.claude/` and scaffold files in the repo
-**Status:** open
+**Status:** done (2026-09-27)
 `.claude/` (machine-local `settings.local.json`) and `project-starter.md` are untracked in
 the working tree. Decide: `.gitignore` them (likely) or commit intentionally. `.gitignore`
 also has an uncommitted `.envrc` line.
+**Correction:** first pass of this review checked the `0.5-dev` worktree
+(`structured-context-spec-0.5.0/`) and found neither file, and wrongly concluded the issue
+was stale. This repo is checked out as two worktrees of the same clone — `main` lives at a
+separate path (`structured-context-spec/`) — and both files are live there: `.claude/`
+holds `settings.local.json` and `rules/scs.md`; `project-starter.md` is confirmed to be
+exactly the Kahuna `project new` scaffold artifact suspected (its own header: "Project
+Brief — scs", `created: 2026-06-26`), not part of `scs-tools`' own templates. The `main`
+worktree's local `.gitignore` also already had an `.envrc` line added by hand, never
+committed — confirming the pattern below was already wanted, just never landed.
+**Done:** added `.claude/` and `.envrc` to `.gitignore` on this branch, so neither gets
+committed by accident once merged to `main` — matches house convention in sibling repos
+(`.claude/` is gitignored wholesale in Kahuna; `.envrc` is gitignored for direnv-scoped
+GitHub tokens in
+`nextern-2h26` and `claude-enterprise`). This repo has no `.envrc` today either; the entry
+is precautionary, not fixing a leak.
 
 ---
 
@@ -360,12 +460,19 @@ so even with ISS-020 fixed, SCD files wouldn't resolve for this example. Needs e
 configurable path convention or a documented one the examples are made to match.
 
 ### ISS-022 — `examples/med-adherence/standards-bundle.yaml` pre-existing violations
-**Status:** open
+**Status:** done (2026-09-27), found during the Phase 9 full validate pass
 Two bugs unrelated to the concern->concept rename, confirmed present before this session's
 changes (only `provenance` was touched here for ISS-005): the `imports` entry
 `bundle:standards:soc2-type2:2023.1` doesn't match the bundle reference pattern (extra
 segment, non-semver version `2023.1`), and the bundle has both `imports` and `scds` set,
 violating the standards-bundle XOR rule. `scs validate --bundle` fails on this file.
+**Fixed:** the SOC2 import never resolved to anything real (no `soc2-type2` bundle exists
+anywhere in this repo; the file's own comment called it aspirational, "in production, this
+might reference a registry"). Dropped it and kept the bundle's real content — three actual
+HIPAA SCDs — as an `scds`-only standards bundle with an explicit `imports: []` (the schema
+requires the key present even when empty). Validates clean; the `xfail(strict=True)` marker
+in `test_regression_050.py` (`KNOWN_INVALID_BUNDLES`) is removed. Both regression suites
+pass fully clean (147 + 79, zero xfail).
 
 ### ISS-023 — `docs/` documentation website: migrate to concept terminology
 **Status:** open (deferred, scoped out of ISS-004 by Tim 2026-09-22)
@@ -658,18 +765,25 @@ concept from the scaffold's SCD-to-concept mapping (now local to `commands/new.p
 by giving `scs add scd` the same reverse lookup. Related: ISS-029, ISS-005b.
 
 ### ISS-039 - MCA (merchant cash advance / business funding) ontology ships with 0.5.0
-**Status:** in-progress: manifest, tests and spec text done (2026-09-24); client clearance open
+**Status:** in-progress: manifest, tests, spec text and client clearance done; only the
+`--ontology` selector (ISS-029) remains open, tracked separately
 Decided by Tim: the third industry ontology, MCA, ships with the 0.5.0 release. Source: the
 business-funding engagement's ontology document (16 concepts, three clusters).
-**Done:** `schema/domain/examples/merchant-cash-advance-domain.yaml` (validates 0 errors, 0 warnings;
+**Done:** `schema/domain/examples/merchant-cash-advance-domain.yaml` and, in `examples/merchant-cash-advance/`, 16
+customer-neutral skeleton SCDs, 16 concept bundles and a domain bundle (all `DRAFT`, all validating; the
+generic skeletons replace the customer's own decisions and policy references with neutral `TODO`s and
+keep only industry-level `e.g.` hints). The manifest (validates 0 errors, 0 warnings;
 15 `depends-on` / `relates-to` relationships; no `satisfies`; client-neutral wording: no client or
 people names, and no specific regulatory claims, e.g. the source's count of states with disclosure
 regimes was dropped); regression tests; `spec/0.5/domain-ontology.md`, `terminology.md` and
 `overview.md` updated. `rfcs/RFC-0001` is untouched (accepted record).
-**Open:** (a) clearance from the client to publish; (b) the `--ontology` selector on `scs new project`
-(ISS-029); (c) whether any MCA concept bundles or example SCDs should ship. The engagement's skeleton
-SCDs were deliberately not shipped: they carry customer owners and departments, i.e. the details, not
-the baseline.
+**Resolved 2026-09-27:** clearance from the client to publish — Tim's own IP, no third-party
+clearance needed.
+**Still open:** the `--ontology` selector on `scs new project` (ISS-029), which can now build
+on the generic skeletons — tracked separately, not a 0.5.0 release blocker (the default SDLC
+scaffold path is unaffected). The engagement's own skeleton pages were fixed separately in the
+engagement repo (their SCD `relationships` no longer target `concept:` ids; the links moved to
+a visible "Related concepts" section) and keep their owners and departments.
 Related: ISS-029, RELEASE-0.5.0.md Phase 2b.
 
 ### ISS-040 - Docs and validator message do not say that concept relationships belong in the ontology (proposed)

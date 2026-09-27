@@ -84,7 +84,7 @@ python -m scs_validator --bundle context/bundle.yaml
 ### Text Output (Default)
 
 ```
-SCS Validator v0.1.0
+SCS Validator v0.5.0
 
 ✓ Syntax validation passed (3 files)
 ✓ Schema validation passed (3 files)
@@ -103,7 +103,7 @@ Status: ✓ VALID
 ### Error Output
 
 ```
-SCS Validator v0.1.0
+SCS Validator v0.5.0
 
 ✓ Syntax validation passed (2 files)
 ✗ Schema validation failed

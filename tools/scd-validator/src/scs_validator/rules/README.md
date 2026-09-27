@@ -10,15 +10,19 @@ The validator ships with strict, production-ready default rules while enabling p
 
 ## Rules Files
 
-### v0.1.0/ - Current Rules Version
+### v0.5.0/ - Current Rules Version
 
 ```
-v0.1.0/
+v0.5.0/
 ├── scd-rules.yaml              # SCD structure validation rules
 ├── bundle-rules.yaml           # Bundle organization and XOR constraints
-├── relationship-rules.yaml     # 7 relationship types and tier constraints
+├── relationship-rules.yaml     # Relationship types and tier constraints
+├── domain-ontology-rules.yaml  # Domain Ontology rules (RFC-0001)
 └── completeness-rules.yaml     # Domain and SCD completeness requirements
 ```
+
+`v0.1.0/` and `v0.3.0/` were retired 2026-09-27 (ISS-015) — `v0.5.0/` is now the only rules
+set the validator ships.
 
 ### Rules File Descriptions
 
@@ -59,7 +63,7 @@ Create `.scs/completeness-rules.yaml` in your project root:
 
 ```bash
 mkdir -p .scs
-cp $VALIDATOR_RULES_DIR/v0.1.0/completeness-rules.yaml .scs/
+cp $VALIDATOR_RULES_DIR/v0.5.0/completeness-rules.yaml .scs/
 
 # Edit .scs/completeness-rules.yaml to customize
 ```
@@ -268,13 +272,13 @@ pattern: "auth|authn|authz"  # Matches SCDs with these keywords
 
 Rules are versioned alongside the validator.
 
-**Current version**: v0.1.0
-**Compatible with**: SCS v0.1
+**Current version**: v0.5.0
+**Compatible with**: SCS 0.5.0
 
 When the validator updates rules:
-- Patch version (0.1.0 → 0.1.1): Bug fixes, clarifications
-- Minor version (0.1.0 → 0.2.0): New rules, backward compatible
-- Major version (0.1.0 → 1.0.0): Breaking changes to rules
+- Patch version (0.5.0 → 0.5.1): Bug fixes, clarifications
+- Minor version (0.5.0 → 0.6.0): New rules, backward compatible
+- Major version (0.5.0 → 1.0.0): Breaking changes to rules
 
 Projects should test validation after updating the validator.
 
