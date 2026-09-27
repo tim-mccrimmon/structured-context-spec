@@ -97,7 +97,7 @@ Welcome to the Structured Context Specification (SCS) documentation. This direct
 
 ## Version
 
-This documentation corresponds to **SCS v0.2.0**.
+This documentation corresponds to **SCS v0.5.0**.
 
 For information about changes between versions, see the project [CHANGELOG](../CHANGELOG.md) (when available).
 

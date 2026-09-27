@@ -32,6 +32,5 @@ nav:
     - Usability & Accessibility: concern-docs/usability-accessibility/README.md
   - Examples:
     - Medical Device CDMO: concern-docs/med-adherence-examples/GETTING_STARTED.md
-    - Med Adherence Getting Started: concern-docs/med-adherence-examples/GETTING_STARTED.md
   - FAQ: FAQ.md
   - Migration (0.3): MIGRATION-0.3.md
