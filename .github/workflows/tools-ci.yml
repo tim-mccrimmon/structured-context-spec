@@ -96,3 +96,11 @@ jobs:
           scs bundle version --bundle bundles/concepts/security.yaml --version 0.1.0 \
             --approved-by ci@example.com --notes "ci smoke"
           scs-validate --bundle bundles/concepts/security-v0.1.0.yaml
+      - name: Scaffold and validate the mca ontology model outside the source tree
+        run: |
+          cd "$(mktemp -d)"
+          scs new project smoke-mca --ontology mca --author CI --email ci@example.com --no-interactive
+          cd smoke-mca
+          scs bundle validate
+          scs validate --domain domain/domain-manifest.yaml
+          for f in context/project/*.yaml; do scs-validate "$f" > /dev/null; done

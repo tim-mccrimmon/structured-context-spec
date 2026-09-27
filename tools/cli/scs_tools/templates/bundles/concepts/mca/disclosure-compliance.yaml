@@ -1,0 +1,12 @@
+id: bundle:disclosure-compliance
+type: concept
+version: DRAFT
+title: Disclosure Compliance Concept Bundle
+description: State commercial-financing disclosure requirements.
+imports: []
+scds:
+- scd:project:disclosure-compliance
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Disclosure Compliance.'

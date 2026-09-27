@@ -1,0 +1,12 @@
+id: bundle:adoption-rollout
+type: concept
+version: DRAFT
+title: Adoption & Rollout Concept Bundle
+description: Phased AI rollout per department, with rollback triggers if a workflow is not working.
+imports: []
+scds:
+- scd:project:adoption-rollout
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Adoption & Rollout.'

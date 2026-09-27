@@ -4,6 +4,8 @@ New project command - scaffolds a new SCS project
 
 import os
 from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as pkg_version
 from pathlib import Path
 
 import click
@@ -15,12 +17,24 @@ from scs_tools.utils.files import (
     write_file,
 )
 from scs_tools.utils.project_types import (
+    ONTOLOGY_MODELS,
     PROJECT_TYPES,
     get_concept_info,
     get_concepts_for_project_type,
     get_domains_for_project_type,
+    get_ontology_model_config,
     get_project_type_config,
 )
+
+
+def _scs_tools_version() -> str:
+    """The installed scs-tools package version, or "unknown" if it can't be read. Read from
+    package metadata rather than hardcoding a version string, which goes stale the moment
+    the package is re-versioned (see the matching fix in commands/bundle.py)."""
+    try:
+        return pkg_version("scs-tools")
+    except PackageNotFoundError:
+        return "unknown"
 
 
 @click.group()
@@ -41,7 +55,14 @@ def new():
     "project_type",
     type=click.Choice(list(PROJECT_TYPES.keys())),
     default=None,
-    help="Type of project to scaffold",
+    help="Type of project to scaffold (sdlc ontology only - ignored for other --ontology values)",
+)
+@click.option(
+    "--ontology",
+    type=click.Choice(list(ONTOLOGY_MODELS.keys())),
+    default="sdlc",
+    help="Ontology model to scaffold against (default: sdlc). Non-sdlc models scaffold their "
+    "full concept set and ignore --type.",
 )
 @click.option(
     "--dir",
@@ -71,20 +92,22 @@ def new():
     is_flag=True,
     help="Disable interactive mode (use defaults/flags only)",
 )
-def project(name, project_type, directory, author, email, interactive, no_interactive):
+def project(name, project_type, ontology, directory, author, email, interactive, no_interactive):
     """
     Create a new SCS project with proper structure and templates
 
     By default, prompts for missing required information interactively.
     Use --no-interactive to disable prompts and require all flags.
 
-    Project types: healthcare, fintech, saas, government, minimal, standard
+    Ontology models: sdlc (default), mca. Project types (--type, sdlc only): healthcare,
+    fintech, saas, government, minimal, standard
 
     \b
     Examples:
         scs new project                           # Interactive mode (default)
         scs new project medication-adherence      # Interactive for missing fields
-        scs new project my-app --type healthcare  # Specify type
+        scs new project my-app --type healthcare  # Specify type (sdlc ontology)
+        scs new project my-funder --ontology mca  # Merchant Cash Advance ontology
         scs new project my-app --type healthcare --author "Jane Doe" \
             --email "jane@example.com" --no-interactive
 
@@ -106,8 +129,9 @@ def project(name, project_type, directory, author, email, interactive, no_intera
         if not name:
             name = click.prompt("Project name", type=str)
 
-        # Show project types if not specified
-        if not project_type:
+        # Show project types if not specified - only meaningful for the sdlc ontology.
+        # --ontology itself is flag-only in this pass, not prompted for interactively.
+        if ontology == "sdlc" and not project_type:
             click.echo("\nAvailable project types:")
             for idx, (ptype, config) in enumerate(PROJECT_TYPES.items(), 1):
                 click.echo(f"  {idx}. {ptype:15} - {config['description']}")
@@ -178,13 +202,22 @@ def project(name, project_type, directory, author, email, interactive, no_intera
         raise click.Abort()
 
     click.echo(f"Creating SCS project: {name}")
-    click.echo(f"Project type: {project_type}")
+    click.echo(f"Ontology model: {ontology}")
+    if ontology == "sdlc":
+        click.echo(f"Project type: {project_type}")
     click.echo(f"Location: {base_path}\n")
 
-    # Get project configuration
-    config = get_project_type_config(project_type)
-    domains = get_domains_for_project_type(project_type)
-    concepts = get_concepts_for_project_type(project_type)
+    # Get project configuration. --type/PROJECT_TYPES only apply to the sdlc ontology -
+    # every other model scaffolds its full, fixed concept set (no --type variants yet).
+    model_config = get_ontology_model_config(ontology)
+    if ontology == "sdlc":
+        config = get_project_type_config(project_type)
+        domains = get_domains_for_project_type(project_type)
+        concepts = get_concepts_for_project_type(project_type)
+    else:
+        config = {"exclude_scds": []}
+        domains = [model_config["domain"]]
+        concepts = model_config["concepts"]
     bundles = domains  # For backwards compatibility in templates
 
     # Create directory structure
@@ -199,6 +232,9 @@ def project(name, project_type, directory, author, email, interactive, no_intera
     variables = {
         "project_name": name,
         "project_type": project_type,
+        "ontology": ontology,
+        "domain_id": model_config["domain"],
+        "domain_name": model_config["domain_name"],
         "author": author_info,
         "email": email_info,
         "created_at": now,
@@ -209,19 +245,21 @@ def project(name, project_type, directory, author, email, interactive, no_intera
 
     # Create bundle files
     click.echo("Creating bundle files...")
-    _create_bundles(base_path, domains, concepts, variables)
+    _create_bundles(base_path, domains, concepts, variables, ontology)
 
     # Create the Domain Ontology manifest (RFC-0001)
     click.echo("Creating Domain Ontology manifest...")
-    _create_domain_manifest(base_path, concepts, variables)
+    _create_domain_manifest(base_path, concepts, variables, model_config)
 
     # Create SCD files
     click.echo("Creating SCD files...")
-    _create_scds(base_path, concepts, variables, config)
+    _create_scds(base_path, concepts, variables, config, ontology)
 
-    # Create concept documentation templates
-    click.echo("Creating concept documentation templates...")
-    _create_concept_docs(base_path, concepts, variables)
+    # Create concept documentation templates. Not yet built for non-sdlc ontology models -
+    # skip cleanly rather than warn once per concept.
+    if ontology == "sdlc":
+        click.echo("Creating concept documentation templates...")
+        _create_concept_docs(base_path, concepts, variables)
 
     # Create supporting files
     click.echo("Creating supporting files...")
@@ -235,17 +273,22 @@ def project(name, project_type, directory, author, email, interactive, no_intera
     click.echo("  # Review docs/GETTING_STARTED.md")
 
 
-def _create_domain_manifest(base_path: Path, concepts: list, variables: dict):
-    """Create domain/domain-manifest.yaml: a flat Domain Ontology of the generated concepts"""
+def _create_domain_manifest(base_path: Path, concepts: list, variables: dict, model_config: dict):
+    """Create domain/domain-manifest.yaml: the Domain Ontology of the generated concepts,
+    including relationships when the ontology model defines them (e.g. mca; sdlc has none,
+    deliberately flat)."""
     manifest_template = get_template_path() / "domain" / "domain-manifest.yaml"
+    concept_info = get_concept_info(
+        concepts, model_config["concept_info"], model_config["relationships"]
+    )
     copy_template(
         manifest_template,
         base_path / "domain" / "domain-manifest.yaml",
-        {**variables, "concept_info": get_concept_info(concepts)},
+        {**variables, "concept_info": concept_info},
     )
 
 
-def _create_bundles(base_path: Path, domains: list, concepts: list, variables: dict):
+def _create_bundles(base_path: Path, domains: list, concepts: list, variables: dict, ontology: str):
     """Create bundle YAML files for SCS 0.5.0 architecture"""
     template_path = get_template_path() / "bundles"
 
@@ -288,9 +331,9 @@ def _create_bundles(base_path: Path, domains: list, concepts: list, variables: d
         else:
             click.echo(f"Warning: Template for domain '{domain}' not found, skipping...")
 
-    # Create concept bundles (the 11 functional areas)
+    # Create concept bundles (the ontology model's functional areas)
     for concept in concepts:
-        concept_template = template_path / "concepts" / f"{concept}.yaml"
+        concept_template = template_path / "concepts" / ontology / f"{concept}.yaml"
         if concept_template.exists():
             copy_template(
                 concept_template,
@@ -301,12 +344,40 @@ def _create_bundles(base_path: Path, domains: list, concepts: list, variables: d
             click.echo(f"Warning: Template for concept '{concept}' not found, skipping...")
 
 
-def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict):
+def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict, ontology: str):
     """Create SCD YAML files"""
-    template_path = get_template_path() / "scds"
+    template_path = get_template_path() / "scds" / ontology
 
-    # SCD mapping by domain
-    scd_mapping = {
+    if ontology != "sdlc":
+        # Every other ontology model maps one SCD per concept (concept id == scd id) - see
+        # e.g. examples/merchant-cash-advance/concepts/*.yaml, which each import exactly the
+        # SCD of the same name.
+        scd_mapping = {concept: [concept] for concept in concepts}
+    else:
+        scd_mapping = _sdlc_scd_mapping()
+
+    # Get excluded SCDs from config
+    exclude_scds = config.get("exclude_scds", [])
+
+    for concept in concepts:
+        scds = scd_mapping.get(concept, [])
+        for scd_name in scds:
+            # Skip excluded SCDs
+            if scd_name in exclude_scds:
+                continue
+
+            scd_template = template_path / f"{scd_name}.yaml"
+            if scd_template.exists():
+                copy_template(
+                    scd_template,
+                    base_path / "context" / "project" / f"{scd_name}.yaml",
+                    variables,
+                )
+
+
+def _sdlc_scd_mapping() -> dict:
+    """SCD names per concept, for the sdlc ontology model only."""
+    return {
         "business-context": [
             "problem-definition",
             "stakeholders",
@@ -369,24 +440,6 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict)
             "model-bias",
         ],
     }
-
-    # Get excluded SCDs from config
-    exclude_scds = config.get("exclude_scds", [])
-
-    for concept in concepts:
-        scds = scd_mapping.get(concept, [])
-        for scd_name in scds:
-            # Skip excluded SCDs
-            if scd_name in exclude_scds:
-                continue
-
-            scd_template = template_path / f"{scd_name}.yaml"
-            if scd_template.exists():
-                copy_template(
-                    scd_template,
-                    base_path / "context" / "project" / f"{scd_name}.yaml",
-                    variables,
-                )
 
 
 def _create_concept_docs(base_path: Path, concepts: list, variables: dict):
@@ -453,6 +506,7 @@ def _create_supporting_files(base_path: Path, variables: dict):
     scs_config = f"""# SCS Project Configuration
 project_name: {variables['project_name']}
 project_type: {variables['project_type']}
-scs_version: 0.1.0
+ontology_model: {variables['ontology']}
+scs_version: {_scs_tools_version()}
 """
     write_file(base_path / ".scs" / "config", scs_config)

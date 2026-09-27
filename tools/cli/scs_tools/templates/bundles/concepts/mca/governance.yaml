@@ -1,0 +1,13 @@
+id: bundle:governance
+type: concept
+version: DRAFT
+title: Governance Concept Bundle
+description: Which AI tools are sanctioned, the autonomy default for AI use, and the hard "never" prohibitions
+  company-wide.
+imports: []
+scds:
+- scd:project:governance
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Governance.'

@@ -1,0 +1,32 @@
+# Skeleton SCD. Every TODO is a decision that someone with standing over this concept still has
+# to make. Once real decisions exist, expect this concept to split into several small SCDs.
+# Links between concepts live in the domain ontology, not in `relationships` (an SCD
+# relationship must point at another SCD).
+id: scd:project:portfolio-risk-management
+type: project
+title: Portfolio Risk Management
+version: 0.1.0
+description: Aggregate credit and default risk across the book (distinct from AI operational risk, which
+  lives under ai-accountability).
+concept: concept:portfolio-risk-management
+content:
+  summary: TODO
+  scope:
+  - TODO — e.g., AI could draft portfolio performance summaries
+  prohibited_uses:
+  - TODO
+  decision_authority:
+  - action: Monthly portfolio performance reporting
+    authority: TODO
+  human_oversight:
+  - TODO — e.g., finance sign-off before figures are used
+  data_boundary:
+  - TODO
+  transparency_requirements:
+  - TODO
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: Skeleton generated from the MCA ontology; awaiting real decisions from the person with standing
+    over this concept before it can be approved.

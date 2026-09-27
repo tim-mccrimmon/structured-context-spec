@@ -5,14 +5,15 @@ Bundle command - manage SCS bundles
 import hashlib
 import subprocess
 from datetime import datetime, timezone
-from importlib.metadata import PackageNotFoundError, version as pkg_version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as pkg_version
 from pathlib import Path
 
 import click
 import yaml
 
 from scs_tools.utils.files import get_template_path
-from scs_tools.utils.project_types import PROJECT_TYPES, SOFTWARE_DEVELOPMENT_CONCEPTS
+from scs_tools.utils.project_types import ONTOLOGY_MODELS, PROJECT_TYPES
 
 
 @click.group()
@@ -43,15 +44,17 @@ def list(available):
         scs bundle list --available  # List all available templates
     """
     if available:
-        click.echo("Available concept bundles:\n")
-        for bundle_name in SOFTWARE_DEVELOPMENT_CONCEPTS:
-            click.echo(f"  • {bundle_name}")
+        for model, model_config in ONTOLOGY_MODELS.items():
+            click.echo(f"Available concept bundles - ontology model '{model}':\n")
+            for concept_name in model_config["concepts"]:
+                click.echo(f"  • {concept_name}")
+            click.echo()
 
-        click.echo("\nAvailable domain bundles:\n")
+        click.echo("Available domain bundles:\n")
         for domain_file in sorted((get_template_path() / "bundles" / "domains").glob("*.yaml")):
             click.echo(f"  • {domain_file.stem}")
 
-        click.echo("\nProject types and their bundles:\n")
+        click.echo("\nProject types and their bundles (sdlc ontology only):\n")
         for ptype, config in PROJECT_TYPES.items():
             click.echo(f"  {ptype}:")
             click.echo(f"    Description: {config['description']}")
@@ -145,14 +148,27 @@ def info(bundle_name):
             bundle_path = loc
             break
 
-    # If not found in project, check templates
+    # If not found in project, check templates. Domain bundles aren't namespaced per model.
+    # Concept bundles are - prefer the current project's own ontology model (if any), then
+    # fall back to searching every model.
     if not bundle_path:
+        from scs_tools.commands.add import _read_ontology_model
+
+        ontology = _read_ontology_model(base_path / ".scs" / "config")
+        concept_models = [ontology] + [m for m in ONTOLOGY_MODELS if m != ontology]
+
         template_path = None
-        for kind in ("concepts", "domains"):
-            candidate = get_template_path() / "bundles" / kind / f"{bundle_name}.yaml"
-            if candidate.exists():
-                template_path = candidate
-                break
+        domain_candidate = get_template_path() / "bundles" / "domains" / f"{bundle_name}.yaml"
+        if domain_candidate.exists():
+            template_path = domain_candidate
+        else:
+            for model in concept_models:
+                candidate = (
+                    get_template_path() / "bundles" / "concepts" / model / f"{bundle_name}.yaml"
+                )
+                if candidate.exists():
+                    template_path = candidate
+                    break
         if template_path:
             bundle_path = template_path
             click.echo("(Showing template bundle, not in current project)\n")

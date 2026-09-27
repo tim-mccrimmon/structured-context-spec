@@ -1,0 +1,31 @@
+# Skeleton SCD. Every TODO is a decision that someone with standing over this concept still has
+# to make. Once real decisions exist, expect this concept to split into several small SCDs.
+# Links between concepts live in the domain ontology, not in `relationships` (an SCD
+# relationship must point at another SCD).
+id: scd:project:adoption-rollout
+type: project
+title: Adoption & Rollout
+version: 0.1.0
+description: Phased AI rollout per department, with rollback triggers if a workflow is not working.
+concept: concept:adoption-rollout
+content:
+  summary: TODO — e.g., phased department-by-department rollout
+  scope:
+  - TODO
+  prohibited_uses:
+  - TODO
+  decision_authority:
+  - action: Which department/workflow goes live first
+    authority: TODO — e.g., start with the lowest-risk department
+  human_oversight:
+  - TODO
+  data_boundary:
+  - N/A — process concept, not a data concept
+  transparency_requirements:
+  - TODO
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: Skeleton generated from the MCA ontology; awaiting real decisions from the person with standing
+    over this concept before it can be approved.

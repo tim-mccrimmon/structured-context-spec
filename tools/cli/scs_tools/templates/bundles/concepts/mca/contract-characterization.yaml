@@ -1,0 +1,13 @@
+id: bundle:contract-characterization
+type: concept
+version: DRAFT
+title: Contract Characterization Concept Bundle
+description: The true-sale and reconciliation-provision discipline that keeps a deal a purchase of receivables,
+  not a loan.
+imports: []
+scds:
+- scd:project:contract-characterization
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: Contract Characterization.'

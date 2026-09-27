@@ -1,0 +1,14 @@
+id: bundle:ai-accountability
+type: concept
+version: DRAFT
+title: AI Accountability Concept Bundle
+description: The company AI use policy. The human is the author of record, AI augments judgment and does
+  not replace sign-off authority, chain of custody, and the human-review thresholds before an AI-assisted
+  recommendation becomes an approve/decline/fund action.
+imports: []
+scds:
+- scd:project:ai-accountability
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: 'Concept bundle for the MCA reference ontology: AI Accountability.'

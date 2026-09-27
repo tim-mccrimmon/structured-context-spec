@@ -461,3 +461,225 @@ def test_add_bundle_honours_the_project_types_compliance_settings(tmp_path: Path
         assert CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"]).exit_code == 0
         text = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
         assert ("hipaa-compliance" in text) is expect_hipaa
+
+
+# ------------------------------------------------------ --ontology mca (ISS-029)
+
+MCA_ONTOLOGY_EXAMPLE = REPO / "schema" / "domain" / "examples" / "merchant-cash-advance-domain.yaml"
+MCA_CONCEPTS = {
+    "origination",
+    "underwriting-decisioning",
+    "contract-characterization",
+    "disclosure-compliance",
+    "security-interest-management",
+    "servicing-collections",
+    "capital-funding",
+    "portfolio-risk-management",
+    "broker-partner-management",
+    "data-provenance",
+    "data-security",
+    "systems-integration",
+    "governance",
+    "ai-accountability",
+    "training-competency",
+    "adoption-rollout",
+}
+
+
+def scaffold_mca(tmp_path: Path) -> Path:
+    result = CliRunner().invoke(
+        cli,
+        [
+            "new",
+            "project",
+            "demo",
+            "--ontology",
+            "mca",
+            "--dir",
+            str(tmp_path),
+            "--author",
+            "Test Author",
+            "--email",
+            "test@example.com",
+            "--no-interactive",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    return tmp_path / "demo"
+
+
+def test_mca_scaffold_generates_exactly_the_16_mca_concepts(tmp_path: Path):
+    root = scaffold_mca(tmp_path)
+    generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
+    assert generated == MCA_CONCEPTS
+
+
+def test_mca_scaffold_ignores_type(tmp_path: Path):
+    """--type is sdlc-only; passing it alongside --ontology mca changes nothing about the
+    scaffold (still the full 16-concept set, not a --type variant)."""
+    result = CliRunner().invoke(
+        cli,
+        [
+            "new",
+            "project",
+            "demo",
+            "--ontology",
+            "mca",
+            "--type",
+            "minimal",
+            "--dir",
+            str(tmp_path),
+            "--author",
+            "A",
+            "--email",
+            "a@example.com",
+            "--no-interactive",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    generated = {p.stem for p in (tmp_path / "demo" / "bundles" / "concepts").glob("*.yaml")}
+    assert generated == MCA_CONCEPTS
+
+
+def test_mca_domain_bundle_imports_exactly_the_16_concepts(tmp_path: Path):
+    root = scaffold_mca(tmp_path)
+    domain = yaml.safe_load((root / "bundles/domains/merchant-cash-advance.yaml").read_text())
+    imported = {ref.split(":")[1] for ref in domain["imports"]}
+    assert imported == MCA_CONCEPTS
+
+
+def test_mca_every_scaffolded_bundle_validates(tmp_path: Path):
+    root = scaffold_mca(tmp_path)
+    for path in (
+        [
+            root / "bundles" / f
+            for f in ("project-bundle.yaml", "meta-bundle.yaml", "standards-bundle.yaml")
+        ]
+        + list((root / "bundles" / "concepts").glob("*.yaml"))
+        + list((root / "bundles" / "domains").glob("*.yaml"))
+    ):
+        result = validate_with_validator("--bundle", str(path))
+        assert result.exit_code == 0, f"{path}: {result.output}"
+
+
+def test_mca_every_scaffolded_scd_validates(tmp_path: Path):
+    root = scaffold_mca(tmp_path)
+    for path in (root / "context" / "project").glob("*.yaml"):
+        result = validate_with_validator(str(path))
+        assert result.exit_code == 0, f"{path}: {result.output}"
+
+
+def test_mca_manifest_is_valid_and_has_relationships(tmp_path: Path):
+    root = scaffold_mca(tmp_path)
+    result = validate_with_validator("--domain", str(root / MANIFEST))
+    assert result.exit_code == 0, result.output
+    assert "0 errors" in result.output and "0 warnings" in result.output
+    concepts = _manifest_concepts(root)
+    with_rels = [c for c in concepts if c.get("relationships")]
+    assert len(with_rels) > 0, "expected at least one mca concept to carry relationships"
+
+
+def test_mca_manifest_declares_the_mca_domain(tmp_path: Path):
+    root = scaffold_mca(tmp_path)
+    domain = yaml.safe_load((root / MANIFEST).read_text())["domain"]
+    assert domain["id"] == "domain:merchant-cash-advance"
+    assert "concerns" not in domain
+
+
+def test_mca_reference_data_matches_the_shipped_ontology_example():
+    """Drift guard: MCA_CONCEPTS/MCA_CONCEPT_INFO/MCA_CONCEPT_RELATIONSHIPS in
+    project_types.py must match schema/domain/examples/merchant-cash-advance-domain.yaml
+    exactly - see the note in that module."""
+    if not MCA_ONTOLOGY_EXAMPLE.is_file():
+        pytest.skip("reference ontology example not available")
+    from scs_tools.utils.project_types import (
+        MCA_CONCEPT_INFO,
+        MCA_CONCEPT_RELATIONSHIPS,
+    )
+    from scs_tools.utils.project_types import (
+        MCA_CONCEPTS as MODULE_MCA_CONCEPTS,
+    )
+
+    reference = yaml.safe_load(MCA_ONTOLOGY_EXAMPLE.read_text())["domain"]["ontology"]["concepts"]
+    reference_ids = [c["id"].split(":", 1)[1] for c in reference]
+
+    assert MODULE_MCA_CONCEPTS == reference_ids, "concept id list/order drifted from the example"
+
+    for c in reference:
+        cid = c["id"].split(":", 1)[1]
+        assert MCA_CONCEPT_INFO[cid] == (c["name"], c["description"].strip())
+        assert MCA_CONCEPT_RELATIONSHIPS.get(cid, []) == c.get("relationships", [])
+
+
+def test_mca_scd_config_records_the_ontology_model(tmp_path: Path):
+    root = scaffold_mca(tmp_path)
+    config = (root / ".scs" / "config").read_text()
+    assert "ontology_model: mca" in config
+    assert "scs_version: 0.1.0" not in config  # was hardcoded stale; now the real package version
+
+
+def test_sdlc_scaffold_still_records_sdlc_as_the_ontology_model(tmp_path: Path):
+    root = scaffold(tmp_path, "standard")
+    assert "ontology_model: sdlc" in (root / ".scs" / "config").read_text()
+
+
+def test_add_bundle_and_add_scd_work_inside_an_mca_project(tmp_path: Path, monkeypatch):
+    root = scaffold_mca(tmp_path)
+    (root / "bundles" / "concepts" / "governance.yaml").unlink()
+    (root / "context" / "project" / "governance.yaml").unlink()
+    monkeypatch.chdir(root)
+
+    result = CliRunner().invoke(cli, ["add", "bundle", "governance"])
+    assert result.exit_code == 0, result.output
+    target = root / "bundles" / "concepts" / "governance.yaml"
+    assert validate_with_validator("--bundle", str(target)).exit_code == 0
+
+    result = CliRunner().invoke(cli, ["add", "scd", "governance"])
+    assert result.exit_code == 0, result.output
+    scd_target = root / "context" / "project" / "governance.yaml"
+    assert validate_with_validator(str(scd_target)).exit_code == 0
+
+
+def test_add_bundle_without_ontology_model_in_config_defaults_to_sdlc(tmp_path: Path, monkeypatch):
+    """A project scaffolded before --ontology existed has no ontology_model line at all -
+    add/bundle commands must still default correctly to sdlc, not error."""
+    root = _init_bare_project(tmp_path, monkeypatch)
+    config_file = root / ".scs" / "config"
+    lines = [
+        line
+        for line in config_file.read_text().splitlines()
+        if not line.startswith("ontology_model")
+    ]
+    config_file.write_text("\n".join(lines) + "\n")
+
+    result = CliRunner().invoke(cli, ["add", "bundle", "security"])
+    assert result.exit_code == 0, result.output
+    assert (root / "bundles" / "concepts" / "security.yaml").is_file()
+
+
+def test_bundle_list_available_shows_both_ontology_models(monkeypatch, tmp_path: Path):
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["bundle", "list", "--available"])
+    assert result.exit_code == 0, result.output
+    assert "ontology model 'sdlc'" in result.output
+    assert "ontology model 'mca'" in result.output
+    assert "governance" in result.output  # an mca-only concept name
+    assert "merchant-cash-advance" in result.output
+
+
+def test_bundle_info_finds_an_mca_concept_in_project(tmp_path: Path, monkeypatch):
+    root = scaffold_mca(tmp_path)
+    monkeypatch.chdir(root)
+    result = CliRunner().invoke(cli, ["bundle", "info", "governance"])
+    assert result.exit_code == 0, result.output
+    assert "ID: bundle:governance" in result.output
+
+
+def test_bundle_info_falls_back_to_the_mca_template_outside_a_project(tmp_path: Path, monkeypatch):
+    """governance only exists as an mca concept - the template fallback must search across
+    ontology models, not just sdlc's."""
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["bundle", "info", "governance"])
+    assert result.exit_code == 0, result.output
+    assert "template bundle" in result.output.lower()
+    assert "ID: bundle:governance" in result.output
