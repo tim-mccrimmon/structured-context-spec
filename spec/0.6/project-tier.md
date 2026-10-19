@@ -18,6 +18,14 @@ adopter authors. It appears in two places:
 The two bundles are independent. A Project bundle MUST NOT import the Domain bundle and
 SHOULD NOT repeat its rules (`bundle-format.md`).
 
+The tier identifies **who authors** an SCD, not **where it applies**. An SCD's scope comes
+from the bundle that includes it: through a Domain bundle it applies to all work, through a
+Project bundle to one project. Tools MUST NOT infer an SCD's scope from its tier.
+
+> **Naming note.** The name "Project" is historical: it predates the separation of Domain
+> and Project bundles in 0.6.0. Read it as "adopter-authored". The name is kept because SCD
+> identifiers (`scd:project:<name>`) must stay stable; see ISSUES.md ISS-041.
+
 Project-Tier SCDs describe:
 
 - architecture  

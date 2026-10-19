@@ -341,6 +341,8 @@ rules, which interpret a standard, are project-tier SCDs in its Domain bundle. S
 ### **3.3 Project-Tier**
 Defines the rules and context an organization or project authors for itself: in a Domain
 bundle, the organization's rules; in a Project bundle, the actual system being built.
+The tier identifies the author, not the scope: scope comes from the bundle that includes the
+SCD (`project-tier.md` §1). The name is historical; read it as "adopter-authored".
 
 Project-tier SCDs include:
 - architecture  

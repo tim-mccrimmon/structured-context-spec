@@ -138,7 +138,9 @@ See `standards-tier.md` and `citations.md`.
 ### 5.3 Project-Tier
 
 Defines governance and context for an organization (in a Domain bundle's concept bundles)
-or for a specific project or system (in a Project bundle).
+or for a specific project or system (in a Project bundle). The tier identifies the author
+(the adopter), not the scope; scope comes from the bundle that includes the SCD, and tools
+MUST NOT infer it from the tier (`project-tier.md` §1).
 
 Includes:
 	•	architecture
