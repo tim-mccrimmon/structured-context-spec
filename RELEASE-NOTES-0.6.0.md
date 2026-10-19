@@ -1,6 +1,6 @@
 # SCS 0.6.0 Release Notes
 
-**Released:** pending &nbsp;|&nbsp; **Previous stable:** 0.5.0
+**Released:** 2026-10-19 &nbsp;|&nbsp; **Previous stable:** 0.5.0
 
 ---
 
