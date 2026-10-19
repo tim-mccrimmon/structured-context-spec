@@ -688,6 +688,7 @@ Future versions may introduce:
 ## 15. Related Documentation
 
 - [Standard Citations](citations.md) - How standards are referenced
+- [Runtime Artifact](runtime-artifact.md) - Compiling Domain and Project bundles for runtime delivery
 - [Domain Ontology](domain-ontology.md) - Concepts and Ontology Models
 - [Bundle Lifecycle](../../docs/bundle-lifecycle.md) - How bundles evolve through development
 - [Migration to 0.6.0](../../docs/MIGRATION-0.6.0.md)

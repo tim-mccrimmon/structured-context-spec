@@ -7,6 +7,7 @@ import click
 from scs_tools import __version__
 from scs_tools.commands.add import add
 from scs_tools.commands.bundle import bundle
+from scs_tools.commands.compile import compile
 from scs_tools.commands.init import init
 from scs_tools.commands.new import new
 from scs_tools.commands.validate import validate
@@ -40,6 +41,7 @@ def cli():
         4. Validate before versioning       → scs bundle validate / scs validate
            (also: scs validate --domain <manifest>, --checkpoint <record>)
         5. Create immutable version         → scs bundle version
+        6. Compile for runtime delivery     → scs compile <bundle> -o <artifact>
 
     For detailed help on any command, use: scs [command] --help
     Documentation: https://github.com/SCS-Labs/scs-cli
@@ -53,6 +55,7 @@ cli.add_command(init)
 cli.add_command(add)
 cli.add_command(bundle)
 cli.add_command(validate)
+cli.add_command(compile)
 
 
 if __name__ == "__main__":

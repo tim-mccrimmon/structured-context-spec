@@ -1,0 +1,19 @@
+id: scd:project:ai-review
+type: project
+title: AI Output Review
+version: "1.0.0"
+description: Human review of AI-generated work.
+concept: concept:ai-use
+content:
+  summary: AI output is a draft until a qualified person reviews it.
+  directives:
+    - id: AI-001
+      directive: >-
+        Treat everything you produce as a draft. A qualified person must review and approve AI-generated content before it enters a controlled document, the design history file, or device software.
+    - id: AI-002
+      directive: >-
+        When you are unsure whether a request is allowed under these rules, say so and name the rule instead of guessing.
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  rationale: Initial approved version

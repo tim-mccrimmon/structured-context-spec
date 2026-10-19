@@ -1,0 +1,16 @@
+id: bundle:infusion-pump-fw
+type: project
+version: "0.3.0"
+title: "Infusion Pump Firmware"
+description: >
+  Project governance for the infusion pump firmware program. Organization rules come from the MedTech CDMO Domain bundle, which this bundle does not import.
+imports: []
+scds:
+  - scd:project:software-safety-class
+  - scd:project:release-gates
+
+provenance:
+  created_by: "fw-lead@medtech-cdmo.example"
+  created_at: "2026-10-05T09:00:00Z"
+  version_approved_by: "fw-lead@medtech-cdmo.example"
+  version_approved_at: "2026-10-12T11:30:00Z"

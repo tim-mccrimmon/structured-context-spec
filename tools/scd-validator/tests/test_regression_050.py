@@ -47,22 +47,32 @@ def _bundle_type(path: Path) -> str | None:
     return m.group(1).strip("\"'") if m else None
 
 
-def _example_bundles() -> list[Path]:
-    found = []
-    for p in sorted(EXAMPLES.rglob("*.yaml")):
-        if EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts) or "scds" in p.parts:
-            continue
-        if _bundle_type(p) in BUNDLE_TYPES:
-            found.append(p)
-    return found
+def _doc_id(path: Path) -> str:
+    m = re.search(r"^id:\s*(\S+)", path.read_text(), re.M)
+    return m.group(1).strip("\"'") if m else ""
 
 
-def _example_scds() -> list[Path]:
+def _example_files() -> list[Path]:
     return [
         p
         for p in sorted(EXAMPLES.rglob("*.yaml"))
-        if "scds" in p.parts and not (EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts))
+        if not (EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts))
     ]
+
+
+def _example_bundles() -> list[Path]:
+    # Bundle manifests, not compiled runtime artifacts (which also carry a bundle: id)
+    return [
+        p
+        for p in _example_files()
+        if _doc_id(p).startswith("bundle:")
+        and _bundle_type(p) in BUNDLE_TYPES
+        and not re.search(r"^scs_runtime:", p.read_text(), re.M)
+    ]
+
+
+def _example_scds() -> list[Path]:
+    return [p for p in _example_files() if _doc_id(p).startswith("scd:")]
 
 
 KNOWN_INVALID_BUNDLES: dict[str, str] = {}

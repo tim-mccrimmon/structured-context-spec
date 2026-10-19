@@ -399,6 +399,7 @@ The SCS 0.6.0 specification includes:
 - **meta-tier.md**, **project-tier.md** - SCD structure per tier
 - **standards-tier.md** - Deprecation of the Standards tier and migration
 - **citations.md** - Standard citation references
+- **runtime-artifact.md** - Compiled runtime artifacts for Domain and Project bundles
 - **governance-and-compliance.md** - How SCDs support compliance and autonomic governance
 - **../../schema/** - JSON schemas for bundles, domain manifests, and SCDs
 - **../../examples/** - Complete working examples, including the Software Development and

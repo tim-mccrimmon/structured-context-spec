@@ -316,3 +316,37 @@ def test_project_scd_may_satisfy_another_project_scd(tmp_path: Path):
     )
     result = run("--bundle", str(root))
     assert result.exit_code == 0, result.output
+
+
+# ------------------------------------------------------------------- directives
+
+DIRECTIVES = """  directives:
+    - id: {first}
+      directive: Do the first thing.
+      cites: [std:iso-13485:2016#7.3.9]
+    - id: {second}
+      directive: Do the second thing.
+"""
+
+
+def _directive_scd(tmp_path: Path, first: str, second: str) -> Path:
+    path = scd(tmp_path, "scd:project:rules")
+    text = path.read_text().replace(
+        "  summary: rules\n", "  summary: rules\n" + DIRECTIVES.format(first=first, second=second)
+    )
+    path.write_text(text)
+    return path
+
+
+def test_directives_validate(tmp_path: Path):
+    assert run(str(_directive_scd(tmp_path, "R-001", "R-002"))).exit_code == 0
+
+
+def test_directive_ids_must_be_unique_within_an_scd(tmp_path: Path):
+    result = run(str(_directive_scd(tmp_path, "R-001", "R-001")))
+    assert result.exit_code == 1
+    assert "more than one directive with id 'R-001'" in result.output
+
+
+def test_directive_ids_must_be_well_formed(tmp_path: Path):
+    assert run(str(_directive_scd(tmp_path, "R 001", "R-002"))).exit_code == 1

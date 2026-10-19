@@ -67,6 +67,25 @@ class SemanticValidator:
         # Validate required string fields are not empty
         self._validate_required_strings(scd, scd_id, result, file_path)
 
+        # Directive ids must be unique within the SCD (they become rule ids)
+        content = scd.get("content")
+        directives = content.get("directives") if isinstance(content, dict) else None
+        if isinstance(directives, list):
+            seen: set[str] = set()
+            for directive in directives:
+                directive_id = directive.get("id") if isinstance(directive, dict) else None
+                if directive_id in seen:
+                    result.add_error(
+                        ValidationError(
+                            f"SCD '{scd_id}' has more than one directive with id "
+                            f"'{directive_id}'. Directive ids must be unique within an SCD.",
+                            scd_id=scd_id,
+                            file_path=file_path,
+                        )
+                    )
+                elif directive_id:
+                    seen.add(directive_id)
+
         return result
 
     def _validate_type_tier_match(

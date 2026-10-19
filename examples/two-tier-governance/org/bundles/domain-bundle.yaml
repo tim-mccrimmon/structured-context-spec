@@ -1,0 +1,16 @@
+id: bundle:medtech-cdmo
+type: domain
+version: "1.0.0"
+title: "MedTech CDMO Governance"
+description: >
+  Organization-wide AI governance for MedTech CDMO. Applies to every project, user, and agent.
+imports:
+  - bundle:ai-use:1.0.0
+  - bundle:design-controls:1.0.0
+scds: []
+
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  version_approved_by: "qa-director@medtech-cdmo.example"
+  version_approved_at: "2026-10-10T14:00:00Z"

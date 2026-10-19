@@ -269,7 +269,34 @@
             "additionalProperties": true
           }
         },
-        "rules": {
+        "directives": {
+        "type": "array",
+        "description": "Plain-language statements an agent is expected to follow; the only SCD content compiled into a runtime artifact (spec/0.6/runtime-artifact.md). Distinct from rules, which references external rule sets for enforcement.",
+        "items": {
+          "type": "object",
+          "required": ["id", "directive"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+              "description": "Unique within the SCD; compiled to the rule id <scd-name>/<id>"
+            },
+            "directive": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cites": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "rules": {
           "type": "object",
           "description": "References to external rule sets stored in Rules Database",
           "properties": {

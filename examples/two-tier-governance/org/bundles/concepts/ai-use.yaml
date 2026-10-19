@@ -1,0 +1,16 @@
+id: bundle:ai-use
+type: concept
+version: "1.0.0"
+title: "AI Use"
+description: >
+  How AI assistants may be used in regulated work.
+imports: []
+scds:
+  - scd:project:ai-review
+  - scd:project:confidential-data
+
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  version_approved_by: "qa-director@medtech-cdmo.example"
+  version_approved_at: "2026-10-10T14:00:00Z"

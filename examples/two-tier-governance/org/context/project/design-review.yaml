@@ -1,0 +1,18 @@
+id: scd:project:design-review
+type: project
+title: Design Review Records
+version: "1.0.0"
+description: What a design review record must contain.
+concept: concept:design-controls
+content:
+  summary: Design review records follow the QMS design review procedure.
+  directives:
+    - id: DR-001
+      directive: >-
+        A design review record must identify the design under review, the participants, and the date of the review.
+      cites:
+        - std:iso-13485:2016#7.3.5
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  rationale: Initial approved version
