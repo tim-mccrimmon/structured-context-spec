@@ -177,7 +177,7 @@ rules:
 - id: medtech-cdmo/prohibited/NO-001
   rule: 'Prohibited: consumer generative AI services and personal AI accounts. Use instead: the company''s private AI service.'
 - id: medtech-cdmo/governance-context/M-001
-  rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both.
+  rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both. Facts describe the organization and its environment; treat them as true unless the user corrects them.
 - id: medtech-cdmo/ai-review/AI-001
   rule: Treat everything you produce as a draft. A qualified person must review and approve AI-generated content before it enters a controlled document, the design history file, or device software.
 - id: medtech-cdmo/design-change-control/DCC-001

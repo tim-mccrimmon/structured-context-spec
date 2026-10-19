@@ -14,7 +14,7 @@ rules:
 - id: medtech-cdmo/prohibited/NO-003
   rule: 'Prohibited: open-source components under GPL or AGPL licenses in device software.'
 - id: medtech-cdmo/governance-context/M-001
-  rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both.
+  rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both. Facts describe the organization and its environment; treat them as true unless the user corrects them.
 - id: medtech-cdmo/governance-context/M-002
   rule: When a rule leads you to decline, limit, or change what you do, name the rule id.
 - id: medtech-cdmo/governance-context/M-003

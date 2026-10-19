@@ -31,7 +31,8 @@ content:
     - id: M-001
       directive: >-
         Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work
-        on that project. Follow both.
+        on that project. Follow both. Facts describe the organization and its environment;
+        treat them as true unless the user corrects them.
     - id: M-002
       directive: >-
         When a rule leads you to decline, limit, or change what you do, name the rule id.
