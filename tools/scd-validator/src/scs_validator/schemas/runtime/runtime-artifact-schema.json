@@ -48,8 +48,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-zA-Z0-9._-]+/[A-Za-z0-9][A-Za-z0-9._-]*$",
-            "description": "<scd-name>/<prohibition-or-directive-id>, or <bundle-name>/identity"
+            "pattern": "^[a-zA-Z0-9._-]+/(identity|[a-zA-Z0-9._-]+/[A-Za-z0-9][A-Za-z0-9._-]*)$",
+            "description": "<bundle-name>/<scd-name>/<prohibition-or-directive-id>, or <bundle-name>/identity"
           },
           "rule": {
             "type": "string",
@@ -76,8 +76,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^[a-zA-Z0-9._-]+/[A-Za-z0-9][A-Za-z0-9._-]*$",
-            "description": "<scd-name>/<fact-id>"
+            "pattern": "^[a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+/[A-Za-z0-9][A-Za-z0-9._-]*$",
+            "description": "<bundle-name>/<scd-name>/<fact-id>"
           },
           "fact": {
             "type": "string",

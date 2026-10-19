@@ -296,6 +296,9 @@ def _scaffold(
     else:
         config = {"exclude_scds": []}
         concepts = model_config["concepts"]
+    if kind == "domain" and ontology == "sdlc":
+        # The Global profile: only concepts with organization-wide SCDs
+        concepts = [c for c in concepts if c in _sdlc_domain_scd_mapping()]
     ontology_concepts = list(concepts)
     if kind == "domain":
         concepts = [*DOMAIN_COMMON_CONCEPTS, *concepts]
@@ -334,7 +337,11 @@ def _scaffold(
 
     # Create SCD files
     click.echo("Creating SCD files...")
-    _create_scds(base_path, concepts, variables, config, ontology)
+    created = _create_scds(base_path, kind, concepts, variables, config, ontology)
+    if kind == "domain":
+        # Concept bundle templates list the project profile's SCDs; list what was generated
+        for concept, scd_names in created.items():
+            _set_concept_scds(base_path / "bundles" / "concepts" / f"{concept}.yaml", scd_names)
 
     # Create concept documentation templates. Not yet built for non-sdlc ontology models -
     # skip cleanly rather than warn once per concept.
@@ -398,8 +405,10 @@ def _create_bundles(base_path: Path, kind: str, concepts: list, variables: dict,
             click.echo(f"Warning: Template for concept '{concept}' not found, skipping...")
 
 
-def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict, ontology: str):
-    """Create SCD YAML files"""
+def _create_scds(
+    base_path: Path, kind: str, concepts: list, variables: dict, config: dict, ontology: str
+) -> dict:
+    """Create SCD YAML files. Returns the SCD names created, per concept."""
     templates_root = get_template_path() / "scds"
 
     if ontology != "sdlc":
@@ -407,6 +416,8 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict,
         # e.g. examples/merchant-cash-advance/concepts/*.yaml, which each import exactly the
         # SCD of the same name.
         scd_mapping = {concept: [concept] for concept in concepts}
+    elif kind == "domain":
+        scd_mapping = _sdlc_domain_scd_mapping()
     else:
         scd_mapping = _sdlc_scd_mapping()
     scd_mapping.update({c: scds for c, (_, _, scds) in DOMAIN_COMMON_CONCEPTS.items()})
@@ -415,6 +426,7 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict,
     exclude_scds = config.get("exclude_scds", [])
 
     created = []
+    by_concept: dict = {}
     for concept in concepts:
         scds = scd_mapping.get(concept, [])
         for scd_name in scds:
@@ -427,10 +439,25 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict,
                 dest = base_path / "context" / "project" / f"{scd_name}.yaml"
                 copy_template(scd_template, dest, variables)
                 created.append(dest)
+                by_concept.setdefault(concept, []).append(scd_name)
 
     generated = {f"scd:project:{path.stem}" for path in created}
     for path in created:
         _drop_dangling_relationships(path, generated)
+    return by_concept
+
+
+def _set_concept_scds(bundle_path: Path, scd_names: list):
+    """Replace the `scds:` list of a scaffolded concept bundle with `scd_names`."""
+    if not bundle_path.is_file():
+        return
+    lines = bundle_path.read_text(encoding="utf-8").splitlines(keepends=True)
+    start = next(i for i, ln in enumerate(lines) if ln.rstrip() == "scds:") + 1
+    end = start
+    while end < len(lines) and (not lines[end].strip() or lines[end].lstrip().startswith("- scd:")):
+        end += 1
+    listed = [f"  - scd:project:{name}\n" for name in scd_names]
+    bundle_path.write_text("".join(lines[:start] + listed + ["\n"] + lines[end:]), encoding="utf-8")
 
 
 def _drop_dangling_relationships(scd_path: Path, generated: set):
@@ -538,6 +565,34 @@ def _sdlc_scd_mapping() -> dict:
             "audit-trail",
             "model-bias",
         ],
+    }
+
+
+def _sdlc_domain_scd_mapping() -> dict:
+    """The sdlc Global profile: SCD names per concept for a Domain bundle. Only SCDs that
+    state organization-wide policy or standards; SCDs that describe one system (problem
+    definition, system context, threat model, performance targets, risk register, ...)
+    belong to Project bundles."""
+    return {
+        "architecture": ["tech-stack", "integration-map"],
+        "security": ["authn-authz", "data-protection", "data-handling"],
+        "usability-accessibility": ["ux-principles", "accessibility-compliance"],
+        "compliance-governance": [
+            "soc2-controls",
+            "hipaa-compliance",
+            "chai-adherence",
+            "tefca-participation",
+            "audit-requirements",
+            "policy-enforcement",
+        ],
+        "data-provenance": ["provenance-tracking", "retention-policy"],
+        "testing-validation": ["test-coverage", "qa-procedures", "engineering-practices"],
+        "deployment-operations": [
+            "infrastructure-definition",
+            "observability",
+            "incident-response",
+        ],
+        "ethics-ai-accountability": ["ai-usage-policy", "audit-trail", "model-bias"],
     }
 
 

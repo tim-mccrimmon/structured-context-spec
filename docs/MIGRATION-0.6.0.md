@@ -50,7 +50,8 @@ warning (an ontology template may list SCD slots not yet written).
 | | 0.5.0 | 0.6.0 |
 |---|---|---|
 | `scs new project` | Project, meta, standards, and domain bundles | Project bundle importing concept bundles |
-| `scs new domain` | — | Domain bundle importing `bundle:meta:0.6.0`, `company` and `prohibited` concept bundles, and the ontology's concept bundles |
+| `scs new domain` | — | Domain bundle importing `bundle:meta:0.6.0`, `company` and `prohibited` concept bundles, and the ontology's concept bundles (sdlc: organization-wide SCDs only) |
+| Compiled rule ids | — | `<bundle-name>/<scd-name>/<id>`, unique across Domain and Project artifacts |
 | `scs add bundle <domain>` | Added a domain bundle to a project | Rejected; use `scs new domain` |
 | `scs bundle validate` / `version` | `bundles/project-bundle.yaml` | `bundles/domain-bundle.yaml` or `bundles/project-bundle.yaml` |
 | `scs compile` | — | Compiles a Domain or Project bundle into a runtime artifact |

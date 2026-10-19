@@ -43,8 +43,8 @@ compiles to `Prohibited: consumer generative AI services and personal AI account
 instead: the company's private AI service.` Validation rejects a subject with a qualifier
 such as "unless" or "where possible".
 
-**Directives** become rules with the id `<scd-name>/<directive-id>`, for example
-`design-change-control/DCC-001`:
+**Directives** become rules with the id `<bundle-name>/<scd-name>/<directive-id>`, for
+example `medtech-cdmo/design-change-control/DCC-001`:
 
 ```yaml
 content:
@@ -78,7 +78,7 @@ side by side: Domain first, then Project.
 
 The Domain bundle imports `bundle:meta:0.6.0`, the meta bundle published with the spec
 (`meta/` at the repo root). The tools ship a copy of it, so the import resolves without the
-meta bundle being in the organization's workspace. Its directives (`governance-context/M-*`)
+meta bundle being in the organization's workspace. Its directives (`medtech-cdmo/governance-context/M-*`)
 come first in `global.yaml` and tell the agent how Domain and Project rules combine and how
 to treat citations.
 

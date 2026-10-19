@@ -1,0 +1,50 @@
+id: scd:project:engineering-practices
+type: project
+version: "1.0.0"
+status: DRAFT
+title: "Engineering Practices"
+description: "Organization-wide engineering practices: coding conventions, code review, branching, and dependencies"
+
+domain: testing-validation
+topics:
+  - coding-conventions
+  - code-review
+  - branching
+  - dependency-management
+
+content:
+  summary: "Engineering practices every {{ project_name }} project follows"
+
+  # Each directive is compiled into the rules an AI agent receives. Write one rule per
+  # directive, as the agent should read it. Practices that are forbidden outright belong in
+  # prohibited.yaml (prohibitions), not here.
+  directives: []
+  # Examples:
+  # - id: EP-001
+  #   directive: "Every change is merged through a pull request reviewed by at least one engineer other than the author."
+  # - id: EP-002
+  #   directive: "Follow the language style guide in each repository's CONTRIBUTING file; do not reformat code you were not asked to change."
+  # - id: EP-003
+  #   directive: "Branch from main and name branches <type>/<ticket>-<short-description>."
+  # - id: EP-004
+  #   directive: "Add a third-party dependency only if it is actively maintained and its license is on the approved list."
+
+  # Reference detail for reviewers (not compiled)
+  conventions:
+    languages:
+      - language: "[Language]"
+        style_guide: "[Style guide or linter configuration]"
+    code_review:
+      required_reviewers: "[Number]"
+      checklist: "[Link to review checklist]"
+    branching:
+      model: "[Trunk-based|GitFlow|Other]"
+    dependencies:
+      approved_licenses: ["[MIT]", "[Apache-2.0]"]
+
+relationships: []
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Engineering practices for {{ project_name }}"

@@ -306,7 +306,7 @@ def test_scaffolded_skeletons_do_not_compile_until_directives_are_written(tmp_pa
     )
     # The packaged meta bundle contributes directives; the skeleton SCDs do not.
     assert result.exit_code == 0, result.output
-    assert "governance-context/M-001" in result.stdout
+    assert "demo/governance-context/M-001" in result.stdout
     assert "has no directives" in result.output
 
 
@@ -769,10 +769,12 @@ def test_filled_in_prohibitions_and_facts_compile(tmp_path: Path):
     assert result.exit_code == 0, result.output
     artifact = yaml.safe_load(result.stdout)
     assert artifact["rules"][1] == {
-        "id": "prohibited/NO-001",
+        "id": "demo/prohibited/NO-001",
         "rule": "Prohibited: committing credentials to any repository.",
     }
-    assert artifact["facts"] == [{"id": "company-profile/CO-001", "fact": "Demo builds software."}]
+    assert artifact["facts"] == [
+        {"id": "demo/company-profile/CO-001", "fact": "Demo builds software."}
+    ]
 
 
 def test_add_bundle_and_scd_find_the_common_templates(tmp_path: Path, monkeypatch):
@@ -781,3 +783,60 @@ def test_add_bundle_and_scd_find_the_common_templates(tmp_path: Path, monkeypatc
     assert CliRunner().invoke(cli, ["add", "scd", "prohibited"]).exit_code == 0
     assert (root / "bundles/concepts/prohibited.yaml").is_file()
     assert (root / "context/project/prohibited.yaml").is_file()
+
+
+# ------------------------------------------------------------------ sdlc Global profile
+
+PROJECT_ONLY_SCDS = {
+    "problem-definition",
+    "stakeholders",
+    "business-objectives",
+    "opportunity-analysis",
+    "constraints-and-assumptions",
+    "success-criteria",
+    "system-context",
+    "component-model",
+    "threat-model",
+    "response-time",
+    "availability",
+    "fault-tolerance",
+    "scalability",
+    "error-handling-ux",
+    "data-model",
+    "validation-plan",
+    "risk-assessment",
+    "safety-checklist",
+}
+
+
+@pytest.mark.parametrize("project_type", ["healthcare", "standard"])
+def test_sdlc_domain_uses_the_global_profile(tmp_path: Path, project_type: str):
+    root = scaffold(tmp_path, project_type, kind="domain")
+    scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
+    assert not scds & PROJECT_ONLY_SCDS
+    assert {"engineering-practices", "audit-requirements", "policy-enforcement"} <= scds
+    concepts = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
+    assert not concepts & {"business-context", "performance-reliability", "safety-risk"}
+    assert not (root / "docs" / "business-context").exists()
+
+
+def test_sdlc_domain_concept_bundles_list_only_generated_scds(tmp_path: Path):
+    root = scaffold(tmp_path, "standard", kind="domain")
+    generated = {f"scd:project:{p.stem}" for p in (root / "context" / "project").glob("*.yaml")}
+    listed = set()
+    for path in (root / "bundles" / "concepts").glob("*.yaml"):
+        listed |= set(yaml.safe_load(path.read_text())["scds"])
+    assert listed == generated
+    security = yaml.safe_load((root / "bundles/concepts/security.yaml").read_text())
+    assert security["scds"] == [
+        "scd:project:authn-authz",
+        "scd:project:data-protection",
+        "scd:project:data-handling",
+    ]
+
+
+def test_sdlc_project_keeps_the_full_profile(tmp_path: Path):
+    root = scaffold(tmp_path, "standard")
+    scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
+    assert PROJECT_ONLY_SCDS <= scds
+    assert "engineering-practices" not in scds

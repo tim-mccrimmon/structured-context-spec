@@ -160,7 +160,7 @@
             "id": {
               "type": "string",
               "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
-              "description": "Unique within the SCD; compiled to the rule id <scd-name>/<id>"
+              "description": "Unique within the SCD; compiled to the rule id <bundle-name>/<scd-name>/<id>"
             },
             "directive": {
               "type": "string",

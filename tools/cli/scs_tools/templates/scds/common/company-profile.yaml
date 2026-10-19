@@ -2,7 +2,7 @@
 # Purpose: Facts about the organization that every AI agent should know.
 #
 # Each fact is compiled into the runtime artifact's `facts` list with the id
-# company-profile/<id>. Write one short, verifiable statement per fact. Rules belong in
+# <bundle-name>/company-profile/<id>. Write one short, verifiable statement per fact. Rules belong in
 # directives (other SCDs) or prohibitions (prohibited.yaml), not here.
 
 id: scd:project:company-profile

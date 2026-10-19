@@ -72,6 +72,9 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
     if result.errors:
         return result
 
+    # Ids carry the root bundle's name so a Domain and a Project artifact never share one,
+    # even when both have an SCD of the same name.
+    bundle_name = _short_name(root.id)
     prohibitions: List[Dict[str, Any]] = []
     directives: List[Dict[str, Any]] = []
     facts: List[Dict[str, Any]] = []
@@ -88,7 +91,7 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
                 "finish or remove it before compiling."
             )
             return
-        item_id = f"{_short_name(scd.ref)}/{entry_id}"
+        item_id = f"{bundle_name}/{_short_name(scd.ref)}/{entry_id}"
         if item_id in seen:
             result.errors.append(
                 f"Duplicate rule id {item_id} (from {seen[item_id]} and {scd.ref})."
@@ -123,11 +126,7 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
     if result.errors:
         return result
 
-    bundle_name = _short_name(root.id)
     identity_id = f"{bundle_name}/identity"
-    if identity_id in seen:
-        result.errors.append(f"Rule id {identity_id} is reserved for the self-identification rule.")
-        return result
 
     sources = [f"{b.id}:{b.version}" for b in tree.bundles[1:]]
     title = " ".join(str(root.data.get("title", "")).split())

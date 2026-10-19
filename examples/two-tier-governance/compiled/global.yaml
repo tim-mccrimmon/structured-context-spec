@@ -7,39 +7,39 @@ sources: ['bundle:meta:0.6.0', 'bundle:company:1.0.0', 'bundle:prohibited:1.0.0'
 rules:
 - id: medtech-cdmo/identity
   rule: 'When asked which governance bundles are active, state: "Domain bundle bundle:medtech-cdmo version 1.0.0".'
-- id: prohibited/NO-001
+- id: medtech-cdmo/prohibited/NO-001
   rule: 'Prohibited: consumer generative AI services and personal AI accounts. Use instead: the company''s private AI service.'
-- id: prohibited/NO-002
+- id: medtech-cdmo/prohibited/NO-002
   rule: 'Prohibited: committing credentials, keys, or tokens to any repository.'
-- id: prohibited/NO-003
+- id: medtech-cdmo/prohibited/NO-003
   rule: 'Prohibited: open-source components under GPL or AGPL licenses in device software.'
-- id: governance-context/M-001
+- id: medtech-cdmo/governance-context/M-001
   rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both.
-- id: governance-context/M-002
+- id: medtech-cdmo/governance-context/M-002
   rule: When a rule leads you to decline, limit, or change what you do, name the rule id.
-- id: governance-context/M-003
+- id: medtech-cdmo/governance-context/M-003
   rule: A citation such as std:iso-13485:2016#7.3.9 names a standard and clause; it does not contain the standard's text. Do not present wording from memory as the text of a cited standard.
-- id: ai-review/AI-001
+- id: medtech-cdmo/ai-review/AI-001
   rule: Treat everything you produce as a draft. A qualified person must review and approve AI-generated content before it enters a controlled document, the design history file, or device software.
-- id: ai-review/AI-002
+- id: medtech-cdmo/ai-review/AI-002
   rule: When you are unsure whether a request is allowed under these rules, say so and name the rule instead of guessing.
-- id: confidential-data/CD-001
+- id: medtech-cdmo/confidential-data/CD-001
   rule: Treat each client's design files, specifications, and test data as confidential to that client. Do not use one client's information in work for another client.
-- id: confidential-data/CD-002
+- id: medtech-cdmo/confidential-data/CD-002
   rule: Do not include patient health information in responses. If a request contains it, ask the user to remove it.
-- id: design-review/DR-001
+- id: medtech-cdmo/design-review/DR-001
   rule: A design review record must identify the design under review, the participants, and the date of the review.
   cites: ['std:iso-13485:2016#7.3.5']
-- id: design-change-control/DCC-001
+- id: medtech-cdmo/design-change-control/DCC-001
   rule: Design changes require documented review and approval before implementation.
   cites: ['std:iso-13485:2016#7.3.9']
-- id: design-change-control/DCC-002
+- id: medtech-cdmo/design-change-control/DCC-002
   rule: Do not describe a design change as approved unless the approval record is identified.
 facts:
-- id: company-profile/CO-001
+- id: medtech-cdmo/company-profile/CO-001
   fact: MedTech CDMO designs and manufactures medical devices under contract. Each client owns the designs, specifications, and test data for its devices.
-- id: company-profile/CO-002
+- id: medtech-cdmo/company-profile/CO-002
   fact: The quality management system is certified to ISO 13485:2016.
   cites: ['std:iso-13485:2016']
-- id: company-profile/CO-003
+- id: medtech-cdmo/company-profile/CO-003
   fact: Controlled documents and design history files are kept in the electronic quality management system, not in shared drives or source repositories.

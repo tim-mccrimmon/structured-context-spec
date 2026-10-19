@@ -71,6 +71,13 @@ scs new domain acme-health
 scs new domain acme-funding --ontology mca
 ```
 
+Every Domain workspace gets `company` (facts about the organization) and `prohibited`
+(binary prohibitions) concept bundles. For the sdlc ontology, a Domain workspace uses the
+**Global profile**: only SCDs that state organization-wide policy or standards (tech stack,
+security, compliance, retention, engineering practices, operations, AI use). SCDs that
+describe one system, such as problem definition, system context, threat model, performance
+targets, and the risk register, are scaffolded only by `scs new project`.
+
 Project workspaces:
 
 ```bash

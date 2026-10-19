@@ -279,7 +279,7 @@
             "id": {
               "type": "string",
               "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
-              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to the rule id <scd-name>/<id>"
+              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to the rule id <bundle-name>/<scd-name>/<id>"
             },
             "directive": {
               "type": "string",
@@ -306,7 +306,7 @@
             "id": {
               "type": "string",
               "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
-              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to <scd-name>/<id>"
+              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to <bundle-name>/<scd-name>/<id>"
             },
             "kind": {
               "type": "string",
@@ -348,7 +348,7 @@
             "id": {
               "type": "string",
               "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
-              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to <scd-name>/<id>"
+              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to <bundle-name>/<scd-name>/<id>"
             },
             "fact": {
               "type": "string",
