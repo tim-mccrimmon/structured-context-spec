@@ -840,3 +840,98 @@ def test_sdlc_project_keeps_the_full_profile(tmp_path: Path):
     scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
     assert PROJECT_ONLY_SCDS <= scds
     assert "engineering-practices" not in scds
+
+
+# ---------------------------------------------------------------------- cdmo ontology
+
+CDMO_ONTOLOGY_EXAMPLE = REPO / "schema" / "domain" / "examples" / "medical-device-cdmo-domain.yaml"
+CDMO_EXAMPLE = REPO / "examples" / "medical-device-cdmo"
+
+
+def scaffold_cdmo(tmp_path: Path, kind: str = "project") -> Path:
+    result = CliRunner().invoke(
+        cli,
+        ["new", kind, "demo", "--ontology", "cdmo", "--dir", str(tmp_path)]
+        + ["--author", "A", "--email", "a@example.com", "--no-interactive"],
+    )
+    assert result.exit_code == 0, result.output
+    return tmp_path / "demo"
+
+
+def test_cdmo_reference_data_matches_the_shipped_ontology_and_example():
+    """Drift guard: the CDMO_* data in project_types.py must match the ontology manifest and
+    the example concept bundles exactly."""
+    if not CDMO_ONTOLOGY_EXAMPLE.is_file():
+        pytest.skip("reference ontology example not available")
+    from scs_tools.utils import project_types as pt
+
+    concepts = yaml.safe_load(CDMO_ONTOLOGY_EXAMPLE.read_text())["domain"]["ontology"]["concepts"]
+    assert pt.CDMO_CONCEPTS == [c["id"].split(":")[1] for c in concepts]
+    for c in concepts:
+        cid = c["id"].split(":")[1]
+        assert pt.CDMO_CONCEPT_INFO[cid] == (c["name"], " ".join(c["description"].split()))
+        assert pt.CDMO_CONCEPT_RELATIONSHIPS.get(cid, []) == c.get("relationships", [])
+        assert pt.CDMO_CONCEPT_SATISFIES.get(cid, []) == c.get("satisfies", [])
+        bundle = yaml.safe_load((CDMO_EXAMPLE / "concepts" / f"{cid}.yaml").read_text())
+        assert [s.split(":")[2] for s in bundle["scds"]] == pt.CDMO_CONCEPT_SCDS[cid]
+
+
+def test_cdmo_domain_profile_is_a_subset_of_the_ontology():
+    from scs_tools.utils import project_types as pt
+
+    for concept, scds in pt.CDMO_DOMAIN_CONCEPT_SCDS.items():
+        assert set(scds) <= set(pt.CDMO_CONCEPT_SCDS[concept]), concept
+    assert "prohibited-uses" not in pt.CDMO_DOMAIN_CONCEPT_SCDS["compliance-governance"]
+
+
+def test_every_cdmo_slot_has_a_template():
+    from scs_tools.utils.project_types import CDMO_CONCEPT_SCDS
+
+    templates = REPO / "tools" / "cli" / "scs_tools" / "templates" / "scds" / "cdmo"
+    assert {p.stem for p in templates.glob("*.yaml")} == {
+        s for scds in CDMO_CONCEPT_SCDS.values() for s in scds
+    }
+
+
+def test_cdmo_project_scaffolds_every_slot_and_validates(tmp_path: Path):
+    root = scaffold_cdmo(tmp_path)
+    scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
+    assert len(scds) == 48 and "prohibited-uses" in scds and "risk-register" in scds
+    result = validate_with_validator("--bundle", str(root / "bundles/project-bundle.yaml"))
+    assert result.exit_code == 0, result.output
+    for path in sorted((root / "context" / "project").glob("*.yaml")):
+        assert validate_with_validator(str(path)).exit_code == 0, path.name
+
+
+def test_cdmo_domain_uses_the_global_profile(tmp_path: Path):
+    root = scaffold_cdmo(tmp_path, kind="domain")
+    scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
+    assert len(scds) == 30
+    assert {"prohibited", "company-profile", "agent-autonomy-rules"} <= scds
+    assert not scds & {"prohibited-uses", "risk-register", "cutover-plan", "program-objectives"}
+    concepts = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
+    assert not concepts & {"business-context", "system-architecture", "implementation-cutover"}
+    manifest = root / "domain" / "domain-manifest.yaml"
+    assert validate_with_validator("--domain", str(manifest)).exit_code == 0
+    entries = yaml.safe_load(manifest.read_text())["domain"]["ontology"]["concepts"]
+    risk = next(c for c in entries if c["id"] == "concept:risk-management")
+    assert risk["satisfies"] == ["std:iso-14971:2019"]
+    result = validate_with_validator("--bundle", str(root / "bundles/domain-bundle.yaml"))
+    assert result.exit_code == 0, result.output
+
+
+def test_cdmo_example_directive_compiles_once_uncommented(tmp_path: Path):
+    root = scaffold_cdmo(tmp_path, kind="domain")
+    scd = root / "context" / "project" / "agent-autonomy-rules.yaml"
+    scd.write_text(
+        scd.read_text().replace(
+            "  directives: []\n  # Examples:\n  # - id: AAR-001\n  #   directive:",
+            "  directives:\n  - id: AAR-001\n    directive:",
+        )
+    )
+    result = CliRunner().invoke(
+        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft"]
+    )
+    assert result.exit_code == 0, result.output
+    ids = [r["id"] for r in yaml.safe_load(result.stdout)["rules"]]
+    assert "demo/agent-autonomy-rules/AAR-001" in ids

@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: ai-accountability).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:accountability-assignment
+type: project
+title: "Accountability Assignment"
+version: "DRAFT"
+description: "Who is accountable for AI-assisted output"
+concept: concept:ai-accountability
+content:
+  summary: "TODO - in a sentence or two, accountability assignment at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: AA-001
+  #   fact: "The engineer who signs off AI-assisted output is accountable for it as if they had written it."
+  assignments: "TODO - each output type and the role accountable for it"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Accountability Assignment skeleton from the Medical-Device CDMO ontology"

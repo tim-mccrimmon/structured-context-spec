@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: ai-accountability).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:non-decision-principle
+type: project
+title: "Non-Decision Principle"
+version: "DRAFT"
+description: "Decisions an AI assistant must never make"
+concept: concept:ai-accountability
+content:
+  summary: "TODO - in a sentence or two, non-decision principle at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: NDP-001
+  #   directive: "Do not make or state quality, release, or regulatory decisions. Present options and evidence for a qualified person to decide."
+  reserved_decisions: "TODO - the decision types reserved for people"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Non-Decision Principle skeleton from the Medical-Device CDMO ontology"

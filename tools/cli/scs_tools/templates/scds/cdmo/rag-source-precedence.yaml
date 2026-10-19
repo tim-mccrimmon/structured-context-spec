@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: data-provenance).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:rag-source-precedence
+type: project
+title: "Source Precedence"
+version: "DRAFT"
+description: "Which sources an assistant should prefer when they conflict"
+concept: concept:data-provenance
+content:
+  summary: "TODO - in a sentence or two, source precedence at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: RSP-001
+  #   directive: "When sources conflict, prefer the approved, effective controlled document over drafts, email, or meeting notes, and say which source you used."
+  precedence: "TODO - the ordered list of source types, highest first"
+  conflict_rule: "TODO - what to do when sources of equal rank disagree"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Source Precedence skeleton from the Medical-Device CDMO ontology"

@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: data-provenance).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:data-classification
+type: project
+title: "Data Classification"
+version: "DRAFT"
+description: "The data-classification scheme, with examples for each class"
+concept: concept:data-provenance
+content:
+  summary: "TODO - in a sentence or two, data classification at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: DC-001
+  #   fact: "Client-confidential data includes client design files, specifications, test data, and program correspondence."
+  classes: "TODO - each class, its definition, examples, and handling rules"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data Classification skeleton from the Medical-Device CDMO ontology"

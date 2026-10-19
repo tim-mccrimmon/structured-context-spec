@@ -1,0 +1,18 @@
+id: bundle:business-context
+type: concept
+version: "DRAFT"
+title: "Business Context Concept Bundle"
+description: "Business context for a medical-device CDMO program: objectives and business case, explicit scope boundaries, measurable success criteria, and the client-program context the work serves."
+
+imports: []
+
+scds:
+  - scd:project:program-objectives
+  - scd:project:scope-definition
+  - scd:project:success-criteria
+  - scd:project:client-program-context
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Business Context concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: security).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:validated-system-boundaries
+type: project
+title: "Validated System Boundaries"
+version: "DRAFT"
+description: "What an AI assistant may and may not do in validated and QMS systems"
+concept: concept:security
+content:
+  summary: "TODO - in a sentence or two, validated system boundaries at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: VSB-001
+  #   directive: "Treat validated QMS systems as read-only. Propose changes for a qualified user to make."
+  systems: "TODO - each validated system and the actions permitted in it"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Validated System Boundaries skeleton from the Medical-Device CDMO ontology"

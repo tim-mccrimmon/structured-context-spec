@@ -1,0 +1,24 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: compliance-governance).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:electronic-records-controls
+type: project
+title: "Electronic Records Controls"
+version: "DRAFT"
+description: "Part 11 controls on electronic records and signatures that AI-assisted work must respect"
+concept: concept:compliance-governance
+content:
+  summary: "TODO - in a sentence or two, electronic records controls at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: ERC-001
+  #   directive: "Do not create, modify, or sign an electronic record in a validated system. Prepare the content for a qualified user to enter."
+  #   cites: [std:21-cfr-11]
+  validated_systems: "TODO - the systems holding Part 11 records"
+  signature_rules: "TODO - who may sign which records, and how"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Electronic Records Controls skeleton from the Medical-Device CDMO ontology"

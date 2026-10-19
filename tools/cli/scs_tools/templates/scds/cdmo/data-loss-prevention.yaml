@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: security).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:data-loss-prevention
+type: project
+title: "Data Loss Prevention"
+version: "DRAFT"
+description: "Data-loss-prevention controls at the AI boundary"
+concept: concept:security
+content:
+  summary: "TODO - in a sentence or two, data loss prevention at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: DLP-001
+  #   directive: "Do not paste, upload, or summarize client-confidential data into a tool outside the approved tier for that data."
+  controls: "TODO - the DLP controls in place and the channels they cover"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data Loss Prevention skeleton from the Medical-Device CDMO ontology"

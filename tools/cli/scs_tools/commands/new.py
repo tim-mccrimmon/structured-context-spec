@@ -126,7 +126,7 @@ def domain(name, project_type, ontology, directory, author, email, interactive, 
     ontology model, imports the published meta bundle and one concept bundle per concept,
     and is compiled with `scs compile bundles/domain-bundle.yaml`.
 
-    Ontology models: sdlc (default), mca.
+    Ontology models: sdlc (default), mca, cdmo.
 
     \b
     Examples:
@@ -162,7 +162,7 @@ def project(name, project_type, ontology, directory, author, email, interactive,
     By default, prompts for missing required information interactively.
     Use --no-interactive to disable prompts and require all flags.
 
-    Ontology models: sdlc (default), mca. Project types (--type, sdlc only): healthcare,
+    Ontology models: sdlc (default), mca, cdmo. Project types (--type, sdlc only): healthcare,
     fintech, saas, government, minimal, standard
 
     \b
@@ -299,6 +299,8 @@ def _scaffold(
     if kind == "domain" and ontology == "sdlc":
         # The Global profile: only concepts with organization-wide SCDs
         concepts = [c for c in concepts if c in _sdlc_domain_scd_mapping()]
+    elif kind == "domain" and "domain_scds" in model_config:
+        concepts = [c for c in concepts if c in model_config["domain_scds"]]
     ontology_concepts = list(concepts)
     if kind == "domain":
         concepts = [*DOMAIN_COMMON_CONCEPTS, *concepts]
@@ -371,7 +373,15 @@ def _create_domain_manifest(base_path: Path, concepts: list, variables: dict, mo
         **model_config["concept_info"],
         **{c: (name, desc) for c, (name, desc, _) in DOMAIN_COMMON_CONCEPTS.items()},
     }
-    concept_info = get_concept_info(concepts, info_map, model_config["relationships"])
+    # A profile may leave concepts out; drop relationships to them so the manifest resolves
+    present = {f"concept:{c}" for c in concepts}
+    relationships = {
+        c: [rel for rel in rels if rel["target"] in present]
+        for c, rels in model_config["relationships"].items()
+    }
+    concept_info = get_concept_info(
+        concepts, info_map, relationships, model_config.get("satisfies")
+    )
     copy_template(
         manifest_template,
         base_path / "domain" / "domain-manifest.yaml",
@@ -410,9 +420,12 @@ def _create_scds(
 ) -> dict:
     """Create SCD YAML files. Returns the SCD names created, per concept."""
     templates_root = get_template_path() / "scds"
+    model_config = get_ontology_model_config(ontology)
 
-    if ontology != "sdlc":
-        # Every other ontology model maps one SCD per concept (concept id == scd id) - see
+    if "scds" in model_config:
+        scd_mapping = dict(model_config["domain_scds" if kind == "domain" else "scds"])
+    elif ontology != "sdlc":
+        # Other ontology models map one SCD per concept (concept id == scd id) - see
         # e.g. examples/merchant-cash-advance/concepts/*.yaml, which each import exactly the
         # SCD of the same name.
         scd_mapping = {concept: [concept] for concept in concepts}

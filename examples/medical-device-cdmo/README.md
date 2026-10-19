@@ -27,8 +27,20 @@ It adapts the software-development reference domain to a regulated medical-devic
 This directory contains the **generic** domain structure only — concept definitions and the SCD
 *slots* a CDMO program would fill. It contains **no** organization-specific rules, values, or data.
 A specific CDMO's actual context (its tier definitions, its retention periods, its program data) is
-authored as project-tier SCDs in that organization's **own private workspace**, which imports this
-domain by version. The structure is generic; the values are the organization's.
+authored in that organization's **own private workspace**, scaffolded from this ontology. The
+structure is generic; the values are the organization's.
+
+```bash
+scs new domain acme-cdmo --ontology cdmo        # organization-wide (Global) context
+scs new project client-x-program --ontology cdmo  # one client program
+```
+
+The Domain workspace gets the organization-wide slots (compliance and AI tiers, data
+classification and segregation, security, validation approach, risk acceptability, AI
+accountability, training, QMS records, supplier qualification) plus `company-profile` and
+`prohibited`. A Project workspace gets all 48 slots, including the program-specific ones
+(objectives, architecture, requirements, risk register, cutover). Each skeleton SCD says
+whether its content compiles as directives, facts, or prohibitions.
 
 ## Layout
 

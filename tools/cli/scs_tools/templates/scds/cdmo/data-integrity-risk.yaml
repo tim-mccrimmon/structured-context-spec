@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: risk-management).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:data-integrity-risk
+type: project
+title: "Data Integrity Risk"
+version: "DRAFT"
+description: "Data-integrity risks for the program and their controls"
+concept: concept:risk-management
+content:
+  summary: "TODO - in a sentence or two, data integrity risk at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: DIR-001
+  #   fact: "Migration risk DI-03 (record truncation) is controlled by field-length checks in OQ-22."
+  risks: "TODO - each data-integrity risk and its control"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data Integrity Risk skeleton from the Medical-Device CDMO ontology"

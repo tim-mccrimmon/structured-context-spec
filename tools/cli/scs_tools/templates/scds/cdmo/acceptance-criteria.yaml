@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: verification-validation).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:acceptance-criteria
+type: project
+title: "Acceptance Criteria"
+version: "DRAFT"
+description: "Quantitative acceptance criteria for the program's validation"
+concept: concept:verification-validation
+content:
+  summary: "TODO - in a sentence or two, acceptance criteria at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: AC-001
+  #   fact: "OQ-22 passes only at a 100% record-count match between source and target."
+  criteria: "TODO - each criterion, its protocol, and its threshold"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Acceptance Criteria skeleton from the Medical-Device CDMO ontology"

@@ -1,0 +1,18 @@
+id: bundle:supplier-qualification
+type: concept
+version: "DRAFT"
+title: "Supplier Qualification Concept Bundle"
+description: "Supplier and vendor qualification for a medical-device CDMO: GAMP supplier assessment for platform vendors, per-tier vendor approval, re-qualification triggers, and AI-vendor qualification (SOC 2, BAA, model provenance, training opt-out)."
+
+imports: []
+
+scds:
+  - scd:project:supplier-assessment
+  - scd:project:vendor-tier-approval
+  - scd:project:requalification-triggers
+  - scd:project:ai-vendor-qualification
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Supplier Qualification concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: system-architecture).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:target-data-model
+type: project
+title: "Target Data Model"
+version: "DRAFT"
+description: "The target data and object model for the program"
+concept: concept:system-architecture
+content:
+  summary: "TODO - in a sentence or two, target data model at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: TDM-001
+  #   fact: "The approved target objects are [X], [Y], and [Z]."
+  objects: "TODO - each object, its key fields, and its system of record"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Target Data Model skeleton from the Medical-Device CDMO ontology"

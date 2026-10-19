@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: compliance-governance).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:agent-autonomy-rules
+type: project
+title: "Agent Autonomy Rules"
+version: "DRAFT"
+description: "What an AI assistant may do without named human sign-off, by workflow type"
+concept: concept:compliance-governance
+content:
+  summary: "TODO - in a sentence or two, agent autonomy rules at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: AAR-001
+  #   directive: "You may draft controlled documents. Do not submit, approve, or release them."
+  workflows: "TODO - each workflow type, the autonomy level allowed, and the sign-off required"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Agent Autonomy Rules skeleton from the Medical-Device CDMO ontology"

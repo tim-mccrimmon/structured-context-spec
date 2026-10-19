@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: implementation-cutover).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:rollback-criteria
+type: project
+title: "Rollback Criteria"
+version: "DRAFT"
+description: "When and how the program rolls back a cutover"
+concept: concept:implementation-cutover
+content:
+  summary: "TODO - in a sentence or two, rollback criteria at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: RC-001
+  #   fact: "Roll back if reconciliation is below 99% or a validated interface fails."
+  procedure: "TODO - the rollback procedure and who decides"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Rollback Criteria skeleton from the Medical-Device CDMO ontology"

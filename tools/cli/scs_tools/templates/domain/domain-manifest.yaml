@@ -25,6 +25,8 @@ domain:
 {% if concept.relationships %}        relationships:
 {% for rel in concept.relationships %}          - type: {{ rel.type }}
             target: {{ rel.target }}
+{% endfor %}{% endif %}{% if concept.satisfies %}        satisfies:
+{% for citation in concept.satisfies %}          - {{ citation }}
 {% endfor %}{% endif %}
 {% endfor %}
   # Shared base SCD schemas from the core spec, as in the reference domains.

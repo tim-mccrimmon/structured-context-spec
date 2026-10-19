@@ -1,0 +1,27 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: compliance-governance).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:regulatory-applicability
+type: project
+title: "Regulatory Applicability"
+version: "DRAFT"
+description: "Which regulations and standards bind the organization's work, and the activities each covers"
+concept: concept:compliance-governance
+content:
+  summary: "TODO - in a sentence or two, regulatory applicability at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: RA-001
+  #   fact: "The quality management system is certified to ISO 13485:2016 and covers design transfer and manufacturing of client devices."
+  #   cites: [std:iso-13485:2016]
+  # - id: RA-002
+  #   fact: "Electronic records and signatures in the eQMS are subject to 21 CFR Part 11."
+  #   cites: [std:21-cfr-11]
+  regulations: "TODO - each regulation or standard, the activities it covers, and its owner"
+  not_applicable: "TODO - regulations considered and ruled out, with the reason"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Regulatory Applicability skeleton from the Medical-Device CDMO ontology"

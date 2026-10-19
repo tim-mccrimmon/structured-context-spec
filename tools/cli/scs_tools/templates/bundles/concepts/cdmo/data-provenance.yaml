@@ -1,0 +1,19 @@
+id: bundle:data-provenance
+type: concept
+version: "DRAFT"
+title: "Data & Provenance Concept Bundle"
+description: "Data governance for a medical-device CDMO: classification scheme, source-to-target lineage, ALCOA+ integrity, RAG source-precedence rules, and client-program data segregation."
+
+imports: []
+
+scds:
+  - scd:project:data-classification
+  - scd:project:data-lineage
+  - scd:project:data-integrity-alcoa
+  - scd:project:rag-source-precedence
+  - scd:project:client-program-segregation
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data & Provenance concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

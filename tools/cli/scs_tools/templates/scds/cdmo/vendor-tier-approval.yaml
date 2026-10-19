@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: supplier-qualification).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:vendor-tier-approval
+type: project
+title: "Vendor Tier Approval"
+version: "DRAFT"
+description: "Which vendors are approved for which AI deployment tiers"
+concept: concept:supplier-qualification
+content:
+  summary: "TODO - in a sentence or two, vendor tier approval at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: VTA-001
+  #   fact: "Vendor V is approved for tier 2. Its tier-3 approval is pending."
+  vendors: "TODO - each vendor, its approved tiers, and the approval date"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Vendor Tier Approval skeleton from the Medical-Device CDMO ontology"

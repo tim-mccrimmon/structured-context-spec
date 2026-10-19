@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: training-competency).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:qualified-reviewer-definition
+type: project
+title: "Qualified Reviewer Definition"
+version: "DRAFT"
+description: "Who may review and approve AI-assisted output"
+concept: concept:training-competency
+content:
+  summary: "TODO - in a sentence or two, qualified reviewer definition at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: QRD-001
+  #   fact: "A qualified reviewer for AI-assisted controlled records is an engineer with current Part 11 training and approval authority in the eQMS."
+  criteria: "TODO - the qualifications a reviewer must hold"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Qualified Reviewer Definition skeleton from the Medical-Device CDMO ontology"

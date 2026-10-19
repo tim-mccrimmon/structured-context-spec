@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: risk-management).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:risk-acceptability-criteria
+type: project
+title: "Risk Acceptability Criteria"
+version: "DRAFT"
+description: "When residual risk is acceptable, under the organization's risk management process"
+concept: concept:risk-management
+content:
+  summary: "TODO - in a sentence or two, risk acceptability criteria at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: RAC-001
+  #   fact: "Residual risk is acceptable only when rated [Low] on the probability-severity matrix, or when [role] approves it."
+  #   cites: [std:iso-14971:2019]
+  matrix: "TODO - the probability and severity scales and the acceptability matrix"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Risk Acceptability Criteria skeleton from the Medical-Device CDMO ontology"

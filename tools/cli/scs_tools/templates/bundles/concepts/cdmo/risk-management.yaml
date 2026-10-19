@@ -1,0 +1,18 @@
+id: bundle:risk-management
+type: concept
+version: "DRAFT"
+title: "Risk Management Concept Bundle"
+description: "Risk management for a medical-device CDMO program: the risk register (probability x severity with controls), risk-to-requirement-to- controlling-deliverable traceability, data-integrity risk controls, and risk-acceptability criteria per ISO 14971."
+
+imports: []
+
+scds:
+  - scd:project:risk-register
+  - scd:project:risk-traceability
+  - scd:project:data-integrity-risk
+  - scd:project:risk-acceptability-criteria
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Risk Management concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

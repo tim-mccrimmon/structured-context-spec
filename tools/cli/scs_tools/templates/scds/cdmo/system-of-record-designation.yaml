@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: qms-records).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:system-of-record-designation
+type: project
+title: "System of Record Designation"
+version: "DRAFT"
+description: "Which systems are authoritative for which records"
+concept: concept:qms-records
+content:
+  summary: "TODO - in a sentence or two, system of record designation at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: SOR-001
+  #   fact: "The eQMS is the system of record for controlled documents. AI output is a working artifact until a qualified user transfers it there."
+  systems: "TODO - each record type and its system of record"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "System of Record Designation skeleton from the Medical-Device CDMO ontology"

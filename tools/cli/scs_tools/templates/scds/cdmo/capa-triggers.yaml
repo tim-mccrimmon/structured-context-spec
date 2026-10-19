@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: qms-records).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:capa-triggers
+type: project
+title: "CAPA Triggers"
+version: "DRAFT"
+description: "What triggers corrective and preventive action, and the assistant's part in it"
+concept: concept:qms-records
+content:
+  summary: "TODO - in a sentence or two, capa triggers at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: CT-001
+  #   directive: "If you find a possible nonconformance, say so and direct the user to the CAPA process. Do not open or close a CAPA yourself."
+  #   cites: [std:iso-13485:2016#8.5.2]
+  triggers: "TODO - each trigger and who evaluates it"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "CAPA Triggers skeleton from the Medical-Device CDMO ontology"

@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: data-provenance).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:client-program-segregation
+type: project
+title: "Client Program Segregation"
+version: "DRAFT"
+description: "How each client program's data is kept separate from every other program's"
+concept: concept:data-provenance
+content:
+  summary: "TODO - in a sentence or two, client program segregation at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: CPS-001
+  #   directive: "Use only the sources assigned to the current client program. Do not draw on another client's documents or data."
+  programs: "TODO - each program and its permitted sources"
+  mechanism: "TODO - how segregation is enforced (workspaces, access groups, indexes)"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Client Program Segregation skeleton from the Medical-Device CDMO ontology"

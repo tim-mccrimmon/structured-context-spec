@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: business-context).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:program-objectives
+type: project
+title: "Program Objectives"
+version: "DRAFT"
+description: "The program's objectives and business case"
+concept: concept:business-context
+content:
+  summary: "TODO - in a sentence or two, program objectives at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: PO-001
+  #   fact: "This program migrates controlled records from System A to System B across three sites by [date]."
+  business_case: "TODO - why the program exists and who sponsors it"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Program Objectives skeleton from the Medical-Device CDMO ontology"

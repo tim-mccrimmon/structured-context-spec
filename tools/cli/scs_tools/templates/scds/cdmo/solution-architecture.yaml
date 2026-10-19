@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: system-architecture).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:solution-architecture
+type: project
+title: "Solution Architecture"
+version: "DRAFT"
+description: "The target system design and configuration for the program"
+concept: concept:system-architecture
+content:
+  summary: "TODO - in a sentence or two, solution architecture at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: SA-001
+  #   fact: "The target eQMS is System B, configured with the objects listed in the approved solution design."
+  components: "TODO - the systems and configuration in the target design"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Solution Architecture skeleton from the Medical-Device CDMO ontology"

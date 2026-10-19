@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: ai-accountability).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:human-authority
+type: project
+title: "Human Authority"
+version: "DRAFT"
+description: "The human sign-off gates for AI-assisted work"
+concept: concept:ai-accountability
+content:
+  summary: "TODO - in a sentence or two, human authority at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: HA-001
+  #   directive: "AI output enters a controlled record only after sign-off by a named, qualified engineer."
+  gates: "TODO - each gate, what it covers, and who signs"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Human Authority skeleton from the Medical-Device CDMO ontology"

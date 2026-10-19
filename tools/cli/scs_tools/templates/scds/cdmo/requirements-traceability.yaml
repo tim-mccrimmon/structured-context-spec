@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: verification-validation).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:requirements-traceability
+type: project
+title: "Requirements Traceability"
+version: "DRAFT"
+description: "How the program's requirements are identified and traced"
+concept: concept:verification-validation
+content:
+  summary: "TODO - in a sentence or two, requirements traceability at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: RT-001
+  #   directive: "Refer to requirements by their URS id (for example URS-014). Do not renumber or paraphrase requirement ids."
+  trace_matrix: "TODO - where the traceability matrix lives and what it links"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Requirements Traceability skeleton from the Medical-Device CDMO ontology"

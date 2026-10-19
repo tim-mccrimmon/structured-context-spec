@@ -69,6 +69,9 @@ scs new domain acme-health
 
 # From the merchant cash advance ontology
 scs new domain acme-funding --ontology mca
+
+# From the medical-device CDMO ontology
+scs new domain acme-cdmo --ontology cdmo
 ```
 
 Every Domain workspace gets `company` (facts about the organization) and `prohibited`
@@ -76,7 +79,11 @@ Every Domain workspace gets `company` (facts about the organization) and `prohib
 **Global profile**: only SCDs that state organization-wide policy or standards (tech stack,
 security, compliance, retention, engineering practices, operations, AI use). SCDs that
 describe one system, such as problem definition, system context, threat model, performance
-targets, and the risk register, are scaffolded only by `scs new project`.
+targets, and the risk register, are scaffolded only by `scs new project`. The cdmo ontology
+has the same split: a Domain workspace gets organization-wide policy (compliance, data,
+security, validation approach, risk acceptability, AI accountability, training, QMS records,
+supplier qualification), and client-program SCDs (objectives, architecture, requirements,
+risk register, cutover) are scaffolded only for a Project.
 
 Project workspaces:
 

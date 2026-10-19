@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: training-competency).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:training-completion-gates
+type: project
+title: "Training Completion Gates"
+version: "DRAFT"
+description: "Access that depends on completed training"
+concept: concept:training-competency
+content:
+  summary: "TODO - in a sentence or two, training completion gates at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: TCG-001
+  #   fact: "Approval rights in the eQMS are granted only after the user's training completion is recorded."
+  gates: "TODO - each access right and the training it requires"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Training Completion Gates skeleton from the Medical-Device CDMO ontology"

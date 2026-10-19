@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: verification-validation).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:qualification-protocols
+type: project
+title: "Qualification Protocols"
+version: "DRAFT"
+description: "The program's qualification protocols and evidence"
+concept: concept:verification-validation
+content:
+  summary: "TODO - in a sentence or two, qualification protocols at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: QP-001
+  #   directive: "Draft protocol steps only from approved URS items, and mark any step that has no traced requirement."
+  protocols: "TODO - each protocol, its scope, and where its evidence is kept"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Qualification Protocols skeleton from the Medical-Device CDMO ontology"

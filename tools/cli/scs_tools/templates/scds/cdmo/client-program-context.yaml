@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: business-context).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:client-program-context
+type: project
+title: "Client Program Context"
+version: "DRAFT"
+description: "The client, the program's responsibilities split, and client constraints"
+concept: concept:business-context
+content:
+  summary: "TODO - in a sentence or two, client program context at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: CPC-001
+  #   fact: "The client owns the device design. The CDMO is responsible for design transfer and manufacturing."
+  quality_agreement: "TODO - the quality agreement and the responsibilities it assigns"
+  constraints: "TODO - client-imposed constraints on the work"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Client Program Context skeleton from the Medical-Device CDMO ontology"
