@@ -23,6 +23,9 @@ DOMAIN_EXAMPLES = SCHEMA / "domain" / "examples"
 FIXTURES = Path(__file__).parent / "fixtures"
 
 BUNDLE_TYPES = {"project", "meta", "standards", "concept", "domain"}
+# Kinds the examples must cover. Meta is published with the spec rather than shipped as an
+# example, and standards is deprecated in 0.6.0.
+EXAMPLE_BUNDLE_TYPES = {"project", "concept", "domain"}
 
 # third-party model output kept as evidence of cross-model testing; not a validity target
 EXCLUDED_DIRS = {"llm-portability"}
@@ -102,7 +105,7 @@ def test_invalid_fixture_fails():
 
 def test_at_least_one_of_each_shipped_bundle_kind_is_covered():
     kinds = {_bundle_type(p) for p in _example_bundles()}
-    assert BUNDLE_TYPES <= kinds
+    assert EXAMPLE_BUNDLE_TYPES <= kinds
 
 
 # ------------------------------------------------------------------ domain manifests
@@ -122,17 +125,16 @@ def test_software_development_ontology_is_clean():
     assert "0 errors" in result.output and "0 warnings" in result.output
 
 
-def test_cdmo_ontology_only_warns_about_unresolved_satisfies_targets():
+def test_cdmo_ontology_satisfies_citations_are_clean():
+    """0.6.0: satisfies targets are std: citations, checked for form and never resolved."""
     result = run("--domain", str(DOMAIN_EXAMPLES / "medical-device-cdmo-domain.yaml"))
     assert result.exit_code == 0
-    assert "0 errors" in result.output
-    warnings = [ln for ln in result.output.splitlines() if "⚠" in ln]
-    assert warnings, "expected the documented unresolved-satisfies warnings"
-    assert all("satisfies" in ln for ln in warnings)
+    assert "0 errors" in result.output and "0 warnings" in result.output
 
 
 def test_strict_mode_turns_warnings_into_exit_code_2():
-    result = run("--domain", str(DOMAIN_EXAMPLES / "medical-device-cdmo-domain.yaml"), "--strict")
+    # The CHAI example is a standards bundle, deprecated in 0.6.0 (a warning).
+    result = run("--bundle", str(EXAMPLES / "chai-standards-bundle" / "bundle.yaml"), "--strict")
     assert result.exit_code == 2
 
 

@@ -63,7 +63,7 @@
                   },
                   "relationships": {
                     "type": "array",
-                    "description": "Optional typed edges to other concepts or to standards-tier SCDs.",
+                    "description": "Optional typed edges to other concepts or, for satisfies, to standard citation references.",
                     "items": {
                       "type": "object",
                       "required": ["type", "target"],
@@ -75,8 +75,8 @@
                         },
                         "target": {
                           "type": "string",
-                          "pattern": "^(concept:[a-z][a-z0-9-]*|scd:standards:[a-zA-Z0-9._-]+)$",
-                          "description": "A concept: id (for depends-on / relates-to) or an scd:standards: id (for satisfies). Must resolve."
+                          "pattern": "^(concept:[a-z][a-z0-9-]*|std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?|scd:standards:[a-zA-Z0-9._-]+)$",
+                          "description": "A concept: id (for depends-on / relates-to, must resolve) or a std: citation reference (for satisfies; citations.md). scd:standards: targets are deprecated in 0.6.0."
                         }
                       },
                       "additionalProperties": false
@@ -86,9 +86,9 @@
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "pattern": "^scd:standards:[a-zA-Z0-9._-]+$"
+                      "pattern": "^(std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?|scd:standards:[a-zA-Z0-9._-]+)$"
                     },
-                    "description": "Shorthand list of scd:standards: ids this concept satisfies (sugar for a relationships entry of type satisfies)."
+                    "description": "Shorthand list of std: citation references this concept satisfies (sugar for relationships entries of type satisfies). scd:standards: ids are deprecated in 0.6.0."
                   },
                   "bundle": {
                     "type": "string",
@@ -131,7 +131,7 @@
         },
         "schemas": {
           "type": "object",
-          "required": ["meta", "standards", "project"],
+          "required": ["meta", "project"],
           "description": "Content schemas for each SCD tier",
           "properties": {
             "meta": {
@@ -154,7 +154,7 @@
               "properties": {
                 "content_schema": {
                   "type": "string",
-                  "description": "Path to JSON Schema file defining standards-tier content structure"
+                  "description": "Path to JSON Schema file defining standards-tier content structure (deprecated in 0.6.0: the standards tier is replaced by citation references)"
                 },
                 "template": {
                   "type": "string",

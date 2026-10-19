@@ -42,8 +42,8 @@ REQUIRED_RULE_FILES = [
 
 def test_default_rules_ship_inside_the_package():
     for name in REQUIRED_RULE_FILES:
-        assert (PACKAGED_RULES / "v0.5.0" / name).is_file(), name
-    assert RulesLoader().rules_dir.resolve() == (PACKAGED_RULES / "v0.5.0").resolve()
+        assert (PACKAGED_RULES / "v0.6.0" / name).is_file(), name
+    assert RulesLoader().rules_dir.resolve() == (PACKAGED_RULES / "v0.6.0").resolve()
 
 
 @pytest.mark.parametrize("rel", REQUIRED_SCHEMAS)

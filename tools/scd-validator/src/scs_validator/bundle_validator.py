@@ -2,6 +2,7 @@
 
 from typing import Any, Dict, List
 
+from .resolver import BundleTree
 from .rules_loader import RulesLoader
 from .utils import ValidationError, ValidationResult, ValidationWarning
 
@@ -58,6 +59,21 @@ class BundleValidator:
             result.add_error(ValidationError(error_msg, file_path=file_path))
             return result
 
+        if self.rules.get("bundle_types", {}).get(bundle_type, {}).get("deprecated"):
+            warning_msg = self.rules_loader.get_error_message(
+                self.rules, "deprecated_standards_bundle", bundle_id=bundle_id
+            )
+            result.add_warning(ValidationWarning(warning_msg, level="bundle", file_path=file_path))
+
+        for ref in bundle.get("scds") or []:
+            if str(ref).startswith("scd:standards:") and bundle_type != "standards":
+                warning_msg = self.rules_loader.get_error_message(
+                    self.rules, "deprecated_standards_scd", ref=ref
+                )
+                result.add_warning(
+                    ValidationWarning(warning_msg, level="bundle", file_path=file_path)
+                )
+
         # Validate XOR constraint
         self._validate_xor_constraint(bundle, bundle_id, bundle_type, result, file_path)
 
@@ -67,6 +83,148 @@ class BundleValidator:
         # Validate meta bundle requirements
         if bundle_type == "meta":
             self._validate_meta_bundle(bundle, bundle_id, result, file_path)
+
+        return result
+
+    def validate_tree(self, tree: BundleTree) -> ValidationResult:
+        """Validate a resolved bundle tree: import types, resolution, cycles, meta pinning.
+
+        Each bundle in the tree is checked against its own type's import rules, using the
+        resolved type of every bundle it imports.
+        """
+        result = ValidationResult("bundle")
+        bundle_types = self.rules.get("bundle_types", {})
+
+        for cycle in tree.cycles:
+            result.add_error(
+                ValidationError(
+                    self.rules_loader.get_error_message(
+                        self.rules, "import_cycle", cycle=" -> ".join(cycle)
+                    ),
+                    file_path=str(tree.root.path),
+                )
+            )
+
+        for importer in tree.bundles:
+            edges = [e for e in tree.edges if e.importer is importer]
+            type_rules = bundle_types.get(importer.type or "", {})
+            path = str(importer.path)
+            fmt = dict(bundle_id=importer.id, bundle_type=(importer.type or "unknown").capitalize())
+            counts: Dict[str, int] = {}
+
+            for edge in edges:
+                if edge.target is None:
+                    result.add_warning(
+                        ValidationWarning(
+                            self.rules_loader.get_error_message(
+                                self.rules, "unresolved_import", ref=edge.ref, **fmt
+                            ),
+                            level="bundle",
+                            file_path=path,
+                        )
+                    )
+                    continue
+                if edge.version_mismatch:
+                    result.add_warning(
+                        ValidationWarning(
+                            self.rules_loader.get_error_message(
+                                self.rules,
+                                "import_version_mismatch",
+                                ref=edge.ref,
+                                version=edge.target.version,
+                                **fmt,
+                            ),
+                            level="bundle",
+                            file_path=path,
+                        )
+                    )
+                import_type = edge.target.type or "unknown"
+                counts[import_type] = counts.get(import_type, 0) + 1
+                if import_type in type_rules.get("forbidden_import_types", []):
+                    result.add_error(
+                        ValidationError(
+                            self.rules_loader.get_error_message(
+                                self.rules,
+                                "forbidden_import_type",
+                                ref=edge.ref,
+                                import_type=import_type,
+                                **fmt,
+                            ),
+                            file_path=path,
+                        )
+                    )
+                elif (
+                    "allowed_import_types" in type_rules
+                    and import_type not in type_rules["allowed_import_types"]
+                ):
+                    result.add_error(
+                        ValidationError(
+                            self.rules_loader.get_error_message(
+                                self.rules,
+                                "import_type_not_allowed",
+                                ref=edge.ref,
+                                import_type=import_type,
+                                allowed=", ".join(type_rules["allowed_import_types"]),
+                                **fmt,
+                            ),
+                            file_path=path,
+                        )
+                    )
+                if import_type == "meta" and ":" not in edge.ref[len("bundle:") :]:
+                    result.add_warning(
+                        ValidationWarning(
+                            self.rules_loader.get_error_message(
+                                self.rules, "meta_import_unpinned", ref=edge.ref, **fmt
+                            ),
+                            level="bundle",
+                            file_path=path,
+                        )
+                    )
+
+            for import_type, limit in type_rules.get("max_imports_of_type", {}).items():
+                if counts.get(import_type, 0) > limit:
+                    result.add_error(
+                        ValidationError(
+                            self.rules_loader.get_error_message(
+                                self.rules,
+                                "too_many_imports_of_type",
+                                import_type=import_type,
+                                count=counts[import_type],
+                                max=limit,
+                                **fmt,
+                            ),
+                            file_path=path,
+                        )
+                    )
+
+            # Only judge missing types when every import resolved; otherwise the
+            # unresolved-import warning already explains the gap.
+            if importer is tree.root and all(e.target is not None for e in edges):
+                for import_type in type_rules.get("expected_import_types", []):
+                    if counts.get(import_type, 0) == 0:
+                        result.add_warning(
+                            ValidationWarning(
+                                self.rules_loader.get_error_message(
+                                    self.rules,
+                                    "missing_expected_import_type",
+                                    import_type=import_type,
+                                    **fmt,
+                                ),
+                                level="bundle",
+                                file_path=path,
+                            )
+                        )
+
+        for bundle_id, ref in tree.unresolved_scds:
+            result.add_warning(
+                ValidationWarning(
+                    self.rules_loader.get_error_message(
+                        self.rules, "unresolved_scd", ref=ref, bundle_id=bundle_id
+                    ),
+                    level="bundle",
+                    file_path=str(tree.root.path),
+                )
+            )
 
         return result
 

@@ -1,16 +1,16 @@
-# Completeness Validation Rules v0.5.0
+# Completeness Validation Rules v0.6.0
 #
-# Domain-aware completeness rules for SCS 0.5.0 multi-domain architecture
+# Completeness rules for SCS 0.6.0 Domain and Project bundles
 # Projects can OPT-IN to completeness checking by creating .scs/completeness-rules.yaml
-# Based on SCS 0.5.0 / RFC-0001 (Domain Ontology) with domain bundles and concept bundles
+# Based on SCS 0.6.0 / RFC-0001 (Domain Ontology) with domain bundles and concept bundles
 #
 # PHILOSOPHY: SCS validates STRUCTURE, not CONTENT COMPLETENESS.
 # You can version bundles with whatever context you have.
 # If your context is incomplete, that's your problem - not a validation failure.
 # Completeness checking is available for teams who want it (opt-in).
 
-version: "0.5.0"
-description: "Optional completeness rules for SCS 0.5.0 multi-domain projects (opt-in)"
+version: "0.6.0"
+description: "Optional completeness rules for SCS 0.6.0 Domain and Project bundles (opt-in)"
 profile: "permissive"  # No required concepts - create what you need
 
 # Validation Level 6: Completeness/Compliance
@@ -24,15 +24,11 @@ severity: "warning"  # When enabled, issues are warnings not errors
 required_bundles: []
 #  - type: "meta"
 #    count: 1
-#    message: "Project must import exactly 1 meta bundle"
+#    message: "Domain bundle must import exactly 1 meta bundle"
 #
-#  - type: "standards"
+#  - type: "concept"
 #    min: 1
-#    message: "Project must import at least 1 standards bundle"
-#
-#  - type: "domain"
-#    min: 1
-#    message: "Project must import at least 1 domain bundle"
+#    message: "Bundle must import at least 1 concept bundle"
 
 # Domain-Specific Completeness Rules
 # The Software Development domain defines 11 concepts as RECOMMENDATIONS, not requirements
@@ -346,21 +342,6 @@ stub_detection:
     SCD '{scd_id}' appears to be a stub or placeholder.
     Consider adding more detailed content before versioning.
 
-# Compliance Validation - DISABLED BY DEFAULT
-compliance_validation:
-  enabled: false  # Opt-in: set to true in .scs/completeness-rules.yaml
-  severity: "warning"  # When enabled, issues are warnings not errors
-
-  checks:
-    - check: "standards_bundle_present"
-      description: "Project must import at least one standards bundle"
-      severity: "warning"
-
-    - check: "standards_satisfied"
-      description: "All standards SCDs should be satisfied by project SCDs"
-      severity: "warning"
-      relationship_type: "satisfies"
-
 # Customization Guidance
 customization:
   description: "Completeness validation is OPT-IN. Create .scs/completeness-rules.yaml to enable."
@@ -393,15 +374,6 @@ customization:
         enabled: true
         severity: "warning"
 
-    - scenario: "Regulated industry (healthcare, fintech)"
-      suggestion: "Enable with compliance validation"
-      example: |
-        # .scs/completeness-rules.yaml
-        enabled: true
-        compliance_validation:
-          enabled: true
-          severity: "error"
-
   override_location: ".scs/completeness-rules.yaml"
 
   priority:
@@ -422,9 +394,6 @@ error_messages:
 
   missing_recommended_scd:
     "Concept '{concept}' is missing recommended SCD matching pattern '{pattern}': {name}"
-
-  no_standards_bundle:
-    "Project must import at least one standards bundle for compliance tracking"
 
   stub_detected:
     "SCD '{scd_id}' appears to be a stub. {indicators}"

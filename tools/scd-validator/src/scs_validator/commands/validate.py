@@ -13,6 +13,7 @@ from ..ontology_validator import OntologyValidator
 from ..parser import Parser
 from ..relationship_validator import RelationshipValidator
 from ..reporter import Reporter
+from ..resolver import resolve
 from ..rules_loader import RulesLoader
 from ..schema_validator import SchemaValidator
 from ..semantic_validator import SemanticValidator
@@ -371,86 +372,34 @@ def validate_bundle(
         # Level 5: Validate bundle organization (XOR constraint, bundle type rules)
         bundle_result = bundle_validator.validate_bundle(bundle, bundle_path)
 
-        # Load SCDs for further validation
+        # Resolve the import tree. Any bundle type can be the root: Domain and Project
+        # bundles are independent trees (SCS 0.6.0).
+        tree = resolve(Path(bundle_path))
+        tree_result = bundle_validator.validate_tree(tree)
+        bundle_result.errors.extend(tree_result.errors)
+        bundle_result.warnings.extend(tree_result.warnings)
+        if not tree_result.passed:
+            bundle_result.passed = False
+
+        if verbose:
+            click.echo(f"Resolved {len(tree.bundles) - 1} imported bundles, {len(tree.scds)} SCDs")
+
         all_scds = []
-        scd_refs = []
+        for resolved_scd in tree.scds:
+            try:
+                scd_data = parser.load_scd(resolved_scd.path)
+            except Exception as e:
+                if verbose:
+                    click.echo(f"  Warning: Could not load {resolved_scd.path}: {e}")
+                continue
+            all_scds.append(scd_data)
 
-        # Collect SCD references from bundle and imported bundles
-        bundle_dir = Path(bundle_path).parent
-        # Project root is parent of bundles/ directory
-        project_root = bundle_dir.parent if bundle_dir.name == "bundles" else bundle_dir
-
-        # If this is a project bundle, load domain bundles to get SCD references
-        if bundle_type == "project":
-            imports = bundle.get("imports", [])
-
-            if verbose:
-                click.echo(f"Loading {len(imports)} imported bundles...")
-
-            for import_ref in imports:
-                # Parse bundle reference: bundle:<name>:<version> or bundle:<name>
-                parts = import_ref.split(":")
-                if len(parts) >= 2 and parts[0] == "bundle":
-                    bundle_name = parts[1]
-
-                    # Skip meta and standards bundles for now
-                    if bundle_name in ["meta", "standards"]:
-                        continue
-
-                    # Try to find the domain bundle file
-                    domain_bundle_path = bundle_dir / "domains" / f"{bundle_name}.yaml"
-
-                    if domain_bundle_path.exists():
-                        try:
-                            domain_bundle = parser.load_bundle(domain_bundle_path)
-                            domain_scds = domain_bundle.get("scds", [])
-                            scd_refs.extend(domain_scds)
-
-                            if verbose:
-                                click.echo(f"  Loaded {bundle_name}: {len(domain_scds)} SCDs")
-                        except Exception as e:
-                            if verbose:
-                                click.echo(f"  Warning: Could not load {domain_bundle_path}: {e}")
-                    else:
-                        if verbose:
-                            click.echo(f"  Warning: Domain bundle not found: {domain_bundle_path}")
-        else:
-            # For non-project bundles, use SCDs directly from the bundle
-            scd_refs = bundle.get("scds", [])
-
-        if scd_refs and verbose:
-            click.echo(f"Loading {len(scd_refs)} SCDs...")
-
-        # Load each SCD file
-        for scd_ref in scd_refs:
-            # Resolve SCD reference to file path
-            # Format: scd:project:system-context → context/project/system-context.yaml
-            if scd_ref.startswith("scd:"):
-                parts = scd_ref.split(":", 2)
-                if len(parts) >= 3:
-                    tier = parts[1]  # project, meta, or standards
-                    scd_name = parts[2]
-
-                    # Construct file path
-                    scd_file = project_root / "context" / tier / f"{scd_name}.yaml"
-
-                    if scd_file.exists():
-                        try:
-                            scd_data = parser.load_scd(scd_file)
-                            all_scds.append(scd_data)
-
-                            # Level 3: Semantic validation for this SCD
-                            result = semantic_validator.validate_scd(scd_data, str(scd_file))
-                            semantic_result.errors.extend(result.errors)
-                            semantic_result.warnings.extend(result.warnings)
-                            if not result.passed:
-                                semantic_result.passed = False
-                        except Exception as e:
-                            if verbose:
-                                click.echo(f"  Warning: Could not load {scd_file}: {e}")
-                    else:
-                        if verbose:
-                            click.echo(f"  Warning: SCD file not found: {scd_file}")
+            # Level 3: Semantic validation for this SCD
+            result = semantic_validator.validate_scd(scd_data, str(resolved_scd.path))
+            semantic_result.errors.extend(result.errors)
+            semantic_result.warnings.extend(result.warnings)
+            if not result.passed:
+                semantic_result.passed = False
 
         if verbose:
             click.echo(f"Successfully loaded {len(all_scds)} SCDs")
@@ -462,10 +411,9 @@ def validate_bundle(
             )
 
         # Level 6: Completeness validation (if not skipped)
-        if not skip_completeness and bundle_type == "project":
-            project_root = Path(bundle_path).parent
+        if not skip_completeness and bundle_type in ("project", "domain"):
             completeness_result = completeness_validator.validate_completeness(
-                bundle, all_scds, bundle_path, project_root
+                bundle, all_scds, bundle_path, tree.project_root, tree=tree
             )
         elif skip_completeness and verbose:
             click.echo("Skipping completeness validation (--skip-completeness)")

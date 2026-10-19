@@ -1,50 +1,31 @@
-# SCS Bundle Examples - Medication Adherence System
+# Medication Adherence System — Project Bundle Example
 
-This directory contains example bundle files for a **Medication Adherence System** project, demonstrating the complete SCS bundle hierarchy.
+A **Project bundle** for a healthcare application, organized by concept. It shows how a
+project carries its own governance context in SCS 0.6.0, independently of any
+organization-wide Domain bundle.
 
-## Bundle Structure
+## Structure
 
 ```
-examples/bundles/
-├── project-bundle.yaml              # Top-level bundle (imports all others)
-├── meta-bundle.yaml                 # Standard meta-tier vocabulary
-├── standards-bundle.yaml            # Compliance standards (SOC2, HIPAA)
-└── domains/                         # Domain-specific bundles
-    ├── architecture.yaml
-    ├── security.yaml
-    ├── performance-reliability.yaml
-    ├── usability-accessibility.yaml
-    ├── compliance-governance.yaml
-    ├── data-provenance.yaml
-    ├── testing-validation.yaml
-    ├── deployment-operations.yaml
-    ├── safety-risk.yaml
-    └── ethics-ai-accountability.yaml
+examples/med-adherence/
+├── project-bundle.yaml        # Project bundle: imports the project's concept bundles
+├── concepts/                  # 11 concept bundles (architecture, security, ...)
+└── scds/project/              # Project-tier SCDs referenced by the concept bundles
 ```
 
-## Bundle Hierarchy
+## How It Fits the 0.6.0 Model
 
-The bundle structure follows the **container model** (similar to Docker):
+- **Project bundle** (`project-bundle.yaml`) imports 11 concept bundles. A project bundle
+  may instead list its project-tier SCDs directly; it does one or the other, not both.
+- **No meta, standards, or domain imports.** Organization-wide rules live in the
+  organization's Domain bundle, which is authored and versioned separately. A runtime
+  applies the Domain bundle and this Project bundle side by side.
+- **Standards are cited, not bundled.** `hipaa-compliance.yaml` and `soc2-controls.yaml`
+  carry `cites:` entries such as `std:hipaa#164.312`. See `spec/0.6/citations.md`.
 
-1. **Project Bundle** (`project-bundle.yaml`)
-   - Top-level bundle for the entire project
-   - Imports: Meta Bundle, Standards Bundle, and all Domain Bundles
-   - Lists no SCDs directly (all context is in imported bundles)
-
-2. **Meta Bundle** (`meta-bundle.yaml`)
-   - Provided by SCS specification
-   - Contains: Standard vocabulary (roles, capabilities, domains, concepts)
-   - Imported by every project
-
-3. **Standards Bundle** (`standards-bundle.yaml`)
-   - Project-specific compliance requirements
-   - Imports: SOC2 bundle (external)
-   - Contains: HIPAA SCDs (project interpretations)
-
-4. **Domain Bundles** (`domains/*.yaml`)
-   - 11 domain-specific bundles (one per major concept area)
-   - Each contains 2-4 SCDs for that domain
-   - Domain bundles DO NOT import other bundles - they contain only SCDs
+Earlier versions of this example imported `bundle:meta`, `bundle:standards`, and a
+`bundle:software-development` domain bundle. Those imports were removed in 0.6.0
+(`docs/MIGRATION-0.6.0.md`).
 
 ## About the Example Project
 
@@ -52,56 +33,19 @@ The bundle structure follows the **container model** (similar to Docker):
 - Healthcare application helping patients track medication schedules
 - Sends medication reminders via mobile app and SMS
 - Provides adherence insights to healthcare providers
-- Subject to HIPAA and SOC2 compliance
-
-## Key Features Demonstrated
-
-1. **Bundle Types**: Four bundle types (Project, Meta, Standards, Domain)
-2. **Version Locking**: All bundles versioned at 1.0.0 (immutable contract)
-3. **Hierarchical Imports**: Project imports Meta + Standards + Domains
-4. **Bundle Independence**: Each domain bundle can version independently
-5. **External Standards**: Standards bundle imports external SOC2 bundle
-6. **Healthcare Context**: Realistic HIPAA and SOC2 compliance requirements
-
-## Container Analogy
-
-Think of SCS bundles like Docker containers:
-
-| Docker | SCS |
-|--------|-----|
-| `Dockerfile` | Bundle manifest |
-| Container image | Versioned bundle |
-| Base image (`FROM`) | Bundle imports |
-| Layers | SCDs |
-| `docker-compose.yml` | Project bundle |
-| Container registry | SCS registry (future) |
-
-## Using These Examples
-
-These bundles are **manifests only** - they reference SCDs but don't contain the actual SCD content files. To see complete SCD examples, check:
-
-- `examples/scds/` - Individual SCD examples
-- SCS Reference Implementation repository - Full templates
+- Subject to HIPAA and SOC 2
 
 ## Validation
 
-To validate these bundles:
-
 ```bash
-# Validate individual bundle (Phase 1 - syntax/schema only)
-scs-validator bundles/domains/architecture.yaml
-
-# Validate complete bundle hierarchy (Phase 2 - coming soon)
-scs-validator bundles/project-bundle.yaml --recursive
+scs-validate --bundle examples/med-adherence/project-bundle.yaml
 ```
+
+The validator resolves every import and SCD in the tree and checks that the project
+bundle imports only concept bundles.
 
 ## Related Documentation
 
-- [Bundle Format Specification](../../spec/0.3/bundle-format.md)
+- [Bundle Format Specification](../../spec/0.6/bundle-format.md)
+- [Standard Citations](../../spec/0.6/citations.md)
 - [Bundle Lifecycle](../../docs/bundle-lifecycle.md)
-- [Project Structure](../../docs/project-structure.md)
-- [Minimum Project SCDs](../../docs/minimum-project-scds.md)
-
----
-
-**Questions?** Open an issue or discussion in the scs-spec repository.

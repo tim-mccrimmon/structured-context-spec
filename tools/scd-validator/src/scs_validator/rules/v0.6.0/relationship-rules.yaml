@@ -30,12 +30,13 @@ relationship_types:
     description: "This SCD fulfills requirements from another SCD"
     directionality: "directional"
     examples:
-      - "Auth Service SCD satisfies HIPAA Security Rule SCD"
+      - "Auth Service SCD satisfies std:hipaa#164.312 (a citation; not tier-checked)"
       - "API Design satisfies Performance Requirements"
     allowed_tiers:
-      # Project satisfies standards (compliance)
+      # Project satisfies project requirements; standards targets are deprecated in 0.6.0
+      # (std: citations replace them and bypass tier checks)
       - from: "project"
-        to: ["standards"]
+        to: ["project", "standards"]
       # Standards can satisfy other standards (hierarchical compliance)
       - from: "standards"
         to: ["standards"]
@@ -139,8 +140,8 @@ relationship_schema:
 
     target:
       type: "string"
-      pattern: "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
-      description: "Must be a valid SCD ID"
+      pattern: "^(scd:(meta|standards|project):[a-zA-Z0-9._-]+|std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?)$"
+      description: "A valid SCD ID, or for satisfies a std: citation (spec/0.6/citations.md)"
 
     description:
       type: "string"
@@ -254,6 +255,15 @@ optimization:
 
 # Error Messages
 error_messages:
+  citation_target_wrong_type:
+    "SCD '{source}' has a '{type}' relationship targeting a citation. Only 'satisfies' may target a std: citation."
+
+  invalid_citation:
+    "SCD '{source}' satisfies '{target}', which is not a valid citation (std:<standard>[:<edition>][#<clause>])."
+
+  deprecated_standards_target:
+    "SCD '{source}' targets '{target}', a standards-tier SCD reference, which is deprecated in SCS 0.6.0. Use a citation (std:<standard>[:<edition>][#<clause>]) instead."
+
   target_not_found:
     "Relationship target SCD '{target}' not found in loaded bundles. Source: '{source}', Type: '{type}'"
 

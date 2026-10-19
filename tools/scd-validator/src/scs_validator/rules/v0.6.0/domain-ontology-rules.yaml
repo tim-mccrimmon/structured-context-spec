@@ -5,7 +5,7 @@
 # (schema/domain/domain-manifest-schema.json), and the `concept` field
 # on SCDs and concept bundles.
 
-version: "0.5.0"
+version: "0.6.0"
 description: "Domain Ontology (RFC-0001) semantic validation rules for SCS v0.5.0"
 
 # Rule 1: concept id format + uniqueness
@@ -47,10 +47,10 @@ relationship_targets:
     description: "target must be a concept: id in the same domain and must resolve"
     severity: "error"
   satisfies:
-    target_kind: "scd:standards"
-    description: "target must be an scd:standards: id"
+    target_kind: "citation"
+    description: "target must be a std: citation (spec/0.6/citations.md); scd:standards: ids are deprecated"
     severity: "error"
-    unresolved_severity: "warning"  # when standards SCDs aren't loaded in this validation context
+    deprecated_severity: "warning"  # scd:standards: targets, accepted in 0.6.0
 
 # Rule 5: depends-on acyclic
 depends_on_cycle_detection:
@@ -97,8 +97,11 @@ error_messages:
   relationship_target_not_found:
     "Concept '{concept_id}' has a '{type}' relationship targeting '{target}', which does not resolve to a concept in domain '{domain_id}'."
 
-  satisfies_target_unresolved:
-    "Concept '{concept_id}' satisfies '{target}', which could not be resolved in this validation context (no standards SCDs loaded)."
+  satisfies_target_deprecated:
+    "Concept '{concept_id}' satisfies '{target}', a standards-tier SCD reference, which is deprecated in SCS 0.6.0. Use a citation (std:<standard>[:<edition>][#<clause>]) instead. See spec/0.6/citations.md."
+
+  satisfies_target_invalid:
+    "Concept '{concept_id}' satisfies '{target}', which is not a valid citation (std:<standard>[:<edition>][#<clause>])."
 
   depends_on_cycle:
     "Cycle detected in concept depends-on relationships: {cycle}"

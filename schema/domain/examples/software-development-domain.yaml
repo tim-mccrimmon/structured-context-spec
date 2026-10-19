@@ -74,9 +74,6 @@ domain:
       content_schema: "../../scd/meta-scd-content-schema.json"
       template: "../../scd/meta-scd-template.json"
 
-    standards:
-      content_schema: "../../scd/standards-scd-content-schema.json"
-      template: "../../scd/standards-scd-template.json"
 
     project:
       content_schema: "../../scd/project-scd-content-schema.json"

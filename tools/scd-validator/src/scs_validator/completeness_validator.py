@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from .resolver import BundleTree
 from .rules_loader import RulesLoader
 from .utils import ValidationError, ValidationResult, ValidationWarning
 
@@ -26,8 +27,9 @@ class CompletenessValidator:
         all_scds: List[Dict[str, Any]],
         file_path: str | None = None,
         project_root: Optional[Path] = None,
+        tree: Optional[BundleTree] = None,
     ) -> ValidationResult:
-        """Validate project completeness and compliance.
+        """Validate Domain or Project bundle completeness and compliance.
 
         This implements Level 6 validation:
         - Required bundles present
@@ -35,13 +37,13 @@ class CompletenessValidator:
         - Minimum SCDs per domain
         - Recommended SCDs (warnings)
         - Stub detection
-        - Compliance validation
 
         Args:
-            bundle: Project bundle data
-            all_scds: List of all SCDs in project
+            bundle: Domain or Project bundle data
+            all_scds: List of all SCDs in the resolved bundle tree
             file_path: Optional file path for error messages
             project_root: Optional project root for finding custom rules
+            tree: Resolved bundle tree, used to count imports by their actual type
 
         Returns:
             ValidationResult with errors and warnings
@@ -64,10 +66,10 @@ class CompletenessValidator:
         severity = rules.get("severity", "warning")
 
         # Validate required bundles
-        self._validate_required_bundles(bundle, rules, severity, result, file_path)
+        self._validate_required_bundles(bundle, rules, severity, result, file_path, tree)
 
         # Validate required domains
-        domain_bundles = self._extract_domain_bundles(bundle)
+        domain_bundles = self._extract_domain_bundles(bundle, tree)
         self._validate_required_domains(
             domain_bundles, all_scds, rules, severity, result, file_path
         )
@@ -78,9 +80,6 @@ class CompletenessValidator:
         # Stub detection
         self._detect_stubs(all_scds, rules, result, file_path)
 
-        # Compliance validation
-        self._validate_compliance(bundle, all_scds, rules, result, file_path)
-
         return result
 
     def _validate_required_bundles(
@@ -90,36 +89,22 @@ class CompletenessValidator:
         severity: str,
         result: ValidationResult,
         file_path: str | None,
+        tree: Optional[BundleTree] = None,
     ) -> None:
-        """Validate required bundle types are present.
+        """Validate required bundle types are imported.
 
         Args:
-            bundle: Project bundle data
+            bundle: Domain or Project bundle data
             rules: Completeness rules
             severity: Rule severity level
             result: Validation result to update
             file_path: Optional file path
+            tree: Resolved bundle tree; without it, imports are typed by name only
         """
         required_bundles = rules.get("required_bundles", [])
-        imports = bundle.get("imports", [])
-
-        # Count bundle types by name
-        # For special types (meta, standards), count by name
-        # For domain type, count how many bundles are NOT meta or standards
-        bundle_type_counts: Dict[str, int] = {"meta": 0, "standards": 0, "domain": 0}
-
-        for import_ref in imports:
-            # Parse bundle reference: bundle:<name>:<version> or bundle:<name>
-            parts = import_ref.split(":")
-            if len(parts) >= 2 and parts[0] == "bundle":
-                bundle_name = parts[1]
-                if bundle_name == "meta":
-                    bundle_type_counts["meta"] += 1
-                elif bundle_name == "standards":
-                    bundle_type_counts["standards"] += 1
-                else:
-                    # Assume any other bundle is a domain bundle
-                    bundle_type_counts["domain"] += 1
+        bundle_type_counts: Dict[str, int] = {}
+        for import_type in self._direct_import_types(bundle, tree):
+            bundle_type_counts[import_type] = bundle_type_counts.get(import_type, 0) + 1
 
         # Check requirements
         for req in required_bundles:
@@ -149,28 +134,42 @@ class CompletenessValidator:
                         file_path,
                     )
 
-    def _extract_domain_bundles(self, bundle: Dict[str, Any]) -> Set[str]:
-        """Extract domain bundle IDs from imports.
+    @staticmethod
+    def _direct_import_types(bundle: Dict[str, Any], tree: Optional[BundleTree]) -> List[str]:
+        """Types of the bundle's direct imports: resolved types when a tree is available,
+        otherwise a name-based guess (bundle:meta is meta, anything else is a concept)."""
+        if tree is not None:
+            return [e.target.type or "unknown" for e in tree.direct_imports() if e.target]
+        types = []
+        for import_ref in bundle.get("imports", []):
+            parts = str(import_ref).split(":")
+            types.append("meta" if len(parts) >= 2 and parts[1] == "meta" else "concept")
+        return types
+
+    def _extract_domain_bundles(
+        self, bundle: Dict[str, Any], tree: Optional[BundleTree] = None
+    ) -> Set[str]:
+        """Names of the non-meta bundles this bundle imports (without version).
 
         Args:
-            bundle: Project bundle data
+            bundle: Domain or Project bundle data
+            tree: Resolved bundle tree, used to exclude imports by their actual type
 
         Returns:
-            Set of domain IDs (without version)
+            Set of imported bundle names
         """
-        domains = set()
-        imports = bundle.get("imports", [])
-
-        for import_ref in imports:
-            # Parse bundle reference
-            parts = import_ref.split(":")
-            if len(parts) >= 2 and parts[0] == "bundle":
-                # Check if it's a domain bundle (not meta or standards)
-                bundle_name = parts[1]
-                if bundle_name not in ["meta", "standards"]:
-                    domains.add(bundle_name)
-
-        return domains
+        if tree is not None:
+            return {
+                e.target.id.split(":", 1)[1]
+                for e in tree.direct_imports()
+                if e.target and e.target.type not in ("meta", "standards")
+            }
+        names = set()
+        for import_ref in bundle.get("imports", []):
+            parts = str(import_ref).split(":")
+            if len(parts) >= 2 and parts[0] == "bundle" and parts[1] not in ("meta", "standards"):
+                names.add(parts[1])
+        return names
 
     def _validate_required_domains(
         self,
@@ -375,41 +374,6 @@ class CompletenessValidator:
                         warning_msg, level="completeness", scd_id=scd_id, file_path=file_path
                     )
                 )
-
-    def _validate_compliance(
-        self,
-        bundle: Dict[str, Any],
-        all_scds: List[Dict[str, Any]],
-        rules: Dict[str, Any],
-        result: ValidationResult,
-        file_path: str | None,
-    ) -> None:
-        """Validate compliance requirements.
-
-        Args:
-            bundle: Project bundle data
-            all_scds: List of all SCDs
-            rules: Completeness rules
-            result: Validation result to update
-            file_path: Optional file path
-        """
-        compliance_config = rules.get("compliance_validation", {})
-        if not compliance_config.get("enabled", True):
-            return
-
-        checks = compliance_config.get("checks", [])
-        imports = bundle.get("imports", [])
-
-        for check in checks:
-            check_type = check.get("check")
-            check_severity = check.get("severity", "error")
-
-            if check_type == "standards_bundle_present":
-                # Check if at least one standards bundle is imported
-                has_standards = any("bundle:standards:" in imp for imp in imports)
-                if not has_standards:
-                    error_msg = self.rules_loader.get_error_message(rules, "no_standards_bundle")
-                    self._add_result(check_severity, error_msg, result, file_path)
 
     def _add_result(
         self,

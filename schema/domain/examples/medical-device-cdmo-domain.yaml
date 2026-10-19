@@ -39,8 +39,8 @@ domain:
           Which regulations bind the work, AI deployment-tier and autonomy
           rules, and the overall QMS governance framework.
         satisfies:
-          - scd:standards:iso-13485
-          - scd:standards:cfr-820-qmsr
+          - std:iso-13485:2016
+          - std:21-cfr-820
         bundle: bundle:compliance-governance:0.1.0
 
       - id: concept:risk-management
@@ -53,7 +53,7 @@ domain:
           - type: relates-to
             target: concept:compliance-governance
         satisfies:
-          - scd:standards:iso-14971
+          - std:iso-14971:2019
         bundle: bundle:risk-management:0.1.0
 
       - id: concept:system-architecture
@@ -87,8 +87,8 @@ domain:
           - type: depends-on
             target: concept:system-architecture
         satisfies:
-          - scd:standards:iec-62304
-          - scd:standards:cfr-part-11
+          - std:iec-62304:2006-a1
+          - std:21-cfr-11
         bundle: bundle:verification-validation:0.1.0
 
       - id: concept:qms-records
@@ -100,7 +100,7 @@ domain:
           - type: relates-to
             target: concept:compliance-governance
         satisfies:
-          - scd:standards:iso-13485-clause-4.2
+          - std:iso-13485:2016#4.2
         bundle: bundle:qms-records:0.1.0
 
       - id: concept:supplier-qualification
@@ -114,7 +114,7 @@ domain:
           - type: relates-to
             target: concept:verification-validation
         satisfies:
-          - scd:standards:iso-13485-clause-7.4
+          - std:iso-13485:2016#7.4
         bundle: bundle:supplier-qualification:0.1.0
 
       - id: concept:training-competency
@@ -126,7 +126,7 @@ domain:
           - type: relates-to
             target: concept:qms-records
         satisfies:
-          - scd:standards:iso-13485-clause-6.2
+          - std:iso-13485:2016#6.2
         bundle: bundle:training-competency:0.1.0
 
       - id: concept:data-provenance
@@ -140,7 +140,7 @@ domain:
           - type: relates-to
             target: concept:qms-records
         satisfies:
-          - scd:standards:cfr-part-11
+          - std:21-cfr-11
         bundle: bundle:data-provenance:0.1.0
 
       - id: concept:ai-accountability
@@ -173,9 +173,6 @@ domain:
       content_schema: "../../scd/meta-scd-content-schema.json"
       template: "../../scd/meta-scd-template.json"
 
-    standards:
-      content_schema: "../../scd/standards-scd-content-schema.json"
-      template: "../../scd/standards-scd-template.json"
 
     project:
       content_schema: "../../scd/project-scd-content-schema.json"

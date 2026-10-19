@@ -1,10 +1,14 @@
 """Utility functions for SCS Validator."""
 
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 SCHEMA_DIR_ENV_VAR = "SCS_SCHEMA_DIR"
+
+# Standard citation reference: std:<standard>[:<edition>][#<clause>] (spec/0.6/citations.md)
+CITATION_RE = re.compile(r"^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$")
 
 
 class ValidationError(Exception):

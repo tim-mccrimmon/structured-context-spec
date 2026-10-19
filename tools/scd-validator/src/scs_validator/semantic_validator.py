@@ -40,6 +40,18 @@ class SemanticValidator:
         # Validate type matches tier in ID
         self._validate_type_tier_match(scd_id, scd_type, result, file_path)
 
+        if scd_type == "standards":
+            result.add_warning(
+                ValidationWarning(
+                    f"SCD '{scd_id}' is a standards-tier SCD, which is deprecated in SCS 0.6.0. "
+                    "Cite the standard (std:<standard>[:<edition>][#<clause>]) from the SCDs that "
+                    "address it instead. See spec/0.6/citations.md.",
+                    level="semantic",
+                    scd_id=scd_id,
+                    file_path=file_path,
+                )
+            )
+
         # Validate version is valid semver or DRAFT
         version = scd.get("version")
         if version:
