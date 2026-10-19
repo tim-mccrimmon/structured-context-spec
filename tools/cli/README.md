@@ -6,11 +6,12 @@ Complete CLI toolkit for creating, managing, and validating Structured Context S
 
 `scs-tools` provides everything you need to work with SCS projects:
 
-- **Scaffold** new SCS projects with proper structure and templates
+- **Scaffold** Domain (organization) and Project bundle workspaces from an ontology model
 - **Initialize** SCS in existing projects
-- **Add** SCDs and domain bundles incrementally
-- **Manage** bundles and project configuration
+- **Add** SCDs and concept bundles incrementally
+- **Manage** and version bundles
 - **Validate** SCDs and bundles against the specification
+- **Compile** a Domain or Project bundle into a runtime artifact
 
 ## Do I Need Both Tools?
 
@@ -54,11 +55,37 @@ pip install -e ".[dev]"
 
 ## Commands
 
-The `scs` command provides five main subcommands:
+The `scs` command provides six main subcommands.
 
-### 1. `scs new` - Create New Projects
+### 1. `scs new` - Create Domain and Project Workspaces
 
-Scaffold a complete SCS project from templates.
+SCS 0.6.0 has two independent governance bundles. `scs new domain` creates an organization's
+Domain bundle (governance for all work); `scs new project` creates a Project bundle (governance
+for one project). Neither imports the other.
+
+```bash
+# An organization's Domain bundle, from the software-development ontology
+scs new domain acme-health
+
+# From the merchant cash advance ontology
+scs new domain acme-funding --ontology mca
+
+# From the medical-device CDMO ontology
+scs new domain acme-cdmo --ontology cdmo
+```
+
+Every Domain workspace gets `company` (facts about the organization) and `prohibited`
+(binary prohibitions) concept bundles. For the sdlc ontology, a Domain workspace uses the
+**Global profile**: only SCDs that state organization-wide policy or standards (tech stack,
+security, compliance, retention, engineering practices, operations, AI use). SCDs that
+describe one system, such as problem definition, system context, threat model, performance
+targets, and the risk register, are scaffolded only by `scs new project`. The cdmo ontology
+has the same split: a Domain workspace gets organization-wide policy (compliance, data,
+security, validation approach, risk acceptability, AI accountability, training, QMS records,
+supplier qualification), and client-program SCDs (objectives, architecture, requirements,
+risk register, cutover) are scaffolded only for a Project.
+
+Project workspaces:
 
 ```bash
 # Basic usage - creates standard project
@@ -181,6 +208,21 @@ scs validate --bundle bundles/project-bundle.yaml --skip-completeness
 
 **Note:** The `scs validate` command uses the `scs-validator` package under the hood. For detailed validation documentation, see the [SCS Validator README](https://github.com/tim-mccrimmon/scs-spec/tree/main/tools/scd-validator).
 
+### 6. `scs compile` - Build Runtime Artifacts
+
+Compile a Domain or Project bundle into one compact, deterministic file of rules for a runtime
+to inject (`spec/0.6/runtime-artifact.md`). Only SCD `content.prohibitions`, `content.directives`, and
+`content.facts` are compiled.
+
+```bash
+scs compile bundles/domain-bundle.yaml -o compiled/global.yaml
+scs compile bundles/project-bundle.yaml -o compiled/projects/my-app.yaml
+scs compile bundles/project-bundle.yaml --allow-draft      # DRAFT -> version DRAFT+<digest>
+scs compile bundles/project-bundle.yaml --format json --no-cites
+```
+
+The bundle is validated first (`--no-validate` skips it). Needs `scs-tools[validator]`.
+
 ### Help
 
 Get help for any command:
@@ -192,29 +234,24 @@ scs init --help
 scs add --help
 scs bundle --help
 scs validate --help
+scs compile --help
 ```
 
-## Project Structure
+## Workspace Structure
 
-A generated SCS project has this structure:
+A generated Project workspace has this structure (a Domain workspace is the same, with
+`bundles/domain-bundle.yaml` in place of `project-bundle.yaml`):
 
 ```
 my-project/
-├── bundles/                    # SCS bundles
-│   ├── project-bundle.yaml    # Top-level bundle
-│   ├── meta-bundle.yaml       # Meta vocabulary
-│   ├── standards-bundle.yaml  # Compliance standards
-│   └── domains/               # Domain bundles
+├── bundles/
+│   ├── project-bundle.yaml    # The Project bundle; imports the concept bundles
+│   └── concepts/              # One concept bundle per ontology concept
 │       ├── architecture.yaml
 │       ├── security.yaml
-│       ├── performance-reliability.yaml
-│       ├── usability-accessibility.yaml
-│       ├── compliance-governance.yaml
-│       ├── data-provenance.yaml
-│       ├── testing-validation.yaml
-│       ├── deployment-operations.yaml
-│       ├── safety-risk.yaml
-│       └── ethics-ai-accountability.yaml
+│       └── ...
+├── domain/
+│   └── domain-manifest.yaml   # The Domain Ontology
 ├── context/                   # SCD files
 │   └── project/              # Project-tier SCDs
 │       ├── system-context.yaml
@@ -233,9 +270,9 @@ my-project/
 └── VERSION
 ```
 
-## Domain Bundles
+## Concept Bundles (sdlc ontology)
 
-Projects include 10 domain bundles covering:
+The sdlc ontology model scaffolds these concept bundles:
 
 1. **Architecture**: System design, tech stack, integrations, components
 2. **Security**: Authentication, data protection, threat model

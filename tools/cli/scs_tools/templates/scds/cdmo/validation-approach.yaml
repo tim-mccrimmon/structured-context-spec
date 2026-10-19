@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: verification-validation).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:validation-approach
+type: project
+title: "Validation Approach"
+version: "DRAFT"
+description: "The organization's computer-system validation approach"
+concept: concept:verification-validation
+content:
+  summary: "TODO - in a sentence or two, validation approach at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: VA-001
+  #   directive: "Before proposing validation activities for a system, state the GAMP 5 category you assumed for it."
+  gamp_categories: "TODO - how systems are categorized"
+  lifecycle: "TODO - the IQ/OQ/PQ approach for each category"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Validation Approach skeleton from the Medical-Device CDMO ontology"

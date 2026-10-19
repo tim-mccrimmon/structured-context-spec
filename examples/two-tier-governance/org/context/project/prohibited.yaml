@@ -1,0 +1,25 @@
+id: scd:project:prohibited
+type: project
+title: Prohibited Tools and Practices
+version: "1.0.0"
+description: Tools and practices that are forbidden, without exception, in all work.
+concept: concept:prohibited
+content:
+  summary: Binary prohibitions; a change requires a new approved version of the Domain bundle.
+  prohibitions:
+    - id: NO-001
+      kind: tool
+      subject: consumer generative AI services and personal AI accounts
+      instead: the company's private AI service
+      reason: Client data may not leave company-controlled systems.
+    - id: NO-002
+      kind: practice
+      subject: committing credentials, keys, or tokens to any repository
+    - id: NO-003
+      kind: tool
+      subject: open-source components under GPL or AGPL licenses in device software
+      reason: Client contracts assign device software ownership to the client.
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  rationale: Initial approved version

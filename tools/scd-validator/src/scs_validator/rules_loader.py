@@ -19,8 +19,8 @@ class RulesLoader:
             rules_dir: Directory containing rules files. If None, uses default location.
         """
         if rules_dir is None:
-            # Default: rules/v0.5.0 relative to this module
-            self.rules_dir = Path(__file__).parent / "rules" / "v0.5.0"
+            # Default: rules/v0.6.0 relative to this module
+            self.rules_dir = Path(__file__).parent / "rules" / "v0.6.0"
         else:
             self.rules_dir = Path(rules_dir)
 

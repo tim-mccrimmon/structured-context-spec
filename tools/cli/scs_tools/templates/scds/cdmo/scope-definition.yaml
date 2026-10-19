@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: business-context).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:scope-definition
+type: project
+title: "Scope Definition"
+version: "DRAFT"
+description: "What is in and out of scope for the program"
+concept: concept:business-context
+content:
+  summary: "TODO - in a sentence or two, scope definition at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: SD-001
+  #   fact: "In scope: design history files and device master records. Out of scope: manufacturing batch records."
+  in_scope: "TODO - items in scope"
+  out_of_scope: "TODO - items explicitly out of scope"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Scope Definition skeleton from the Medical-Device CDMO ontology"

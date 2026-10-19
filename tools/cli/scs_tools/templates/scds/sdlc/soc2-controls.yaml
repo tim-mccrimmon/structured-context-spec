@@ -57,7 +57,7 @@ relationships:
   # SOC2 Controls satisfy compliance standards and constrain implementation.
   # Example relationships:
   - type: "satisfies"
-    target: "scd:standards:soc2-trust-criteria"
+    target: "std:soc2:2017"
     description: "Implements SOC2 Trust Service Criteria"
   - type: "constrains"
     target: "scd:project:authn-authz"

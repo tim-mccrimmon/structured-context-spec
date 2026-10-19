@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: implementation-cutover).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:cutover-plan
+type: project
+title: "Cutover Plan"
+version: "DRAFT"
+description: "The program's cutover plan"
+concept: concept:implementation-cutover
+content:
+  summary: "TODO - in a sentence or two, cutover plan at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: CP-001
+  #   fact: "Cutover runs over [weekend]. System A becomes read-only at [time]."
+  steps: "TODO - the cutover steps, owners, and timings"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Cutover Plan skeleton from the Medical-Device CDMO ontology"

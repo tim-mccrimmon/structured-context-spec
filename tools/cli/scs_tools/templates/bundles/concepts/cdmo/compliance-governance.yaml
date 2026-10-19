@@ -1,0 +1,19 @@
+id: bundle:compliance-governance
+type: concept
+version: "DRAFT"
+title: "Compliance & Governance Concept Bundle"
+description: "Regulatory and QMS governance for a medical-device CDMO: which regulations bind the work, the AI deployment-tier and autonomy rules, electronic-records controls, and hard prohibitions on AI use."
+
+imports: []
+
+scds:
+  - scd:project:regulatory-applicability
+  - scd:project:ai-deployment-tiers
+  - scd:project:agent-autonomy-rules
+  - scd:project:electronic-records-controls
+  - scd:project:prohibited-uses
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Compliance & Governance concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

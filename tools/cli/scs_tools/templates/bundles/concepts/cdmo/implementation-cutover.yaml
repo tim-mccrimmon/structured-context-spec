@@ -1,0 +1,18 @@
+id: bundle:implementation-cutover
+type: concept
+version: "DRAFT"
+title: "Implementation & Cutover Concept Bundle"
+description: "Implementation and cutover for a medical-device CDMO program: the cutover plan and sequence, multi-site rollout (including role/licensing differences), rollback triggers and procedure, and hypercare / go-live criteria."
+
+imports: []
+
+scds:
+  - scd:project:cutover-plan
+  - scd:project:rollout-sequence
+  - scd:project:rollback-criteria
+  - scd:project:hypercare-plan
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Implementation & Cutover concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

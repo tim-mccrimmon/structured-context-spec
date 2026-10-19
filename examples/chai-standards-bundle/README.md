@@ -1,5 +1,10 @@
 # CHAI Prior Authorization Standards Bundle
 
+> **Deprecated in SCS 0.6.0.** Standards bundles are deprecated: standards are referenced by
+> citation, and an organization's interpretation of a framework belongs in its Domain
+> bundle as its own rules. This example still validates (with a deprecation warning) and is
+> kept for reference. See `spec/0.6/citations.md` and `docs/MIGRATION-0.6.0.md`.
+
 ## What This Is
 
 A transposition of the [CHAI (Coalition for Health AI) Prior Authorization Best Practice Guide and Testing & Evaluation Framework](https://www.chai.org/workgroup/use-case/ai-supported-prior-authorization-criteria-matching) into SCS standards bundle format.

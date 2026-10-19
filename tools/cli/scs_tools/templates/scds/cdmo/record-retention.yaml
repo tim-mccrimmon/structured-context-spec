@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: qms-records).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:record-retention
+type: project
+title: "Record Retention"
+version: "DRAFT"
+description: "Retention periods for quality records, including AI contribution records"
+concept: concept:qms-records
+content:
+  summary: "TODO - in a sentence or two, record retention at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: RR-001
+  #   fact: "Design history files are retained for the life of the device plus [N] years."
+  #   cites: [std:iso-13485:2016#4.2.5]
+  periods: "TODO - each record type and its retention period"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Record Retention skeleton from the Medical-Device CDMO ontology"

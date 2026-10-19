@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: system-architecture).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:architecture-constraints
+type: project
+title: "Architecture Constraints"
+version: "DRAFT"
+description: "Architectural limits an assistant must not drift from"
+concept: concept:system-architecture
+content:
+  summary: "TODO - in a sentence or two, architecture constraints at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: AC-001
+  #   directive: "Do not propose custom objects, fields, or integrations that are not in the approved solution design."
+  constraints: "TODO - each constraint and the reason for it"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Architecture Constraints skeleton from the Medical-Device CDMO ontology"

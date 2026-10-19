@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: system-architecture).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:integration-map
+type: project
+title: "Integration Map"
+version: "DRAFT"
+description: "Integration topology between the program's systems"
+concept: concept:system-architecture
+content:
+  summary: "TODO - in a sentence or two, integration map at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: IM-001
+  #   fact: "System B receives part data from the ERP through the approved interface only."
+  interfaces: "TODO - each interface, its direction, and its protocol"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Integration Map skeleton from the Medical-Device CDMO ontology"

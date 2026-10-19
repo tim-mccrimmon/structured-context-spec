@@ -269,7 +269,103 @@
             "additionalProperties": true
           }
         },
-        "rules": {
+        "directives": {
+        "type": "array",
+        "description": "Plain-language statements an agent is expected to follow; compiled into a runtime artifact's rules (spec/0.6/runtime-artifact.md). Distinct from rules, which references external rule sets for enforcement.",
+        "items": {
+          "type": "object",
+          "required": ["id", "directive"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to the rule id <bundle-name>/<scd-name>/<id>"
+            },
+            "directive": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cites": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "prohibitions": {
+        "type": "array",
+        "description": "Binary prohibitions: tools or practices that are forbidden, with no conditions. Compiled into rules ahead of directives (spec/0.6/runtime-artifact.md).",
+        "items": {
+          "type": "object",
+          "required": ["id", "kind", "subject"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to <bundle-name>/<scd-name>/<id>"
+            },
+            "kind": {
+              "type": "string",
+              "enum": ["tool", "practice"],
+              "description": "tool: a product, service, library, or model; practice: an action"
+            },
+            "subject": {
+              "type": "string",
+              "minLength": 1,
+              "description": "What is prohibited, as a noun phrase, without conditions or qualifiers (e.g. 'public LLM services')"
+            },
+            "instead": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The approved alternative, if any; compiled"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why it is prohibited; for reviewers, not compiled"
+            },
+            "cites": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "facts": {
+        "type": "array",
+        "description": "Statements of fact an agent should know (company, architecture, environment). Compiled into the artifact's facts list (spec/0.6/runtime-artifact.md).",
+        "items": {
+          "type": "object",
+          "required": ["id", "fact"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+              "description": "Unique within the SCD across directives, prohibitions, and facts; compiled to <bundle-name>/<scd-name>/<id>"
+            },
+            "fact": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cites": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "rules": {
           "type": "object",
           "description": "References to external rule sets stored in Rules Database",
           "properties": {
@@ -296,6 +392,14 @@
       },
       "additionalProperties": true
     },
+    "cites": {
+      "type": "array",
+      "description": "Optional standard citation references (citations.md): edition and clause only, never standard text.",
+      "items": {
+        "type": "string",
+        "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+      }
+    },
     "relationships": {
       "type": "array",
       "items": {
@@ -307,7 +411,8 @@
           },
           "target": {
             "type": "string",
-            "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+            "pattern": "^(scd:(meta|standards|project):[a-zA-Z0-9._-]+|std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?)$",
+            "description": "An scd: id, or (for satisfies) a std: citation reference (citations.md). scd:standards: targets are deprecated in 0.6.0."
           },
           "description": {
             "type": "string"

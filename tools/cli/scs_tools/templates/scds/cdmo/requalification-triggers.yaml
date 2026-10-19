@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: supplier-qualification).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:requalification-triggers
+type: project
+title: "Requalification Triggers"
+version: "DRAFT"
+description: "Events that require a supplier to be requalified"
+concept: concept:supplier-qualification
+content:
+  summary: "TODO - in a sentence or two, requalification triggers at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: RT-001
+  #   fact: "A vendor is requalified after a change of ownership, a security incident, or a change to its data-processing terms."
+  triggers: "TODO - each trigger and who initiates requalification"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Requalification Triggers skeleton from the Medical-Device CDMO ontology"

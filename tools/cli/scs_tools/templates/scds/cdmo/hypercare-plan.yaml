@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: implementation-cutover).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:hypercare-plan
+type: project
+title: "Hypercare Plan"
+version: "DRAFT"
+description: "Support and go-live criteria after each rollout wave"
+concept: concept:implementation-cutover
+content:
+  summary: "TODO - in a sentence or two, hypercare plan at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: HP-001
+  #   fact: "Hypercare lasts [N] weeks after each wave, with [team] on call."
+  exit_criteria: "TODO - when hypercare ends"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Hypercare Plan skeleton from the Medical-Device CDMO ontology"

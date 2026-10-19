@@ -4,7 +4,7 @@ import re
 from typing import Any, Dict, List, Optional, Set
 
 from .rules_loader import RulesLoader
-from .utils import ValidationError, ValidationResult, ValidationWarning
+from .utils import CITATION_RE, ValidationError, ValidationResult, ValidationWarning
 
 
 class OntologyValidator:
@@ -268,31 +268,24 @@ class OntologyValidator:
                 )
                 result.add_error(ValidationError(msg, file_path=file_path))
 
-        elif target_kind == "scd:standards":
-            if not target.startswith("scd:standards:"):
+        elif target_kind == "citation":
+            # Citations are checked for form only, never resolved (citations.md §7).
+            if target.startswith("scd:standards:"):
                 msg = self.rules_loader.get_error_message(
                     self.rules,
-                    "relationship_target_not_found",
-                    concept_id=concept_id,
-                    type=rel_type,
-                    target=target,
-                    domain_id=domain_id,
-                )
-                result.add_error(ValidationError(msg, file_path=file_path))
-            else:
-                # Well-formed scd:standards: id. Resolving it against real
-                # SCDs needs project-level context this validator doesn't
-                # have when called with only a domain manifest - flag as a
-                # soft warning, not an error, consistent with how
-                # relationship_validator treats unresolved cross-bundle
-                # targets.
-                msg = self.rules_loader.get_error_message(
-                    self.rules,
-                    "satisfies_target_unresolved",
+                    "satisfies_target_deprecated",
                     concept_id=concept_id,
                     target=target,
                 )
                 result.add_warning(ValidationWarning(msg, level="ontology", file_path=file_path))
+            elif not CITATION_RE.match(target):
+                msg = self.rules_loader.get_error_message(
+                    self.rules,
+                    "satisfies_target_invalid",
+                    concept_id=concept_id,
+                    target=target,
+                )
+                result.add_error(ValidationError(msg, file_path=file_path))
 
     def _validate_depends_on_acyclic(
         self,

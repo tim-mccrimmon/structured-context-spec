@@ -1,0 +1,39 @@
+# SCD Template: Prohibited Tools and Practices
+# Purpose: Things that are forbidden in all of the organization's work, without exception.
+#
+# A prohibition is binary. Write only what is prohibited (`subject`), as a noun phrase; the
+# compiler writes the rule as "Prohibited: <subject>." Validation rejects a subject that
+# contains a condition or qualifier (unless, except, if, when, where possible, avoid,
+# should, ...). If something is allowed in some cases, narrow the subject so that what
+# remains is always forbidden.
+#
+#   kind:    tool (a product, service, library, or model) or practice (an action)
+#   instead: the approved alternative, if any (compiled)
+#   reason:  why, for reviewers (not compiled)
+#   cites:   standard citations, e.g. std:hipaa#164.312(a)(1) (compiled)
+#
+# Projects cannot override these; changing one means a new version of the Domain bundle.
+
+id: scd:project:prohibited
+type: project
+title: "Prohibited Tools and Practices"
+version: "DRAFT"
+description: "Tools and practices forbidden, without exception, in all of {{ project_name }}'s work"
+
+content:
+  summary: "Binary prohibitions that apply to all work"
+  prohibitions: []
+  # Examples:
+  # - id: NO-001
+  #   kind: tool
+  #   subject: "consumer generative AI services and personal AI accounts"
+  #   instead: "the company's private AI service"
+  #   reason: "Company and client data may not leave company-controlled systems."
+  # - id: NO-002
+  #   kind: practice
+  #   subject: "committing credentials, keys, or tokens to any repository"
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Prohibitions for {{ project_name }}"

@@ -8,6 +8,7 @@ from pathlib import Path
 
 import click
 
+from scs_tools.commands.new import _scs_tools_version
 from scs_tools.utils.files import (
     copy_template,
     create_directory_structure,
@@ -93,10 +94,10 @@ def init(project_type, author, email, force):
 
     # Create .scs/config
     click.echo("Creating SCS configuration...")
-    scs_config_content = f"""# SCS Project Configuration
+    scs_config_content = f"""# SCS Workspace Configuration
 project_name: {project_name}
 project_type: {project_type}
-scs_version: 0.1.0
+scs_version: {_scs_tools_version()}
 author: {author_info}
 email: {email_info}
 """
@@ -117,6 +118,9 @@ email: {email_info}
 
     click.echo("\n✓ SCS initialized successfully!")
     click.echo("\nNext steps:")
-    click.echo(f"  scs new project {project_name}  # Generate full project structure")
+    click.echo("  scs add bundle <concept>        # Add concept bundles")
     click.echo("  scs add scd <name>              # Add individual SCDs")
-    click.echo("  scs bundle list                 # List available bundles")
+    click.echo("  scs bundle list --available     # List available templates")
+    click.echo(
+        "  # Or scaffold a complete workspace: scs new project <name> / scs new domain <name>"
+    )

@@ -1,0 +1,15 @@
+id: bundle:prohibited
+type: concept
+version: "DRAFT"
+title: "Prohibited Tools and Practices"
+description: "Tools and practices forbidden in all of {{ project_name }}'s work"
+
+imports: []
+
+scds:
+  - scd:project:prohibited
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Prohibited Tools and Practices concept bundle for {{ project_name }}"

@@ -2,20 +2,22 @@ name: tools-ci
 
 # CI for tools/scd-validator (scs-validator) and tools/cli (scs-tools). ISS-013.
 # The regression suites also validate every shipped example, ontology manifest and scaffold, so a
-# change to schema/, rules/, templates or examples that breaks 0.5.0 behaviour fails here.
+# change to schema/, rules/, templates or examples that breaks 0.6.0 behaviour fails here.
 
 on:
   push:
-    branches: [main, 0.5-dev]
+    branches: [main, 0.6-dev]
     paths:
       - "tools/**"
       - "schema/**"
+      - "meta/**"
       - "examples/**"
       - ".github/workflows/tools-ci.yml"
   pull_request:
     paths:
       - "tools/**"
       - "schema/**"
+      - "meta/**"
       - "examples/**"
       - ".github/workflows/tools-ci.yml"
 

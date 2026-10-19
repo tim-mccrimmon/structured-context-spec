@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: supplier-qualification).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:ai-vendor-qualification
+type: project
+title: "AI Vendor Qualification"
+version: "DRAFT"
+description: "Criteria for qualifying AI vendors"
+concept: concept:supplier-qualification
+content:
+  summary: "TODO - in a sentence or two, ai vendor qualification at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: AVQ-001
+  #   fact: "AI vendors are approved only with SOC 2 Type II evidence and a signed data-processing agreement."
+  #   cites: [std:soc2:2017]
+  criteria: "TODO - each criterion and the evidence required"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "AI Vendor Qualification skeleton from the Medical-Device CDMO ontology"

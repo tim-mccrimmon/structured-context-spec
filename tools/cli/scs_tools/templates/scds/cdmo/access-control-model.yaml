@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: security).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:access-control-model
+type: project
+title: "Access Control Model"
+version: "DRAFT"
+description: "Who and what may reach which systems, including AI assistants"
+concept: concept:security
+content:
+  summary: "TODO - in a sentence or two, access control model at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: ACM-001
+  #   directive: "Use only the system access granted to the requesting user. Do not request or use shared or elevated credentials."
+  systems: "TODO - each system, the access an assistant has, and who grants it"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Access Control Model skeleton from the Medical-Device CDMO ontology"

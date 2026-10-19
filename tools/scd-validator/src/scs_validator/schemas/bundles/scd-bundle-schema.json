@@ -14,7 +14,7 @@
     "type": {
       "type": "string",
       "enum": ["project", "meta", "standards", "concept", "domain"],
-      "description": "Bundle type: 'project' (top-level), 'meta' (vocabulary), 'standards' (compliance), 'concept' (a Domain Ontology concept, RFC-0001), 'domain' (industry vertical)"
+      "description": "Bundle type: 'domain' (an organization's governance, also called Global), 'project' (one project's governance), 'meta' (vocabulary, published with the spec), 'concept' (a Domain Ontology concept, RFC-0001), 'standards' (deprecated in 0.6.0; use citation references)"
     },
     "version": {
       "type": "string",
@@ -33,7 +33,7 @@
     },
     "imports": {
       "type": "array",
-      "description": "List of external bundle references with versions (e.g., bundle:architecture:1.0.0). Domain bundles import concept bundles. Concept bundles MUST have empty imports array.",
+      "description": "List of external bundle references with versions (e.g., bundle:architecture:1.0.0). Domain bundles import a meta bundle and concept bundles. Project bundles MAY import concept bundles and MUST NOT import meta, domain, or project bundles. Concept bundles MUST have empty imports array.",
       "items": {
         "type": "string",
         "pattern": "^bundle:[a-zA-Z0-9._-]+(:[0-9]+\\.[0-9]+\\.[0-9]+)?$",
@@ -42,7 +42,7 @@
     },
     "scds": {
       "type": "array",
-      "description": "List of SCD identifiers included directly in this bundle (not from imports). Project bundles typically have empty scds array.",
+      "description": "List of SCD identifiers included directly in this bundle (not from imports). A bundle lists SCDs or imports, not both (bundle-format.md §9.3).",
       "items": {
         "type": "string",
         "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$",
@@ -124,28 +124,11 @@
         "properties": {
           "imports": {
             "minItems": 1,
-            "description": "Domain bundles MUST import at least one concept bundle"
+            "description": "Domain bundles MUST import at least one concept bundle (and MAY import one meta bundle)"
           },
           "scds": {
             "maxItems": 0,
-            "description": "Domain bundles import concepts, they do not directly contain SCDs"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "type": {
-            "const": "project"
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "imports": {
-            "minItems": 1,
-            "description": "Project bundles MUST import at least one bundle (typically meta, standards, and domain bundles)"
+            "description": "Domain bundles hold their rules in concept bundles, not as direct SCDs"
           }
         }
       }
@@ -201,5 +184,5 @@
       }
     }
   ],
-  "$comment": "Bundle Types: project (top-level, imports all), meta (foundational vocabulary), standards (compliance requirements), concept (a Domain Ontology concept, RFC-0001), domain (industry vertical)"
+  "$comment": "Bundle Types (0.6.0): domain (organization governance, also called Global; imports meta + concept bundles), project (one project's governance; independent of domain), meta (foundational vocabulary, published with the spec), concept (a Domain Ontology concept, RFC-0001), standards (deprecated; use citation references)"
 }

@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: data-provenance).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:data-lineage
+type: project
+title: "Data Lineage"
+version: "DRAFT"
+description: "Source-to-target lineage for data this program migrates or transforms"
+concept: concept:data-provenance
+content:
+  summary: "TODO - in a sentence or two, data lineage at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: DL-001
+  #   fact: "Device master records migrate from System A to System B. System B is authoritative after cutover."
+  flows: "TODO - each source, target, transformation, and reconciliation check"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Data Lineage skeleton from the Medical-Device CDMO ontology"

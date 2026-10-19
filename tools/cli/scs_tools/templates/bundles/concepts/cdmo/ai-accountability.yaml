@@ -1,0 +1,18 @@
+id: bundle:ai-accountability
+type: concept
+version: "DRAFT"
+title: "AI Accountability Concept Bundle"
+description: "AI accountability for a medical-device CDMO: human decision authority and sign-off gates, the non-decision principle (automated controls do not approve), named accountability for AI-assisted output, and the method for handling AI limitations and bias."
+
+imports: []
+
+scds:
+  - scd:project:human-authority
+  - scd:project:non-decision-principle
+  - scd:project:accountability-assignment
+  - scd:project:bias-mitigation
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "AI Accountability concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

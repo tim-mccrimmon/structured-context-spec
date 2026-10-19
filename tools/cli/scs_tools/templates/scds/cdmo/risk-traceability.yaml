@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: risk-management).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:risk-traceability
+type: project
+title: "Risk Traceability"
+version: "DRAFT"
+description: "How risks trace to requirements and controlling deliverables"
+concept: concept:risk-management
+content:
+  summary: "TODO - in a sentence or two, risk traceability at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: RT-001
+  #   directive: "When you change a requirement or deliverable, list the risks that trace to it."
+  trace: "TODO - how risk, requirement, and deliverable ids are linked"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Risk Traceability skeleton from the Medical-Device CDMO ontology"

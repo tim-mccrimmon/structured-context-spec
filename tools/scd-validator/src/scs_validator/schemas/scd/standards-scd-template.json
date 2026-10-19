@@ -141,6 +141,14 @@
       },
       "additionalProperties": true
     },
+    "cites": {
+      "type": "array",
+      "description": "Optional standard citation references (citations.md): edition and clause only, never standard text.",
+      "items": {
+        "type": "string",
+        "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+      }
+    },
     "relationships": {
       "type": "array",
       "items": {
@@ -152,7 +160,8 @@
           },
           "target": {
             "type": "string",
-            "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+            "pattern": "^(scd:(meta|standards|project):[a-zA-Z0-9._-]+|std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?)$",
+            "description": "An scd: id, or (for satisfies) a std: citation reference (citations.md). scd:standards: targets are deprecated in 0.6.0."
           },
           "description": {
             "type": "string"

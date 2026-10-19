@@ -22,6 +22,8 @@ REPO_SCHEMA = REPO / "schema"
 PACKAGE = Path(str(resources.files("scs_validator")))
 PACKAGED_RULES = PACKAGE / "rules"
 PACKAGED_SCHEMAS = PACKAGE / "schemas"
+PACKAGED_META = PACKAGE / "meta"
+REPO_META = REPO / "meta"
 
 REQUIRED_SCHEMAS = [
     "bundles/scd-bundle-schema.json",
@@ -42,8 +44,8 @@ REQUIRED_RULE_FILES = [
 
 def test_default_rules_ship_inside_the_package():
     for name in REQUIRED_RULE_FILES:
-        assert (PACKAGED_RULES / "v0.5.0" / name).is_file(), name
-    assert RulesLoader().rules_dir.resolve() == (PACKAGED_RULES / "v0.5.0").resolve()
+        assert (PACKAGED_RULES / "v0.6.0" / name).is_file(), name
+    assert RulesLoader().rules_dir.resolve() == (PACKAGED_RULES / "v0.6.0").resolve()
 
 
 @pytest.mark.parametrize("rel", REQUIRED_SCHEMAS)
@@ -116,3 +118,25 @@ def test_the_sync_script_reports_no_drift():
         [sys.executable, str(script), "--check"], capture_output=True, text=True
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_meta_bundle_ships_inside_the_package():
+    assert (PACKAGED_META / "bundles" / "meta-bundle.yaml").is_file()
+    assert (PACKAGED_META / "context" / "meta" / "governance-context.yaml").is_file()
+
+
+def test_packaged_meta_matches_the_repo_meta():
+    """Drift check. To fix a failure run `python scripts/sync_schemas.py` in tools/scd-validator."""
+    if not REPO_META.is_dir():
+        pytest.skip("repo-root meta/ not available (running from an sdist or installed copy)")
+    source = {p.relative_to(REPO_META).as_posix(): p for p in REPO_META.rglob("*.yaml")}
+    vendored = {p.relative_to(PACKAGED_META).as_posix(): p for p in PACKAGED_META.rglob("*.yaml")}
+    assert set(vendored) == set(source)
+    assert all(source[rel].read_bytes() == vendored[rel].read_bytes() for rel in source)
+
+
+def test_packaged_meta_bundle_validates():
+    result = CliRunner().invoke(
+        validate, ["--bundle", str(PACKAGED_META / "bundles" / "meta-bundle.yaml"), "--no-color"]
+    )
+    assert result.exit_code == 0, result.output

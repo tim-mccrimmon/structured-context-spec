@@ -68,7 +68,7 @@ relationships:
   # HIPAA Compliance satisfies regulatory standards and constrains implementation.
   # Example relationships:
   - type: "satisfies"
-    target: "scd:standards:hipaa-security-rule"
+    target: "std:hipaa"
     description: "Implements HIPAA Security Rule requirements"
   - type: "constrains"
     target: "scd:project:data-handling"

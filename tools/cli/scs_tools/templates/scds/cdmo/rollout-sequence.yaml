@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: implementation-cutover).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:rollout-sequence
+type: project
+title: "Rollout Sequence"
+version: "DRAFT"
+description: "The multi-site rollout sequence, including role and licensing differences"
+concept: concept:implementation-cutover
+content:
+  summary: "TODO - in a sentence or two, rollout sequence at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: RS-001
+  #   fact: "Wave 1: [site] on [date]. Wave 2: [sites] on [date]."
+  waves: "TODO - each wave, its sites, and its readiness checks"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Rollout Sequence skeleton from the Medical-Device CDMO ontology"

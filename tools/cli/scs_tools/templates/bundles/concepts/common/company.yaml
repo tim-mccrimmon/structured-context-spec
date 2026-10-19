@@ -1,0 +1,15 @@
+id: bundle:company
+type: concept
+version: "DRAFT"
+title: "Company"
+description: "Facts about {{ project_name }} that every agent should know"
+
+imports: []
+
+scds:
+  - scd:project:company-profile
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Company concept bundle for {{ project_name }}"

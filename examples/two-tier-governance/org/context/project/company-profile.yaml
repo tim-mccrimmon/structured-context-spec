@@ -1,0 +1,25 @@
+id: scd:project:company-profile
+type: project
+title: Company Profile
+version: "1.0.0"
+description: What MedTech CDMO does and where its controlled records live.
+concept: concept:company
+content:
+  summary: A contract manufacturer of medical devices with a certified quality system.
+  facts:
+    - id: CO-001
+      fact: >-
+        MedTech CDMO designs and manufactures medical devices under contract. Each client owns
+        the designs, specifications, and test data for its devices.
+    - id: CO-002
+      fact: The quality management system is certified to ISO 13485:2016.
+      cites:
+        - std:iso-13485:2016
+    - id: CO-003
+      fact: >-
+        Controlled documents and design history files are kept in the electronic quality
+        management system, not in shared drives or source repositories.
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  rationale: Initial approved version

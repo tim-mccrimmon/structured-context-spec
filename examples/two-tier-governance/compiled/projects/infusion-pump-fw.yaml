@@ -1,0 +1,20 @@
+scs_runtime: '0.6'
+id: bundle:infusion-pump-fw
+type: project
+version: 0.3.0
+title: Infusion Pump Firmware
+sources: []
+rules:
+- id: infusion-pump-fw/identity
+  rule: 'When asked which governance bundles are active, state: "Project bundle bundle:infusion-pump-fw version 0.3.0".'
+- id: infusion-pump-fw/software-safety-class/SSC-001
+  rule: The pump firmware is IEC 62304 software safety class C. Treat every firmware change as safety-relevant.
+  cites: ['std:iec-62304:2006-a1#4.3']
+- id: infusion-pump-fw/software-safety-class/SSC-002
+  rule: Do not propose removing or weakening an alarm, interlock, or dose limit check. Refer such requests to the risk management lead.
+  cites: ['std:iso-14971:2019']
+- id: infusion-pump-fw/release-gates/RG-001
+  rule: A firmware build is releasable only after unit, integration, and system verification have passed and the results are recorded.
+  cites: ['std:iec-62304:2006-a1#5.8']
+- id: infusion-pump-fw/release-gates/RG-002
+  rule: Generated code must not be merged without review by a firmware engineer.

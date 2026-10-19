@@ -1,0 +1,21 @@
+id: scd:project:design-change-control
+type: project
+title: Design Change Control
+version: "1.0.0"
+description: Review and approval of design changes.
+concept: concept:design-controls
+content:
+  summary: Design changes follow the QMS design change procedure.
+  directives:
+    - id: DCC-001
+      directive: >-
+        Design changes require documented review and approval before implementation.
+      cites:
+        - std:iso-13485:2016#7.3.9
+    - id: DCC-002
+      directive: >-
+        Do not describe a design change as approved unless the approval record is identified.
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  rationale: Initial approved version

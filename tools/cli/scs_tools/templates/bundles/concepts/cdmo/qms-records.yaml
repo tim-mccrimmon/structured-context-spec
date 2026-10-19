@@ -1,0 +1,18 @@
+id: bundle:qms-records
+type: concept
+version: "DRAFT"
+title: "QMS Records Concept Bundle"
+description: "QMS records management for a medical-device CDMO: document hierarchy and control rules, record-retention rules, CAPA triggers, and which records are authoritative systems of record (AI output is never one)."
+
+imports: []
+
+scds:
+  - scd:project:document-control
+  - scd:project:record-retention
+  - scd:project:capa-triggers
+  - scd:project:system-of-record-designation
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "QMS Records concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

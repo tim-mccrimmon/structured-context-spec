@@ -1,0 +1,17 @@
+id: bundle:training-competency
+type: concept
+version: "DRAFT"
+title: "Training & Competency Concept Bundle"
+description: "Training and competency for a medical-device CDMO program: the role-to-required-competency matrix, the definition of a qualified reviewer (who may approve AI-assisted output), and training-completion gates on system/data access."
+
+imports: []
+
+scds:
+  - scd:project:role-competency-matrix
+  - scd:project:qualified-reviewer-definition
+  - scd:project:training-completion-gates
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Training & Competency concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

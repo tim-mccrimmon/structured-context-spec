@@ -1,0 +1,16 @@
+id: bundle:design-controls
+type: concept
+version: "1.0.0"
+title: "Design Controls"
+description: >
+  Organization rules for design review and design change control.
+imports: []
+scds:
+  - scd:project:design-review
+  - scd:project:design-change-control
+
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  version_approved_by: "qa-director@medtech-cdmo.example"
+  version_approved_at: "2026-10-10T14:00:00Z"

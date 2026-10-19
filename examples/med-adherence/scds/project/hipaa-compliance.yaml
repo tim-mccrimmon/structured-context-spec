@@ -5,6 +5,10 @@ domain: compliance-governance
 title: "HIPAA Compliance"
 description: "HIPAA Privacy and Security Rule compliance requirements"
 concept: concept:compliance-governance
+cites:
+  - std:hipaa#164.308
+  - std:hipaa#164.312
+  - std:hipaa#164.502
 
 content:
   summary: "System handles PHI and must comply with HIPAA Privacy and Security Rules"

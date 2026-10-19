@@ -1,0 +1,20 @@
+id: bundle:meta
+type: meta
+version: "0.6.0"
+title: "SCS Meta Bundle"
+description: >
+  Shared SCS vocabulary and the directives that tell an agent how to read SCS governance
+  context. Published and versioned with the SCS specification; adopters pin it from their
+  Domain bundle (bundle:meta:0.6.0) and do not edit it.
+
+imports: []
+
+scds:
+  - scd:meta:governance-context
+
+provenance:
+  created_by: "scs-maintainers"
+  created_at: "2026-10-19T00:00:00Z"
+  version_approved_by: "scs-maintainers"
+  version_approved_at: "2026-10-19T00:00:00Z"
+  rationale: "Meta bundle for SCS 0.6.0"

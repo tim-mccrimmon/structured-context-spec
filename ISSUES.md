@@ -827,3 +827,16 @@ where concept links go, so the mistake is easy to make. Fix: state it in `domain
 and `core-model.md` §6, and make the validator message point at the ontology when a relationship
 target starts with `concept:`. Related: RFC-0001, ISS-006.
 
+### ISS-041 - "Project" tier name is misleading for organization-wide SCDs (open question)
+**Status:** open question, not scheduled
+Since 0.6.0, organization-wide rules in a Domain bundle are `scd:project:*` SCDs, so a
+"project" SCD can apply to every project. Decided 2026-10-19 (Tim): keep the tier name in
+0.6.0 and define it as "adopter-authored"; scope comes from the bundle that includes an SCD,
+never from its tier (`spec/0.6/project-tier.md` §1, `terminology.md` §3.3, `core-model.md`
+§5.3). The tier does not appear in compiled artifacts (rule ids are
+`<bundle>/<scd-name>/<id>`), so the name has no runtime effect.
+**Open question:** whether to rename the tier (e.g. `local`, `adopter`) with `project` as a
+deprecated alias. Cost: every SCD id, template, and example changes, against the
+requirement that ids stay stable. Revisit only if adopters report the name as a real source
+of confusion; a rename needs an RFC.
+

@@ -1,0 +1,15 @@
+id: bundle:prohibited
+type: concept
+version: "1.0.0"
+title: "Prohibited Tools and Practices"
+description: >
+  Tools and practices that are forbidden in all MedTech CDMO work.
+imports: []
+scds:
+  - scd:project:prohibited
+
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  version_approved_by: "qa-director@medtech-cdmo.example"
+  version_approved_at: "2026-10-10T14:00:00Z"

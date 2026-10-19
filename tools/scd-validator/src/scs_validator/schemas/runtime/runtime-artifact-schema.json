@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://structuredcontext.dev/schema/runtime-artifact.schema.json",
+  "title": "SCS Runtime Artifact",
+  "description": "A compiled Domain or Project bundle: the self-contained governance context a runtime delivers to an AI agent (spec/0.6/runtime-artifact.md).",
+  "type": "object",
+  "required": ["scs_runtime", "id", "type", "version", "title", "sources", "rules"],
+  "properties": {
+    "scs_runtime": {
+      "type": "string",
+      "const": "0.6",
+      "description": "Artifact format version"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^bundle:[a-zA-Z0-9._-]+$",
+      "description": "The compiled bundle's id"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["domain", "project"],
+      "description": "Only Domain and Project bundles are compiled"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(\\d+\\.\\d+\\.\\d+|DRAFT\\+[0-9a-f]{8})$",
+      "description": "The bundle's semantic version, or DRAFT+<8 hex digest> for an explicitly allowed draft"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sources": {
+      "type": "array",
+      "description": "Every bundle in the resolved tree except the root, as bundle:<name>:<version>, in resolution order",
+      "items": {
+        "type": "string",
+        "pattern": "^bundle:[a-zA-Z0-9._-]+:(\\d+\\.\\d+\\.\\d+|DRAFT)$"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The self-identification rule, then one rule per prohibition, then one rule per directive",
+      "items": {
+        "type": "object",
+        "required": ["id", "rule"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+/(identity|[a-zA-Z0-9._-]+/[A-Za-z0-9][A-Za-z0-9._-]*)$",
+            "description": "<bundle-name>/<scd-name>/<prohibition-or-directive-id>, or <bundle-name>/identity"
+          },
+          "rule": {
+            "type": "string",
+            "minLength": 1
+          },
+          "cites": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "facts": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One entry per fact, in tree order; omitted when the tree has no facts",
+      "items": {
+        "type": "object",
+        "required": ["id", "fact"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+/[A-Za-z0-9][A-Za-z0-9._-]*$",
+            "description": "<bundle-name>/<scd-name>/<fact-id>"
+          },
+          "fact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "cites": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

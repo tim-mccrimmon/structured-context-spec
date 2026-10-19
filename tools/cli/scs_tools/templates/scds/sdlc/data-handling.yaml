@@ -69,7 +69,7 @@ relationships:
     target: "scd:project:integration-map"
     description: "Data handling rules constrain how data flows to external systems"
   # - type: "satisfies"
-  #   target: "scd:standards:gdpr"
+  #   target: "std:gdpr:2016-679"
   #   description: "Data handling satisfies GDPR requirements"
 
 provenance:

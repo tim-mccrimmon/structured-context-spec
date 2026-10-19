@@ -150,7 +150,34 @@
             "additionalProperties": true
           }
         },
-        "rules": {
+        "directives": {
+        "type": "array",
+        "description": "Plain-language statements an agent is expected to follow; the only SCD content compiled into a runtime artifact (spec/0.6/runtime-artifact.md). Distinct from rules, which references external rule sets for enforcement.",
+        "items": {
+          "type": "object",
+          "required": ["id", "directive"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+              "description": "Unique within the SCD; compiled to the rule id <bundle-name>/<scd-name>/<id>"
+            },
+            "directive": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cites": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "rules": {
           "type": "object",
           "description": "References to external rule sets stored in Rules Database",
           "properties": {
@@ -177,6 +204,14 @@
       },
       "additionalProperties": true
     },
+    "cites": {
+      "type": "array",
+      "description": "Optional standard citation references (citations.md): edition and clause only, never standard text.",
+      "items": {
+        "type": "string",
+        "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+      }
+    },
     "relationships": {
       "type": "array",
       "description": "Optional relationships to other SCDs.",
@@ -189,7 +224,8 @@
           },
           "target": {
             "type": "string",
-            "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+            "pattern": "^(scd:(meta|standards|project):[a-zA-Z0-9._-]+|std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?)$",
+            "description": "An scd: id, or (for satisfies) a std: citation reference (citations.md). scd:standards: targets are deprecated in 0.6.0."
           },
           "description": {
             "type": "string"

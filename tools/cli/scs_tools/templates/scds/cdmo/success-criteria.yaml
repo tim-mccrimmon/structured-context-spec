@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: business-context).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:success-criteria
+type: project
+title: "Success Criteria"
+version: "DRAFT"
+description: "Measurable criteria for program success"
+concept: concept:business-context
+content:
+  summary: "TODO - in a sentence or two, success criteria at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: SC-001
+  #   fact: "The program succeeds when every controlled record is migrated and validated with a 100% record-count match."
+  criteria: "TODO - each criterion and how it is measured"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Success Criteria skeleton from the Medical-Device CDMO ontology"

@@ -1,0 +1,19 @@
+id: scd:project:confidential-data
+type: project
+title: Confidential Data
+version: "1.0.0"
+description: Handling of client and patient information.
+concept: concept:ai-use
+content:
+  summary: Client information stays with the client; patient information stays out of AI work.
+  directives:
+    - id: CD-001
+      directive: >-
+        Treat each client's design files, specifications, and test data as confidential to that client. Do not use one client's information in work for another client.
+    - id: CD-002
+      directive: >-
+        Do not include patient health information in responses. If a request contains it, ask the user to remove it.
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  rationale: Initial approved version

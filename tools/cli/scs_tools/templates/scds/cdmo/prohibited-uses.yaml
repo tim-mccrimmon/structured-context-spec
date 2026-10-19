@@ -1,0 +1,24 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: compliance-governance).
+# Profile: Project only.
+# Write the tools and practices that are prohibited, with no conditions in `prohibitions`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:prohibited-uses
+type: project
+title: "Prohibited Uses"
+version: "DRAFT"
+description: "Tools and practices prohibited on this client program, in addition to the organization's prohibitions"
+concept: concept:compliance-governance
+content:
+  summary: "TODO - in a sentence or two, prohibited uses at {{ project_name }}"
+  prohibitions: []
+  # Examples:
+  # - id: PU-001
+  #   kind: tool
+  #   subject: "AI services not named in the client's quality agreement"
+  #   reason: "The quality agreement lists the only permitted processors."
+  client_agreement: "TODO - the clause of the client's quality agreement each prohibition comes from"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Prohibited Uses skeleton from the Medical-Device CDMO ontology"

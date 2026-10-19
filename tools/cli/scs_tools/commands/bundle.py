@@ -21,10 +21,29 @@ def bundle():
     """
     Manage SCS bundles
 
-    Bundles organize SCDs by domain and enable validation and versioning.
+    A workspace's root bundle is its Domain bundle (bundles/domain-bundle.yaml) or its
+    Project bundle (bundles/project-bundle.yaml); concept bundles group its SCDs.
     Use these commands to list, inspect, validate, and version your bundles.
     """
     pass
+
+
+ROOT_BUNDLE_FILES = ("domain-bundle.yaml", "project-bundle.yaml")
+
+
+def _root_bundle(base_path: Path) -> Path:
+    """The workspace's root bundle: bundles/domain-bundle.yaml or bundles/project-bundle.yaml."""
+    found = [base_path / "bundles" / name for name in ROOT_BUNDLE_FILES]
+    found = [path for path in found if path.exists()]
+    if len(found) != 1:
+        problem = "both" if found else "neither"
+        click.echo(
+            f"Error: Found {problem} of bundles/domain-bundle.yaml and "
+            "bundles/project-bundle.yaml; pass the bundle explicitly.",
+            err=True,
+        )
+        raise click.Abort()
+    return found[0]
 
 
 @bundle.command()
@@ -50,11 +69,9 @@ def list(available):
                 click.echo(f"  • {concept_name}")
             click.echo()
 
-        click.echo("Available domain bundles:\n")
-        for domain_file in sorted((get_template_path() / "bundles" / "domains").glob("*.yaml")):
-            click.echo(f"  • {domain_file.stem}")
+        click.echo("Domain bundles: create one with 'scs new domain <name> [--ontology ...]'.\n")
 
-        click.echo("\nProject types and their bundles (sdlc ontology only):\n")
+        click.echo("Project types and their bundles (sdlc ontology only):\n")
         for ptype, config in PROJECT_TYPES.items():
             click.echo(f"  {ptype}:")
             click.echo(f"    Description: {config['description']}")
@@ -76,11 +93,9 @@ def list(available):
         )
         raise click.Abort()
 
-    click.echo("Project bundles:\n")
+    click.echo("Root bundle:\n")
 
-    # Check for main bundles
-    main_bundles = ["project-bundle.yaml", "meta-bundle.yaml", "standards-bundle.yaml"]
-    for bundle_file in main_bundles:
+    for bundle_file in ROOT_BUNDLE_FILES:
         bundle_path = bundles_dir / bundle_file
         if bundle_path.exists():
             with open(bundle_path, "r") as f:
@@ -105,18 +120,6 @@ def list(available):
             click.echo(f"    Version: {data.get('version', 'unknown')}")
             click.echo(f"    SCDs: {len(data.get('scds') or [])}\n")
 
-    # Check for domain bundles
-    domains_dir = bundles_dir / "domains"
-    if domains_dir.exists():
-        click.echo("Domain bundles:\n")
-        for bundle_file in sorted(domains_dir.glob("*.yaml")):
-            with open(bundle_file, "r") as f:
-                data = yaml.safe_load(f) or {}
-            click.echo(f"  • {bundle_file.name}")
-            click.echo(f"    ID: {data.get('id', 'unknown')}")
-            click.echo(f"    Version: {data.get('version', 'unknown')}")
-            click.echo(f"    Imports: {len(data.get('imports') or [])} concept bundles\n")
-
 
 @bundle.command()
 @click.argument("bundle_name")
@@ -139,7 +142,6 @@ def info(bundle_name):
     bundle_locations = [
         base_path / "bundles" / f"{bundle_name}.yaml",
         base_path / "bundles" / "concepts" / f"{bundle_name}.yaml",
-        base_path / "bundles" / "domains" / f"{bundle_name}.yaml",
     ]
 
     bundle_path = None
@@ -148,9 +150,8 @@ def info(bundle_name):
             bundle_path = loc
             break
 
-    # If not found in project, check templates. Domain bundles aren't namespaced per model.
-    # Concept bundles are - prefer the current project's own ontology model (if any), then
-    # fall back to searching every model.
+    # If not found in project, check the concept bundle templates - prefer the current
+    # workspace's own ontology model (if any), then fall back to searching every model.
     if not bundle_path:
         from scs_tools.commands.add import _read_ontology_model
 
@@ -158,17 +159,11 @@ def info(bundle_name):
         concept_models = [ontology] + [m for m in ONTOLOGY_MODELS if m != ontology]
 
         template_path = None
-        domain_candidate = get_template_path() / "bundles" / "domains" / f"{bundle_name}.yaml"
-        if domain_candidate.exists():
-            template_path = domain_candidate
-        else:
-            for model in concept_models:
-                candidate = (
-                    get_template_path() / "bundles" / "concepts" / model / f"{bundle_name}.yaml"
-                )
-                if candidate.exists():
-                    template_path = candidate
-                    break
+        for model in concept_models:
+            candidate = get_template_path() / "bundles" / "concepts" / model / f"{bundle_name}.yaml"
+            if candidate.exists():
+                template_path = candidate
+                break
         if template_path:
             bundle_path = template_path
             click.echo("(Showing template bundle, not in current project)\n")
@@ -228,29 +223,22 @@ def info(bundle_name):
 @bundle.command()
 def validate():
     """
-    Validate bundles in the current project
+    Validate the workspace's root bundle and everything it imports
 
-    This is a shortcut for: scs validate --bundle bundles/project-bundle.yaml
+    This is a shortcut for: scs validate --bundle bundles/domain-bundle.yaml
+    (or bundles/project-bundle.yaml in a Project workspace)
 
     \b
     Example:
         scs bundle validate
     """
-    base_path = Path.cwd()
-    project_bundle = base_path / "bundles" / "project-bundle.yaml"
-
-    if not project_bundle.exists():
-        click.echo(
-            "Error: No project bundle found at bundles/project-bundle.yaml",
-            err=True,
-        )
-        raise click.Abort()
+    root_bundle = _root_bundle(Path.cwd())
 
     # Import and call the validate command
     from scs_tools.commands.validate import validate as validate_cmd
 
     ctx = click.get_current_context()
-    ctx.invoke(validate_cmd, bundle=str(project_bundle))
+    ctx.invoke(validate_cmd, bundle=str(root_bundle))
 
 
 @bundle.command()
@@ -258,8 +246,8 @@ def validate():
     "--bundle",
     "-b",
     type=click.Path(exists=True),
-    default="bundles/project-bundle.yaml",
-    help="Path to bundle file to version",
+    default=None,
+    help="Path to bundle file to version (default: the workspace's domain or project bundle)",
 )
 @click.option(
     "--version",
@@ -313,14 +301,14 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
             --approved-by "jane@example.com" --notes "Initial release"
 
         # Version a specific bundle
-        scs bundle version --bundle bundles/custom-bundle.yaml --version 2.1.0
+        scs bundle version --bundle bundles/concepts/security.yaml --version 2.1.0
 
         # Skip git operations (manual git workflow)
         scs bundle version --version 1.0.0 --no-git
     """
     click.echo("=== SCS Bundle Versioning ===\n")
 
-    bundle_path = Path(bundle)
+    bundle_path = Path(bundle) if bundle else _root_bundle(Path.cwd())
     if not bundle_path.exists():
         click.echo(f"Error: Bundle file not found: {bundle}", err=True)
         raise click.Abort()
@@ -574,14 +562,8 @@ def _create_version_manifest(
     if context_dir.exists():
         scd_count = len([f for f in context_dir.iterdir() if f.suffix == ".yaml"])
 
-    # Extract domain bundles from imports
-    foundation_bundles = []
-    domain_bundles = []
-    for imp in imports:
-        if "meta" in imp or "standards" in imp:
-            foundation_bundles.append(imp)
-        else:
-            domain_bundles.append(imp)
+    meta_bundles = [imp for imp in imports if imp.split(":")[1:2] == ["meta"]]
+    imported_bundles = [imp for imp in imports if imp not in meta_bundles]
 
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -607,12 +589,12 @@ def _create_version_manifest(
             "errors": validation_result["errors"],
             "warnings": validation_result["warnings"],
             "scd_count": scd_count,
-            "domain_count": len(domain_bundles),
+            "import_count": len(imports),
         }
 
     manifest["components"] = {
-        "foundation_bundles": foundation_bundles,
-        "domain_bundles": domain_bundles,
+        "meta_bundles": meta_bundles,
+        "imported_bundles": imported_bundles,
         "total_scds": scd_count,
     }
 
@@ -686,10 +668,6 @@ Deliverables:
 - SHA-256 checksum: {checksum}
 
 This bundle is now the authoritative source of truth.
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 """
 
         # Create commit

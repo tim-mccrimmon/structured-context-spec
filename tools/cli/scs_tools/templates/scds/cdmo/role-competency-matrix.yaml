@@ -1,0 +1,23 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: training-competency).
+# Profile: Project only.
+# Write the facts an AI agent should know in `facts`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:role-competency-matrix
+type: project
+title: "Role Competency Matrix"
+version: "DRAFT"
+description: "The competencies each role needs"
+concept: concept:training-competency
+content:
+  summary: "TODO - in a sentence or two, role competency matrix at {{ project_name }}"
+  facts: []
+  # Examples:
+  # - id: RCM-001
+  #   fact: "Validation engineers complete 21 CFR Part 11 and CSV procedure training before approving validation records."
+  #   cites: [std:iso-13485:2016#6.2]
+  roles: "TODO - each role and its required training"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Role Competency Matrix skeleton from the Medical-Device CDMO ontology"

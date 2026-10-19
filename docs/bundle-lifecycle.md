@@ -1,7 +1,13 @@
 # Bundle Lifecycle and Workflow
 
-**Version**: 0.1
-**Last Updated**: 2025-11-21
+**Version**: 0.6
+**Last Updated**: 2026-10-19
+
+> **SCS 0.6.0:** An organization's Domain bundle and each Project bundle are independent and
+> versioned separately; Standards bundles are replaced by citations; versioned bundles are
+> compiled into runtime artifacts. See [Bundle Hierarchy](#bundle-hierarchy) and
+> [Compiling for Runtime](#compiling-for-runtime). Other sections describe the general workflow
+> and still apply.
 
 ---
 
@@ -19,10 +25,11 @@ This document describes the complete lifecycle of SCD Bundles within a project, 
 4. [Review and Validation](#review-and-validation)
 5. [Versioning and Locking](#versioning-and-locking)
 6. [Bundle Hierarchy](#bundle-hierarchy)
-7. [Development Phase](#development-phase)
-8. [Change Management](#change-management)
-9. [Automation Opportunities](#automation-opportunities)
-10. [Best Practices](#best-practices)
+7. [Compiling for Runtime](#compiling-for-runtime)
+8. [Development Phase](#development-phase)
+9. [Change Management](#change-management)
+10. [Automation Opportunities](#automation-opportunities)
+11. [Best Practices](#best-practices)
 
 ---
 
@@ -232,15 +239,15 @@ When a bundle is versioned and locked:
 
 ### Versioning Structure
 
-#### Domain Bundle Versioning
+#### Concept Bundle Versioning
 
 ```yaml
 id: bundle:architecture
-type: domain
+type: concept
 version: "1.0.0"
-title: "Architecture Bundle"
-description: "Complete architectural context for Project X"
-imports: []  # Domain bundles cannot import other bundles
+title: "Architecture"
+description: "Architectural context for Project X"
+imports: []  # Concept bundles are leaves
 scds:
   - scd:project:system-context
   - scd:project:tech-stack
@@ -248,8 +255,9 @@ scds:
   - scd:project:component-model
 provenance:
   created_by: "alice@company.com"
-  created_at: "2025-11-20T10:00:00Z"
-  rationale: "Initial architecture definition for Project X launch"
+  created_at: "2026-10-01T10:00:00Z"
+  version_approved_by: "architecture-lead@company.com"
+  version_approved_at: "2026-10-10T14:00:00Z"
 ```
 
 #### Project Bundle Versioning
@@ -258,30 +266,23 @@ provenance:
 id: bundle:project-x
 type: project
 version: "1.0.0"
-title: "Project X Complete Context Bundle"
-description: "Complete context contract for Project X development"
+title: "Project X Governance"
+description: "Governance for Project X"
 imports:
-  # Foundation bundles
-  - bundle:meta:1.0.0
-  - bundle:standards:1.0.0
-
-  # Domain bundles (11 prescribed)
   - bundle:architecture:1.0.0
   - bundle:security:1.0.0
-  - bundle:performance-reliability:1.0.0
-  - bundle:usability-accessibility:1.0.0
-  - bundle:compliance-governance:1.0.0
-  - bundle:data-provenance:1.0.0
   - bundle:testing-validation:1.0.0
-  - bundle:deployment-operations:1.0.0
-  - bundle:safety-risk:1.0.0
-  - bundle:ethics-ai-accountability:1.0.0
-scds: []  # All SCDs are in imported bundles
+scds: []  # All SCDs are in imported concept bundles
 provenance:
   created_by: "project-lead@company.com"
-  created_at: "2025-11-20T14:00:00Z"
-  rationale: "Project X v1.0 development contract - approved by all domain teams"
+  created_at: "2026-10-01T14:00:00Z"
+  version_approved_by: "project-lead@company.com"
+  version_approved_at: "2026-10-12T09:00:00Z"
 ```
+
+A Project bundle does not import the organization's Domain bundle, the meta bundle, or a
+standards bundle. The Domain bundle is versioned on its own schedule by the people who own
+organization-wide governance.
 
 ### Immutability
 
@@ -295,91 +296,86 @@ Once versioned:
 
 ## Bundle Hierarchy
 
-### Compositional Structure
+### Two Independent Trees
 
-SCS bundles are **hierarchical and compositional** with **4 bundle types**:
-
-```
-Project Bundle (type: project, top-level orchestrator)
-  │
-  ├─ Meta Bundle:1.0.0 (type: meta, foundational vocabulary)
-  │   ├─ scd:meta:roles
-  │   ├─ scd:meta:capabilities
-  │   ├─ scd:meta:domains
-  │   └─ scd:meta:concerns
-  │
-  ├─ Standards Bundle:1.0.0 (type: standards, compliance)
-  │   ├─ scd:standards:hipaa-privacy-rule
-  │   └─ scd:standards:hipaa-security-rule
-  │
-  ├─ Architecture Bundle:1.0.0 (type: domain)
-  │   ├─ scd:project:system-context
-  │   ├─ scd:project:tech-stack
-  │   ├─ scd:project:integration-map
-  │   └─ scd:project:component-model
-  │
-  ├─ Security Bundle:1.0.0 (type: domain)
-  │   ├─ scd:project:authn-authz
-  │   ├─ scd:project:data-protection
-  │   ├─ scd:project:data-handling
-  │   └─ scd:project:threat-model
-  │
-  ├─ Governance Bundle:1.0.0
-  │   ├─ scd:meta:roles:1.0.0
-  │   ├─ scd:project:decision-framework:1.0.0
-  │   └─ scd:project:approval-process:1.0.0
-  │
-  └─ Compliance Bundle:1.0.0
-      ├─ scd:standards:hipaa:1.0.0
-      ├─ scd:project:hipaa-mappings:1.0.0
-      └─ scd:project:audit-evidence:1.0.0
-```
-
-### Domain Teams Own Domain Bundles
-
-- **Architecture team** owns and manages `bundle:architecture`
-- **Security team** owns and manages `bundle:security`
-- **Governance team** owns and manages `bundle:governance`
-- Each domain team works independently on their bundle
-- Each domain bundle can version independently (during iterations)
-
-### Project Bundle Composition
-
-The **project bundle** is the master contract that:
-- Imports specific versions of all domain bundles
-- May contain cross-cutting SCDs that span domains
-- Represents the complete, versioned context for the project
-- Is what the development team builds against
-
-### File Organization (Recommended)
+SCS 0.6.0 has two governance bundles, each the root of its own tree:
 
 ```
-project-x/
+Domain bundle (type: domain)            organization-wide; applies to all work
+  ├─ bundle:meta:0.6.0                  published with the SCS specification
+  ├─ bundle:ai-use (concept)
+  │   └─ scd:project:ai-review
+  └─ bundle:design-controls (concept)
+      ├─ scd:project:design-review
+      └─ scd:project:design-change-control
+
+Project bundle (type: project)          one project
+  ├─ bundle:architecture (concept)
+  │   └─ scd:project:system-context
+  └─ bundle:security (concept)
+      └─ scd:project:threat-model
+```
+
+- The **Domain bundle** (also called the organization or Global bundle) starts from an
+  industry ontology model and holds the organization's own rules. It imports the published
+  meta bundle and its concept bundles, and contains no SCDs of its own.
+- A **Project bundle** imports its concept bundles directly (or lists project SCDs directly).
+  It does not import the Domain bundle.
+- Neither tree contains standards text. SCDs and concepts cite standards with `std:`
+  references (`spec/0.6/citations.md`).
+
+A runtime applies the two side by side. The rules in the Domain bundle apply to every
+project; the Project bundle adds the rules for one project.
+
+### Teams Own Concept Bundles
+
+- The **architecture team** owns `bundle:architecture`, the **security team**
+  `bundle:security`, and so on.
+- Each concept bundle can be versioned independently during iterations.
+- Organization-wide concept bundles belong to the Domain bundle's owners (for example,
+  quality or compliance); project concept bundles belong to the project team.
+
+### File Organization
+
+`scs new domain <name>` and `scs new project <name>` create these layouts:
+
+```
+acme/                                   # Domain workspace
 ├── bundles/
-│   ├── project-bundle.yaml          # Master contract
-│   ├── architecture-bundle.yaml     # Domain bundle
-│   ├── security-bundle.yaml         # Domain bundle
-│   ├── governance-bundle.yaml       # Domain bundle
-│   ├── performance-bundle.yaml      # Domain bundle
-│   └── compliance-bundle.yaml       # Domain bundle
-│
-└── scd/
-    ├── meta/
-    │   ├── roles.yaml
-    │   └── capabilities.yaml
-    │
-    ├── standards/
-    │   ├── hipaa.yaml
-    │   └── soc2.yaml
-    │
-    └── project/
-        ├── system-context.yaml
-        ├── tech-stack.yaml
-        ├── component-model.yaml
-        ├── threat-model.yaml
-        ├── security-controls.yaml
-        └── ... (more SCDs)
+│   ├── domain-bundle.yaml
+│   └── concepts/
+├── context/project/                    # SCDs
+└── domain/domain-manifest.yaml         # Domain Ontology
+
+project-x/                              # Project workspace
+├── bundles/
+│   ├── project-bundle.yaml
+│   └── concepts/
+├── context/project/
+└── domain/domain-manifest.yaml
 ```
+
+---
+
+## Compiling for Runtime
+
+A versioned Domain or Project bundle is compiled into a **runtime artifact**: one file holding
+the bundle's prohibitions and directives as rules with stable ids, its facts, a version, and a
+self-identification rule
+(`spec/0.6/runtime-artifact.md`).
+
+```bash
+scs compile bundles/domain-bundle.yaml -o compiled/global.yaml
+scs compile bundles/project-bundle.yaml -o compiled/projects/project-x.yaml
+```
+
+Only each SCD's `content.prohibitions`, `content.directives`, and `content.facts` are
+compiled. The artifact carries no timestamps or
+authors, so the same versioned bundle always yields the same bytes and hash; a runtime can
+record that hash as evidence of which governance was applied. Use `--allow-draft` to compile a
+DRAFT bundle for testing; its version becomes `DRAFT+<digest>`.
+
+How a runtime stores, selects, and injects artifacts is outside SCS.
 
 ---
 

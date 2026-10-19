@@ -23,6 +23,9 @@ DOMAIN_EXAMPLES = SCHEMA / "domain" / "examples"
 FIXTURES = Path(__file__).parent / "fixtures"
 
 BUNDLE_TYPES = {"project", "meta", "standards", "concept", "domain"}
+# Kinds the examples must cover. Meta is published with the spec rather than shipped as an
+# example, and standards is deprecated in 0.6.0.
+EXAMPLE_BUNDLE_TYPES = {"project", "concept", "domain"}
 
 # third-party model output kept as evidence of cross-model testing; not a validity target
 EXCLUDED_DIRS = {"llm-portability"}
@@ -44,22 +47,32 @@ def _bundle_type(path: Path) -> str | None:
     return m.group(1).strip("\"'") if m else None
 
 
-def _example_bundles() -> list[Path]:
-    found = []
-    for p in sorted(EXAMPLES.rglob("*.yaml")):
-        if EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts) or "scds" in p.parts:
-            continue
-        if _bundle_type(p) in BUNDLE_TYPES:
-            found.append(p)
-    return found
+def _doc_id(path: Path) -> str:
+    m = re.search(r"^id:\s*(\S+)", path.read_text(), re.M)
+    return m.group(1).strip("\"'") if m else ""
 
 
-def _example_scds() -> list[Path]:
+def _example_files() -> list[Path]:
     return [
         p
         for p in sorted(EXAMPLES.rglob("*.yaml"))
-        if "scds" in p.parts and not (EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts))
+        if not (EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts))
     ]
+
+
+def _example_bundles() -> list[Path]:
+    # Bundle manifests, not compiled runtime artifacts (which also carry a bundle: id)
+    return [
+        p
+        for p in _example_files()
+        if _doc_id(p).startswith("bundle:")
+        and _bundle_type(p) in BUNDLE_TYPES
+        and not re.search(r"^scs_runtime:", p.read_text(), re.M)
+    ]
+
+
+def _example_scds() -> list[Path]:
+    return [p for p in _example_files() if _doc_id(p).startswith("scd:")]
 
 
 KNOWN_INVALID_BUNDLES: dict[str, str] = {}
@@ -102,7 +115,7 @@ def test_invalid_fixture_fails():
 
 def test_at_least_one_of_each_shipped_bundle_kind_is_covered():
     kinds = {_bundle_type(p) for p in _example_bundles()}
-    assert BUNDLE_TYPES <= kinds
+    assert EXAMPLE_BUNDLE_TYPES <= kinds
 
 
 # ------------------------------------------------------------------ domain manifests
@@ -122,17 +135,16 @@ def test_software_development_ontology_is_clean():
     assert "0 errors" in result.output and "0 warnings" in result.output
 
 
-def test_cdmo_ontology_only_warns_about_unresolved_satisfies_targets():
+def test_cdmo_ontology_satisfies_citations_are_clean():
+    """0.6.0: satisfies targets are std: citations, checked for form and never resolved."""
     result = run("--domain", str(DOMAIN_EXAMPLES / "medical-device-cdmo-domain.yaml"))
     assert result.exit_code == 0
-    assert "0 errors" in result.output
-    warnings = [ln for ln in result.output.splitlines() if "⚠" in ln]
-    assert warnings, "expected the documented unresolved-satisfies warnings"
-    assert all("satisfies" in ln for ln in warnings)
+    assert "0 errors" in result.output and "0 warnings" in result.output
 
 
 def test_strict_mode_turns_warnings_into_exit_code_2():
-    result = run("--domain", str(DOMAIN_EXAMPLES / "medical-device-cdmo-domain.yaml"), "--strict")
+    # The CHAI example is a standards bundle, deprecated in 0.6.0 (a warning).
+    result = run("--bundle", str(EXAMPLES / "chai-standards-bundle" / "bundle.yaml"), "--strict")
     assert result.exit_code == 2
 
 
@@ -411,7 +423,8 @@ def test_mca_domain_bundle_imports_every_concept_bundle():
 
     domain = yaml.safe_load((MCA_EXAMPLE / "domains" / "merchant-cash-advance.yaml").read_text())
     assert domain["type"] == "domain" and domain["scds"] == []
-    assert {ref.split(":", 1)[1] for ref in domain["imports"]} == _mca_concept_slugs()
+    assert domain["imports"][0] == "bundle:meta:0.6.0"
+    assert {ref.split(":", 1)[1] for ref in domain["imports"][1:]} == _mca_concept_slugs()
 
 
 def test_mca_skeletons_are_unfilled_and_carry_no_concept_relationships():

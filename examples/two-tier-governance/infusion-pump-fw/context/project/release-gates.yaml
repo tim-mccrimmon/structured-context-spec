@@ -1,0 +1,21 @@
+id: scd:project:release-gates
+type: project
+title: Release Gates
+version: "1.0.0"
+description: Conditions for releasing a firmware build.
+concept: concept:verification-validation
+content:
+  summary: Firmware builds are released only through the release procedure.
+  directives:
+    - id: RG-001
+      directive: >-
+        A firmware build is releasable only after unit, integration, and system verification have passed and the results are recorded.
+      cites:
+        - std:iec-62304:2006-a1#5.8
+    - id: RG-002
+      directive: >-
+        Generated code must not be merged without review by a firmware engineer.
+provenance:
+  created_by: "fw-lead@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  rationale: Initial approved version

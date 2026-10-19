@@ -13,7 +13,7 @@ This is the **spec repo**, not the product. SCS defines the format (SCDs, bundle
 relationships). SCP (Supervisory Control Plane) is the commercial runtime product built on top
 of SCS — it lives in a separate private repo.
 
-**Current spec version**: 0.3
+**Current spec version**: 0.6.0 (draft, branch `0.6-dev`)
 **License**: Apache 2.0
 **Website**: https://structuredcontext.dev
 **Registry/product**: SCP (separate repo: `SCP-2`)
@@ -24,18 +24,21 @@ of SCS — it lives in a separate private repo.
 
 ```
 structured-context-spec/
-├── spec/0.3/               # The specification documents (source of truth)
+├── spec/0.6/               # The specification documents (source of truth)
 │   ├── overview.md         # Top-level spec overview
 │   ├── core-model.md       # SCDs, bundles, tiers
 │   ├── bundle-format.md    # Bundle manifest format
+│   ├── citations.md        # std: standard citations
+│   ├── runtime-artifact.md # Compiled runtime artifact format
 │   ├── meta-tier.md        # Meta tier specification
-│   ├── standards-tier.md   # Standards tier specification
+│   ├── standards-tier.md   # Deprecated in 0.6.0 (replaced by citations)
 │   ├── project-tier.md     # Project tier specification
 │   ├── terminology.md      # Canonical definitions
 │   └── governance-and-compliance.md
 ├── rfcs/                   # Requests for Comments (spec changes)
 │   ├── README.md           # RFC process guide
 │   └── 0000-template.md    # Template for new RFCs
+├── meta/                   # The published meta bundle (bundle:meta:0.6.0), read-only
 ├── schema/                 # JSON Schema validation files
 ├── templates/              # Starter templates
 │   ├── bundles/            # Bundle manifest templates
@@ -69,8 +72,10 @@ which collided when installed together. Don't rename either back to a shared nam
 
 ### `tools/cli/` — `scs-tools` (project scaffolding)
 
-Click-based CLI exposing the `scs` command (`scs_tools.cli:cli`). Subcommands: `new`, `init`,
-`add`, `bundle`, `validate`. Templates it scaffolds live in `scs_tools/templates/`.
+Click-based CLI exposing the `scs` command (`scs_tools.cli:cli`). Subcommands: `new`
+(`domain`, `project`), `init`, `add`, `bundle`, `validate`, `compile`. Templates it scaffolds live
+in `scs_tools/templates/`. `scs compile` (`scs_tools/compiler.py`) turns a Domain or Project
+bundle into a runtime artifact; it needs `scs-validator` for tree resolution.
 
 ```bash
 cd tools/cli
@@ -85,11 +90,13 @@ pytest                    # regression suite (needs `pip install pytest` and the
 `src/`-layout package (`src/scs_validator/`). Validates SCDs and bundles in layered passes:
 syntax → schema → semantic → relationship → bundle/completeness (one module per pass,
 e.g. `schema_validator.py`, `semantic_validator.py`, `bundle_validator.py`). Validation
-**rules are data**, declared in `src/scs_validator/rules/v0.5.0/*.yaml` and loaded by
+**rules are data**, declared in `src/scs_validator/rules/v0.6.0/*.yaml` and loaded by
 `rules_loader.py` — prefer editing rule YAML over hardcoding checks. The repo-root `schema/`
 directory is the source of truth for the JSON Schemas; a copy is vendored into the package at
-`src/scs_validator/schemas/` so the wheel is self-contained. **After changing anything under
-`schema/`, run `python scripts/sync_schemas.py`** (from `tools/scd-validator`); a test fails if the
+`src/scs_validator/schemas/` so the wheel is self-contained; the repo-root `meta/` bundle is
+vendored the same way into `src/scs_validator/meta/`, and the resolver searches it first so
+`bundle:meta:<version>` resolves anywhere. **After changing anything under `schema/` or `meta/`,
+run `python scripts/sync_schemas.py`** (from `tools/scd-validator`); a test fails if the
 copies drift. The schema directory is found automatically (`--schema-dir`, then `$SCS_SCHEMA_DIR`,
 then a `schema/` dir from the current directory upward or in the checkout, then the packaged copy).
 
@@ -139,11 +146,16 @@ See `rfcs/README.md` for full process details.
 
 - **SCD** (Structured Context Document) — YAML file containing context content
   - Format: `scd:<tier>:<name>` (e.g., `scd:project:company-overview`)
-  - Tiers: `meta`, `standards`, `project`
+  - Tiers: `meta`, `project` (`standards` deprecated in 0.6.0)
+  - Compiled content (the only content `scs compile` emits): `content.prohibitions` (binary,
+    compiled first as `Prohibited: <subject>.`), `content.directives` (rules), `content.facts`
+  - `cites` — standard citations (`std:iso-13485:2016#7.3.9`); standard text never goes in SCS
 - **Bundle** — Manifest grouping SCDs + imports
-  - Types: meta, standards, concern, domain, project
-  - Concern bundles are leaf nodes (no imports)
-  - Domain bundles aggregate concerns (no direct SCDs)
+  - Types: meta, concept, domain, project (`standards` deprecated)
+  - Concept bundles are leaf nodes (no imports)
+  - Domain bundle = organization / Global: imports `bundle:meta:<version>` + concepts, no direct SCDs
+  - Project bundle: concepts (or SCDs) directly; never imports meta, domain, or standards
+  - Domain and Project bundles are independent trees, compiled separately
 - **Relationships** — Explicit edges between SCDs for graph traversal (`references`, `applies_to`, `governed_by`)
 - **Validation**: Loose (structure only) in Phase 1 / DRAFT; strict in Phase 2 / versioned
 
@@ -193,6 +205,6 @@ Don't add SCP product details to spec documents. Don't add SCS spec format detai
 
 ---
 
-**Last Updated**: 2026-02-23
-**Current Version**: SCS 0.3
+**Last Updated**: 2026-10-19
+**Current Version**: SCS 0.6.0 (draft)
 **Global product context**: see `~/.claude/CLAUDE.md`

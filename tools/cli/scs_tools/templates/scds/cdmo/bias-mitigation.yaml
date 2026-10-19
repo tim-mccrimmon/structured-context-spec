@@ -1,0 +1,22 @@
+# Skeleton SCD from the Medical-Device CDMO ontology (concept: ai-accountability).
+# Profile: Project only.
+# Write the rules an AI agent must follow in `directives`; only that list is
+# compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
+id: scd:project:bias-mitigation
+type: project
+title: "Bias Mitigation"
+version: "DRAFT"
+description: "The method for detecting and limiting bias or omission in AI-assisted work"
+concept: concept:ai-accountability
+content:
+  summary: "TODO - in a sentence or two, bias mitigation at {{ project_name }}"
+  directives: []
+  # Examples:
+  # - id: BM-001
+  #   directive: "When summarizing complaints or nonconformances, include every record in scope and state how many you reviewed."
+  method: "TODO - the concrete check, its threshold, and when it runs"
+relationships: []
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Bias Mitigation skeleton from the Medical-Device CDMO ontology"

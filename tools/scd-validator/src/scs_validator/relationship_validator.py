@@ -3,7 +3,13 @@
 from typing import Any, Dict, List, Set
 
 from .rules_loader import RelationshipTypeValidator, RulesLoader
-from .utils import ValidationError, ValidationResult, ValidationWarning, get_tier_from_id
+from .utils import (
+    CITATION_RE,
+    ValidationError,
+    ValidationResult,
+    ValidationWarning,
+    get_tier_from_id,
+)
 
 
 class RelationshipValidator:
@@ -46,8 +52,10 @@ class RelationshipValidator:
         # Build SCD lookup
         scd_lookup: Dict[str, Dict[str, Any]] = {scd["id"]: scd for scd in scds if scd.get("id")}
 
-        # Track validation mode (standalone vs complete)
-        is_complete_project = bundle_type == "project"
+        # A Domain bundle tree is self-contained, so a missing target is an error there.
+        # Project trees may reference the organization's Domain SCDs, and standalone
+        # concept bundles may reference other bundles, so a missing target is a warning.
+        is_complete_project = bundle_type == "domain"
 
         # Validate each SCD's relationships
         for scd in scds:
@@ -84,7 +92,7 @@ class RelationshipValidator:
             source_id: Source SCD ID
             relationship: Relationship dictionary
             scd_lookup: Lookup of all SCDs by ID
-            is_complete_project: Whether this is a complete project bundle
+            is_complete_project: Whether the loaded SCDs are a self-contained (Domain) tree
             result: Validation result to update
             file_path: Optional file path
         """
@@ -123,6 +131,30 @@ class RelationshipValidator:
             )
             result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
             return
+
+        # Standard citations are checked for form only, never resolved (citations.md §7)
+        if target_id.startswith("std:"):
+            if rel_type != "satisfies":
+                error_msg = self.rules_loader.get_error_message(
+                    self.rules, "citation_target_wrong_type", source=source_id, type=rel_type
+                )
+                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+            elif not CITATION_RE.match(target_id):
+                error_msg = self.rules_loader.get_error_message(
+                    self.rules, "invalid_citation", source=source_id, target=target_id
+                )
+                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+            return
+
+        if target_id.startswith("scd:standards:"):
+            warning_msg = self.rules_loader.get_error_message(
+                self.rules, "deprecated_standards_target", source=source_id, target=target_id
+            )
+            result.add_warning(
+                ValidationWarning(
+                    warning_msg, level="relationships", scd_id=source_id, file_path=file_path
+                )
+            )
 
         # Validate no self-reference
         if source_id == target_id:

@@ -62,7 +62,7 @@ relationships:
   #   target: "scd:project:integration-map"
   #   description: "Data model constrains API contracts and integrations"
   # - type: "satisfies"
-  #   target: "scd:standards:hipaa-compliance"
+  #   target: "std:hipaa#164.312"
   #   description: "PII/PHI classification satisfies HIPAA data requirements"
 
 provenance:

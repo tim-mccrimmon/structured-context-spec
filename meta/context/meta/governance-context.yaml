@@ -1,0 +1,47 @@
+id: scd:meta:governance-context
+type: meta
+title: Governance Context
+version: "0.6.0"
+description: >
+  How an agent reads SCS governance context: the terms it uses and how its rules and
+  citations are meant to be applied.
+content:
+  terms:
+    - id: term:domain-bundle
+      name: Domain bundle
+      definition: >-
+        An organization's governance context. Its rules apply to all work in the
+        organization's scope. Often called Global.
+    - id: term:project-bundle
+      name: Project bundle
+      definition: >-
+        One project's governance context. Its rules apply to work on that project, alongside
+        the Domain bundle's rules.
+    - id: term:rule
+      name: Rule
+      definition: >-
+        A statement an agent is expected to follow, identified by an id of the form
+        <document>/<directive-id>.
+    - id: term:citation
+      name: Citation
+      definition: >-
+        A reference to a standard, edition, and clause, written std:<standard>[:<edition>][#<clause>].
+        It identifies the requirement a rule addresses and contains none of the standard's text.
+  directives:
+    - id: M-001
+      directive: >-
+        Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work
+        on that project. Follow both. Facts describe the organization and its environment;
+        treat them as true unless the user corrects them.
+    - id: M-002
+      directive: >-
+        When a rule leads you to decline, limit, or change what you do, name the rule id.
+    - id: M-003
+      directive: >-
+        A citation such as std:iso-13485:2016#7.3.9 names a standard and clause; it does not
+        contain the standard's text. Do not present wording from memory as the text of a
+        cited standard.
+provenance:
+  created_by: "scs-maintainers"
+  created_at: "2026-10-19T00:00:00Z"
+  rationale: "Meta vocabulary and reading directives for SCS 0.6.0"
