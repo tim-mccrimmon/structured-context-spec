@@ -55,7 +55,7 @@ relationships:
     target: "scd:project:tech-stack"
     description: "Component design depends on technology choices"
   # - type: "satisfies"
-  #   target: "scd:standards:hipaa-compliance"
+  #   target: "std:hipaa#164.312"
   #   description: "Component boundaries satisfy PHI isolation requirements"
 
 provenance:

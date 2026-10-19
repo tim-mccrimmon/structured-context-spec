@@ -38,7 +38,22 @@ This is a breaking change, expected pre-1.0. No automated `scs migrate` helper s
 | Domain manifest `schemas.standards` | Required | Optional, deprecated |
 
 The validator now resolves the whole import tree for any bundle type, so it checks import
-types, unresolved imports, version mismatches, and import cycles that 0.5.0 did not.
+types, unresolved imports, version mismatches, and import cycles that 0.5.0 did not. An import
+that resolves to no bundle is an **error**; an SCD listed in a bundle but not found is a
+warning (an ontology template may list SCD slots not yet written).
+
+`bundle:meta:<version>` resolves to the meta bundle published with the spec (`meta/`), which
+`scs-validator` ships; you do not need a copy of it in your workspace.
+
+### Tooling
+
+| | 0.5.0 | 0.6.0 |
+|---|---|---|
+| `scs new project` | Project, meta, standards, and domain bundles | Project bundle importing concept bundles |
+| `scs new domain` | — | Domain bundle importing `bundle:meta:0.6.0` and concept bundles |
+| `scs add bundle <domain>` | Added a domain bundle to a project | Rejected; use `scs new domain` |
+| `scs bundle validate` / `version` | `bundles/project-bundle.yaml` | `bundles/domain-bundle.yaml` or `bundles/project-bundle.yaml` |
+| `scs compile` | — | Compiles a Domain or Project bundle into a runtime artifact |
 
 ---
 
@@ -137,6 +152,18 @@ scs-validate --bundle path/to/project-bundle.yaml
 Deprecation warnings point at any remaining standards bundles, `scd:standards:` references,
 and `satisfies` targets.
 
+### 7. Write directives and compile (optional)
+
+To deliver governance to an AI runtime, add `content.directives` to the SCDs whose rules
+agents should follow, then compile each bundle:
+
+```bash
+scs compile path/to/domain-bundle.yaml -o compiled/global.yaml
+scs compile path/to/project-bundle.yaml -o compiled/projects/my-app.yaml
+```
+
+See `spec/0.6/runtime-artifact.md`.
+
 ---
 
 ## Reference
@@ -144,4 +171,6 @@ and `satisfies` targets.
 - `spec/0.6/bundle-format.md` — bundle types and rules
 - `spec/0.6/citations.md` — standard citations
 - `spec/0.6/standards-tier.md` — the deprecation
+- `spec/0.6/runtime-artifact.md` — compiled runtime artifacts
+- `examples/two-tier-governance/` — a Domain and a Project bundle, compiled
 - `examples/med-adherence/` — a Project bundle organized by concept

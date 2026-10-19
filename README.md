@@ -6,7 +6,7 @@ Every session starts over. Decisions contradict earlier ones. The architectural 
 
 SCS is the fix: a structured, versioned format for giving your AI a world to operate in, not just prompts to respond to.
 
-![Version](https://img.shields.io/badge/version-0.3.0-blue)
+![Version](https://img.shields.io/badge/version-0.6.0-blue)
 ![License](https://img.shields.io/badge/license-Apache_2.0-green)
 ![Status](https://img.shields.io/badge/status-active_development-orange)
 
@@ -54,7 +54,7 @@ A specification and tooling for representing AI context as structured, versioned
 - **Precise** — structured YAML, not ambiguous prose
 - **Non-conflicting** — explicitly composed and validated
 - **Versionable** — git-native, reviewable, auditable
-- **Reusable** — composable bundles across standards, domains, and projects
+- **Reusable** — composable bundles shared across an organization and its projects
 
 ---
 
@@ -77,7 +77,7 @@ The scs-vibe plugin performs that composition for you. If you're writing `CLAUDE
 by hand, you're already doing structured context — SCS is how you do it with validation and
 versioning, in a form that isn't locked to Claude Code specifically. The same governed
 content composes just as validly into an MCP server's tool-permission gate, a LangGraph
-node's system prompt, or a checkpoint record in an audit trail — see `spec/0.5/any-ai-actor-model.md`.
+node's system prompt, or a checkpoint record in an audit trail — see `spec/0.6/any-ai-actor-model.md`.
 
 ---
 
@@ -86,9 +86,19 @@ node's system prompt, or a checkpoint record in an audit trail — see `spec/0.5
 **Structured Context Documents (SCDs)** — individual YAML files, each containing one specific piece of context: a rule, a constraint, a compliance requirement, a design decision.
 
 **Bundles** — composed collections of SCDs:
-- **Standards Bundle** — regulatory requirements (HIPAA, SOC2, CHAI)
-- **Domain Bundle** — company-wide or concern-specific context
-- **Project Bundle** — your initiative, importing what it needs
+- **Domain Bundle** — organization-wide governance that applies to all work, built from an
+  industry ontology (software development, medical-device CDMO, merchant cash advance)
+- **Project Bundle** — governance for one initiative, independent of the Domain bundle
+- **Concept Bundles** — the SCDs for one concept (security, design controls, ...), imported by
+  either
+
+**Directives** — the rules in an SCD that an AI agent is expected to follow, each with an id.
+
+**Citations** — standards appear as references such as `std:iso-13485:2016#7.3.9`, never as
+standard text.
+
+**Runtime artifacts** — `scs compile` turns a Domain or Project bundle into one compact,
+deterministic file of rules that a runtime can inject and identify by hash.
 
 ---
 
@@ -105,10 +115,11 @@ Walks you through capturing your project's intent and outputs native Claude Code
 ### Option 2: CLI
 
 ```bash
-pip install scs-tools
-scs new project my-app
+pip install 'scs-tools[validator]'
+scs new project my-app            # or: scs new domain my-org
 cd my-app
-scs validate
+scs bundle validate
+scs compile bundles/project-bundle.yaml --allow-draft
 ```
 
 [CLI documentation →](tools/cli/README.md)
@@ -119,7 +130,7 @@ scs validate
 git clone https://github.com/tim-mccrimmon/structured-context-spec.git
 ```
 
-Start with `spec/0.3/overview.md` and `examples/bundles/project-bundle.yaml`.
+Start with `spec/0.6/overview.md` and `examples/two-tier-governance/`.
 
 ---
 
@@ -135,7 +146,7 @@ Start with `spec/0.3/overview.md` and `examples/bundles/project-bundle.yaml`.
 
 ```
 structured-context-spec/
-├── spec/0.3/          # Normative spec
+├── spec/0.6/          # Normative spec (current draft)
 ├── schema/            # JSON Schemas
 ├── plugins/           # Claude Code plugins
 ├── templates/         # YAML starters
@@ -149,7 +160,7 @@ structured-context-spec/
 
 ## Contributing
 
-SCS is v0.3, actively evolving, and open to contribution.
+SCS is v0.6 (draft), actively evolving, and open to contribution.
 
 - **Discussions** — use cases, boundary arguments, counterexamples that break the model
 - **Issues** — schema problems, unclear terminology, missing examples

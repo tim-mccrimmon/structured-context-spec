@@ -34,12 +34,12 @@ CONCEPTS = {
 }
 
 
-def scaffold(tmp_path: Path, project_type: str) -> Path:
+def scaffold(tmp_path: Path, project_type: str, kind: str = "project") -> Path:
     result = CliRunner().invoke(
         cli,
         [
             "new",
-            "project",
+            kind,
             "demo",
             "--type",
             project_type,
@@ -75,9 +75,6 @@ def test_scaffold_creates_the_expected_structure(tmp_path: Path, project_type: s
     root = scaffold(tmp_path, project_type)
     for rel in [
         "bundles/project-bundle.yaml",
-        "bundles/meta-bundle.yaml",
-        "bundles/standards-bundle.yaml",
-        "bundles/domains/software-development.yaml",
         ".scs/config",
         "VERSION",
         "README.md",
@@ -90,6 +87,11 @@ def test_scaffold_creates_the_expected_structure(tmp_path: Path, project_type: s
     else:
         assert generated == CONCEPTS
     assert len(list((root / "context" / "project").glob("*.yaml"))) >= 11
+    # 0.6.0: no meta, standards, or domain bundles in a Project workspace
+    assert sorted(p.name for p in (root / "bundles").iterdir()) == [
+        "concepts",
+        "project-bundle.yaml",
+    ]
 
 
 @pytest.mark.parametrize("project_type", PROJECT_TYPES)
@@ -248,38 +250,73 @@ def test_versioning_refuses_to_overwrite_without_force(tmp_path: Path, monkeypat
     assert "already exists" in again.output
 
 
-# ------------------------------------------------------ domain bundle imports (ISS-033)
+# ------------------------------------- root bundle imports (ISS-033, SCS 0.6.0 layout)
 
 
 @pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_domain_bundle_imports_exactly_the_concept_bundles_generated(
+def test_project_bundle_imports_exactly_the_concept_bundles_generated(
     tmp_path: Path, project_type: str
 ):
     root = scaffold(tmp_path, project_type)
     generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
-    domain = yaml.safe_load((root / "bundles/domains/software-development.yaml").read_text())
-    imported = {ref.split(":")[1] for ref in domain["imports"]}
+    project = yaml.safe_load((root / "bundles/project-bundle.yaml").read_text())
+    assert project["type"] == "project" and project["id"] == "bundle:demo"
+    imported = {ref.split(":")[1] for ref in project["imports"]}
     assert imported == generated
 
 
-def test_add_domain_bundle_imports_the_projects_concept_bundles(tmp_path: Path, monkeypatch):
+@pytest.mark.parametrize("project_type", ["standard", "minimal"])
+def test_new_domain_scaffolds_a_domain_bundle_importing_meta_and_concepts(
+    tmp_path: Path, project_type: str
+):
+    root = scaffold(tmp_path, project_type, kind="domain")
+    assert sorted(p.name for p in (root / "bundles").iterdir()) == [
+        "concepts",
+        "domain-bundle.yaml",
+    ]
+    domain = yaml.safe_load((root / "bundles/domain-bundle.yaml").read_text())
+    assert domain["type"] == "domain" and domain["id"] == "bundle:demo"
+    assert domain["scds"] == []
+    assert domain["imports"][0] == "bundle:meta:0.6.0"
+    generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
+    assert {ref.split(":")[1] for ref in domain["imports"][1:]} == generated
+    assert "bundle_type: domain" in (root / ".scs" / "config").read_text()
+
+
+def test_new_domain_workspace_validates(tmp_path: Path):
+    root = scaffold(tmp_path, "standard", kind="domain")
+    result = validate_with_validator("--bundle", str(root / "bundles/domain-bundle.yaml"))
+    assert result.exit_code == 0, result.output
+
+
+def test_bundle_validate_shortcut_finds_the_domain_bundle(tmp_path: Path, monkeypatch):
+    root = scaffold(tmp_path, "minimal", kind="domain")
+    monkeypatch.chdir(root)
+    monkeypatch.setenv("SCS_SCHEMA_DIR", str(SCHEMA))
+    # No project-bundle.yaml here: before 0.6.0 the shortcut aborted
+    result = CliRunner().invoke(cli, ["bundle", "validate"])
+    assert result.exit_code == 0, result.output
+    assert "VALID" in result.output
+
+
+def test_scaffolded_skeletons_do_not_compile_until_directives_are_written(tmp_path: Path):
+    root = scaffold(tmp_path, "minimal", kind="domain")
+    result = CliRunner().invoke(
+        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft", "--no-validate"]
+    )
+    # The packaged meta bundle contributes directives; the skeleton SCDs do not.
+    assert result.exit_code == 0, result.output
+    assert "governance-context/M-001" in result.stdout
+    assert "has no directives" in result.output
+
+
+def test_add_bundle_rejects_a_domain_name_with_a_hint(tmp_path: Path, monkeypatch):
     root = scaffold(tmp_path, "minimal")
-    (root / "bundles/domains/software-development.yaml").unlink()
     monkeypatch.chdir(root)
     result = CliRunner().invoke(cli, ["add", "bundle", "software-development"])
-    assert result.exit_code == 0, result.output
-    domain = yaml.safe_load((root / "bundles/domains/software-development.yaml").read_text())
-    assert {ref.split(":")[1] for ref in domain["imports"]} == {
-        "architecture",
-        "security",
-        "deployment-operations",
-    }
-    assert (
-        validate_with_validator(
-            "--bundle", str(root / "bundles/domains/software-development.yaml")
-        ).exit_code
-        == 0
-    )
+    assert result.exit_code != 0
+    assert "scs new domain" in result.output
+    assert not (root / "bundles" / "domains").exists()
 
 
 # ------------------------------------ concept bundles in add / list / info (ISS-034)
@@ -307,13 +344,6 @@ def test_add_bundle_adds_a_concept_bundle(tmp_path: Path, monkeypatch):
     assert validate_with_validator("--bundle", str(target)).exit_code == 0
 
 
-def test_add_bundle_still_adds_a_domain_bundle(tmp_path: Path, monkeypatch):
-    root = _init_bare_project(tmp_path, monkeypatch)
-    result = CliRunner().invoke(cli, ["add", "bundle", "software-development"])
-    assert result.exit_code == 0, result.output
-    assert (root / "bundles" / "domains" / "software-development.yaml").is_file()
-
-
 def test_add_bundle_rejects_an_unknown_name_cleanly(tmp_path: Path, monkeypatch):
     _init_bare_project(tmp_path, monkeypatch)
     result = CliRunner().invoke(cli, ["add", "bundle", "no-such-bundle"])
@@ -336,7 +366,7 @@ def test_bundle_list_available_names_concepts_as_concept_bundles(monkeypatch, tm
     result = CliRunner().invoke(cli, ["bundle", "list", "--available"])
     assert result.exit_code == 0, result.output
     assert "Available concept bundles" in result.output
-    assert "Available domain bundles" in result.output
+    assert "scs new domain" in result.output
 
 
 def test_bundle_info_finds_a_project_concept_bundle(healthcare_project: Path, monkeypatch):
@@ -541,22 +571,17 @@ def test_mca_scaffold_ignores_type(tmp_path: Path):
     assert generated == MCA_CONCEPTS
 
 
-def test_mca_domain_bundle_imports_exactly_the_16_concepts(tmp_path: Path):
+def test_mca_project_bundle_imports_exactly_the_16_concepts(tmp_path: Path):
     root = scaffold_mca(tmp_path)
-    domain = yaml.safe_load((root / "bundles/domains/merchant-cash-advance.yaml").read_text())
-    imported = {ref.split(":")[1] for ref in domain["imports"]}
+    project = yaml.safe_load((root / "bundles/project-bundle.yaml").read_text())
+    imported = {ref.split(":")[1] for ref in project["imports"]}
     assert imported == MCA_CONCEPTS
 
 
 def test_mca_every_scaffolded_bundle_validates(tmp_path: Path):
     root = scaffold_mca(tmp_path)
-    for path in (
-        [
-            root / "bundles" / f
-            for f in ("project-bundle.yaml", "meta-bundle.yaml", "standards-bundle.yaml")
-        ]
-        + list((root / "bundles" / "concepts").glob("*.yaml"))
-        + list((root / "bundles" / "domains").glob("*.yaml"))
+    for path in [root / "bundles" / "project-bundle.yaml"] + list(
+        (root / "bundles" / "concepts").glob("*.yaml")
     ):
         result = validate_with_validator("--bundle", str(path))
         assert result.exit_code == 0, f"{path}: {result.output}"
@@ -664,7 +689,6 @@ def test_bundle_list_available_shows_both_ontology_models(monkeypatch, tmp_path:
     assert "ontology model 'sdlc'" in result.output
     assert "ontology model 'mca'" in result.output
     assert "governance" in result.output  # an mca-only concept name
-    assert "merchant-cash-advance" in result.output
 
 
 def test_bundle_info_finds_an_mca_concept_in_project(tmp_path: Path, monkeypatch):

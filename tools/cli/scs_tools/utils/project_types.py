@@ -5,7 +5,6 @@ from typing import Dict, List
 PROJECT_TYPES = {
     "healthcare": {
         "description": "Healthcare application (HIPAA, CHAI, TEFCA)",
-        "domains": ["software-development"],  # Can add clinical domain later
         "compliance_bundles": [
             "hipaa-compliance",
             "chai-adherence",
@@ -16,25 +15,21 @@ PROJECT_TYPES = {
     },
     "fintech": {
         "description": "Financial services application (PCI-DSS, SOX)",
-        "domains": ["software-development"],  # Can add financial domain later
         "compliance_bundles": ["pci-dss-compliance", "sox-controls", "soc2-controls"],
         "exclude_scds": ["chai-adherence", "tefca-participation"],
     },
     "saas": {
         "description": "SaaS product (GDPR, SOC2, multi-tenancy)",
-        "domains": ["software-development"],
         "compliance_bundles": ["gdpr-compliance", "soc2-controls"],
         "exclude_scds": ["hipaa-compliance", "chai-adherence", "tefca-participation"],
     },
     "government": {
         "description": "Government application (NIST, FedRAMP)",
-        "domains": ["software-development"],
         "compliance_bundles": ["nist-800-53", "fedramp-controls"],
         "exclude_scds": ["hipaa-compliance", "chai-adherence", "tefca-participation"],
     },
     "minimal": {
         "description": "Minimal project (essential concepts only)",
-        "domains": ["software-development"],  # Still uses domain, but with fewer concepts
         "minimal_concepts": ["architecture", "security", "deployment-operations"],
         "compliance_bundles": [],
         "exclude_scds": [],
@@ -42,7 +37,6 @@ PROJECT_TYPES = {
     },
     "standard": {
         "description": "Standard software development project (all 11 concepts)",
-        "domains": ["software-development"],
         "compliance_bundles": ["soc2-controls"],
         "exclude_scds": ["hipaa-compliance", "chai-adherence", "tefca-participation"],
     },
@@ -302,30 +296,6 @@ MINIMAL_CONCEPTS = [
 ]
 
 
-# Available domains (SCS 0.5.0 - multi-domain architecture, RFC-0001 Domain Ontology)
-AVAILABLE_DOMAINS = {
-    "software-development": {
-        "name": "Software Development",
-        "description": "Software engineering practices, architecture, testing, deployment",
-        "concepts": SOFTWARE_DEVELOPMENT_CONCEPTS,
-    },
-    # Future domains to be added by domain experts:
-    # "legal": {...},
-    # "clinical": {...},
-    # "financial": {...},
-}
-
-
-def get_domains_for_project_type(project_type: str) -> List[str]:
-    """Get the list of domain bundles for a project type.
-
-    In SCS 0.5.0, projects import domain bundles (e.g., software-development),
-    which in turn import concept bundles (e.g., architecture, security).
-    """
-    config = PROJECT_TYPES.get(project_type, PROJECT_TYPES["standard"])
-    return config.get("domains", ["software-development"])
-
-
 def get_concepts_for_project_type(project_type: str) -> List[str]:
     """Get the list of concept bundles for a project type.
 
@@ -342,21 +312,6 @@ def get_concepts_for_project_type(project_type: str) -> List[str]:
     return SOFTWARE_DEVELOPMENT_CONCEPTS
 
 
-def get_bundles_for_project_type(project_type: str) -> List[str]:
-    """Get the list of bundles to import in the project bundle.
-
-    DEPRECATED in 0.3: Use get_domains_for_project_type() instead.
-    This function is maintained for backward compatibility and returns
-    domain bundles, not concept bundles.
-    """
-    return get_domains_for_project_type(project_type)
-
-
 def get_project_type_config(project_type: str) -> Dict:
     """Get the configuration for a project type"""
     return PROJECT_TYPES.get(project_type, PROJECT_TYPES["standard"])
-
-
-def get_domain_config(domain_name: str) -> Dict:
-    """Get configuration for a specific domain"""
-    return AVAILABLE_DOMAINS.get(domain_name, AVAILABLE_DOMAINS["software-development"])

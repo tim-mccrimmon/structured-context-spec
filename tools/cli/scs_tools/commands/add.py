@@ -133,19 +133,19 @@ def scd(scd_name, author, email):
 )
 def bundle(bundle_name, author, email):
     """
-    Add a concept or domain bundle to the project
+    Add a concept bundle to the workspace
 
     Concept bundles group the SCDs for one concept (architecture, security,
     compliance-governance, data-provenance, testing-validation,
     deployment-operations, and more) and are written to bundles/concepts/.
-    Domain bundles (software-development) import concept bundles and are
-    written to bundles/domains/.
+    Add the new concept to your Domain or Project bundle's imports.
+
+    A Domain bundle is a workspace of its own: create one with 'scs new domain'.
 
     \b
     Examples:
         scs add bundle architecture          # Add the architecture concept bundle
         scs add bundle security              # Add the security concept bundle
-        scs add bundle software-development  # Add the software-development domain bundle
         scs add bundle data-provenance --author "Jane Doe"  # With provenance
 
     See also: scs bundle list --available
@@ -160,36 +160,34 @@ def bundle(bundle_name, author, email):
         )
         raise click.Abort()
 
-    # Find the template: a concept bundle (from the project's own ontology model) or a
-    # domain bundle (domain bundles aren't namespaced per model - no name collides today)
+    # Find the concept bundle template in the workspace's own ontology model
+    from scs_tools.utils.project_types import ONTOLOGY_MODELS
+
     config_file = base_path / ".scs" / "config"
     ontology = _read_ontology_model(config_file)
-    templates_root = get_template_path() / "bundles"
+    concepts_root = get_template_path() / "bundles" / "concepts" / ontology
+    template_path = concepts_root / f"{bundle_name}.yaml"
 
-    def _candidate(k: str) -> Path:
-        return (
-            templates_root / k / ontology / f"{bundle_name}.yaml"
-            if k == "concepts"
-            else (templates_root / k / f"{bundle_name}.yaml")
+    if bundle_name in {m["domain"] for m in ONTOLOGY_MODELS.values()}:
+        click.echo(
+            f"Error: '{bundle_name}' is a domain, not a concept bundle. In SCS 0.6.0 a Domain "
+            "bundle is its own workspace: create one with 'scs new domain <name>'.",
+            err=True,
         )
-
-    kind = next((k for k in ("concepts", "domains") if _candidate(k).exists()), None)
-    if kind is None:
-        available = sorted((templates_root / "concepts" / ontology).glob("*.yaml")) + sorted(
-            (templates_root / "domains").glob("*.yaml")
-        )
+        raise click.Abort()
+    if not template_path.exists():
+        available = sorted(concepts_root.glob("*.yaml"))
         click.echo(
             f"Error: Bundle '{bundle_name}' not found in the '{ontology}' ontology model.\n"
             f"Available bundles: {', '.join(p.stem for p in available)}",
             err=True,
         )
         raise click.Abort()
-    template_path = _candidate(kind)
 
     # Check if the destination directory exists
-    bundles_dir = base_path / "bundles" / kind
+    bundles_dir = base_path / "bundles" / "concepts"
     if not bundles_dir.exists():
-        click.echo(f"Creating bundles/{kind} directory...")
+        click.echo("Creating bundles/concepts directory...")
         bundles_dir.mkdir(parents=True, exist_ok=True)
 
     # Check if bundle already exists
@@ -218,14 +216,10 @@ def bundle(bundle_name, author, email):
         "author": author_info,
         "email": email_info,
         "created_at": now,
-        "bundles": [],  # Not used in domain bundles
         # Project-type settings (e.g. which compliance SCDs a concept bundle lists) - sdlc only
         "config": (
             get_project_type_config(_read_project_type(config_file)) if ontology == "sdlc" else {}
         ),
-        # A domain bundle imports the concept bundles this project has; a project with none yet
-        # gets this ontology model's full reference set
-        "concepts": _project_concepts(base_path, ontology),
     }
 
     click.echo(f"Adding bundle: {bundle_name}")
@@ -234,21 +228,8 @@ def bundle(bundle_name, author, email):
     click.echo(f"✓ Bundle '{bundle_name}' added successfully!")
     click.echo(f"  Location: {bundle_file.relative_to(base_path)}")
 
-    # A concept added to the project also belongs in the Domain Ontology manifest
-    if kind == "concepts":
-        _remind_about_ontology(base_path, bundle_name)
-
-
-def _project_concepts(base_path: Path, ontology: str) -> list:
-    """Concept bundles present in the project, in reference order for its ontology model
-    (all of that model's concepts if none exist yet)"""
-    from scs_tools.utils.project_types import get_ontology_model_config
-
-    reference_concepts = get_ontology_model_config(ontology)["concepts"]
-    concepts_dir = base_path / "bundles" / "concepts"
-    present = {p.stem for p in concepts_dir.glob("*.yaml")} if concepts_dir.is_dir() else set()
-    ordered = [c for c in reference_concepts if c in present]
-    return ordered or list(reference_concepts)
+    # A concept added to the workspace also belongs in the Domain Ontology manifest
+    _remind_about_ontology(base_path, bundle_name)
 
 
 def _remind_about_ontology(base_path: Path, concept: str):

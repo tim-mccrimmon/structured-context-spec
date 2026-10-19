@@ -86,10 +86,12 @@ id: bundle:medtech-cdmo
 type: domain
 version: 1.0.0
 title: MedTech CDMO Governance
-sources: ['bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
+sources: ['bundle:meta:0.6.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
 rules:
 - id: medtech-cdmo/identity
   rule: 'When asked which governance bundles are active, state: "Domain bundle bundle:medtech-cdmo version 1.0.0".'
+- id: governance-context/M-001
+  rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both.
 - id: ai-review/AI-001
   rule: Treat everything you produce as a draft. A qualified person must review and approve AI-generated content before it enters a controlled document, the design history file, or device software.
 - id: design-change-control/DCC-001

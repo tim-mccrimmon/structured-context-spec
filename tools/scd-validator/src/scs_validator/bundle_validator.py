@@ -114,12 +114,11 @@ class BundleValidator:
 
             for edge in edges:
                 if edge.target is None:
-                    result.add_warning(
-                        ValidationWarning(
+                    result.add_error(
+                        ValidationError(
                             self.rules_loader.get_error_message(
                                 self.rules, "unresolved_import", ref=edge.ref, **fmt
                             ),
-                            level="bundle",
                             file_path=path,
                         )
                     )
@@ -198,7 +197,7 @@ class BundleValidator:
                     )
 
             # Only judge missing types when every import resolved; otherwise the
-            # unresolved-import warning already explains the gap.
+            # unresolved-import error already explains the gap.
             if importer is tree.root and all(e.target is not None for e in edges):
                 for import_type in type_rules.get("expected_import_types", []):
                     if counts.get(import_type, 0) == 0:
@@ -215,6 +214,8 @@ class BundleValidator:
                             )
                         )
 
+        # Unresolved SCDs stay warnings: an ontology template may list SCD slots that
+        # the adopting organization has not written yet. Compilation rejects them.
         for bundle_id, ref in tree.unresolved_scds:
             result.add_warning(
                 ValidationWarning(

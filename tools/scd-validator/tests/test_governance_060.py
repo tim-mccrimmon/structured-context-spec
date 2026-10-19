@@ -180,13 +180,38 @@ def test_domain_bundle_may_import_only_one_meta_bundle(tmp_path: Path, concept: 
 # ------------------------------------------------------------------ resolution
 
 
-def test_unresolved_import_is_a_warning(tmp_path: Path):
+def test_unresolved_import_is_an_error(tmp_path: Path):
     root = bundle(
         tmp_path, "bundles/project.yaml", "bundle:app", "project", ["bundle:missing:1.0.0"]
     )
     result = run("--bundle", str(root))
+    assert result.exit_code == 1
+    assert "could not be resolved" in result.output
+
+
+def test_unresolved_scd_is_a_warning(tmp_path: Path):
+    root = bundle(tmp_path, "bundles/project.yaml", "bundle:app", "project", scds=["scd:project:x"])
+    result = run("--bundle", str(root))
     assert result.exit_code == 0
     assert "could not be resolved" in result.output
+
+
+def test_meta_import_resolves_to_the_packaged_meta_bundle(tmp_path: Path):
+    bundle(tmp_path, "bundles/concepts/c.yaml", "bundle:c", "concept")
+    root = bundle(
+        tmp_path, "bundles/domain.yaml", "bundle:org", "domain", ["bundle:meta:0.6.0", "bundle:c"]
+    )
+    tree = resolve(root)
+    meta = tree.bundles[1]
+    assert (meta.id, meta.version) == ("bundle:meta", "0.6.0")
+    assert "scs_validator" in meta.path.parts
+    assert [s.ref for s in tree.scds] == ["scd:meta:governance-context"]
+    assert not tree.unresolved_imports and not tree.unresolved_scds
+
+
+def test_project_root_can_be_searched_alone(tmp_path: Path):
+    root = bundle(tmp_path, "bundles/domain.yaml", "bundle:org", "domain", ["bundle:meta:0.6.0"])
+    assert resolve(root, extra_search_dirs=()).unresolved_imports
 
 
 def test_import_cycle_is_an_error(tmp_path: Path):

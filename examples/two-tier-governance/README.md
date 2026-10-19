@@ -54,7 +54,10 @@ are active?" reports both bundles and their versions.
 The two bundles are compiled separately and never import each other. A runtime applies them
 side by side: Domain first, then Project.
 
-The Domain bundle does not yet import the meta bundle; it will once the meta bundle is
-published with the spec.
+The Domain bundle imports `bundle:meta:0.6.0`, the meta bundle published with the spec
+(`meta/` at the repo root). The tools ship a copy of it, so the import resolves without the
+meta bundle being in the organization's workspace. Its directives (`governance-context/M-*`)
+come first in `global.yaml` and tell the agent how Domain and Project rules combine and how
+to treat citations.
 
 See `spec/0.6/runtime-artifact.md`.

@@ -423,7 +423,8 @@ def test_mca_domain_bundle_imports_every_concept_bundle():
 
     domain = yaml.safe_load((MCA_EXAMPLE / "domains" / "merchant-cash-advance.yaml").read_text())
     assert domain["type"] == "domain" and domain["scds"] == []
-    assert {ref.split(":", 1)[1] for ref in domain["imports"]} == _mca_concept_slugs()
+    assert domain["imports"][0] == "bundle:meta:0.6.0"
+    assert {ref.split(":", 1)[1] for ref in domain["imports"][1:]} == _mca_concept_slugs()
 
 
 def test_mca_skeletons_are_unfilled_and_carry_no_concept_relationships():

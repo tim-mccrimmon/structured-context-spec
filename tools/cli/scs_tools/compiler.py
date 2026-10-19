@@ -169,7 +169,7 @@ def compile_bundle(
     bundle_path: Path,
     allow_draft: bool = False,
     include_cites: bool = True,
-    extra_search_dirs: tuple = (),
+    extra_search_dirs: Optional[tuple] = None,
 ) -> CompileResult:
     """Resolve the bundle at `bundle_path` and compile it. Does not run validation."""
     from scs_validator.resolver import resolve

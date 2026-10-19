@@ -70,7 +70,7 @@ relationships: []
   #   target: "scd:project:other-scd-name"
   #   description: "Why this relationship exists"
   # - type: "satisfies"
-  #   target: "scd:standards:compliance-requirement"
+  #   target: "std:<standard>:<edition>#<clause>"   # a standard citation
   #   description: "How this SCD satisfies the requirement"
 
 provenance:

@@ -94,6 +94,9 @@ def test_rule_ids_order_and_self_identification():
     ids = [r["id"] for r in artifact["rules"]]
     assert ids == [
         "medtech-cdmo/identity",
+        "governance-context/M-001",
+        "governance-context/M-002",
+        "governance-context/M-003",
         "ai-review/AI-001",
         "ai-review/AI-002",
         "confidential-data/CD-001",
@@ -104,6 +107,7 @@ def test_rule_ids_order_and_self_identification():
     ]
     assert "Domain bundle bundle:medtech-cdmo version 1.0.0" in artifact["rules"][0]["rule"]
     assert artifact["sources"] == [
+        "bundle:meta:0.6.0",
         "bundle:ai-use:1.0.0",
         "bundle:design-controls:1.0.0",
     ]

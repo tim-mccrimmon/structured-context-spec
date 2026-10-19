@@ -3,6 +3,10 @@
 Any bundle type can be the root. Bundles and SCDs are found by their `id`, not their file
 name, by indexing every YAML file under the bundle's project root. The project root is the
 bundle's directory, walking up past `bundles/`, `domains/` and `concepts/` directories.
+
+The meta bundle published with the spec ships inside this package and is searched before
+the project root, so `bundle:meta:<version>` resolves to the published copy wherever the
+tools are installed.
 """
 
 from __future__ import annotations
@@ -14,6 +18,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
 
+PACKAGED_META = Path(__file__).resolve().parent / "meta"
 BUNDLE_REF = re.compile(r"^bundle:(?P<name>[a-zA-Z0-9._-]+)(?::(?P<version>\d+\.\d+\.\d+))?$")
 LAYOUT_DIRS = {"bundles", "domains", "concepts"}
 SKIP_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", "build", "dist"}
@@ -137,19 +142,22 @@ class Index:
 
 def resolve(
     bundle_path: Path,
-    extra_search_dirs: Iterable[Path] = (),
+    extra_search_dirs: Optional[Iterable[Path]] = None,
     index: Optional[Index] = None,
 ) -> BundleTree:
     """Resolve the import tree and SCDs of the bundle at `bundle_path`.
 
-    `extra_search_dirs` are searched after the project root (e.g. a packaged meta bundle).
+    `extra_search_dirs` are searched before the project root; by default, the packaged meta
+    bundle. Pass `()` to search the project root only.
     Bundles appear in depth-first import order with the root first; SCDs in the order their
     bundles list them, imports before the importing bundle's own SCDs.
     """
     bundle_path = Path(bundle_path)
     project_root = find_project_root(bundle_path)
     if index is None:
-        index = Index([project_root, *extra_search_dirs])
+        if extra_search_dirs is None:
+            extra_search_dirs = (PACKAGED_META,)
+        index = Index([*extra_search_dirs, project_root])
 
     data = yaml.safe_load(bundle_path.read_text(encoding="utf-8")) or {}
     root = ResolvedBundle(

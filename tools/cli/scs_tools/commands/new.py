@@ -1,5 +1,5 @@
 """
-New project command - scaffolds a new SCS project
+New command - scaffolds a new SCS Domain or Project workspace
 """
 
 import os
@@ -21,10 +21,13 @@ from scs_tools.utils.project_types import (
     PROJECT_TYPES,
     get_concept_info,
     get_concepts_for_project_type,
-    get_domains_for_project_type,
     get_ontology_model_config,
     get_project_type_config,
 )
+
+# The meta bundle published with the spec (meta/ at the repo root). scs-validator ships a copy,
+# so a Domain bundle's import of it resolves without the bundle being in the workspace.
+META_BUNDLE_REF = "bundle:meta:0.6.0"
 
 
 def _scs_tools_version() -> str:
@@ -42,59 +45,98 @@ def new():
     """
     Create new SCS artifacts
 
-    Currently supports creating complete SCS projects with directory structure,
-    bundles, SCDs, and documentation templates.
+    `scs new domain` creates an organization's Domain bundle workspace (governance that
+    applies to all work); `scs new project` creates a Project bundle workspace (governance
+    for one project). The two are independent: neither imports the other.
     """
     pass
 
 
+def _workspace_options(f):
+    """Options shared by `scs new domain` and `scs new project`."""
+    for option in reversed(_WORKSPACE_OPTIONS):
+        f = option(f)
+    return f
+
+
+_WORKSPACE_OPTIONS = [
+    click.argument("name", required=False),
+    click.option(
+        "--type",
+        "project_type",
+        type=click.Choice(list(PROJECT_TYPES.keys())),
+        default=None,
+        help="Concept and SCD set to scaffold (sdlc ontology only - ignored for other "
+        "--ontology values)",
+    ),
+    click.option(
+        "--ontology",
+        type=click.Choice(list(ONTOLOGY_MODELS.keys())),
+        default="sdlc",
+        help="Ontology model to scaffold against (default: sdlc). Non-sdlc models scaffold "
+        "their full concept set and ignore --type.",
+    ),
+    click.option(
+        "--dir",
+        "directory",
+        type=click.Path(),
+        default=None,
+        help="Directory to create the workspace in (default: current directory)",
+    ),
+    click.option("--author", default=None, help="Author name for provenance"),
+    click.option("--email", default=None, help="Author email for provenance"),
+    click.option("--interactive", "-i", is_flag=True, help="Interactive mode with prompts"),
+    click.option(
+        "--no-interactive",
+        is_flag=True,
+        help="Disable interactive mode (use defaults/flags only)",
+    ),
+]
+
+
 @new.command()
-@click.argument("name", required=False)
-@click.option(
-    "--type",
-    "project_type",
-    type=click.Choice(list(PROJECT_TYPES.keys())),
-    default=None,
-    help="Type of project to scaffold (sdlc ontology only - ignored for other --ontology values)",
-)
-@click.option(
-    "--ontology",
-    type=click.Choice(list(ONTOLOGY_MODELS.keys())),
-    default="sdlc",
-    help="Ontology model to scaffold against (default: sdlc). Non-sdlc models scaffold their "
-    "full concept set and ignore --type.",
-)
-@click.option(
-    "--dir",
-    "directory",
-    type=click.Path(),
-    default=None,
-    help="Directory to create project in (default: current directory)",
-)
-@click.option(
-    "--author",
-    default=None,
-    help="Author name for provenance",
-)
-@click.option(
-    "--email",
-    default=None,
-    help="Author email for provenance",
-)
-@click.option(
-    "--interactive",
-    "-i",
-    is_flag=True,
-    help="Interactive mode with prompts",
-)
-@click.option(
-    "--no-interactive",
-    is_flag=True,
-    help="Disable interactive mode (use defaults/flags only)",
-)
+@_workspace_options
+def domain(name, project_type, ontology, directory, author, email, interactive, no_interactive):
+    """
+    Create a Domain bundle workspace for an organization
+
+    The Domain bundle holds the governance that applies to all of an organization's work
+    (sometimes called its Global or organization bundle). It starts from an industry
+    ontology model, imports the published meta bundle and one concept bundle per concept,
+    and is compiled with `scs compile bundles/domain-bundle.yaml`.
+
+    Ontology models: sdlc (default), mca.
+
+    \b
+    Examples:
+        scs new domain acme-health                 # Interactive mode (default)
+        scs new domain acme-funding --ontology mca
+        scs new domain acme --author "Jane Doe" --email "jane@example.com" --no-interactive
+
+    See also: scs new project
+    """
+    _scaffold(
+        "domain",
+        name,
+        project_type,
+        ontology,
+        directory,
+        author,
+        email,
+        interactive,
+        no_interactive,
+    )
+
+
+@new.command()
+@_workspace_options
 def project(name, project_type, ontology, directory, author, email, interactive, no_interactive):
     """
-    Create a new SCS project with proper structure and templates
+    Create a Project bundle workspace
+
+    The Project bundle holds the governance for one project. It imports its concept bundles
+    directly and does not import the organization's Domain bundle; a runtime applies the two
+    side by side. Compile it with `scs compile bundles/project-bundle.yaml`.
 
     By default, prompts for missing required information interactively.
     Use --no-interactive to disable prompts and require all flags.
@@ -111,9 +153,26 @@ def project(name, project_type, ontology, directory, author, email, interactive,
         scs new project my-app --type healthcare --author "Jane Doe" \
             --email "jane@example.com" --no-interactive
 
-    See also: scs init (for adding SCS to existing projects)
+    See also: scs new domain, scs init (for adding SCS to existing projects)
     """
+    _scaffold(
+        "project",
+        name,
+        project_type,
+        ontology,
+        directory,
+        author,
+        email,
+        interactive,
+        no_interactive,
+    )
 
+
+def _scaffold(
+    kind, name, project_type, ontology, directory, author, email, interactive, no_interactive
+):
+    """Create a `kind` ("domain" or "project") workspace."""
+    label = kind.capitalize()
     # Determine if we should be interactive
     # Interactive by default unless --no-interactive is specified
     should_prompt = not no_interactive or interactive
@@ -122,12 +181,12 @@ def project(name, project_type, ontology, directory, author, email, interactive,
     if should_prompt:
         # Show welcome message
         if not name and not project_type:
-            click.echo("=== SCS Project Setup ===\n")
-            click.echo("Let's create your SCS project!\n")
+            click.echo(f"=== SCS {label} Setup ===\n")
+            click.echo(f"Let's create your SCS {kind} workspace!\n")
 
-        # Prompt for project name if not provided
+        # Prompt for the name if not provided
         if not name:
-            name = click.prompt("Project name", type=str)
+            name = click.prompt(f"{label} name", type=str)
 
         # Show project types if not specified - only meaningful for the sdlc ontology.
         # --ontology itself is flag-only in this pass, not prompted for interactively.
@@ -165,12 +224,12 @@ def project(name, project_type, ontology, directory, author, email, interactive,
         # Prompt for directory if not provided
         if not directory:
             use_cwd = click.confirm(
-                f"\nCreate project in current directory ({Path.cwd()})?",
+                f"\nCreate {kind} in current directory ({Path.cwd()})?",
                 default=True,
             )
             if not use_cwd:
                 directory = click.prompt(
-                    "Project directory",
+                    f"{label} directory",
                     type=click.Path(),
                     default=str(Path.cwd()),
                 )
@@ -179,7 +238,7 @@ def project(name, project_type, ontology, directory, author, email, interactive,
     else:
         # Non-interactive mode - require all parameters
         if not name:
-            click.echo("Error: Project name is required in non-interactive mode", err=True)
+            click.echo(f"Error: {label} name is required in non-interactive mode", err=True)
             raise click.Abort()
 
         # Set defaults for optional parameters
@@ -201,7 +260,7 @@ def project(name, project_type, ontology, directory, author, email, interactive,
         click.echo(f"Error: Directory '{base_path}' already exists", err=True)
         raise click.Abort()
 
-    click.echo(f"Creating SCS project: {name}")
+    click.echo(f"Creating SCS {kind}: {name}")
     click.echo(f"Ontology model: {ontology}")
     if ontology == "sdlc":
         click.echo(f"Project type: {project_type}")
@@ -212,13 +271,10 @@ def project(name, project_type, ontology, directory, author, email, interactive,
     model_config = get_ontology_model_config(ontology)
     if ontology == "sdlc":
         config = get_project_type_config(project_type)
-        domains = get_domains_for_project_type(project_type)
         concepts = get_concepts_for_project_type(project_type)
     else:
         config = {"exclude_scds": []}
-        domains = [model_config["domain"]]
         concepts = model_config["concepts"]
-    bundles = domains  # For backwards compatibility in templates
 
     # Create directory structure
     click.echo("Creating directory structure...")
@@ -230,6 +286,8 @@ def project(name, project_type, ontology, directory, author, email, interactive,
     email_info = email or f"{author_info}@example.com"
 
     variables = {
+        "bundle_kind": kind,
+        "meta_bundle_ref": META_BUNDLE_REF,
         "project_name": name,
         "project_type": project_type,
         "ontology": ontology,
@@ -238,14 +296,13 @@ def project(name, project_type, ontology, directory, author, email, interactive,
         "author": author_info,
         "email": email_info,
         "created_at": now,
-        "bundles": bundles,
         "concepts": concepts,
         "config": config,
     }
 
     # Create bundle files
     click.echo("Creating bundle files...")
-    _create_bundles(base_path, domains, concepts, variables, ontology)
+    _create_bundles(base_path, kind, concepts, variables, ontology)
 
     # Create the Domain Ontology manifest (RFC-0001)
     click.echo("Creating Domain Ontology manifest...")
@@ -265,12 +322,13 @@ def project(name, project_type, ontology, directory, author, email, interactive,
     click.echo("Creating supporting files...")
     _create_supporting_files(base_path, variables)
 
-    click.echo(f"\n✓ Project '{name}' created successfully!")
+    click.echo(f"\n✓ {label} '{name}' created successfully!")
     click.echo("\nNext steps:")
     click.echo(f"  cd {name}")
-    click.echo("  # Edit SCDs in context/project/")
-    click.echo("  # Edit bundles in bundles/")
+    click.echo("  # Write directives in the SCDs in context/project/")
     click.echo("  # Review docs/GETTING_STARTED.md")
+    click.echo("  scs bundle validate")
+    click.echo(f"  scs compile bundles/{kind}-bundle.yaml --allow-draft")
 
 
 def _create_domain_manifest(base_path: Path, concepts: list, variables: dict, model_config: dict):
@@ -288,48 +346,16 @@ def _create_domain_manifest(base_path: Path, concepts: list, variables: dict, mo
     )
 
 
-def _create_bundles(base_path: Path, domains: list, concepts: list, variables: dict, ontology: str):
-    """Create bundle YAML files for SCS 0.5.0 architecture"""
+def _create_bundles(base_path: Path, kind: str, concepts: list, variables: dict, ontology: str):
+    """Create the root bundle (domain or project) and its concept bundles (SCS 0.6.0).
+    The meta bundle is not scaffolded: a Domain bundle imports the published one."""
     template_path = get_template_path() / "bundles"
 
-    # Create project bundle
-    project_bundle_template = template_path / "project-bundle.yaml"
-    if project_bundle_template.exists():
-        copy_template(
-            project_bundle_template,
-            base_path / "bundles" / "project-bundle.yaml",
-            variables,
-        )
-
-    # Create meta bundle
-    meta_bundle_template = template_path / "meta-bundle.yaml"
-    if meta_bundle_template.exists():
-        copy_template(
-            meta_bundle_template,
-            base_path / "bundles" / "meta-bundle.yaml",
-            variables,
-        )
-
-    # Create standards bundle
-    standards_bundle_template = template_path / "standards-bundle.yaml"
-    if standards_bundle_template.exists():
-        copy_template(
-            standards_bundle_template,
-            base_path / "bundles" / "standards-bundle.yaml",
-            variables,
-        )
-
-    # Create domain bundles (e.g., software-development)
-    for domain in domains:
-        domain_template = template_path / "domains" / f"{domain}.yaml"
-        if domain_template.exists():
-            copy_template(
-                domain_template,
-                base_path / "bundles" / "domains" / f"{domain}.yaml",
-                variables,
-            )
-        else:
-            click.echo(f"Warning: Template for domain '{domain}' not found, skipping...")
+    copy_template(
+        template_path / f"{kind}-bundle.yaml",
+        base_path / "bundles" / f"{kind}-bundle.yaml",
+        variables,
+    )
 
     # Create concept bundles (the ontology model's functional areas)
     for concept in concepts:
@@ -359,6 +385,7 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict,
     # Get excluded SCDs from config
     exclude_scds = config.get("exclude_scds", [])
 
+    created = []
     for concept in concepts:
         scds = scd_mapping.get(concept, [])
         for scd_name in scds:
@@ -368,11 +395,54 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict,
 
             scd_template = template_path / f"{scd_name}.yaml"
             if scd_template.exists():
-                copy_template(
-                    scd_template,
-                    base_path / "context" / "project" / f"{scd_name}.yaml",
-                    variables,
-                )
+                dest = base_path / "context" / "project" / f"{scd_name}.yaml"
+                copy_template(scd_template, dest, variables)
+                created.append(dest)
+
+    generated = {f"scd:project:{path.stem}" for path in created}
+    for path in created:
+        _drop_dangling_relationships(path, generated)
+
+
+def _drop_dangling_relationships(scd_path: Path, generated: set):
+    """Remove relationships whose target is a project SCD this scaffold did not generate
+    (e.g. hipaa-compliance in a non-healthcare project). Works on the text so the template's
+    comments survive; relationship items are `  - type:` lines with 4-space continuations."""
+    lines = scd_path.read_text(encoding="utf-8").splitlines(keepends=True)
+    out, item, kept, in_block = [], [], 0, False
+
+    def flush():
+        nonlocal item, kept
+        target = next(
+            (ln.split(":", 1)[1].strip().strip('"') for ln in item if "target:" in ln), ""
+        )
+        if not (target.startswith("scd:project:") and target not in generated):
+            out.extend(item)
+            kept += 1
+        item = []
+
+    for line in lines:
+        if line.startswith("relationships:"):
+            in_block, block_start = True, len(out)
+            out.append(line)
+            continue
+        if in_block and line.startswith("  - type:"):
+            if item:
+                flush()
+            item = [line]
+        elif in_block and item and line.startswith("    "):
+            item.append(line)
+        else:
+            if item:
+                flush()
+            if in_block and line.strip() and not line.startswith(" "):
+                in_block = False
+            out.append(line)
+    if item:
+        flush()
+    if not kept and any(ln.startswith("relationships:") for ln in out):
+        out[block_start] = "relationships: []\n"
+    scd_path.write_text("".join(out), encoding="utf-8")
 
 
 def _sdlc_scd_mapping() -> dict:
@@ -503,7 +573,8 @@ def _create_supporting_files(base_path: Path, variables: dict):
         )
 
     # Create .scs/config
-    scs_config = f"""# SCS Project Configuration
+    scs_config = f"""# SCS Workspace Configuration
+bundle_type: {variables['bundle_kind']}
 project_name: {variables['project_name']}
 project_type: {variables['project_type']}
 ontology_model: {variables['ontology']}

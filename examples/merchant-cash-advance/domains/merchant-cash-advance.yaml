@@ -6,6 +6,7 @@ title: Merchant Cash Advance Domain
 description: 'Domain bundle for the MCA (merchant cash advance / business funding) reference ontology:
   imports the 16 concept bundles, each holding one skeleton SCD.'
 imports:
+- bundle:meta:0.6.0
 - bundle:origination
 - bundle:underwriting-decisioning
 - bundle:contract-characterization

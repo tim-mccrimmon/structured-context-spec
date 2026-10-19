@@ -1,66 +1,55 @@
 # {{ project_name }}
 
-**Project Type**: {{ project_type }}
-**SCS Version**: 0.1.0
+**Bundle type**: {{ bundle_kind | capitalize }}
+**Ontology model**: {{ ontology }}{% if ontology == 'sdlc' %} ({{ project_type }}){% endif %}
 **Created**: {{ created_at }}
 
 ## Overview
 
-This project follows the Structured Context Specification (SCS) for organizing project context, requirements, and compliance information.
+{% if bundle_kind == 'domain' -%}
+This workspace holds {{ project_name }}'s **Domain bundle**: the governance that applies to all of
+the organization's work, whichever project it is part of. It starts from the {{ domain_name }}
+ontology model; fill it in with your organization's own rules.
+{%- else -%}
+This workspace holds the **Project bundle** for {{ project_name }}: the governance for this
+project. It is independent of your organization's Domain bundle; a runtime applies the two side
+by side.
+{%- endif %}
 
-## Project Structure
+## Structure
 
 ```
 {{ project_name }}/
-├── bundles/                    # SCS bundles
-│   ├── project-bundle.yaml    # Top-level project bundle
-│   ├── meta-bundle.yaml       # Meta vocabulary bundle
-│   ├── standards-bundle.yaml  # Compliance standards bundle
-│   └── domains/               # Domain-specific bundles
-│       ├── architecture.yaml
-│       ├── security.yaml
-│       └── ...
-├── context/                   # SCD files
-│   └── project/              # Project-tier SCDs
-│       ├── system-context.yaml
-│       ├── tech-stack.yaml
-│       └── ...
-├── docs/                      # Documentation
+├── bundles/
+│   ├── {{ bundle_kind }}-bundle.yaml{{ '     ' if bundle_kind == 'domain' else '    ' }}# The {{ bundle_kind | capitalize }} bundle (compile this)
+│   └── concepts/              # One concept bundle per ontology concept
+├── context/
+│   └── project/               # SCDs: write directives here
+├── domain/
+│   └── domain-manifest.yaml   # The Domain Ontology
+├── docs/
 │   └── GETTING_STARTED.md
-├── .scs/                      # SCS configuration
+├── .scs/
 │   └── config
-└── README.md                  # This file
+└── README.md
 ```
+{% if bundle_kind == 'domain' %}
+The Domain bundle imports `{{ meta_bundle_ref }}`, the meta bundle published with the SCS
+specification. It is not in this workspace; the SCS tools ship a copy.
+{% endif %}
+## Working With This Workspace
 
-## Getting Started
+1. Write directives in the SCDs under `context/project/` (`content.directives`): plain-language
+   rules an AI agent should follow, each with an id. Cite standards with `std:` references.
+2. Validate: `scs bundle validate`
+3. Compile: `scs compile bundles/{{ bundle_kind }}-bundle.yaml --allow-draft`
+4. Version: `scs bundle version --bundle bundles/{{ bundle_kind }}-bundle.yaml --version 1.0.0`
 
-See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for detailed instructions on:
-- Understanding the SCS structure
-- Editing SCDs and bundles
-- Working with domains and concepts
-- Validating your context
-
-## SCDs Included
-
-This project includes the minimum recommended set of SCDs for a {{ project_type }} project:
-
-{% for bundle in bundles -%}
-- **{{ bundle }}**: Domain bundle for {{ bundle }} concepts
-{% endfor %}
-
-## Editing Context
-
-All context is stored in YAML files:
-
-1. **SCDs** (`context/project/*.yaml`): Structured Context Documents containing specific project information
-2. **Bundles** (`bundles/**/*.yaml`): Organize and group related SCDs
-
-Start by editing the SCDs in `context/project/` to match your project requirements.
+See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 ## SCS Resources
 
 - [SCS Specification](https://github.com/tim-mccrimmon/scs-spec)
-- [Documentation](https://github.com/tim-mccrimmon/scs-spec/tree/main/docs)
 - [Examples](https://github.com/tim-mccrimmon/scs-spec/tree/main/examples)
 
 ## Provenance
@@ -68,4 +57,3 @@ Start by editing the SCDs in `context/project/` to match your project requiremen
 - **Author**: {{ author }}
 - **Email**: {{ email }}
 - **Created At**: {{ created_at }}
-- **Generator**: scs-tools v0.1.0

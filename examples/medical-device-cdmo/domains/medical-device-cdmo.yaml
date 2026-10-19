@@ -17,6 +17,7 @@ description: >
   and regulatory workflows.
 
 imports:
+  - bundle:meta:0.6.0
   - bundle:compliance-governance:0.1.0
   - bundle:data-provenance:0.1.0
   - bundle:security:0.1.0
