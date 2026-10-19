@@ -1,0 +1,29 @@
+# SCD Template: Company Profile
+# Purpose: Facts about the organization that every AI agent should know.
+#
+# Each fact is compiled into the runtime artifact's `facts` list with the id
+# company-profile/<id>. Write one short, verifiable statement per fact. Rules belong in
+# directives (other SCDs) or prohibitions (prohibited.yaml), not here.
+
+id: scd:project:company-profile
+type: project
+title: "Company Profile"
+version: "DRAFT"
+description: "What {{ project_name }} does, for whom, and the environment its work runs in"
+
+content:
+  summary: "Facts about {{ project_name }} for AI agents"
+  facts: []
+  # Examples:
+  # - id: CO-001
+  #   fact: "{{ project_name }} builds clinical scheduling software for US hospitals."
+  # - id: CO-002
+  #   fact: "Production systems run in the company's Azure tenant in US regions."
+  # - id: CO-003
+  #   fact: "The information security program is audited annually against SOC 2."
+  #   cites: ["std:soc2:2017"]
+
+provenance:
+  created_by: "{{ email }}"
+  created_at: "{{ created_at }}"
+  rationale: "Company facts for {{ project_name }}"

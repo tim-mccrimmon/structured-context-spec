@@ -3,10 +3,16 @@ id: bundle:medtech-cdmo
 type: domain
 version: 1.0.0
 title: MedTech CDMO Governance
-sources: ['bundle:meta:0.6.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
+sources: ['bundle:meta:0.6.0', 'bundle:company:1.0.0', 'bundle:prohibited:1.0.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
 rules:
 - id: medtech-cdmo/identity
   rule: 'When asked which governance bundles are active, state: "Domain bundle bundle:medtech-cdmo version 1.0.0".'
+- id: prohibited/NO-001
+  rule: 'Prohibited: consumer generative AI services and personal AI accounts. Use instead: the company''s private AI service.'
+- id: prohibited/NO-002
+  rule: 'Prohibited: committing credentials, keys, or tokens to any repository.'
+- id: prohibited/NO-003
+  rule: 'Prohibited: open-source components under GPL or AGPL licenses in device software.'
 - id: governance-context/M-001
   rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both.
 - id: governance-context/M-002
@@ -29,3 +35,11 @@ rules:
   cites: ['std:iso-13485:2016#7.3.9']
 - id: design-change-control/DCC-002
   rule: Do not describe a design change as approved unless the approval record is identified.
+facts:
+- id: company-profile/CO-001
+  fact: MedTech CDMO designs and manufactures medical devices under contract. Each client owns the designs, specifications, and test data for its devices.
+- id: company-profile/CO-002
+  fact: The quality management system is certified to ISO 13485:2016.
+  cites: ['std:iso-13485:2016']
+- id: company-profile/CO-003
+  fact: Controlled documents and design history files are kept in the electronic quality management system, not in shared drives or source repositories.

@@ -189,3 +189,29 @@ error_messages:
 
   type_tier_mismatch:
     "Type '{type}' does not match tier '{tier}' in ID '{scd_id}'"
+
+# Prohibitions (spec/0.6/runtime-artifact.md §2.3): a prohibition is binary, so its subject may
+# not contain words that make it conditional or advisory. Matched case-insensitively as whole
+# words or phrases.
+prohibition_qualifiers:
+  severity: "error"
+  words:
+    - "unless"
+    - "except"
+    - "excluding"
+    - "if"
+    - "when"
+    - "whenever"
+    - "where possible"
+    - "wherever possible"
+    - "where practical"
+    - "avoid"
+    - "prefer"
+    - "should"
+    - "generally"
+    - "usually"
+    - "ideally"
+    - "try to"
+    - "discouraged"
+    - "recommended"
+    - "without approval"

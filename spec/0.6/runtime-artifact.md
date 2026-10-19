@@ -19,14 +19,30 @@ artifacts is outside this specification.
 
 ---
 
-## 2. Directives
+## 2. Compiled Content
 
 ### 2.1 What Gets Compiled
 
-A runtime artifact contains **directives** and nothing else from SCD content. A directive is
-a plain-language statement an agent is expected to follow, with an identifier.
+A runtime artifact contains three kinds of SCD content and nothing else:
 
-Directives are authored in an SCD's `content.directives` list:
+| Kind | Authored in | Compiled to | Purpose |
+|---|---|---|---|
+| Prohibition | `content.prohibitions` | `rules` (first) | A tool or practice that is forbidden, without conditions |
+| Directive | `content.directives` | `rules` | A statement an agent is expected to follow |
+| Fact | `content.facts` | `facts` | A statement an agent should know |
+
+Other SCD content (summaries, rationale, architecture narratives, decisions) is context for
+the people who author and review governance; it is not compiled. An SCD with none of the
+three contributes nothing to the artifact.
+
+`content.directives` is distinct from `content.rules`, which references rule sets held by an
+external rules engine for enforcement. Directives are instructions an agent reads; rule sets
+are checks a runtime executes.
+
+### 2.2 Directives
+
+A directive is a plain-language statement an agent is expected to follow, with an
+identifier:
 
 ```yaml
 id: scd:project:design-change-control
@@ -51,28 +67,86 @@ provenance:
 
 | Field | Required | Notes |
 |---|---|---|
-| `id` | yes | `^[A-Za-z0-9][A-Za-z0-9._-]*$`; unique within the SCD |
+| `id` | yes | `^[A-Za-z0-9][A-Za-z0-9._-]*$`; unique within the SCD (§2.5) |
 | `directive` | yes | The statement, as the agent should read it |
 | `cites` | no | Standard citations (`citations.md`) |
 
-Other SCD content (summaries, rationale, architecture, decisions) is context for the people
-who author and review governance; it is not compiled. An SCD without directives contributes
-nothing to the artifact.
+### 2.3 Prohibitions
 
-`content.directives` is distinct from `content.rules`, which references rule sets held by an
-external rules engine for enforcement. Directives are instructions an agent reads; rule sets
-are checks a runtime executes.
+A prohibition names a tool or practice that is forbidden. It is **binary**: the thing is
+either prohibited or it is not, with no conditions, exceptions, or advice. The author states
+only what is prohibited; the compiler writes the rule, so the wording cannot soften it.
 
-### 2.2 Rule Identifiers
+```yaml
+content:
+  prohibitions:
+    - id: NO-001
+      kind: tool
+      subject: consumer generative AI services and personal AI accounts
+      instead: the company's private AI service
+      reason: Client data may not leave company-controlled systems.
+    - id: NO-002
+      kind: practice
+      subject: committing credentials, keys, or tokens to any repository
+```
 
-Each directive becomes a **rule** in the artifact with the identifier
-`<scd-name>/<directive-id>`, where `<scd-name>` is the SCD identifier without its
+| Field | Required | Compiled | Notes |
+|---|---|---|---|
+| `id` | yes | yes | As for directives (§2.5) |
+| `kind` | yes | no | `tool` (a product, service, library, or model) or `practice` (an action) |
+| `subject` | yes | yes | What is prohibited, as a noun phrase |
+| `instead` | no | yes | The approved alternative |
+| `reason` | no | no | Why, for reviewers |
+| `cites` | no | yes | Standard citations |
+
+The compiled rule text is `Prohibited: <subject>.`, followed by ` Use instead: <instead>.`
+when `instead` is present.
+
+A validator MUST reject a prohibition whose `subject` contains a word or phrase that makes it
+conditional or advisory, such as *unless*, *except*, *if*, *when*, *where possible*,
+*avoid*, *prefer*, or *should*. Something that is allowed in some cases is expressed by
+narrowing the subject until what remains is always forbidden.
+
+Prohibitions in a Domain bundle apply to all work. Because a runtime applies the Domain and
+Project artifacts together (`bundle-format.md` §4), a Project bundle cannot lift a Domain
+prohibition; changing one requires a new version of the Domain bundle. A Project bundle MAY
+add prohibitions of its own.
+
+### 2.4 Facts
+
+A fact is a statement about the organization, its systems, or its environment that an agent
+should know but that is not itself an instruction: what the company does, where systems run,
+where records are kept.
+
+```yaml
+content:
+  facts:
+    - id: CO-002
+      fact: The quality management system is certified to ISO 13485:2016.
+      cites:
+        - std:iso-13485:2016
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `id` | yes | As for directives (§2.5) |
+| `fact` | yes | One short, verifiable statement |
+| `cites` | no | Standard citations |
+
+Facts SHOULD be stated so that a reviewer can check them. A rule phrased as a fact ("Code
+must be reviewed") belongs in a directive.
+
+### 2.5 Identifiers
+
+Each prohibition and directive becomes a **rule**, and each fact a **fact entry**, with the
+identifier `<scd-name>/<id>`, where `<scd-name>` is the SCD identifier without its
 `scd:<tier>:` prefix. `scd:project:design-change-control` directive `DCC-001` becomes rule
 `design-change-control/DCC-001`.
 
-Rule identifiers are stable as long as the SCD name and directive id are unchanged. Authors
-SHOULD NOT reuse a directive id for a different statement. A compiler MUST reject an
-artifact in which two rules share an identifier.
+Directive, prohibition, and fact ids share one namespace within an SCD and MUST be unique
+across all three. Identifiers are stable as long as the SCD name and id are unchanged.
+Authors SHOULD NOT reuse an id for a different statement. A compiler MUST reject an artifact
+in which two rules or facts share an identifier.
 
 ---
 
@@ -86,10 +160,12 @@ id: bundle:medtech-cdmo
 type: domain
 version: 1.0.0
 title: MedTech CDMO Governance
-sources: ['bundle:meta:0.6.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
+sources: ['bundle:meta:0.6.0', 'bundle:company:1.0.0', 'bundle:prohibited:1.0.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
 rules:
 - id: medtech-cdmo/identity
   rule: 'When asked which governance bundles are active, state: "Domain bundle bundle:medtech-cdmo version 1.0.0".'
+- id: prohibited/NO-001
+  rule: 'Prohibited: consumer generative AI services and personal AI accounts. Use instead: the company''s private AI service.'
 - id: governance-context/M-001
   rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both.
 - id: ai-review/AI-001
@@ -97,6 +173,10 @@ rules:
 - id: design-change-control/DCC-001
   rule: Design changes require documented review and approval before implementation.
   cites: ['std:iso-13485:2016#7.3.9']
+facts:
+- id: company-profile/CO-002
+  fact: The quality management system is certified to ISO 13485:2016.
+  cites: ['std:iso-13485:2016']
 ```
 
 (Excerpt of `examples/two-tier-governance/compiled/global.yaml`.)
@@ -109,19 +189,26 @@ rules:
 | `version` | yes | The bundle's version, or `DRAFT+<digest>` (§3.4) |
 | `title` | yes | The bundle's title |
 | `sources` | yes | Every bundle in the resolved tree except the root, as `bundle:<name>:<version>`, in resolution order |
-| `rules` | yes | The self-identification rule, then one rule per directive (§3.2) |
-| `rules[].id` | yes | Rule identifier (§2.2) |
-| `rules[].rule` | yes | The directive text |
-| `rules[].cites` | no | Citations, copied from the directive |
+| `rules` | yes | The self-identification rule, then one rule per prohibition, then one per directive (§3.2) |
+| `rules[].id` | yes | Rule identifier (§2.5) |
+| `rules[].rule` | yes | The directive text, or the prohibition rule text (§2.3) |
+| `rules[].cites` | no | Citations, copied from the source |
+| `facts` | no | One entry per fact (§3.2); omitted when the tree has no facts |
+| `facts[].id` | yes | Fact identifier (§2.5) |
+| `facts[].fact` | yes | The fact text |
+| `facts[].cites` | no | Citations, copied from the source |
 
 Only Domain and Project bundles are compiled. Each produces one artifact, independently.
 
 ### 3.2 Rule Order
 
-The first rule is the self-identification rule (§3.3). The remaining rules follow the
-resolved bundle tree: the root's imports in manifest order, depth first, and within a bundle
-its SCDs in manifest order, and within an SCD its directives in order. The same source
-always yields the same order.
+The first rule is the self-identification rule (§3.3). Then come all prohibitions, then all
+directives. Prohibitions come first because they are the rules least acceptable to miss.
+
+Within each group, entries follow the resolved bundle tree: the root's imports in manifest
+order, depth first; within a bundle, its SCDs in manifest order; within an SCD, entries in
+the order written. Facts follow the same tree order. The same source always yields the same
+order.
 
 ### 3.3 Self-Identification Rule
 
@@ -174,11 +261,12 @@ A conformant compiler, given a Domain or Project bundle:
 1. Validates the bundle tree and stops on any validation error.
 2. Resolves every import and SCD; an unresolved import or SCD is an error.
 3. Refuses `DRAFT` bundles anywhere in the tree unless drafts are allowed (§3.4).
-4. Collects directives in the order of §3.2 and builds rule identifiers (§2.2). Whitespace
-   in directive text, including line breaks from folded YAML, is collapsed to single spaces.
-5. Rejects duplicate rule identifiers, empty directives, and directives containing `TODO`.
-6. Rejects a tree that yields no directives.
-7. Reports each SCD that contributes no directives (warning).
+4. Collects prohibitions, directives, and facts in the order of §3.2 and builds identifiers
+   (§2.5). Whitespace in text, including line breaks from folded YAML, is collapsed to single
+   spaces.
+5. Rejects duplicate identifiers, empty entries, and entries containing `TODO`.
+6. Rejects a tree that yields no prohibitions, directives, or facts.
+7. Reports each SCD that contributes nothing (warning).
 8. Emits the artifact (§3).
 
 ---

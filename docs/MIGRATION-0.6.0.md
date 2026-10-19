@@ -50,7 +50,7 @@ warning (an ontology template may list SCD slots not yet written).
 | | 0.5.0 | 0.6.0 |
 |---|---|---|
 | `scs new project` | Project, meta, standards, and domain bundles | Project bundle importing concept bundles |
-| `scs new domain` | — | Domain bundle importing `bundle:meta:0.6.0` and concept bundles |
+| `scs new domain` | — | Domain bundle importing `bundle:meta:0.6.0`, `company` and `prohibited` concept bundles, and the ontology's concept bundles |
 | `scs add bundle <domain>` | Added a domain bundle to a project | Rejected; use `scs new domain` |
 | `scs bundle validate` / `version` | `bundles/project-bundle.yaml` | `bundles/domain-bundle.yaml` or `bundles/project-bundle.yaml` |
 | `scs compile` | — | Compiles a Domain or Project bundle into a runtime artifact |
@@ -155,7 +155,9 @@ and `satisfies` targets.
 ### 7. Write directives and compile (optional)
 
 To deliver governance to an AI runtime, add `content.directives` to the SCDs whose rules
-agents should follow, then compile each bundle:
+agents should follow, `content.prohibitions` for tools and practices that are forbidden
+outright, and `content.facts` for what agents should know about the organization. Then
+compile each bundle:
 
 ```bash
 scs compile path/to/domain-bundle.yaml -o compiled/global.yaml

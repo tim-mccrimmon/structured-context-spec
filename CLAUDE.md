@@ -147,7 +147,8 @@ See `rfcs/README.md` for full process details.
 - **SCD** (Structured Context Document) — YAML file containing context content
   - Format: `scd:<tier>:<name>` (e.g., `scd:project:company-overview`)
   - Tiers: `meta`, `project` (`standards` deprecated in 0.6.0)
-  - `content.directives` — the rules an agent follows; the only content `scs compile` emits
+  - Compiled content (the only content `scs compile` emits): `content.prohibitions` (binary,
+    compiled first as `Prohibited: <subject>.`), `content.directives` (rules), `content.facts`
   - `cites` — standard citations (`std:iso-13485:2016#7.3.9`); standard text never goes in SCS
 - **Bundle** — Manifest grouping SCDs + imports
   - Types: meta, concept, domain, project (`standards` deprecated)

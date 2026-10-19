@@ -1,0 +1,15 @@
+id: bundle:company
+type: concept
+version: "1.0.0"
+title: "Company"
+description: >
+  Facts about MedTech CDMO that every agent should know.
+imports: []
+scds:
+  - scd:project:company-profile
+
+provenance:
+  created_by: "quality@medtech-cdmo.example"
+  created_at: "2026-10-01T09:00:00Z"
+  version_approved_by: "qa-director@medtech-cdmo.example"
+  version_approved_at: "2026-10-10T14:00:00Z"

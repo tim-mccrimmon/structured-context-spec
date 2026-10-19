@@ -24,7 +24,7 @@ by side.
 │   ├── {{ bundle_kind }}-bundle.yaml{{ '     ' if bundle_kind == 'domain' else '    ' }}# The {{ bundle_kind | capitalize }} bundle (compile this)
 │   └── concepts/              # One concept bundle per ontology concept
 ├── context/
-│   └── project/               # SCDs: write directives here
+│   └── project/               # SCDs: write directives, prohibitions, and facts here
 ├── domain/
 │   └── domain-manifest.yaml   # The Domain Ontology
 ├── docs/
@@ -39,8 +39,9 @@ specification. It is not in this workspace; the SCS tools ship a copy.
 {% endif %}
 ## Working With This Workspace
 
-1. Write directives in the SCDs under `context/project/` (`content.directives`): plain-language
-   rules an AI agent should follow, each with an id. Cite standards with `std:` references.
+1. Write the SCDs under `context/project/`: directives (rules an AI agent should follow),
+   prohibitions (tools and practices that are forbidden, with no conditions), and facts
+   (what an agent should know). Cite standards with `std:` references.
 2. Validate: `scs bundle validate`
 3. Compile: `scs compile bundles/{{ bundle_kind }}-bundle.yaml --allow-draft`
 4. Version: `scs bundle version --bundle bundles/{{ bundle_kind }}-bundle.yaml --version 1.0.0`

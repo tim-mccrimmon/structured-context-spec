@@ -370,8 +370,62 @@ def test_directives_validate(tmp_path: Path):
 def test_directive_ids_must_be_unique_within_an_scd(tmp_path: Path):
     result = run(str(_directive_scd(tmp_path, "R-001", "R-001")))
     assert result.exit_code == 1
-    assert "more than one directive with id 'R-001'" in result.output
+    assert "more than one directive, prohibition, or fact with id 'R-001'" in result.output
 
 
 def test_directive_ids_must_be_well_formed(tmp_path: Path):
     assert run(str(_directive_scd(tmp_path, "R 001", "R-002"))).exit_code == 1
+
+
+PROHIBITIONS_AND_FACTS = """  prohibitions:
+    - id: NO-001
+      kind: tool
+      subject: {subject}
+      instead: the company's private AI service
+      reason: Client data may not leave company systems.
+  facts:
+    - id: {fact_id}
+      fact: Production systems run in the company's Azure tenant.
+"""
+
+
+def _prohibition_scd(tmp_path: Path, subject: str, fact_id: str = "F-001") -> Path:
+    path = scd(tmp_path, "scd:project:prohibited")
+    text = path.read_text().replace(
+        "  summary: prohibited\n",
+        "  summary: prohibited\n" + PROHIBITIONS_AND_FACTS.format(subject=subject, fact_id=fact_id),
+    )
+    path.write_text(text)
+    return path
+
+
+def test_prohibitions_and_facts_validate(tmp_path: Path):
+    result = run(str(_prohibition_scd(tmp_path, "public LLM services")))
+    assert result.exit_code == 0, result.output
+
+
+@pytest.mark.parametrize(
+    "subject",
+    [
+        "public LLM services unless approved",
+        "GPL libraries where possible",
+        "Should not use public LLMs",
+        "storing PHI when unencrypted",
+    ],
+)
+def test_qualified_prohibitions_are_rejected(tmp_path: Path, subject: str):
+    result = run(str(_prohibition_scd(tmp_path, subject)))
+    assert result.exit_code == 1
+    assert "is not binary" in result.output
+
+
+def test_words_containing_a_qualifier_are_not_rejected(tmp_path: Path):
+    # "difference" contains "if"; "shoulder" contains "should"
+    result = run(str(_prohibition_scd(tmp_path, "shoulder-surfing difference tools")))
+    assert result.exit_code == 0, result.output
+
+
+def test_prohibition_and_fact_ids_share_the_directive_namespace(tmp_path: Path):
+    result = run(str(_prohibition_scd(tmp_path, "public LLM services", fact_id="NO-001")))
+    assert result.exit_code == 1
+    assert "more than one directive, prohibition, or fact with id 'NO-001'" in result.output

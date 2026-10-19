@@ -37,9 +37,10 @@ def compile(bundle_file, output, fmt, allow_draft, no_cites, no_validate):
     """
     Compile a Domain or Project bundle into a runtime artifact
 
-    The artifact is one self-contained file holding the bundle's directives as rules with
-    stable ids, a version, and a self-identification rule. It contains no timestamps or
-    other volatile content, so the same source always produces the same bytes and hash.
+    The artifact is one self-contained file holding the bundle's prohibitions and directives
+    as rules with stable ids, its facts, a version, and a self-identification rule. It
+    contains no timestamps or other volatile content, so the same source always produces the
+    same bytes and hash.
     See spec/0.6/runtime-artifact.md.
 
     \b
@@ -88,9 +89,10 @@ def compile(bundle_file, output, fmt, allow_draft, no_cites, no_validate):
     text = render(result.artifact, fmt)
     digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
     rule_count = len(result.artifact["rules"]) - 1
+    fact_count = len(result.artifact.get("facts", []))
     summary = (
         f"Compiled {result.artifact['id']} {result.artifact['version']}: "
-        f"{rule_count} rules, sha256 {digest}"
+        f"{rule_count} rules, {fact_count} facts, sha256 {digest}"
     )
 
     if output:

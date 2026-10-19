@@ -6,6 +6,8 @@ description: >
   Organization-wide AI governance for MedTech CDMO. Applies to every project, user, and agent.
 imports:
   - bundle:meta:0.6.0
+  - bundle:company:1.0.0
+  - bundle:prohibited:1.0.0
   - bundle:ai-use:1.0.0
   - bundle:design-controls:1.0.0
 scds: []

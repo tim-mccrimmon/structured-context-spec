@@ -1,7 +1,7 @@
 """Compile a Domain or Project bundle into a runtime artifact (spec/0.6/runtime-artifact.md).
 
-The artifact holds directives only, in a fixed order, with no volatile content, so identical
-source always produces identical bytes.
+The artifact holds prohibitions and directives as rules, and facts, in a fixed order, with no
+volatile content, so identical source always produces identical bytes.
 """
 
 from __future__ import annotations
@@ -27,6 +27,18 @@ class CompileResult:
 
 def _canonical_json(data: Any) -> str:
     return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+
+
+def _text(value: Any) -> str:
+    """Collapse whitespace, including line breaks from folded YAML."""
+    return " ".join(str(value or "").split())
+
+
+def _prohibition_rule(entry: Dict[str, Any]) -> str:
+    subject = _text(entry.get("subject")).rstrip(".")
+    instead = _text(entry.get("instead")).rstrip(".")
+    rule = f"Prohibited: {subject}."
+    return f"{rule} Use instead: {instead}." if instead else rule
 
 
 def _short_name(prefixed_id: str) -> str:
@@ -60,42 +72,54 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
     if result.errors:
         return result
 
-    rules: List[Dict[str, Any]] = []
+    prohibitions: List[Dict[str, Any]] = []
+    directives: List[Dict[str, Any]] = []
+    facts: List[Dict[str, Any]] = []
     seen: Dict[str, str] = {}
+
+    def add(scd: Any, entry: Any, text: str, label: str, out: List[Dict[str, Any]], key: str):
+        entry_id = str(entry.get("id", "")).strip() if isinstance(entry, dict) else ""
+        if not entry_id or not text:
+            result.errors.append(f"{scd.ref} has a {label} without an id or text.")
+            return
+        if "TODO" in text:
+            result.errors.append(
+                f"{scd.ref} {label} {entry_id} still contains TODO; "
+                "finish or remove it before compiling."
+            )
+            return
+        item_id = f"{_short_name(scd.ref)}/{entry_id}"
+        if item_id in seen:
+            result.errors.append(
+                f"Duplicate rule id {item_id} (from {seen[item_id]} and {scd.ref})."
+            )
+            return
+        seen[item_id] = scd.ref
+        item: Dict[str, Any] = {"id": item_id, key: text}
+        cites = entry.get("cites")
+        if include_cites and cites:
+            item["cites"] = [str(c) for c in cites]
+        out.append(item)
+
     for scd in tree.scds:
         content = scd.data.get("content")
-        directives = content.get("directives") if isinstance(content, dict) else None
-        if not directives:
-            result.warnings.append(f"{scd.ref} has no directives and contributes no rules.")
+        content = content if isinstance(content, dict) else {}
+        if not any(content.get(k) for k in ("prohibitions", "directives", "facts")):
+            result.warnings.append(
+                f"{scd.ref} has no directives, prohibitions, or facts and contributes nothing."
+            )
             continue
-        scd_name = _short_name(scd.ref)
-        for directive in directives:
-            directive_id = str(directive.get("id", "")).strip()
-            text = " ".join(str(directive.get("directive", "")).split())
-            if not directive_id or not text:
-                result.errors.append(f"{scd.ref} has a directive without an id or text.")
-                continue
-            if "TODO" in text:
-                result.errors.append(
-                    f"{scd.ref} directive {directive_id} still contains TODO; "
-                    "finish or remove it before compiling."
-                )
-                continue
-            rule_id = f"{scd_name}/{directive_id}"
-            if rule_id in seen:
-                result.errors.append(
-                    f"Duplicate rule id {rule_id} (from {seen[rule_id]} and {scd.ref})."
-                )
-                continue
-            seen[rule_id] = scd.ref
-            rule: Dict[str, Any] = {"id": rule_id, "rule": text}
-            cites = directive.get("cites")
-            if include_cites and cites:
-                rule["cites"] = [str(c) for c in cites]
-            rules.append(rule)
+        for entry in content.get("prohibitions") or []:
+            text = _prohibition_rule(entry) if _text(entry.get("subject")) else ""
+            add(scd, entry, text, "prohibition", prohibitions, "rule")
+        for entry in content.get("directives") or []:
+            add(scd, entry, _text(entry.get("directive")), "directive", directives, "rule")
+        for entry in content.get("facts") or []:
+            add(scd, entry, _text(entry.get("fact")), "fact", facts, "fact")
 
-    if not rules and not result.errors:
-        result.errors.append(f"{root.id} yields no directives; there is nothing to compile.")
+    rules = prohibitions + directives
+    if not rules and not facts and not result.errors:
+        result.errors.append(f"{root.id} yields no rules or facts; there is nothing to compile.")
     if result.errors:
         return result
 
@@ -112,6 +136,8 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
     if any(b.version == "DRAFT" for b in tree.bundles):
         body = {"id": root.id, "type": root.type, "title": title, "sources": sources}
         body["rules"] = rules
+        if facts:
+            body["facts"] = facts
         digest = hashlib.sha256(_canonical_json(body).encode("utf-8")).hexdigest()[:8]
         version = f"DRAFT+{digest}"
 
@@ -132,6 +158,8 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
         "sources": sources,
         "rules": [identity, *rules],
     }
+    if facts:
+        result.artifact["facts"] = facts
     return result
 
 

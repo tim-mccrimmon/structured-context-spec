@@ -197,7 +197,8 @@ scs validate --bundle bundles/project-bundle.yaml --skip-completeness
 ### 6. `scs compile` - Build Runtime Artifacts
 
 Compile a Domain or Project bundle into one compact, deterministic file of rules for a runtime
-to inject (`spec/0.6/runtime-artifact.md`). Only SCD `content.directives` are compiled.
+to inject (`spec/0.6/runtime-artifact.md`). Only SCD `content.prohibitions`, `content.directives`, and
+`content.facts` are compiled.
 
 ```bash
 scs compile bundles/domain-bundle.yaml -o compiled/global.yaml

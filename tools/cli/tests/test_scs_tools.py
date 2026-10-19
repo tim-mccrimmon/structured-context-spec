@@ -707,3 +707,77 @@ def test_bundle_info_falls_back_to_the_mca_template_outside_a_project(tmp_path: 
     assert result.exit_code == 0, result.output
     assert "template bundle" in result.output.lower()
     assert "ID: bundle:governance" in result.output
+
+
+# --------------------------------------------- company facts and prohibitions (Domain only)
+
+
+def test_new_domain_adds_company_and_prohibited_concepts(tmp_path: Path):
+    root = scaffold(tmp_path, "minimal", kind="domain")
+    domain = yaml.safe_load((root / "bundles/domain-bundle.yaml").read_text())
+    assert domain["imports"][1:3] == ["bundle:company", "bundle:prohibited"]
+    for rel in ["context/project/company-profile.yaml", "context/project/prohibited.yaml"]:
+        assert (root / rel).is_file(), rel
+        assert validate_with_validator(str(root / rel)).exit_code == 0
+    manifest = yaml.safe_load((root / "domain/domain-manifest.yaml").read_text())
+    ids = [c["id"] for c in manifest["domain"]["ontology"]["concepts"]]
+    assert ids[:2] == ["concept:company", "concept:prohibited"]
+    assert (
+        validate_with_validator("--domain", str(root / "domain/domain-manifest.yaml")).exit_code
+        == 0
+    )
+
+
+def test_new_project_does_not_add_the_domain_wide_concepts(tmp_path: Path):
+    root = scaffold(tmp_path, "standard")
+    assert not (root / "bundles/concepts/prohibited.yaml").exists()
+    assert not (root / "context/project/company-profile.yaml").exists()
+
+
+def test_new_mca_domain_validates(tmp_path: Path):
+    result = CliRunner().invoke(
+        cli,
+        ["new", "domain", "funder", "--ontology", "mca", "--dir", str(tmp_path)]
+        + ["--author", "A", "--email", "a@example.com", "--no-interactive"],
+    )
+    assert result.exit_code == 0, result.output
+    root = tmp_path / "funder"
+    assert (root / "bundles/concepts/prohibited.yaml").is_file()
+    result = validate_with_validator("--bundle", str(root / "bundles/domain-bundle.yaml"))
+    assert result.exit_code == 0, result.output
+
+
+def test_filled_in_prohibitions_and_facts_compile(tmp_path: Path):
+    root = scaffold(tmp_path, "minimal", kind="domain")
+    prohibited = root / "context/project/prohibited.yaml"
+    prohibited.write_text(
+        prohibited.read_text().replace(
+            "  prohibitions: []\n",
+            "  prohibitions:\n    - id: NO-001\n      kind: practice\n"
+            "      subject: committing credentials to any repository\n",
+        )
+    )
+    profile = root / "context/project/company-profile.yaml"
+    profile.write_text(
+        profile.read_text().replace(
+            "  facts: []\n", "  facts:\n    - id: CO-001\n      fact: Demo builds software.\n"
+        )
+    )
+    result = CliRunner().invoke(
+        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft"]
+    )
+    assert result.exit_code == 0, result.output
+    artifact = yaml.safe_load(result.stdout)
+    assert artifact["rules"][1] == {
+        "id": "prohibited/NO-001",
+        "rule": "Prohibited: committing credentials to any repository.",
+    }
+    assert artifact["facts"] == [{"id": "company-profile/CO-001", "fact": "Demo builds software."}]
+
+
+def test_add_bundle_and_scd_find_the_common_templates(tmp_path: Path, monkeypatch):
+    root = _init_bare_project(tmp_path, monkeypatch)
+    assert CliRunner().invoke(cli, ["add", "bundle", "prohibited"]).exit_code == 0
+    assert CliRunner().invoke(cli, ["add", "scd", "prohibited"]).exit_code == 0
+    assert (root / "bundles/concepts/prohibited.yaml").is_file()
+    assert (root / "context/project/prohibited.yaml").is_file()

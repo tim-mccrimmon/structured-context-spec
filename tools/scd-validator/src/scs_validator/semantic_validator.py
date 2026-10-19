@@ -67,26 +67,59 @@ class SemanticValidator:
         # Validate required string fields are not empty
         self._validate_required_strings(scd, scd_id, result, file_path)
 
-        # Directive ids must be unique within the SCD (they become rule ids)
         content = scd.get("content")
-        directives = content.get("directives") if isinstance(content, dict) else None
-        if isinstance(directives, list):
-            seen: set[str] = set()
-            for directive in directives:
-                directive_id = directive.get("id") if isinstance(directive, dict) else None
-                if directive_id in seen:
+        if isinstance(content, dict):
+            self._validate_compiled_content(content, scd_id, result, file_path)
+
+        return result
+
+    def _validate_compiled_content(
+        self,
+        content: Dict[str, Any],
+        scd_id: str,
+        result: ValidationResult,
+        file_path: str | None,
+    ) -> None:
+        """Ids of directives, prohibitions, and facts are unique within the SCD (they become
+        rule and fact ids), and prohibition subjects carry no qualifiers (they are binary)."""
+        seen: set[str] = set()
+        for section in ("directives", "prohibitions", "facts"):
+            entries = content.get(section)
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                entry_id = entry.get("id") if isinstance(entry, dict) else None
+                if entry_id in seen:
                     result.add_error(
                         ValidationError(
-                            f"SCD '{scd_id}' has more than one directive with id "
-                            f"'{directive_id}'. Directive ids must be unique within an SCD.",
+                            f"SCD '{scd_id}' has more than one directive, prohibition, or fact "
+                            f"with id '{entry_id}'. These ids must be unique within an SCD.",
                             scd_id=scd_id,
                             file_path=file_path,
                         )
                     )
-                elif directive_id:
-                    seen.add(directive_id)
+                elif entry_id:
+                    seen.add(entry_id)
 
-        return result
+        qualifiers = self.rules.get("prohibition_qualifiers", {}).get("words", [])
+        if not qualifiers:
+            return
+        pattern = re.compile(
+            r"\b(" + "|".join(re.escape(q) for q in qualifiers) + r")\b", re.IGNORECASE
+        )
+        for entry in content.get("prohibitions") or []:
+            subject = entry.get("subject") if isinstance(entry, dict) else None
+            match = pattern.search(subject) if isinstance(subject, str) else None
+            if match:
+                result.add_error(
+                    ValidationError(
+                        f"Prohibition '{entry.get('id')}' in SCD '{scd_id}' is not binary: its "
+                        f"subject contains '{match.group(1)}'. State exactly what is prohibited, "
+                        "with no conditions; narrow the subject instead of qualifying it.",
+                        scd_id=scd_id,
+                        file_path=file_path,
+                    )
+                )
 
     def _validate_type_tier_match(
         self,

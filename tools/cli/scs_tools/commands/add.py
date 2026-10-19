@@ -105,6 +105,8 @@ def scd(scd_name, author, email):
     ontology = _read_ontology_model(config_file)
     template_path = get_template_path() / "scds" / ontology / f"{scd_name}.yaml"
     if not template_path.exists():
+        template_path = get_template_path() / "scds" / "common" / f"{scd_name}.yaml"
+    if not template_path.exists():
         click.echo(
             f"Error: Template for '{scd_name}' not found in the '{ontology}' ontology model.\n"
             f"Available templates are in: {get_template_path() / 'scds' / ontology}",
@@ -167,6 +169,8 @@ def bundle(bundle_name, author, email):
     ontology = _read_ontology_model(config_file)
     concepts_root = get_template_path() / "bundles" / "concepts" / ontology
     template_path = concepts_root / f"{bundle_name}.yaml"
+    if not template_path.exists():
+        template_path = concepts_root.parent / "common" / f"{bundle_name}.yaml"
 
     if bundle_name in {m["domain"] for m in ONTOLOGY_MODELS.values()}:
         click.echo(

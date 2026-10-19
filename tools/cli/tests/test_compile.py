@@ -94,6 +94,9 @@ def test_rule_ids_order_and_self_identification():
     ids = [r["id"] for r in artifact["rules"]]
     assert ids == [
         "medtech-cdmo/identity",
+        "prohibited/NO-001",
+        "prohibited/NO-002",
+        "prohibited/NO-003",
         "governance-context/M-001",
         "governance-context/M-002",
         "governance-context/M-003",
@@ -108,6 +111,8 @@ def test_rule_ids_order_and_self_identification():
     assert "Domain bundle bundle:medtech-cdmo version 1.0.0" in artifact["rules"][0]["rule"]
     assert artifact["sources"] == [
         "bundle:meta:0.6.0",
+        "bundle:company:1.0.0",
+        "bundle:prohibited:1.0.0",
         "bundle:ai-use:1.0.0",
         "bundle:design-controls:1.0.0",
     ]
@@ -239,3 +244,61 @@ def test_validation_errors_stop_compilation(org: Path, tmp_path: Path):
     assert result.exit_code != 0
     assert "must not import a domain bundle" in result.output
     assert not out.exists()
+
+
+# ------------------------------------------------------------ prohibitions and facts
+
+
+def test_prohibitions_compile_to_binary_rules_ahead_of_directives():
+    artifact = yaml.safe_load(compile_(str(DOMAIN), "--no-validate").stdout)
+    rules = {r["id"]: r["rule"] for r in artifact["rules"]}
+    assert rules["prohibited/NO-001"] == (
+        "Prohibited: consumer generative AI services and personal AI accounts. "
+        "Use instead: the company's private AI service."
+    )
+    assert rules["prohibited/NO-002"] == (
+        "Prohibited: committing credentials, keys, or tokens to any repository."
+    )
+    assert "reason" not in str(artifact) and "Client contracts" not in str(artifact)
+
+
+def test_facts_compile_into_their_own_list():
+    artifact = yaml.safe_load(compile_(str(DOMAIN), "--no-validate").stdout)
+    assert list(artifact)[-1] == "facts"
+    assert [f["id"] for f in artifact["facts"]] == [
+        "company-profile/CO-001",
+        "company-profile/CO-002",
+        "company-profile/CO-003",
+    ]
+    assert artifact["facts"][1]["cites"] == ["std:iso-13485:2016"]
+
+
+def test_artifacts_without_facts_have_no_facts_key():
+    artifact = yaml.safe_load(compile_(str(PROJECT), "--no-validate").stdout)
+    assert "facts" not in artifact
+
+
+def test_a_qualified_prohibition_fails_validation(org: Path):
+    edit(
+        org / "context" / "project" / "prohibited.yaml",
+        "to any repository",
+        "to any repository unless encrypted",
+    )
+    result = compile_(str(org / "bundles" / "domain-bundle.yaml"))
+    assert result.exit_code != 0
+    assert "is not binary" in result.output
+
+
+def test_duplicate_fact_ids_are_an_error(org: Path):
+    edit(org / "context" / "project" / "company-profile.yaml", "id: CO-003", "id: CO-002")
+    result = compile_(str(org / "bundles" / "domain-bundle.yaml"), "--no-validate")
+    assert "Duplicate rule id company-profile/CO-002" in result.output
+
+
+def test_facts_change_the_draft_digest(org: Path):
+    edit(org / "bundles" / "domain-bundle.yaml", 'version: "1.0.0"', 'version: "DRAFT"')
+    root = str(org / "bundles" / "domain-bundle.yaml")
+    first = yaml.safe_load(compile_(root, "--no-validate", "--allow-draft").stdout)["version"]
+    edit(org / "context" / "project" / "company-profile.yaml", "ISO 13485:2016.", "ISO 13485.")
+    second = yaml.safe_load(compile_(root, "--no-validate", "--allow-draft").stdout)["version"]
+    assert first != second

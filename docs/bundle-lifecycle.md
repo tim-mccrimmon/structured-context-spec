@@ -360,7 +360,8 @@ project-x/                              # Project workspace
 ## Compiling for Runtime
 
 A versioned Domain or Project bundle is compiled into a **runtime artifact**: one file holding
-the bundle's directives as rules with stable ids, a version, and a self-identification rule
+the bundle's prohibitions and directives as rules with stable ids, its facts, a version, and a
+self-identification rule
 (`spec/0.6/runtime-artifact.md`).
 
 ```bash
@@ -368,7 +369,8 @@ scs compile bundles/domain-bundle.yaml -o compiled/global.yaml
 scs compile bundles/project-bundle.yaml -o compiled/projects/project-x.yaml
 ```
 
-Only the `content.directives` of each SCD are compiled. The artifact carries no timestamps or
+Only each SCD's `content.prohibitions`, `content.directives`, and `content.facts` are
+compiled. The artifact carries no timestamps or
 authors, so the same versioned bundle always yields the same bytes and hash; a runtime can
 record that hash as evidence of which governance was applied. Use `--allow-draft` to compile a
 DRAFT bundle for testing; its version becomes `DRAFT+<digest>`.

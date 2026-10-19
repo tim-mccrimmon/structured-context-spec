@@ -11,7 +11,7 @@ each compiled to a **runtime artifact** (`compiled/`) with `scs compile`.
 examples/two-tier-governance/
 ├── org/                                 # Organization governance (normally its own repo)
 │   ├── bundles/domain-bundle.yaml       # bundle:medtech-cdmo — the Domain ("Global") bundle
-│   ├── bundles/concepts/                # ai-use, design-controls
+│   ├── bundles/concepts/                # company, prohibited, ai-use, design-controls
 │   └── context/project/                 # SCDs holding the organization's directives
 ├── infusion-pump-fw/                    # One project's governance (normally its own repo)
 │   ├── bundles/project-bundle.yaml      # bundle:infusion-pump-fw — lists its SCDs directly
@@ -21,10 +21,30 @@ examples/two-tier-governance/
     └── projects/infusion-pump-fw.yaml   # Compiled Project bundle
 ```
 
-## Directives
+## What Gets Compiled
 
-Only `content.directives` is compiled. Each directive becomes a rule with the id
-`<scd-name>/<directive-id>`, for example `design-change-control/DCC-001`:
+Three kinds of SCD content are compiled; the rest of an SCD (summary, provenance, other
+content) stays in the source for reviewers.
+
+**Prohibitions** (`org/context/project/prohibited.yaml`) name tools and practices that are
+forbidden, with no conditions. The compiler writes the rule text and puts these rules first:
+
+```yaml
+content:
+  prohibitions:
+    - id: NO-001
+      kind: tool
+      subject: consumer generative AI services and personal AI accounts
+      instead: the company's private AI service
+      reason: Client data may not leave company-controlled systems.   # not compiled
+```
+
+compiles to `Prohibited: consumer generative AI services and personal AI accounts. Use
+instead: the company's private AI service.` Validation rejects a subject with a qualifier
+such as "unless" or "where possible".
+
+**Directives** become rules with the id `<scd-name>/<directive-id>`, for example
+`design-change-control/DCC-001`:
 
 ```yaml
 content:
@@ -37,7 +57,9 @@ content:
         - std:iso-13485:2016#7.3.9
 ```
 
-The rest of an SCD (summary, provenance, other content) stays in the source for reviewers.
+**Facts** (`org/context/project/company-profile.yaml`) are statements an agent should know,
+such as what the company does and where records are kept. They compile into a separate
+`facts` list.
 
 ## Compile
 

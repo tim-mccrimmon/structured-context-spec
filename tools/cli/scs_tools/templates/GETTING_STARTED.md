@@ -22,10 +22,16 @@ Bundles are collections of related SCDs (Structured Context Documents). This wor
 {%- endif %}
 2. **Concept Bundles** (`bundles/concepts/*.yaml`): One per ontology concept, each listing its SCDs.
 
-### Directives
+### What Agents Receive
 
-The rules an AI agent receives are the **directives** in your SCDs (`content.directives`). Only
-directives are compiled; the rest of an SCD is context for the people who write and review it.
+Three kinds of SCD content are compiled into what an AI agent receives; the rest of an SCD is
+context for the people who write and review it.
+
+- **Prohibitions** (`content.prohibitions`): tools or practices that are forbidden, with no
+  conditions.{% if bundle_kind == 'domain' %} Write them in `context/project/prohibited.yaml`.{% endif %}
+- **Directives** (`content.directives`): rules the agent is expected to follow.
+- **Facts** (`content.facts`): statements the agent should know.{% if bundle_kind == 'domain' %} Write
+  facts about the organization in `context/project/company-profile.yaml`.{% endif %}
 
 ```yaml
 content:

@@ -29,6 +29,27 @@ from scs_tools.utils.project_types import (
 # so a Domain bundle's import of it resolves without the bundle being in the workspace.
 META_BUNDLE_REF = "bundle:meta:0.6.0"
 
+# Concepts every Domain bundle gets, whatever its ontology model: facts about the organization
+# and its binary prohibitions. Concept id -> (name, description, SCD names). Templates live in
+# templates/bundles/concepts/common/ and templates/scds/common/.
+DOMAIN_COMMON_CONCEPTS = {
+    "company": (
+        "Company",
+        "Facts about the organization that every agent should know",
+        ["company-profile"],
+    ),
+    "prohibited": (
+        "Prohibited Tools and Practices",
+        "Tools and practices forbidden, without exception, in all of the organization's work",
+        ["prohibited"],
+    ),
+}
+
+
+def _template_model(concept: str, ontology: str) -> str:
+    """Template directory for a concept: `common` for the Domain-wide concepts."""
+    return "common" if concept in DOMAIN_COMMON_CONCEPTS else ontology
+
 
 def _scs_tools_version() -> str:
     """The installed scs-tools package version, or "unknown" if it can't be read. Read from
@@ -275,6 +296,9 @@ def _scaffold(
     else:
         config = {"exclude_scds": []}
         concepts = model_config["concepts"]
+    ontology_concepts = list(concepts)
+    if kind == "domain":
+        concepts = [*DOMAIN_COMMON_CONCEPTS, *concepts]
 
     # Create directory structure
     click.echo("Creating directory structure...")
@@ -316,7 +340,7 @@ def _scaffold(
     # skip cleanly rather than warn once per concept.
     if ontology == "sdlc":
         click.echo("Creating concept documentation templates...")
-        _create_concept_docs(base_path, concepts, variables)
+        _create_concept_docs(base_path, ontology_concepts, variables)
 
     # Create supporting files
     click.echo("Creating supporting files...")
@@ -325,7 +349,7 @@ def _scaffold(
     click.echo(f"\n✓ {label} '{name}' created successfully!")
     click.echo("\nNext steps:")
     click.echo(f"  cd {name}")
-    click.echo("  # Write directives in the SCDs in context/project/")
+    click.echo("  # Write directives, prohibitions, and facts in context/project/")
     click.echo("  # Review docs/GETTING_STARTED.md")
     click.echo("  scs bundle validate")
     click.echo(f"  scs compile bundles/{kind}-bundle.yaml --allow-draft")
@@ -336,9 +360,11 @@ def _create_domain_manifest(base_path: Path, concepts: list, variables: dict, mo
     including relationships when the ontology model defines them (e.g. mca; sdlc has none,
     deliberately flat)."""
     manifest_template = get_template_path() / "domain" / "domain-manifest.yaml"
-    concept_info = get_concept_info(
-        concepts, model_config["concept_info"], model_config["relationships"]
-    )
+    info_map = {
+        **model_config["concept_info"],
+        **{c: (name, desc) for c, (name, desc, _) in DOMAIN_COMMON_CONCEPTS.items()},
+    }
+    concept_info = get_concept_info(concepts, info_map, model_config["relationships"])
     copy_template(
         manifest_template,
         base_path / "domain" / "domain-manifest.yaml",
@@ -359,7 +385,9 @@ def _create_bundles(base_path: Path, kind: str, concepts: list, variables: dict,
 
     # Create concept bundles (the ontology model's functional areas)
     for concept in concepts:
-        concept_template = template_path / "concepts" / ontology / f"{concept}.yaml"
+        concept_template = (
+            template_path / "concepts" / _template_model(concept, ontology) / f"{concept}.yaml"
+        )
         if concept_template.exists():
             copy_template(
                 concept_template,
@@ -372,7 +400,7 @@ def _create_bundles(base_path: Path, kind: str, concepts: list, variables: dict,
 
 def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict, ontology: str):
     """Create SCD YAML files"""
-    template_path = get_template_path() / "scds" / ontology
+    templates_root = get_template_path() / "scds"
 
     if ontology != "sdlc":
         # Every other ontology model maps one SCD per concept (concept id == scd id) - see
@@ -381,6 +409,7 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict,
         scd_mapping = {concept: [concept] for concept in concepts}
     else:
         scd_mapping = _sdlc_scd_mapping()
+    scd_mapping.update({c: scds for c, (_, _, scds) in DOMAIN_COMMON_CONCEPTS.items()})
 
     # Get excluded SCDs from config
     exclude_scds = config.get("exclude_scds", [])
@@ -393,7 +422,7 @@ def _create_scds(base_path: Path, concepts: list, variables: dict, config: dict,
             if scd_name in exclude_scds:
                 continue
 
-            scd_template = template_path / f"{scd_name}.yaml"
+            scd_template = templates_root / _template_model(concept, ontology) / f"{scd_name}.yaml"
             if scd_template.exists():
                 dest = base_path / "context" / "project" / f"{scd_name}.yaml"
                 copy_template(scd_template, dest, variables)
