@@ -65,7 +65,10 @@ what form you render it into, is up to you.
 ## Quick Start
 
 ```bash
-pip install 'scs-tools[validator]'
+# Python 3.11 or later. Installs the 0.6.0 tools from GitHub (not yet published to PyPI).
+pip install \
+  "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/scd-validator" \
+  "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/cli"
 
 scs new domain my-org --ontology sdlc     # organization-wide (or personal) context
 cd my-org
@@ -82,7 +85,9 @@ Fill in the scaffolded SCDs, validate until it's clean, then version it with a n
 - [CLI documentation](tools/cli/README.md)
 - [Migrating to 0.6.0](docs/MIGRATION-0.6.0.md)
 
-Known issues in the 0.6.0 tooling are tracked in [ISSUES.md](ISSUES.md).
+The `scs-tools` package on PyPI is an old 0.1.0 release; don't use it. Publishing 0.7.0 to PyPI
+is planned (see [ROADMAP.md](ROADMAP.md)). Known issues in the 0.6.0 tooling are tracked in
+[ISSUES.md](ISSUES.md).
 
 ---
 
