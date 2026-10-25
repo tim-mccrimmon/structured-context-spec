@@ -1,105 +1,111 @@
 # SCS Roadmap
 
-Current stable: **0.5.0** (tagged `v0.5.0`). No active development branch is open right now —
-see "Beyond 0.5.0," below, for candidate next work; none of it is scheduled yet.
+Current stable: **0.6.0** (tagged `v0.6.0`, 2026-10-19). In development: **0.7.0**, on branch
+`0.7-dev`.
 
-This document supersedes the forward-looking "Roadmap" section of
-`RELEASE-NOTES-0.3.md` for 0.5.0 and beyond. Granular backlog: `ISSUES.md`.
+Granular backlog: `ISSUES.md`. Design proposals: `rfcs/`.
 
-## SCS 0.5.0 — theme
+## Previous releases
 
-**Structured context is the governed context layer for any AI actor** — chat assistants,
-autonomous agents, MCP tool invocations, and multi-agent workflows — not just chat. 0.5.0
-makes the domain model explicit, resolves the runtime-facing open questions, and hardens
-the tooling so downstream systems can depend on it.
+- **0.5.0:** the Domain Ontology replaced "concerns" (RFC 0001); structured context reframed
+  for any AI actor; runtime decisions on immutability, versioning, and drift. See
+  `RELEASE-0.5.0.md`.
+- **0.6.0:** Domain (Global) and Project bundles as independent trees; standards as citations
+  only; prohibitions, directives, and facts compiled into a deterministic runtime artifact by
+  `scs compile`; the packaged meta bundle. See `RELEASE-NOTES-0.6.0.md`.
 
-0.5.0 is a **breaking change** — expected pre-1.0, per semver; the spec is still settling
-and isn't claiming stability yet (see Governance, below).
+## SCS 0.7.0: theme
+
+**Approved, versioned context as the source of truth for AI, produced through conversation.**
+Through 0.6.0, using SCS means learning the spec. 0.7.0 makes an AI assistant the intended way
+to create, maintain, validate, version, and compile bundles, with the spec as the authority,
+the validator as the gate, and a named person approving every version. It also makes versioned
+bundles verifiably immutable.
+
+Design: `rfcs/RFC-0002-agent-mediated-scs.md`, accepted 2026-10-25. 0.7.0 is additive: no
+breaking changes to SCDs or bundles.
+
+**Scope.** SCS ends at a validated, versioned bundle and its compiled artifact. Placing
+artifacts where AI services read them, multi-user review and approval workflows, registries,
+hosting, and runtime serving stay outside SCS.
 
 ## Workstreams
 
-### 1. Domain Ontology (anchor)
+In the RFC's implementation order. Each is usable on its own.
 
-Replace "concern" with the **Domain Ontology**: a domain-defined set of **concepts** with
-an optional shallow taxonomy, a small fixed set of typed relationships, and a mapping from
-each concept to the standards it satisfies. Hierarchy becomes
-`Project → Domain → Concept → SCD`. Design: `rfcs/RFC-0001-domain-ontology.md`.
+### 1. Hardening
 
-Everything else in 0.5.0 sequences behind this.
+Make the lifecycle dependable before an agent drives it.
 
-### 2. "Any AI actor" reframe
+- ISS-042: `scs --version` reports the wrong version
+- ISS-043: version manifests and tags collide when several bundles share a version
+- ISS-044: cdmo templates carry a misleading profile header
+- ISS-045: versioned bundles are not verifiably immutable (content digest, verified by the
+  validator and compiler, carried in the artifact)
+- ISS-047: no approver taken silently from `git config`
 
-Rewrite the model and spec docs so structured context is defined for any AI runtime, with
-chat and editor plugins as one case:
+### 2. Domain repositories (ISS-048)
 
-- context scoped to **agent + intent**, not just "session"
-- **policy-as-context** — a tool / MCP-server's permitted operations expressed as governed
-  context
-- context that **flows through a workflow** — per-step, per-agent, version pinned at a
-  checkpoint
+One git repository per Domain, holding the Domain workspace and its Projects, with agent
+instructions and a CI workflow. A `personal` Domain profile for individual developers.
 
-### 3. Runtime decisions
+### 3. Machine mode (ISS-049)
 
-Turn the runtime-blocking items in `OPEN_QUESTIONS.md` into normative spec decisions:
+`--json` and `--dry-run` across the CLI, a single result envelope, no prompts.
 
-- **immutability scope** — per execution / task / session
-- **versioning ↔ runtime behaviour** — how a context version in effect is chosen, pinned,
-  and superseded
-- **context drift** — a normative definition and the signal a consumer uses to detect it
+### 4. Intake, provenance, and review findings (ISS-050)
 
-### 4. Metadata additions — deferred out of 0.5.0 (2026-09-27)
+The intake record schema, item-level `derived_from`, and recorded decisions on advisory review
+findings.
 
-- **Model-routing metadata** — bundle / SCD metadata expressing which model(s) a governed
-  workload should route to, so routing is governed rather than hardcoded downstream.
-  Deferred: not blocking, and routing is runtime/orchestration behavior, out of scope on
-  the same grounds as workflow modeling (see workstream 2).
-- **Multi-author provenance** — provenance that names the real per-perspective owner
-  (compliance, IT, engineering …), not a single source, with a review/approval workflow.
-  Deferred: conditional from the start on single-source approval proving insufficient,
-  which hasn't happened. See "Beyond 0.5.0."
+### 5. Agent Skills (ISS-051)
 
-### 5. Tier stack
+The primary interface: intake, draft, review, validate, version, compile, and explain, in the
+open Agent Skills format.
 
-Corporate / Project tiers only in 0.5.0. (The Personal tier is deferred.)
+### 6. Change summary (ISS-052)
 
-### 6. Tooling & release engineering
+`scs bundle diff`: a deterministic summary of what an approver is approving.
 
-- CI for `scs-tools` and `scs-validator` (none today).
-- Published, pinned releases (PyPI) so downstream builds can depend on a fixed version.
-- Converge validator rules on a single `rules/v0.5.0/` set; retire `v0.1.0` and `v0.3.0`.
+### 7. Placement guide (ISS-053)
 
-### 7. Migration
+Non-normative docs on where Domain and Project artifacts typically go for common AI services.
 
-- `spec/0.5/` docs, a 0.3 → 0.5.0 migration guide, and (open) a `scs migrate` helper for the
-  mechanical concern → concept rename.
+### 8. Release engineering
+
+- Publish `scs-tools` and `scs-validator` to PyPI at 0.7.0. PyPI currently holds `scs-tools`
+  0.1.0 and no `scs-validator`, so `pip install` from PyPI does not give a working toolchain.
+  Skills running in hosted chat sandboxes depend on a working `pip install` (RFC 0002,
+  Unresolved Question 3). This revisits the publish deferred in ISS-014.
+- GitHub releases for each tag, starting with `v0.6.0`.
+
+### 9. MCP server (ISS-054)
+
+A local stdio adapter over the engine. Lowest priority; started when there is demand.
+
+### 10. Acceptance (ISS-055)
+
+Onboard Omarchy entirely through a chat client using the skills, compared against a baseline
+run with the 0.6 tools.
 
 ## Governance
 
-Through 0.5.0, the specification is maintained by Tim McCrimmon as sole maintainer; RFCs
-and Discussions are informative, not gating. The transition to broader community governance
-(the 0.3 roadmap's "path to 1.0") is **deferred to 1.0**, which is likewise not scheduled by
-this roadmap — 0.5.0 is deliberately pre-1.0 while the domain model and runtime decisions
-are still settling.
+The specification is maintained by Tim McCrimmon as sole maintainer. RFCs and Discussions
+inform decisions; the maintainer may shorten an RFC's comment period, as was done for RFC 0002.
+The transition to broader community governance is deferred to 1.0, which this roadmap does not
+schedule.
 
-## Beyond 0.5.0
+## Beyond 0.7.0
 
-Carried forward from the 0.3 roadmap, not scheduled:
+Not scheduled:
 
-- Domain registry / marketplace
-- Legal, Clinical, Financial and other expert-authored domains
-- Cross-domain dependency management; shared/importable concept libraries
-- Public working group formation and the community-governance transition
+- **Review profiles** (RFC 0003, stub): declarative, citable checks per framework (for example
+  CHAI, HIPAA, ISO 13485) that structure the advisory review.
+- **Model-routing metadata** (ISS-010): routing is runtime behavior, kept out of scope for now.
+- **Multi-author provenance** (ISS-011): conditional on single-source approval proving
+  insufficient. Multi-user approval workflows are outside SCS under RFC 0002.
+- Carried from the 0.3 roadmap: a domain registry or marketplace; expert-authored domains
+  (legal, clinical, financial); cross-domain dependency management; a public working group.
 
-Deferred out of 0.5.0's workstream 4 (2026-09-27), not scheduled:
-
-- **Model-routing metadata** (ISS-010) — not blocking, and routing is runtime/orchestration
-  behavior, the same class of thing SCS already keeps out of scope for workflows.
-- **Multi-author provenance** (ISS-011) — conditional from the start ("only pursue if
-  single-source approval proves insufficient"); revisit if that limit is actually hit.
-
-Deferred out of workstream 6 (2026-09-27), not scheduled:
-
-- **Publishing `scs-tools`/`scs-validator` to PyPI** (ISS-014) — the version-bump and
-  packaging/bug-fix work is done, but the actual publish is cut: local editable installs
-  cover current use, and the release tag does not depend on it. Revisit when a `pip
-  install`-without-a-clone user actually shows up.
+Resolved by 0.7.0: the **personal tier** deferred since 0.5.0 becomes the personal Domain
+(RFC 0002).
