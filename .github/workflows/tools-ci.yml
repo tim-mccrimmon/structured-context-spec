@@ -6,7 +6,7 @@ name: tools-ci
 
 on:
   push:
-    branches: [main, 0.6-dev]
+    branches: [main, 0.7-dev]
     paths:
       - "tools/**"
       - "schema/**"

@@ -1,7 +1,8 @@
 # SCS Issues
 
-Working backlog for SCS **0.5.0** (branch `0.5-dev`). See `ROADMAP.md` for the theme and
-workstreams, `rfcs/` for design proposals.
+Working backlog for SCS. Current work: **0.7.0** (branch `0.7-dev`), implementing RFC 0002;
+see "RFC 0002 implementation (0.7.0)" below. Earlier sections record 0.5.0 and 0.6.0 work.
+`rfcs/` holds design proposals.
 
 Status: `open` · `in-progress` · `blocked` · `done`
 
