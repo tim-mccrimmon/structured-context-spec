@@ -112,9 +112,12 @@ Points to settle:
 
 1. Profile format and matching model (see Reference-level sketch).
 2. Whether the spec ships any real profile, or only a worked example.
-3. Licensing of source frameworks. CHAI's checklists were described as open access at their
-   June 2024 draft release; current terms and the status of the final guide need checking
-   before any CHAI profile is built.
+3. Licensing of source frameworks. CHAI publishes material openly, including use-case guides
+   such as the Prior Authorization Best Practice Guide v1.0 (December 2025) and a public content
+   repository (`coalition-for-health-ai/responsible-ai-content`). The license terms for reuse
+   in a profile still need checking before any CHAI profile is built.
+   `examples/chai-standards-bundle/`, a deprecated 0.5-era transcription of the Prior
+   Authorization guide, is a natural candidate for the first worked example.
 4. Governance for community profiles: naming, trust, and how a user knows who maintains one.
 5. Whether structured checks run in the validator as well as in agent review.
 
