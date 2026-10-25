@@ -840,3 +840,62 @@ deprecated alias. Cost: every SCD id, template, and example changes, against the
 requirement that ids stay stable. Revisit only if adopters report the name as a real source
 of confusion; a rename needs an RFC.
 
+
+### ISS-042 - `scs --version` reports 0.5.0 in 0.6.0
+**Status:** open
+Found 2026-10-20 in an AI governance trial with a cdmo Domain. `tools/cli/scs_tools/__init__.py`
+still has `__version__ = "0.5.0"` at tag `v0.6.0`; the 0.6.0 bump changed `tools/cli/pyproject.toml`
+only. `cli.py` feeds `__version__` to `click.version_option`, so `scs --version` prints 0.5.0 on a fresh
+install of 0.6.0 (seen on Omarchy and the Mac). Package metadata is correct (`importlib.metadata`
+reports 0.6.0 on a fresh install), so versioned-bundle manifests are not affected.
+Fix: set `__version__` to 0.6.0, or read it from `importlib.metadata.version("scs-tools")` so it can't
+go stale again (as ISS-014 did for the manifest's `validator_version`). Add a test that `scs --version`
+matches the package version. Related: ISS-014.
+
+### ISS-043 - `scs bundle version` on concept bundles: manifests overwrite each other
+**Status:** open
+Found 2026-10-20 versioning a cdmo Domain workspace (CDMO governance trial): 11 concept bundles, then
+the Domain bundle with pinned imports, all at 1.0.0 with `--no-git`. `_create_version_manifest`
+(`tools/cli/scs_tools/commands/bundle.py`) names the manifest `VERSION-<version>-MANIFEST.yaml` in the
+bundle's directory, so every concept bundle versioned at the same version writes the same
+`bundles/concepts/VERSION-1.0.0-MANIFEST.yaml`. Only the last one survives (here
+`project: verification-validation`); the other ten checksums and approval records are lost.
+Likely the same for git (not reproduced, `--no-git` was used): `_create_git_version` tags `v<version>`
+for every bundle, so the second concept bundle at 1.0.0 would collide with the first tag.
+Versioning every concept bundle at the same version is the normal path for a new Domain or Project
+workspace, since the Domain bundle pins `bundle:<name>:<version>` imports.
+Fix: include the bundle name in the manifest filename (for example `<name>-v<version>-MANIFEST.yaml`)
+and in the tag (`<name>-v<version>`), or version a workspace in one command that writes one manifest
+listing every bundle. Also check `distribution.repository` (set to the bundle name) and the empty
+`components` already noted in ISS-027. Related: ISS-027.
+
+### ISS-044 - cdmo SCD templates say "Profile: Project only" in a Domain workspace
+**Status:** open
+Found 2026-10-20 with `scs new domain <name> --ontology cdmo`. All 48 templates in
+`tools/cli/scs_tools/templates/scds/cdmo/` carry the header line `# Profile: Project only.`, including
+the 28 the Domain scaffold selects through `domain_scds` (`commands/new.py`). In a Domain workspace the
+line reads as "this SCD doesn't belong here", which contradicts the Global profile that put it there.
+Fix: render the line per profile (for example "Profile: Global and Project" for SCDs in `domain_scds`,
+"Profile: Project only" for the rest), or drop the line. Check the sdlc and mca templates for the same
+pattern. Related: ISS-041 (tier name, a separate question).
+
+### ISS-045 - Versioned bundles are not verifiably immutable
+**Status:** open
+Found 2026-10-25 while reviewing RFC 0002. `bundle-format.md` §7.3 says a versioned bundle MUST
+remain immutable, and the versioned bundle is SCS's source of truth, but the tooling does not enforce
+or verify it:
+- `scs bundle version` (`tools/cli/scs_tools/commands/bundle.py`) snapshots only the bundle manifest
+  (`<name>-v<version>.yaml`) and checksums only that file. SCDs and concept bundles are not
+  snapshotted or covered by the checksum; they are resolved from the working tree at validate and
+  compile time. Editing an SCD after `1.0.0` changes what `1.0.0` compiles to, and nothing reports it.
+- Nothing ever verifies the checksum. `scs-validate` and `scs compile` don't read it.
+- `_create_versioned_bundle` writes `validation_passed: true` and `approval_status: validated` into the
+  snapshot unconditionally, including under `--no-validate`.
+- Git tags can be moved, so a tag alone isn't an immutability guarantee.
+- The runtime artifact identifies its bundle by id and version only (`runtime-artifact.md` §3.1), so a
+  rendering can't be checked against the exact content it came from.
+Fix: compute a content digest over the resolved bundle (the manifest, every SCD it includes, and the
+digests of its pinned imports), each file parsed and serialized canonically (JSON, sorted keys, as
+`runtime-artifact.md` §3.6 does for artifacts), and record it in the version manifest; verify it in `scs-validate` and before `scs compile` (a mismatch is
+an error); carry it in the compiled artifact as `source_digest`. Record `validation_passed` from the
+actual result. Proposed in RFC 0002 section 11. Related: ISS-014, ISS-027, ISS-043.

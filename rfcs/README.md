@@ -93,7 +93,8 @@ Idea Discussion → RFC Written → PR Submitted → Community Review (2+ weeks)
 
 | Number | Title | Author | Status | PR |
 |--------|-------|--------|--------|----|
-| (None currently) | | | | |
+| 0002 | Agent-Mediated SCS | @tim-mccrimmon | Draft | |
+| 0003 | Review Profiles | @tim-mccrimmon | Stub | |
 
 ### Accepted (Pending Implementation)
 
