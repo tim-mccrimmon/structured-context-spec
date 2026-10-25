@@ -236,7 +236,7 @@ def test_manifest_checksum_matches_the_snapshot(tmp_path: Path, monkeypatch):
     assert _version_security_bundle(project, monkeypatch, "--no-validate").exit_code == 0
     snapshot = project / "bundles/concepts/security-v0.1.0.yaml"
     manifest = yaml.safe_load(
-        (project / "bundles/concepts/VERSION-0.1.0-MANIFEST.yaml").read_text()
+        (project / "bundles/concepts/security-v0.1.0-MANIFEST.yaml").read_text()
     )
     assert manifest["bundle"]["sha256"] == hashlib.sha256(snapshot.read_bytes()).hexdigest()
     assert manifest["approval"]["approved_by"] == "sam@example.com"
@@ -248,6 +248,132 @@ def test_versioning_refuses_to_overwrite_without_force(tmp_path: Path, monkeypat
     again = _version_security_bundle(project, monkeypatch, "--no-validate")
     assert again.exit_code != 0
     assert "already exists" in again.output
+
+
+def test_scs_version_matches_the_package_version():
+    """ISS-042: `scs --version` must not drift from the package metadata."""
+    from importlib.metadata import version as pkg_version
+
+    result = CliRunner().invoke(cli, ["--version"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == f"scs, version {pkg_version('scs-tools')}"
+
+
+def _version(project: Path, monkeypatch, bundle: str, *extra: str, input=None):
+    monkeypatch.chdir(project)
+    monkeypatch.setenv("SCS_SCHEMA_DIR", str(SCHEMA))
+    return CliRunner().invoke(
+        cli,
+        ["bundle", "version", "--bundle", bundle, "--version", "1.0.0", "--notes", "n", *extra],
+        input=input,
+    )
+
+
+def test_concept_bundles_at_the_same_version_keep_their_own_manifests(tmp_path: Path, monkeypatch):
+    """ISS-043: every concept bundle versioned at 1.0.0 used to write the same manifest."""
+    project = scaffold(tmp_path, "healthcare")
+    for name in ("security", "architecture"):
+        result = _version(
+            project,
+            monkeypatch,
+            f"bundles/concepts/{name}.yaml",
+            "--approved-by",
+            "sam@example.com",
+            "--no-git",
+            "--no-validate",
+        )
+        assert result.exit_code == 0, result.output
+    for name in ("security", "architecture"):
+        manifest = yaml.safe_load(
+            (project / f"bundles/concepts/{name}-v1.0.0-MANIFEST.yaml").read_text()
+        )
+        assert manifest["bundle"]["id"] == f"bundle:{name}"
+        assert manifest["bundle"]["file"] == f"{name}-v1.0.0.yaml"
+        assert "tag" not in manifest["distribution"]
+        assert "repository" not in manifest["distribution"]
+    assert not list((project / "bundles/concepts").glob("VERSION-*"))
+
+
+def test_concept_bundles_at_the_same_version_get_their_own_tags(tmp_path: Path, monkeypatch):
+    """ISS-043: git tags are name-qualified, so the second bundle doesn't collide."""
+    import subprocess
+
+    project = scaffold(tmp_path, "healthcare")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", "/dev/null")
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    for var in ("GIT_AUTHOR", "GIT_COMMITTER"):
+        monkeypatch.setenv(f"{var}_NAME", "Test")
+        monkeypatch.setenv(f"{var}_EMAIL", "git@example.com")
+    subprocess.run(["git", "init", "-q", "-b", "main", str(project)], check=True)
+    for name in ("security", "architecture"):
+        result = _version(
+            project,
+            monkeypatch,
+            f"bundles/concepts/{name}.yaml",
+            "--approved-by",
+            "sam@example.com",
+            "--no-validate",
+        )
+        assert result.exit_code == 0, result.output
+    tags = subprocess.check_output(["git", "tag"], cwd=project, text=True).split()
+    assert sorted(tags) == ["architecture-v1.0.0", "security-v1.0.0"]
+    manifest = yaml.safe_load(
+        (project / "bundles/concepts/security-v1.0.0-MANIFEST.yaml").read_text()
+    )
+    assert manifest["distribution"]["tag"] == "security-v1.0.0"
+    assert manifest["distribution"]["repository"] == project.name
+    assert manifest["distribution"]["branch"] == "main"
+
+    again = _version(
+        project,
+        monkeypatch,
+        "bundles/concepts/security.yaml",
+        "--approved-by",
+        "sam@example.com",
+        "--no-validate",
+        "--force",
+    )
+    assert again.exit_code != 0
+    assert "tag already exists: security-v1.0.0" in again.output
+
+
+def test_the_approver_is_never_taken_from_git_config(tmp_path: Path, monkeypatch):
+    """ISS-047: without --approved-by the user is asked; git config user.email is not used."""
+    project = scaffold(tmp_path, "healthcare")
+    gitconfig = tmp_path / "gitconfig"
+    gitconfig.write_text("[user]\n\temail = git@example.com\n")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(gitconfig))
+    result = _version(
+        project,
+        monkeypatch,
+        "bundles/concepts/security.yaml",
+        "--no-git",
+        "--no-validate",
+        input="jane@example.com\n",
+    )
+    assert result.exit_code == 0, result.output
+    assert "Approver email" in result.output
+    manifest = yaml.safe_load(
+        (project / "bundles/concepts/security-v1.0.0-MANIFEST.yaml").read_text()
+    )
+    assert manifest["approval"]["approved_by"] == "jane@example.com"
+
+
+@pytest.mark.parametrize("approver", [None, "", "   "])
+def test_versioning_without_an_approver_fails(tmp_path: Path, monkeypatch, approver):
+    """ISS-047: no approver (no input, or a blank one) means no version."""
+    project = scaffold(tmp_path, "healthcare")
+    extra = () if approver is None else ("--approved-by", approver)
+    result = _version(
+        project,
+        monkeypatch,
+        "bundles/concepts/security.yaml",
+        "--no-git",
+        "--no-validate",
+        *extra,
+    )
+    assert result.exit_code != 0
+    assert not (project / "bundles/concepts/security-v1.0.0.yaml").exists()
 
 
 # ------------------------------------- root bundle imports (ISS-033, SCS 0.6.0 layout)
@@ -891,6 +1017,14 @@ def test_every_cdmo_slot_has_a_template():
     assert {p.stem for p in templates.glob("*.yaml")} == {
         s for scds in CDMO_CONCEPT_SCDS.values() for s in scds
     }
+
+
+def test_cdmo_domain_scds_carry_no_profile_note(tmp_path: Path):
+    """ISS-044: "Profile: Project only" contradicted the Domain workspace that held the SCD."""
+    root = scaffold_cdmo(tmp_path, "domain")
+    scds = list((root / "context" / "project").glob("*.yaml"))
+    assert scds
+    assert not [p.name for p in scds if "Profile:" in p.read_text()]
 
 
 def test_cdmo_project_scaffolds_every_slot_and_validates(tmp_path: Path):

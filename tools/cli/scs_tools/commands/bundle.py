@@ -258,7 +258,7 @@ def validate():
 )
 @click.option(
     "--approved-by",
-    help="Approver email (default: git config user.email)",
+    help="Approver email (prompted for if omitted; never taken from git config)",
 )
 @click.option(
     "--notes",
@@ -323,19 +323,22 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
         )
         raise click.Abort()
 
-    # Get approver email
+    # The approver is a person the user names, never inferred from the environment
+    # (ISS-047, RFC 0002 sections 3 and 6).
+    if approved_by is None:
+        approved_by = click.prompt("Approver email", type=str)
+    approved_by = approved_by.strip()
     if not approved_by:
-        try:
-            approved_by = subprocess.check_output(
-                ["git", "config", "user.email"],
-                stderr=subprocess.DEVNULL,
-                text=True,
-            ).strip()
-        except subprocess.CalledProcessError:
-            approved_by = None
+        click.echo("Error: An approver is required to version a bundle.", err=True)
+        raise click.Abort()
 
-        if not approved_by:
-            approved_by = click.prompt("Approver email", type=str)
+    # Manifests and tags carry the bundle name, so several bundles versioned at the same
+    # version don't overwrite each other (ISS-043).
+    bundle_name = _bundle_name(bundle_path)
+    tag = f"{bundle_name}-v{version_number}"
+    if not no_git and _git_tag_exists(tag):
+        click.echo(f"Error: Git tag already exists: {tag}", err=True)
+        raise click.Abort()
 
     # Get version notes if not provided
     if not notes:
@@ -383,6 +386,8 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
     manifest_path = _create_version_manifest(
         bundle_path,
         versioned_bundle_path,
+        bundle_name,
+        tag if not no_git else None,
         version_number,
         approved_by,
         notes,
@@ -398,11 +403,13 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
         _create_git_version(
             versioned_bundle_path,
             manifest_path,
+            bundle_name,
+            tag,
             version_number,
             checksum,
             validation_result if not no_validate else None,
         )
-        click.echo(f"  ✓ Committed and tagged: v{version_number}\n")
+        click.echo(f"  ✓ Committed and tagged: {tag}\n")
     else:
         click.echo("Step 5/5: Skipping git operations (--no-git)\n")
 
@@ -415,12 +422,12 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
     click.echo(f"Manifest: {manifest_path}")
     click.echo(f"Checksum: {checksum}")
     if not no_git:
-        click.echo(f"Git Tag: v{version_number}")
+        click.echo(f"Git Tag: {tag}")
     click.echo()
     click.echo("Next steps:")
     click.echo("  • Review the versioned bundle and manifest")
     if not no_git:
-        click.echo("  • Push to remote: git push origin main && git push origin v{version_number}")
+        click.echo(f"  • Push to remote: git push && git push origin {tag}")
     click.echo("  • Proceed to Phase 4 (Build) - Configure development environments")
     click.echo()
 
@@ -457,6 +464,34 @@ def _validate_bundle(bundle_path):
     except Exception as e:
         click.echo(f"  Warning: Could not run validation: {e}")
         return {"passed": False, "errors": 1, "warnings": 0}
+
+
+def _bundle_name(bundle_path):
+    """The bundle's name from its id (`bundle:<name>`), falling back to the file stem."""
+    with open(bundle_path, "r") as f:
+        bundle_id = (yaml.safe_load(f) or {}).get("id", "")
+    parts = bundle_id.split(":")
+    return parts[1] if len(parts) >= 2 and parts[0] == "bundle" and parts[1] else bundle_path.stem
+
+
+def _git_tag_exists(tag):
+    result = subprocess.run(
+        ["git", "rev-parse", "-q", "--verify", f"refs/tags/{tag}"],
+        capture_output=True,
+        check=False,
+    )
+    return result.returncode == 0
+
+
+def _git_output(*args):
+    """Output of a git command, or None outside a repository or on error."""
+    try:
+        return (
+            subprocess.check_output(["git", *args], stderr=subprocess.DEVNULL, text=True).strip()
+            or None
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
 
 
 def _validator_version():
@@ -537,6 +572,8 @@ def _generate_checksum(file_path):
 def _create_version_manifest(
     original_bundle_path,
     versioned_bundle_path,
+    bundle_name,
+    tag,
     version_number,
     approved_by,
     notes,
@@ -553,9 +590,6 @@ def _create_version_manifest(
     bundle_type = bundle_data.get("type", "project")
     imports = bundle_data.get("imports", [])
 
-    # Get project name from bundle ID
-    project_name = bundle_id.replace("bundle:", "")
-
     # Count SCDs in project
     context_dir = original_bundle_path.parent.parent / "context" / "project"
     scd_count = 0
@@ -571,7 +605,7 @@ def _create_version_manifest(
         "version": version_number,
         "release_date": timestamp,
         "status": "validated",
-        "project": project_name,
+        "project": bundle_name,
         "bundle": {
             "id": bundle_id,
             "type": bundle_type,
@@ -613,16 +647,22 @@ def _create_version_manifest(
 
     manifest["release_notes"] = notes
 
-    manifest["distribution"] = {
-        "repository": project_name,
-        "branch": "main",
-        "tag": f"v{version_number}",
-        "immutable": True,
-        "authoritative": True,
-    }
+    # Repository and branch come from git, not the bundle name; without git they're omitted.
+    distribution = {}
+    if tag:
+        toplevel = _git_output("rev-parse", "--show-toplevel")
+        branch = _git_output("symbolic-ref", "--short", "-q", "HEAD")
+        if toplevel:
+            distribution["repository"] = Path(toplevel).name
+        if branch:
+            distribution["branch"] = branch
+        distribution["tag"] = tag
+    distribution["immutable"] = True
+    distribution["authoritative"] = True
+    manifest["distribution"] = distribution
 
     # Write manifest
-    manifest_filename = f"VERSION-{version_number}-MANIFEST.yaml"
+    manifest_filename = f"{bundle_name}-v{version_number}-MANIFEST.yaml"
     manifest_path = versioned_bundle_path.parent / manifest_filename
 
     with open(manifest_path, "w") as f:
@@ -632,7 +672,13 @@ def _create_version_manifest(
 
 
 def _create_git_version(
-    versioned_bundle_path, manifest_path, version_number, checksum, validation_result
+    versioned_bundle_path,
+    manifest_path,
+    bundle_name,
+    tag,
+    version_number,
+    checksum,
+    validation_result,
 ):
     """Create git commit and tag for the version."""
     try:
@@ -658,7 +704,7 @@ Phase 2 (Validate) Results:
 - {validation_result.get('warnings', 0)} warnings
 """
 
-        commit_message = f"""Release v{version_number} - Phase 3 (Version) Complete
+        commit_message = f"""Release {tag} - Phase 3 (Version) Complete
 
 Created immutable versioned snapshot of validated SCD bundle.
 {validation_summary}
@@ -678,7 +724,7 @@ This bundle is now the authoritative source of truth.
         )
 
         # Create annotated tag
-        tag_message = f"""SCD Bundle v{version_number}
+        tag_message = f"""SCD Bundle {bundle_name} v{version_number}
 
 Validation Status: {'✓ PASSED' if validation_result and validation_result['passed'] else '✗ FAILED'}
 Bundle Checksum (SHA-256): {checksum}
@@ -692,7 +738,7 @@ Ready for Phase 4 (Build) - development environment configuration.
 """
 
         subprocess.run(
-            ["git", "tag", "-a", f"v{version_number}", "-m", tag_message],
+            ["git", "tag", "-a", tag, "-m", tag_message],
             check=True,
         )
 

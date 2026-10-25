@@ -1,5 +1,4 @@
 # Skeleton SCD from the Medical-Device CDMO ontology (concept: supplier-qualification).
-# Profile: Project only.
 # Write the facts an AI agent should know in `facts`; only that list is
 # compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
 id: scd:project:ai-vendor-qualification

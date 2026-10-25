@@ -843,7 +843,7 @@ of confusion; a rename needs an RFC.
 
 
 ### ISS-042 - `scs --version` reports 0.5.0 in 0.6.0
-**Status:** open
+**Status:** done (2026-10-25)
 Found 2026-10-20 in an AI governance trial with a cdmo Domain. `tools/cli/scs_tools/__init__.py`
 still has `__version__ = "0.5.0"` at tag `v0.6.0`; the 0.6.0 bump changed `tools/cli/pyproject.toml`
 only. `cli.py` feeds `__version__` to `click.version_option`, so `scs --version` prints 0.5.0 on a fresh
@@ -852,9 +852,11 @@ reports 0.6.0 on a fresh install), so versioned-bundle manifests are not affecte
 Fix: set `__version__` to 0.6.0, or read it from `importlib.metadata.version("scs-tools")` so it can't
 go stale again (as ISS-014 did for the manifest's `validator_version`). Add a test that `scs --version`
 matches the package version. Related: ISS-014.
+Done: `__version__` reads `importlib.metadata.version("scs-tools")`; a test checks `scs --version`
+against the package metadata.
 
 ### ISS-043 - `scs bundle version` on concept bundles: manifests overwrite each other
-**Status:** open
+**Status:** done (2026-10-25)
 Found 2026-10-20 versioning a cdmo Domain workspace (CDMO governance trial): 11 concept bundles, then
 the Domain bundle with pinned imports, all at 1.0.0 with `--no-git`. `_create_version_manifest`
 (`tools/cli/scs_tools/commands/bundle.py`) names the manifest `VERSION-<version>-MANIFEST.yaml` in the
@@ -869,9 +871,13 @@ Fix: include the bundle name in the manifest filename (for example `<name>-v<ver
 and in the tag (`<name>-v<version>`), or version a workspace in one command that writes one manifest
 listing every bundle. Also check `distribution.repository` (set to the bundle name) and the empty
 `components` already noted in ISS-027. Related: ISS-027.
+Done: manifests are `<bundle-name>-v<version>-MANIFEST.yaml` and tags `<bundle-name>-v<version>`, the
+name taken from the bundle id; an existing tag is refused before any file is written.
+`distribution.repository` and `branch` now come from git (omitted with `--no-git`). Workspace
+qualification of tags is ISS-048; the empty `components` remains with ISS-027.
 
 ### ISS-044 - cdmo SCD templates say "Profile: Project only" in a Domain workspace
-**Status:** open
+**Status:** done (2026-10-25)
 Found 2026-10-20 with `scs new domain <name> --ontology cdmo`. All 48 templates in
 `tools/cli/scs_tools/templates/scds/cdmo/` carry the header line `# Profile: Project only.`, including
 the 28 the Domain scaffold selects through `domain_scds` (`commands/new.py`). In a Domain workspace the
@@ -879,6 +885,8 @@ line reads as "this SCD doesn't belong here", which contradicts the Global profi
 Fix: render the line per profile (for example "Profile: Global and Project" for SCDs in `domain_scds`,
 "Profile: Project only" for the rest), or drop the line. Check the sdlc and mca templates for the same
 pattern. Related: ISS-041 (tier name, a separate question).
+Done: line removed from all 48 cdmo templates (scope comes from the including bundle, per
+ISS-041). sdlc and mca templates never carried it.
 
 ### ISS-045 - Versioned bundles are not verifiably immutable
 **Status:** open
@@ -912,11 +920,13 @@ Accepted by the maintainer on 2026-10-25 in PR #25, waiving the two-week comment
 (Review Profiles) was merged in the same PR as a stub and is not accepted.
 
 ### ISS-047 - `scs bundle version`: no approver from `git config`
-**Status:** open
+**Status:** done (2026-10-25)
 `scs bundle version` falls back to `git config user.email` when `--approved-by` is omitted
 (`tools/cli/scs_tools/commands/bundle.py`). Require an explicit approver; in machine mode, offer
 the git value only as a suggestion (RFC 0002 sections 3 and 6). Note the behavior change in the
 migration guide.
+Done: with no `--approved-by`, `scs bundle version` prompts; a blank approver aborts. The git
+suggestion for machine mode comes with ISS-049. Noted in `docs/MIGRATION-0.7.0.md`.
 
 ### ISS-048 - Domain repositories
 **Status:** open
