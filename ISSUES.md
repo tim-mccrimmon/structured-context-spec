@@ -840,3 +840,127 @@ deprecated alias. Cost: every SCD id, template, and example changes, against the
 requirement that ids stay stable. Revisit only if adopters report the name as a real source
 of confusion; a rename needs an RFC.
 
+
+### ISS-042 - `scs --version` reports 0.5.0 in 0.6.0
+**Status:** open
+Found 2026-10-20 in an AI governance trial with a cdmo Domain. `tools/cli/scs_tools/__init__.py`
+still has `__version__ = "0.5.0"` at tag `v0.6.0`; the 0.6.0 bump changed `tools/cli/pyproject.toml`
+only. `cli.py` feeds `__version__` to `click.version_option`, so `scs --version` prints 0.5.0 on a fresh
+install of 0.6.0 (seen on Omarchy and the Mac). Package metadata is correct (`importlib.metadata`
+reports 0.6.0 on a fresh install), so versioned-bundle manifests are not affected.
+Fix: set `__version__` to 0.6.0, or read it from `importlib.metadata.version("scs-tools")` so it can't
+go stale again (as ISS-014 did for the manifest's `validator_version`). Add a test that `scs --version`
+matches the package version. Related: ISS-014.
+
+### ISS-043 - `scs bundle version` on concept bundles: manifests overwrite each other
+**Status:** open
+Found 2026-10-20 versioning a cdmo Domain workspace (CDMO governance trial): 11 concept bundles, then
+the Domain bundle with pinned imports, all at 1.0.0 with `--no-git`. `_create_version_manifest`
+(`tools/cli/scs_tools/commands/bundle.py`) names the manifest `VERSION-<version>-MANIFEST.yaml` in the
+bundle's directory, so every concept bundle versioned at the same version writes the same
+`bundles/concepts/VERSION-1.0.0-MANIFEST.yaml`. Only the last one survives (here
+`project: verification-validation`); the other ten checksums and approval records are lost.
+Likely the same for git (not reproduced, `--no-git` was used): `_create_git_version` tags `v<version>`
+for every bundle, so the second concept bundle at 1.0.0 would collide with the first tag.
+Versioning every concept bundle at the same version is the normal path for a new Domain or Project
+workspace, since the Domain bundle pins `bundle:<name>:<version>` imports.
+Fix: include the bundle name in the manifest filename (for example `<name>-v<version>-MANIFEST.yaml`)
+and in the tag (`<name>-v<version>`), or version a workspace in one command that writes one manifest
+listing every bundle. Also check `distribution.repository` (set to the bundle name) and the empty
+`components` already noted in ISS-027. Related: ISS-027.
+
+### ISS-044 - cdmo SCD templates say "Profile: Project only" in a Domain workspace
+**Status:** open
+Found 2026-10-20 with `scs new domain <name> --ontology cdmo`. All 48 templates in
+`tools/cli/scs_tools/templates/scds/cdmo/` carry the header line `# Profile: Project only.`, including
+the 28 the Domain scaffold selects through `domain_scds` (`commands/new.py`). In a Domain workspace the
+line reads as "this SCD doesn't belong here", which contradicts the Global profile that put it there.
+Fix: render the line per profile (for example "Profile: Global and Project" for SCDs in `domain_scds`,
+"Profile: Project only" for the rest), or drop the line. Check the sdlc and mca templates for the same
+pattern. Related: ISS-041 (tier name, a separate question).
+
+### ISS-045 - Versioned bundles are not verifiably immutable
+**Status:** open
+Found 2026-10-25 while reviewing RFC 0002. `bundle-format.md` §7.3 says a versioned bundle MUST
+remain immutable, and the versioned bundle is SCS's source of truth, but the tooling does not enforce
+or verify it:
+- `scs bundle version` (`tools/cli/scs_tools/commands/bundle.py`) snapshots only the bundle manifest
+  (`<name>-v<version>.yaml`) and checksums only that file. SCDs and concept bundles are not
+  snapshotted or covered by the checksum; they are resolved from the working tree at validate and
+  compile time. Editing an SCD after `1.0.0` changes what `1.0.0` compiles to, and nothing reports it.
+- Nothing ever verifies the checksum. `scs-validate` and `scs compile` don't read it.
+- `_create_versioned_bundle` writes `validation_passed: true` and `approval_status: validated` into the
+  snapshot unconditionally, including under `--no-validate`.
+- Git tags can be moved, so a tag alone isn't an immutability guarantee.
+- The runtime artifact identifies its bundle by id and version only (`runtime-artifact.md` §3.1), so a
+  rendering can't be checked against the exact content it came from.
+Fix: compute a content digest over the resolved bundle (the manifest, every SCD it includes, and the
+digests of its pinned imports), each file parsed and serialized canonically (JSON, sorted keys, as
+`runtime-artifact.md` §3.6 does for artifacts), and record it in the version manifest; verify it in `scs-validate` and before `scs compile` (a mismatch is
+an error); carry it in the compiled artifact as `source_digest`. Record `validation_passed` from the
+actual result. Proposed in RFC 0002 section 11. Related: ISS-014, ISS-027, ISS-043.
+
+## RFC 0002 implementation (0.7.0)
+
+Tracking for `rfcs/RFC-0002-agent-mediated-scs.md`, in the RFC's implementation order. Step 1
+(hardening) is ISS-042 to ISS-045 plus ISS-047.
+
+### ISS-046 - Agent-Mediated SCS: accept RFC 0002
+**Status:** done (2026-10-25)
+Accepted by the maintainer on 2026-10-25 in PR #25, waiving the two-week comment period. RFC 0003
+(Review Profiles) was merged in the same PR as a stub and is not accepted.
+
+### ISS-047 - `scs bundle version`: no approver from `git config`
+**Status:** open
+`scs bundle version` falls back to `git config user.email` when `--approved-by` is omitted
+(`tools/cli/scs_tools/commands/bundle.py`). Require an explicit approver; in machine mode, offer
+the git value only as a suggestion (RFC 0002 sections 3 and 6). Note the behavior change in the
+migration guide.
+
+### ISS-048 - Domain repositories
+**Status:** open
+RFC 0002 section 9. `scs new domain` creates a git repository with `domain/`, `projects/`,
+`AGENTS.md` (plus a client pointer file), and a CI workflow; `scs new project` adds a workspace
+under `projects/` of an existing Domain repository. `personal` Domain profile (`company` and
+`prohibited` concept bundles only). Repository-level validation. Compile output to `dist/`.
+Workspace- and name-qualified tags and manifests (with ISS-043).
+
+### ISS-049 - Machine mode: `--json` and `--dry-run`
+**Status:** open
+RFC 0002 section 3. `--json` and `--dry-run` on `new`, `add`, `bundle`, `validate`, and
+`compile`; the result envelope (`ok`, `exit_code`, `changes`, `diagnostics`, `result`); no
+prompts and no inferred human values in machine mode; existing exit codes kept.
+
+### ISS-050 - Intake record, `derived_from`, and review findings
+**Status:** open
+RFC 0002 sections 4, 5, and 12. `schema/intake.schema.json` (including `review_findings`);
+optional `derived_from` on prohibitions, directives, and facts; validator rules for resolving
+ids; `compile` never emits either. Run `scripts/sync_schemas.py`.
+
+### ISS-051 - Agent Skills
+**Status:** open
+RFC 0002 sections 2, 4, 6, 8, and 12. Skills for intake, draft, review, validate, version,
+compile, and explain, calling the engine in machine mode, with placement advice from the guide
+(ISS-053). Open questions from the RFC to settle first: where the skills live; what happens to
+`scs-vibe` and `scs-team`; whether hosted chat sandboxes can install `scs-tools`.
+
+### ISS-052 - `scs bundle diff`
+**Status:** open
+RFC 0002 section 7. Deterministic summary of changes between two versions of a bundle, or a
+version and the working tree, with `--json`.
+
+### ISS-053 - Placement guide
+**Status:** open
+RFC 0002 section 10. Non-normative docs: where Domain and Project artifacts typically go for the
+most widely used AI services, checked against each service's current documentation.
+
+### ISS-054 - Local MCP server
+**Status:** open
+RFC 0002 section 2, layer 3. A stdio adapter over the engine. Lowest priority; start when there
+is demand.
+
+### ISS-055 - Acceptance test: Omarchy through chat
+**Status:** open
+RFC 0002 appendix. Onboard Omarchy (one Domain repository, two Projects) entirely through a chat
+client using the skills, with no direct CLI use and no reading of the spec, and record every
+point of friction. Compare against a baseline run with the 0.6 tools.

@@ -86,6 +86,25 @@ Known issues in the 0.6.0 tooling are tracked in [ISSUES.md](ISSUES.md).
 
 ---
 
+## Where SCS Is Heading
+
+SCS 0.6.0 still expects you to learn the format. The next releases aim to remove that
+requirement: you describe your organization or project to an AI assistant, and it builds,
+validates, and versions the bundles with you, asking for your approval at each step.
+
+- **[RFC 0002: Agent-Mediated SCS](rfcs/RFC-0002-agent-mediated-scs.md)** (accepted, planned
+  for 0.7.0). An agent interface to the full lifecycle through Agent Skills and an optional
+  MCP server; an adaptive intake for individuals and organizations; one repository per Domain;
+  content digests that make versioned bundles verifiably immutable; and an advisory review in
+  which the agent raises problems and the human decides.
+- **[RFC 0003: Review Profiles](rfcs/RFC-0003-review-profiles.md)** (early stub). Declarative,
+  citable checks per framework (for example CHAI, HIPAA, or ISO 13485) that make the agent's
+  review consistent and auditable.
+
+Feedback is welcome in Discussions and Issues.
+
+---
+
 ## Examples
 
 - [`examples/two-tier-governance/`](examples/two-tier-governance/): a Domain and a Project side by side
@@ -124,7 +143,8 @@ structured-context-spec/
 
 The `scs-vibe` and `scs-team` plugins in [`plugins/`](plugins/) offered an early
 conversational path into SCS for Claude Code. They're built on the model SCS used before
-0.6.0 (concern bundles) and haven't been updated. They remain available for reference.
+0.6.0 (concern bundles) and haven't been updated. They remain available for reference; RFC
+0002 proposes a portable replacement built on Agent Skills.
 
 ---
 

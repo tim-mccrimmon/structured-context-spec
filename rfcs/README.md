@@ -93,13 +93,14 @@ Idea Discussion → RFC Written → PR Submitted → Community Review (2+ weeks)
 
 | Number | Title | Author | Status | PR |
 |--------|-------|--------|--------|----|
-| (None currently) | | | | |
+| 0003 | Review Profiles | @tim-mccrimmon | Stub (not yet open for review) | |
 
 ### Accepted (Pending Implementation)
 
 | Number | Title | Author | Accepted Date | Tracking Issue |
 |--------|-------|--------|---------------|----------------|
 | 0001 | Domain Ontology (replaces "Concern") | @tim-mccrimmon | 2026-09-21 | ISS-001 – ISS-005 |
+| 0002 | Agent-Mediated SCS | @tim-mccrimmon | 2026-10-25 | ISS-042 – ISS-055 |
 
 ### Implemented
 
