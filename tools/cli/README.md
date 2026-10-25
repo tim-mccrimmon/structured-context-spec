@@ -25,25 +25,24 @@ The `scs-validator` is included as a dependency of `scs-tools`, so installing `s
 
 ## Installation
 
-### From PyPI
+Requires Python 3.11 or later. The tools are not yet published to PyPI; the `scs-tools` package
+there is an old 0.1.0 release. Install `scs-validator` alongside `scs-tools`: `scs compile` and
+`scs bundle validate` need it.
+
+### From GitHub (no clone)
 
 ```bash
-pip install scs-tools
+pip install \
+  "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/scd-validator" \
+  "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/cli"
 ```
-
-This automatically installs `scs-validator` as an optional dependency (use `pip install scs-tools[validator]` for validation features).
 
 ### From Source
 
 ```bash
-# Clone the main repo
 git clone https://github.com/tim-mccrimmon/structured-context-spec.git
-
-# Navigate to CLI directory
-cd structured-context-spec/tools/cli
-
-# Install in development mode
-pip install -e .
+cd structured-context-spec
+pip install -e tools/scd-validator -e tools/cli
 ```
 
 ### For Development
@@ -538,7 +537,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install SCS Tools
-        run: pip install scs-tools
+        run: |
+          pip install \
+            "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/scd-validator" \
+            "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/cli"
 
       - name: Validate SCS Bundle
         run: |
