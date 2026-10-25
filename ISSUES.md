@@ -899,3 +899,68 @@ digests of its pinned imports), each file parsed and serialized canonically (JSO
 `runtime-artifact.md` §3.6 does for artifacts), and record it in the version manifest; verify it in `scs-validate` and before `scs compile` (a mismatch is
 an error); carry it in the compiled artifact as `source_digest`. Record `validation_passed` from the
 actual result. Proposed in RFC 0002 section 11. Related: ISS-014, ISS-027, ISS-043.
+
+## RFC 0002 implementation (0.7.0)
+
+Tracking for `rfcs/RFC-0002-agent-mediated-scs.md`, in the RFC's implementation order. Step 1
+(hardening) is ISS-042 to ISS-045 plus ISS-047.
+
+### ISS-046 - Agent-Mediated SCS: accept RFC 0002
+**Status:** done (2026-10-25)
+Accepted by the maintainer on 2026-10-25 in PR #25, waiving the two-week comment period. RFC 0003
+(Review Profiles) was merged in the same PR as a stub and is not accepted.
+
+### ISS-047 - `scs bundle version`: no approver from `git config`
+**Status:** open
+`scs bundle version` falls back to `git config user.email` when `--approved-by` is omitted
+(`tools/cli/scs_tools/commands/bundle.py`). Require an explicit approver; in machine mode, offer
+the git value only as a suggestion (RFC 0002 sections 3 and 6). Note the behavior change in the
+migration guide.
+
+### ISS-048 - Domain repositories
+**Status:** open
+RFC 0002 section 9. `scs new domain` creates a git repository with `domain/`, `projects/`,
+`AGENTS.md` (plus a client pointer file), and a CI workflow; `scs new project` adds a workspace
+under `projects/` of an existing Domain repository. `personal` Domain profile (`company` and
+`prohibited` concept bundles only). Repository-level validation. Compile output to `dist/`.
+Workspace- and name-qualified tags and manifests (with ISS-043).
+
+### ISS-049 - Machine mode: `--json` and `--dry-run`
+**Status:** open
+RFC 0002 section 3. `--json` and `--dry-run` on `new`, `add`, `bundle`, `validate`, and
+`compile`; the result envelope (`ok`, `exit_code`, `changes`, `diagnostics`, `result`); no
+prompts and no inferred human values in machine mode; existing exit codes kept.
+
+### ISS-050 - Intake record, `derived_from`, and review findings
+**Status:** open
+RFC 0002 sections 4, 5, and 12. `schema/intake.schema.json` (including `review_findings`);
+optional `derived_from` on prohibitions, directives, and facts; validator rules for resolving
+ids; `compile` never emits either. Run `scripts/sync_schemas.py`.
+
+### ISS-051 - Agent Skills
+**Status:** open
+RFC 0002 sections 2, 4, 6, 8, and 12. Skills for intake, draft, review, validate, version,
+compile, and explain, calling the engine in machine mode, with placement advice from the guide
+(ISS-053). Open questions from the RFC to settle first: where the skills live; what happens to
+`scs-vibe` and `scs-team`; whether hosted chat sandboxes can install `scs-tools`.
+
+### ISS-052 - `scs bundle diff`
+**Status:** open
+RFC 0002 section 7. Deterministic summary of changes between two versions of a bundle, or a
+version and the working tree, with `--json`.
+
+### ISS-053 - Placement guide
+**Status:** open
+RFC 0002 section 10. Non-normative docs: where Domain and Project artifacts typically go for the
+most widely used AI services, checked against each service's current documentation.
+
+### ISS-054 - Local MCP server
+**Status:** open
+RFC 0002 section 2, layer 3. A stdio adapter over the engine. Lowest priority; start when there
+is demand.
+
+### ISS-055 - Acceptance test: Omarchy through chat
+**Status:** open
+RFC 0002 appendix. Onboard Omarchy (one Domain repository, two Projects) entirely through a chat
+client using the skills, with no direct CLI use and no reading of the spec, and record every
+point of friction. Compare against a baseline run with the 0.6 tools.

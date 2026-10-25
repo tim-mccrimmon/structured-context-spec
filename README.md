@@ -90,19 +90,18 @@ Known issues in the 0.6.0 tooling are tracked in [ISSUES.md](ISSUES.md).
 
 SCS 0.6.0 still expects you to learn the format. The next releases aim to remove that
 requirement: you describe your organization or project to an AI assistant, and it builds,
-validates, and versions the bundles with you, asking for your approval at each step. Two
-proposals are open for comment:
+validates, and versions the bundles with you, asking for your approval at each step.
 
-- **[RFC 0002: Agent-Mediated SCS](rfcs/RFC-0002-agent-mediated-scs.md).** An agent interface
-  to the full lifecycle through Agent Skills and an optional MCP server; an adaptive intake for
-  individuals and organizations; one repository per Domain; content digests that make versioned
-  bundles verifiably immutable; and an advisory review in which the agent raises problems and
-  the human decides.
+- **[RFC 0002: Agent-Mediated SCS](rfcs/RFC-0002-agent-mediated-scs.md)** (accepted, planned
+  for 0.7.0). An agent interface to the full lifecycle through Agent Skills and an optional
+  MCP server; an adaptive intake for individuals and organizations; one repository per Domain;
+  content digests that make versioned bundles verifiably immutable; and an advisory review in
+  which the agent raises problems and the human decides.
 - **[RFC 0003: Review Profiles](rfcs/RFC-0003-review-profiles.md)** (early stub). Declarative,
   citable checks per framework (for example CHAI, HIPAA, or ISO 13485) that make the agent's
   review consistent and auditable.
 
-Feedback is welcome in Discussions or on the RFC pull requests.
+Feedback is welcome in Discussions and Issues.
 
 ---
 

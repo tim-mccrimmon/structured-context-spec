@@ -1,10 +1,10 @@
 # RFC 0002: Agent-Mediated SCS
 
 - **Start Date**: 2026-10-25
-- **RFC PR**: (leave blank, will be filled by maintainer)
-- **Tracking Issue**: (leave blank, will be filled when RFC is accepted)
+- **RFC PR**: #25
+- **Tracking Issue**: `ISSUES.md` ISS-042 – ISS-055
 - **Author(s)**: Tim McCrimmon (@tim-mccrimmon)
-- **Status**: Draft
+- **Status**: Accepted (2026-10-25; comment period waived by the maintainer)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---

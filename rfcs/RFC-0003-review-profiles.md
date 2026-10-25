@@ -1,7 +1,7 @@
 # RFC 0003: Review Profiles
 
 - **Start Date**: 2026-10-25
-- **RFC PR**: (leave blank, will be filled by maintainer)
+- **RFC PR**: (merged as a stub in #25; a review PR will follow)
 - **Tracking Issue**: (leave blank, will be filled when RFC is accepted)
 - **Author(s)**: Tim McCrimmon (@tim-mccrimmon)
 - **Status**: Stub (not yet open for review)
