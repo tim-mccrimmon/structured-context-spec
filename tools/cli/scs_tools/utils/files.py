@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from jinja2 import Environment
 
@@ -52,7 +52,7 @@ def write_file(file_path: Path, content: str):
         f.write(content)
 
 
-def copy_template(template_path: Path, dest_path: Path, variables: Dict[str, Any] = None):
+def copy_template(template_path: Path, dest_path: Path, variables: Optional[Dict[str, Any]] = None):
     """Copy a template file, optionally rendering it with variables"""
     with open(template_path, "r", encoding="utf-8") as f:
         content = f.read()

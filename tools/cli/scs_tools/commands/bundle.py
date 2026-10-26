@@ -459,37 +459,24 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
 
 
 def _validate_bundle(bundle_path):
-    """Run validation on the bundle and return results.
-
-    Runs the validator as ``python -m scs_validator`` with this interpreter, so it works whether or
-    not the ``scs``/``scs-validate`` scripts are on PATH. Schema lookup is the validator's own
-    (``--schema-dir``, ``SCS_SCHEMA_DIR``, then discovery).
-    """
-    import re
-    import sys
+    """Validate the bundle in-process (D-37) and return its error and warning counts. Schema
+    lookup is the validator's own (``SCS_SCHEMA_DIR``, then discovery)."""
+    from scs_validator import api
 
     try:
-        result = subprocess.run(
-            [sys.executable, "-m", "scs_validator", "--bundle", str(bundle_path), "--no-color"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-
-        # The summary block reads "  N errors" / "  M warnings"
-        error_match = re.search(r"^\s*(\d+) errors?", result.stdout, re.M)
-        warning_match = re.search(r"^\s*(\d+) warnings?", result.stdout, re.M)
-        errors = int(error_match.group(1)) if error_match else (0 if result.returncode == 0 else 1)
-        warnings = int(warning_match.group(1)) if warning_match else 0
-
-        if result.returncode != 0 and result.stderr.strip():
-            click.echo(f"  {result.stderr.strip()}", err=True)
-
-        return {"passed": result.returncode == 0, "errors": errors, "warnings": warnings}
-
+        report = api.validate_bundle(bundle_path)
     except Exception as e:
         click.echo(f"  Warning: Could not run validation: {e}")
         return {"passed": False, "errors": 1, "warnings": 0}
+    results = report.all_results()
+    for result in results:
+        for error in result.errors:
+            click.echo(f"  {error.format_message()}", err=True)
+    return {
+        "passed": report.exit_code() == 0,
+        "errors": sum(r.error_count for r in results),
+        "warnings": sum(r.warning_count for r in results),
+    }
 
 
 def _bundle_name(bundle_path):
@@ -524,10 +511,9 @@ def _git_output(*args):
 def _validator_version():
     """Return the installed scs-validator package version, or "unknown" if it can't be read.
 
-    `_validate_bundle` runs the validator as a subprocess of this same interpreter (see above),
-    so if that call produced a real result, scs-validator is installed in this environment and
-    this lookup should succeed. Read from package metadata rather than hardcoding a version
-    string, which goes stale the moment either package is re-versioned.
+    `_validate_bundle` runs the validator in-process (see above), so scs-validator is installed
+    in this environment and this lookup should succeed. Read from package metadata rather than
+    hardcoding a version string, which goes stale the moment either package is re-versioned.
     """
     try:
         return pkg_version("scs-validator")

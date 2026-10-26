@@ -2,20 +2,30 @@
 SCS CLI - Command-line interface for Structured Context Specification tools
 """
 
+import importlib
+import pkgutil
+import sys
+
 import click
+from scs_validator.envelope import Envelope, MachineMode
 
-from scs_tools import __version__
-from scs_tools.commands.add import add
-from scs_tools.commands.bundle import bundle
-from scs_tools.commands.compile import compile
-from scs_tools.commands.init import init
-from scs_tools.commands.new import new
-from scs_tools.commands.validate import validate
+from scs_tools import __version__, commands
 
 
-@click.group()
-@click.version_option(version=__version__, prog_name="scs")
-def cli():
+class SCSGroup(MachineMode, click.Group):
+    tools_version = __version__
+
+
+@click.group(cls=SCSGroup, invoke_without_command=True)
+@click.option("--version", "show_version", is_flag=True, help="Show the version and exit.")
+@click.option(
+    "--json",
+    "json_mode",
+    is_flag=True,
+    help="With --version: write a JSON result envelope (RFC 0002 section 3)",
+)
+@click.pass_context
+def cli(ctx, show_version, json_mode):
     """
     SCS Tools - CLI for Structured Context Specification
 
@@ -46,16 +56,32 @@ def cli():
     For detailed help on any command, use: scs [command] --help
     Documentation: https://github.com/SCS-Labs/scs-cli
     """
-    pass
+    if show_version:
+        from scs_validator.envelope import SCS_VERSION
+
+        if json_mode:
+            envelope = Envelope("--version", __version__)
+            envelope.result = {"scs_version": SCS_VERSION, "tools_version": __version__}
+            click.echo(envelope.dumps())
+        else:
+            click.echo(f"scs, version {__version__}")
+        sys.exit(0)
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
 
-# Register commands
-cli.add_command(new)
-cli.add_command(init)
-cli.add_command(add)
-cli.add_command(bundle)
-cli.add_command(validate)
-cli.add_command(compile)
+def _discover() -> None:
+    """Register every command in scs_tools.commands: each module defines a click command or
+    group named like the module (`scd.py` defines `scd`), so adding a command needs no edit
+    here."""
+    for info in sorted(pkgutil.iter_modules(commands.__path__), key=lambda m: m.name):
+        module = importlib.import_module(f"{commands.__name__}.{info.name}")
+        command = getattr(module, info.name, None)
+        if isinstance(command, click.Command):
+            cli.add_command(command)
+
+
+_discover()
 
 
 if __name__ == "__main__":

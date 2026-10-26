@@ -22,7 +22,9 @@ SCHEMA = json.loads((REPO / "schema" / "runtime" / "runtime-artifact-schema.json
 
 
 def compile_(*args: str):
-    return CliRunner().invoke(cli, ["compile", *args])
+    """`scs compile`, writing the artifact to stdout unless the test names an output."""
+    named = {"-o", "--output", "--json", "--dry-run"} & set(args)
+    return CliRunner().invoke(cli, ["compile", *args, *([] if named else ["--stdout"])])
 
 
 @pytest.fixture
@@ -51,10 +53,9 @@ def edit(path: Path, old: str, new: str) -> None:
 def test_compiled_examples_match_the_committed_artifacts(
     tmp_path: Path, bundle: Path, golden: Path
 ):
-    out = tmp_path / "out.yaml"
-    result = compile_(str(bundle), "-o", str(out))
+    result = compile_(str(bundle))
     assert result.exit_code == 0, result.output
-    assert out.read_bytes() == golden.read_bytes()
+    assert result.stdout.encode("utf-8") == golden.read_bytes()
 
 
 @pytest.mark.parametrize("bundle", [DOMAIN, PROJECT])
@@ -64,11 +65,8 @@ def test_artifacts_conform_to_the_runtime_schema(bundle: Path):
     jsonschema.validate(yaml.safe_load(result.stdout), SCHEMA)
 
 
-def test_compiling_twice_gives_identical_bytes(tmp_path: Path):
-    a, b = tmp_path / "a.yaml", tmp_path / "b.yaml"
-    compile_(str(DOMAIN), "-o", str(a))
-    compile_(str(DOMAIN), "-o", str(b))
-    assert a.read_bytes() == b.read_bytes()
+def test_compiling_twice_gives_identical_bytes():
+    assert compile_(str(DOMAIN)).stdout == compile_(str(DOMAIN)).stdout
 
 
 def test_artifact_has_no_volatile_content():
@@ -248,7 +246,7 @@ def test_validation_errors_stop_compilation(org: Path, tmp_path: Path):
         'provenance:\n  created_by: a@example.com\n  created_at: "2026-10-19T00:00:00Z"\n'
         '  version_approved_by: a@example.com\n  version_approved_at: "2026-10-19T00:00:00Z"\n'
     )
-    out = tmp_path / "out.yaml"
+    out = org / "dist" / "out.yaml"
     result = compile_(str(project), "-o", str(out))
     assert result.exit_code != 0
     assert "must not import a domain bundle" in result.output

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Union
+from typing import Any, Callable, Iterable, List, Optional, Union
 
 from .bundle_validator import BundleValidator
 from .checks import CheckContext, run_checks
@@ -124,6 +124,33 @@ def validate_files(
 
     for result in (syntax_result, schema_result, semantic_result):
         result.details["files_checked"] = files_checked
+    return Report([syntax_result, schema_result, semantic_result])
+
+
+def validate_scd_data(
+    data: Any,
+    path: PathLike,
+    *,
+    schema_dir: Optional[PathLike] = None,
+    validators: Optional[Validators] = None,
+) -> Report:
+    """Validate SCD content that is not on disk yet (`scs scd write`); `path` names it in
+    diagnostics."""
+    v = validators or Validators(schema_dir)
+    syntax_result = ValidationResult("syntax")
+    schema_result = ValidationResult("schema")
+    semantic_result = ValidationResult("semantic")
+    if not isinstance(data, dict):
+        syntax_result.add_error(
+            ValidationError(
+                "SCD content must be a YAML mapping",
+                file_path=str(path),
+                code="PARSE_NOT_AN_OBJECT",
+            )
+        )
+    else:
+        schema_result.extend(v.schema.validate_scd(data, str(path)))
+        semantic_result.extend(v.semantic.validate_scd(data, str(path)))
     return Report([syntax_result, schema_result, semantic_result])
 
 

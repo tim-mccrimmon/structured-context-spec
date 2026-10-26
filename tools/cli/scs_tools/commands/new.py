@@ -478,7 +478,9 @@ def _drop_dangling_relationships(scd_path: Path, generated: set):
     (e.g. hipaa-compliance in a non-healthcare project). Works on the text so the template's
     comments survive; relationship items are `  - type:` lines with 4-space continuations."""
     lines = scd_path.read_text(encoding="utf-8").splitlines(keepends=True)
-    out, item, kept, in_block = [], [], 0, False
+    out: list[str] = []
+    item: list[str] = []
+    kept, in_block = 0, False
 
     def flush():
         nonlocal item, kept

@@ -38,3 +38,16 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
         for line in problems:
             print(f"  {line}")
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
+
+
+@pytest.fixture(autouse=True)
+def no_network(monkeypatch: pytest.MonkeyPatch) -> None:
+    """No scs command opens a network connection (WP-05)."""
+    import socket
+
+    def refuse(*args: object, **kwargs: object) -> None:
+        raise AssertionError("an scs command tried to open a network connection")
+
+    monkeypatch.setattr(socket.socket, "connect", refuse)
+    monkeypatch.setattr(socket.socket, "connect_ex", refuse)
+    monkeypatch.setattr(socket, "create_connection", refuse)

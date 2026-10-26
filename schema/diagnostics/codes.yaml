@@ -38,6 +38,13 @@ codes:
   BUNDLE_XOR_VIOLATION_WARNING:
     severity: warning
     meaning: A bundle has both imports and scds, or neither, and the rules set this check to warn.
+  COMPILE_ERROR:
+    severity: error
+    meaning: The bundle tree cannot be compiled (unresolved import or SCD, import cycle, DRAFT without
+      --allow-draft, digest mismatch, or a non-compilable bundle type).
+  COMPILE_WARNING:
+    severity: warning
+    meaning: The compiler compiled the bundle but noted a problem with its content.
   COMPLETENESS_DOMAIN_MISSING:
     severity: error
     meaning: A domain the completeness rules require is not imported.
@@ -62,6 +69,9 @@ codes:
   COMPLETENESS_STUB_SCD:
     severity: warning
     meaning: An SCD shows enough stub indicators to look like an unfinished placeholder.
+  CONCEPT_IS_A_DOMAIN:
+    severity: error
+    meaning: The name given to scs add bundle is a domain, which is a workspace of its own (scs new domain).
   CONFIG_NAME_MISMATCH:
     severity: error
     meaning: The name in a workspace's .scs/config differs from the workspace name, domain or its directory
@@ -81,6 +91,15 @@ codes:
   DUPLICATE_ID:
     severity: error
     meaning: Two documents in one workspace share an id (bundles share an id and version) (D-43).
+  FILE_EXISTS:
+    severity: error
+    meaning: The file the command would write already exists; pass --force to overwrite it.
+  FILE_NOT_FOUND:
+    severity: error
+    meaning: A file or directory named on the command line does not exist; exit code 4.
+  FILE_UNREADABLE:
+    severity: error
+    meaning: A file named on the command line cannot be read; exit code 4.
   IMPORT_CYCLE:
     severity: error
     meaning: Bundle imports form a cycle.
@@ -105,10 +124,19 @@ codes:
   IMPORT_VERSION_MISMATCH:
     severity: warning
     meaning: An import pins a version different from the version of the bundle that was found.
+  INPUT_EMPTY:
+    severity: error
+    meaning: Content expected on stdin or in a file was empty; exit code 3.
+  INTERNAL_ERROR:
+    severity: error
+    meaning: The tool failed unexpectedly; exit code 5. Report it with the message.
   MANIFEST_SCHEMA_INVALID:
     severity: error
     meaning: A version manifest does not validate against schema/manifest/version-manifest-schema.json
       (D-28, D-36).
+  NO_INPUT:
+    severity: error
+    meaning: The command was given nothing to act on; exit code 3.
   ONTOLOGY_CONCEPT_BUNDLE_MISMATCH:
     severity: error
     meaning: An SCD in a concept bundle names a different concept than the one that owns the bundle.
@@ -156,6 +184,9 @@ codes:
   ONTOLOGY_SCD_CONCEPT_NOT_FOUND:
     severity: error
     meaning: An SCD's concept field names a concept that is not in the domain.
+  OUTPUT_OUTSIDE_REPO:
+    severity: error
+    meaning: An output path is outside the repository root; SCS commands write only inside it.
   PARSE_FILE_NOT_FOUND:
     severity: error
     meaning: The file to validate does not exist.
@@ -263,6 +294,10 @@ codes:
   SCHEMA_CHECKPOINT_RECORD_INVALID:
     severity: error
     meaning: A checkpoint record does not validate against the checkpoint record JSON Schema.
+  SCHEMA_DIR_NOT_FOUND:
+    severity: error
+    meaning: No SCS JSON Schema directory was found (--schema-dir, SCS_SCHEMA_DIR, discovery, or the packaged
+      copy); exit code 4.
   SCHEMA_DOMAIN_MANIFEST_INVALID:
     severity: error
     meaning: A domain manifest does not validate against the domain manifest JSON Schema.
@@ -278,6 +313,21 @@ codes:
   SCHEMA_VALIDATION_FAILED:
     severity: error
     meaning: Schema validation itself failed with an unexpected exception, so the document was not checked.
+  TEMPLATE_NOT_FOUND:
+    severity: error
+    meaning: No SCD or concept bundle template has the given name in the workspace's ontology model.
+  USAGE_ERROR:
+    severity: error
+    meaning: The command line is wrong (unknown option, missing argument, conflicting options); exit code
+      3.
   WORKSPACE_CONFIG_INVALID:
     severity: error
     meaning: A workspace's .scs/config cannot be read as key-value pairs.
+  WORKSPACE_NOT_FOUND:
+    severity: error
+    meaning: No workspace was found (no .scs/config above the current directory, or no workspace by the
+      --workspace name).
+  WORKSPACE_REQUIRED:
+    severity: error
+    meaning: At the root of a Domain repository a workspace-scoped command needs --workspace (D-42); exit
+      code 3.

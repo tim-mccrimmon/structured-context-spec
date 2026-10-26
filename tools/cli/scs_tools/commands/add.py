@@ -7,12 +7,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import click
+from scs_validator.envelope import Change, relative
+from scs_validator.names import RESERVED_BUNDLE_NAMES
 
-from scs_tools.utils.files import (
-    copy_template,
-    get_template_path,
-)
+from scs_tools.machine import CommandError, Envelope, Output, machine_command
+from scs_tools.utils.files import get_template_path, render_template, write_file
 from scs_tools.utils.project_types import get_project_type_config
+from scs_tools.workspace import repository_root, select_workspace
 
 
 @click.group()
@@ -28,19 +29,69 @@ def add():
     pass
 
 
+def _common_options(f):
+    for option in reversed(
+        [
+            click.option("--author", default=None, help="Author name for provenance"),
+            click.option("--email", default=None, help="Author email for provenance"),
+            click.option("--force", is_flag=True, help="Overwrite the file if it exists"),
+            click.option("--dry-run", is_flag=True, help="Report what would be written"),
+            click.option(
+                "--workspace",
+                default=None,
+                help="Workspace to add to: domain or a Project name (default: the current one)",
+            ),
+        ]
+    ):
+        f = option(f)
+    return f
+
+
+def _variables(base_path: Path, author, email) -> dict:
+    now = datetime.now(timezone.utc).isoformat()
+    author_info = author or os.getenv("USER", "developer")
+    project_name = base_path.name
+    config_file = base_path / ".scs" / "config"
+    if config_file.exists():
+        with open(config_file, "r") as f:
+            for line in f:
+                if line.startswith("project_name:"):
+                    project_name = line.split(":", 1)[1].strip()
+                    break
+    return {
+        "project_name": project_name,
+        "author": author_info,
+        "email": email or f"{author_info}@example.com",
+        "created_at": now,
+    }
+
+
+def _write(
+    envelope: Envelope,
+    out: Output,
+    template_path: Path,
+    dest: Path,
+    variables: dict,
+    force: bool,
+    dry_run: bool,
+) -> None:
+    """Render a template to `dest`, recording the change. Overwriting needs --force."""
+    root = repository_root(dest.parent)
+    shown = relative(dest, root) if root else str(dest)
+    if dest.exists() and not force:
+        raise CommandError("FILE_EXISTS", f"{shown} already exists; use --force to overwrite")
+    content = render_template(template_path.read_text(encoding="utf-8"), variables)
+    envelope.changes.append(Change("modify" if dest.exists() else "create", path=shown))
+    envelope.result = {"path": shown}
+    if not dry_run:
+        write_file(dest, content)
+
+
 @add.command()
 @click.argument("scd_name")
-@click.option(
-    "--author",
-    default=None,
-    help="Author name for provenance",
-)
-@click.option(
-    "--email",
-    default=None,
-    help="Author email for provenance",
-)
-def scd(scd_name, author, email):
+@_common_options
+@machine_command("add scd")
+def scd(envelope, out, scd_name, author, email, force, dry_run, workspace):
     """
     Add an individual SCD to the project
 
@@ -56,84 +107,41 @@ def scd(scd_name, author, email):
 
     See also: scs bundle list --available
     """
-    base_path = Path.cwd()
-
-    # Check if SCS is initialized
-    if not (base_path / ".scs" / "config").exists():
-        click.echo(
-            "Error: Not an SCS project. Run 'scs init' first.",
-            err=True,
-        )
-        raise click.Abort()
-
-    # Check if context/project directory exists
-    context_dir = base_path / "context" / "project"
-    if not context_dir.exists():
-        click.echo("Creating context/project directory...")
-        context_dir.mkdir(parents=True, exist_ok=True)
-
-    # Check if SCD already exists
-    scd_file = context_dir / f"{scd_name}.yaml"
-    if scd_file.exists():
-        if not click.confirm(f"SCD '{scd_name}' already exists. Overwrite?"):
-            click.echo("Aborted.")
-            raise click.Abort()
-
-    # Template variables
-    now = datetime.now(timezone.utc).isoformat()
-    author_info = author or os.getenv("USER", "developer")
-    email_info = email or f"{author_info}@example.com"
-
-    # Read project name from config
+    base_path = select_workspace(workspace)
     config_file = base_path / ".scs" / "config"
-    project_name = base_path.name
-    if config_file.exists():
-        with open(config_file, "r") as f:
-            for line in f:
-                if line.startswith("project_name:"):
-                    project_name = line.split(":", 1)[1].strip()
-                    break
 
-    variables = {
-        "project_name": project_name,
-        "author": author_info,
-        "email": email_info,
-        "created_at": now,
-    }
-
-    # Find and copy template - from the project's own ontology model
+    # Find the template in the workspace's own ontology model
     ontology = _read_ontology_model(config_file)
     template_path = get_template_path() / "scds" / ontology / f"{scd_name}.yaml"
     if not template_path.exists():
         template_path = get_template_path() / "scds" / "common" / f"{scd_name}.yaml"
     if not template_path.exists():
-        click.echo(
-            f"Error: Template for '{scd_name}' not found in the '{ontology}' ontology model.\n"
+        raise CommandError(
+            "TEMPLATE_NOT_FOUND",
+            f"Template for '{scd_name}' not found in the '{ontology}' ontology model. "
             f"Available templates are in: {get_template_path() / 'scds' / ontology}",
-            err=True,
         )
-        raise click.Abort()
 
-    click.echo(f"Adding SCD: {scd_name}")
-    copy_template(template_path, scd_file, variables)
-
-    click.echo(f"✓ SCD '{scd_name}' added successfully!")
-    click.echo(f"  Location: {scd_file.relative_to(base_path)}")
+    scd_file = base_path / "context" / "project" / f"{scd_name}.yaml"
+    _write(
+        envelope,
+        out,
+        template_path,
+        scd_file,
+        _variables(base_path, author, email),
+        force,
+        dry_run,
+    )
+    if not dry_run:
+        out.echo(f"✓ SCD '{scd_name}' added successfully!")
+        out.echo(f"  Location: {scd_file.relative_to(base_path)}")
 
 
 @add.command()
 @click.argument("bundle_name")
-@click.option(
-    "--author",
-    default=None,
-    help="Author name for provenance",
-)
-@click.option(
-    "--email",
-    default=None,
-    help="Author email for provenance",
-)
-def bundle(bundle_name, author, email):
+@_common_options
+@machine_command("add bundle")
+def bundle(envelope, out, bundle_name, author, email, force, dry_run, workspace):
     """
     Add a concept bundle to the workspace
 
@@ -152,19 +160,15 @@ def bundle(bundle_name, author, email):
 
     See also: scs bundle list --available
     """
-    base_path = Path.cwd()
-
-    # Check if SCS is initialized
-    if not (base_path / ".scs" / "config").exists():
-        click.echo(
-            "Error: Not an SCS project. Run 'scs init' first.",
-            err=True,
-        )
-        raise click.Abort()
-
-    # Find the concept bundle template in the workspace's own ontology model
     from scs_tools.utils.project_types import ONTOLOGY_MODELS
 
+    if bundle_name in RESERVED_BUNDLE_NAMES:
+        raise CommandError(
+            "RESERVED_BUNDLE_NAME",
+            f"'{bundle_name}' is reserved for a later release; choose another bundle name",
+        )
+
+    base_path = select_workspace(workspace)
     config_file = base_path / ".scs" / "config"
     ontology = _read_ontology_model(config_file)
     concepts_root = get_template_path() / "bundles" / "concepts" / ontology
@@ -173,70 +177,35 @@ def bundle(bundle_name, author, email):
         template_path = concepts_root.parent / "common" / f"{bundle_name}.yaml"
 
     if bundle_name in {m["domain"] for m in ONTOLOGY_MODELS.values()}:
-        click.echo(
-            f"Error: '{bundle_name}' is a domain, not a concept bundle. In SCS 0.6.0 a Domain "
-            "bundle is its own workspace: create one with 'scs new domain <name>'.",
-            err=True,
+        raise CommandError(
+            "CONCEPT_IS_A_DOMAIN",
+            f"'{bundle_name}' is a domain, not a concept bundle. A Domain bundle is its own "
+            "workspace: create one with 'scs new domain <name>'.",
         )
-        raise click.Abort()
     if not template_path.exists():
         available = sorted(concepts_root.glob("*.yaml"))
-        click.echo(
-            f"Error: Bundle '{bundle_name}' not found in the '{ontology}' ontology model.\n"
+        raise CommandError(
+            "TEMPLATE_NOT_FOUND",
+            f"Bundle '{bundle_name}' not found in the '{ontology}' ontology model. "
             f"Available bundles: {', '.join(p.stem for p in available)}",
-            err=True,
         )
-        raise click.Abort()
 
-    # Check if the destination directory exists
-    bundles_dir = base_path / "bundles" / "concepts"
-    if not bundles_dir.exists():
-        click.echo("Creating bundles/concepts directory...")
-        bundles_dir.mkdir(parents=True, exist_ok=True)
-
-    # Check if bundle already exists
-    bundle_file = bundles_dir / f"{bundle_name}.yaml"
-    if bundle_file.exists():
-        if not click.confirm(f"Bundle '{bundle_name}' already exists. Overwrite?"):
-            click.echo("Aborted.")
-            raise click.Abort()
-
-    # Template variables
-    now = datetime.now(timezone.utc).isoformat()
-    author_info = author or os.getenv("USER", "developer")
-    email_info = email or f"{author_info}@example.com"
-
-    # Read project name from config (config_file and ontology already read above)
-    project_name = base_path.name
-    if config_file.exists():
-        with open(config_file, "r") as f:
-            for line in f:
-                if line.startswith("project_name:"):
-                    project_name = line.split(":", 1)[1].strip()
-                    break
-
-    variables = {
-        "project_name": project_name,
-        "author": author_info,
-        "email": email_info,
-        "created_at": now,
-        # Project-type settings (e.g. which compliance SCDs a concept bundle lists) - sdlc only
-        "config": (
-            get_project_type_config(_read_project_type(config_file)) if ontology == "sdlc" else {}
-        ),
-    }
-
-    click.echo(f"Adding bundle: {bundle_name}")
-    copy_template(template_path, bundle_file, variables)
-
-    click.echo(f"✓ Bundle '{bundle_name}' added successfully!")
-    click.echo(f"  Location: {bundle_file.relative_to(base_path)}")
+    variables = _variables(base_path, author, email)
+    # Project-type settings (e.g. which compliance SCDs a concept bundle lists) - sdlc only
+    variables["config"] = (
+        get_project_type_config(_read_project_type(config_file)) if ontology == "sdlc" else {}
+    )
+    bundle_file = base_path / "bundles" / "concepts" / f"{bundle_name}.yaml"
+    _write(envelope, out, template_path, bundle_file, variables, force, dry_run)
+    if not dry_run:
+        out.echo(f"✓ Bundle '{bundle_name}' added successfully!")
+        out.echo(f"  Location: {bundle_file.relative_to(base_path)}")
 
     # A concept added to the workspace also belongs in the Domain Ontology manifest
-    _remind_about_ontology(base_path, bundle_name)
+    _remind_about_ontology(base_path, bundle_name, out)
 
 
-def _remind_about_ontology(base_path: Path, concept: str):
+def _remind_about_ontology(base_path: Path, concept: str, out: Output):
     """If the project has a Domain Ontology manifest that lacks this concept, say how to add it"""
     manifest = base_path / "domain" / "domain-manifest.yaml"
     if not manifest.is_file():
@@ -244,7 +213,7 @@ def _remind_about_ontology(base_path: Path, concept: str):
     concept_id = f"concept:{concept}"
     if f"id: {concept_id}" in manifest.read_text(encoding="utf-8"):
         return
-    click.echo(
+    out.echo(
         f"\nNote: {concept_id} is not in domain/domain-manifest.yaml yet. Add it under\n"
         f"ontology.concepts so the ontology matches your concept bundles:\n"
         f"  - id: {concept_id}\n"

@@ -23,12 +23,15 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "click>=8.0.0",
+    "click>=8.1",
     "pyyaml>=6.0",
     "jinja2>=3.0.0",
+    # Validation, versioning, and compiling call the validator in-process (D-37)
+    "scs-validator>=0.6.0",
 ]
 
 [project.optional-dependencies]
+# Kept so `pip install 'scs-tools[validator]'` still works; the validator is now a dependency
 validator = ["scs-validator>=0.6.0"]
 
 [project.urls]
@@ -54,5 +57,9 @@ line-length = 100
 target-version = "py311"
 
 # Explicit rule set so results do not change when ruff changes its defaults (ISS-036)
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = false
+
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]

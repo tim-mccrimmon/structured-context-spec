@@ -60,7 +60,7 @@ where = ["src"]
 # package (ISS-035). Schemas and meta are copies of the repo-root schema/ and meta/ made by
 # scripts/sync_schemas.py; tests fail if they drift.
 [tool.setuptools.package-data]
-scs_validator = ["rules/**/*.yaml", "rules/**/*.md", "schemas/**/*.json", "meta/**/*.yaml"]
+scs_validator = ["rules/**/*.yaml", "rules/**/*.md", "schemas/**/*.json", "meta/**/*.yaml", "py.typed"]
 
 [tool.black]
 line-length = 100

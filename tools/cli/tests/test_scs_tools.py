@@ -449,7 +449,14 @@ def test_bundle_validate_shortcut_finds_the_domain_bundle(tmp_path: Path, monkey
 def test_scaffolded_skeletons_do_not_compile_until_directives_are_written(tmp_path: Path):
     root = scaffold(tmp_path, "minimal", kind="domain")
     result = CliRunner().invoke(
-        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft", "--no-validate"]
+        cli,
+        [
+            "compile",
+            str(root / "bundles/domain-bundle.yaml"),
+            "--allow-draft",
+            "--no-validate",
+            "--stdout",
+        ],
     )
     # The packaged meta bundle contributes directives; the skeleton SCDs do not.
     assert result.exit_code == 0, result.output
@@ -911,7 +918,7 @@ def test_filled_in_prohibitions_and_facts_compile(tmp_path: Path):
         )
     )
     result = CliRunner().invoke(
-        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft"]
+        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft", "--stdout"]
     )
     assert result.exit_code == 0, result.output
     artifact = yaml.safe_load(result.stdout)
@@ -1085,7 +1092,7 @@ def test_cdmo_example_directive_compiles_once_uncommented(tmp_path: Path):
         )
     )
     result = CliRunner().invoke(
-        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft"]
+        cli, ["compile", str(root / "bundles/domain-bundle.yaml"), "--allow-draft", "--stdout"]
     )
     assert result.exit_code == 0, result.output
     ids = [r["id"] for r in yaml.safe_load(result.stdout)["rules"]]

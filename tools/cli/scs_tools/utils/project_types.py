@@ -1,8 +1,8 @@
 """Project type configurations for SCS 0.5.0"""
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
-PROJECT_TYPES = {
+PROJECT_TYPES: Dict[str, Dict[str, Any]] = {
     "healthcare": {
         "description": "Healthcare application (HIPAA, CHAI, TEFCA)",
         "compliance_bundles": [

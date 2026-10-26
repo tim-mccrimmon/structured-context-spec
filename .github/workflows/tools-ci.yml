@@ -67,6 +67,9 @@ jobs:
       - name: mypy (scs-validator)
         working-directory: tools/scd-validator
         run: mypy src
+      - name: mypy (scs-tools)
+        working-directory: tools/cli
+        run: mypy scs_tools
 
   wheel-smoke:
     # Installs the built wheels (not editable) into a clean environment and uses them away from the
