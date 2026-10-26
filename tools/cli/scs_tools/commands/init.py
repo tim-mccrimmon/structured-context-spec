@@ -2,13 +2,14 @@
 Init command - initialize SCS in an existing project
 """
 
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 import click
 
+from scs_tools import identity
 from scs_tools.commands.new import _scs_tools_version
+from scs_tools.machine import CommandError
 from scs_tools.utils.files import (
     copy_template,
     create_directory_structure,
@@ -54,7 +55,7 @@ def init(project_type, author, email, force):
     Examples:
         scs init                                # Initialize with defaults
         scs init --type healthcare              # Healthcare project type
-        scs init --author "Jane Doe" --email "jane@example.com"  # With metadata
+        scs init --author "Jane Doe" --email "jane@acme-health.org"  # With metadata
         scs init --force                        # Overwrite existing config
 
     See also: scs new project (for creating new projects from scratch)
@@ -71,6 +72,12 @@ def init(project_type, author, email, force):
         )
         raise click.Abort()
 
+    # Never invented: prompted with git's values as defaults (D-71)
+    try:
+        author_info, email_info = identity.author(author, email, prompt=True)
+    except CommandError as e:
+        raise click.UsageError(e.message)
+
     click.echo(f"Initializing SCS in: {base_path}")
     click.echo(f"Project name: {project_name}")
     click.echo(f"Project type: {project_type}\n")
@@ -81,8 +88,6 @@ def init(project_type, author, email, force):
 
     # Template variables
     now = datetime.now(timezone.utc).isoformat()
-    author_info = author or os.getenv("USER", "developer")
-    email_info = email or f"{author_info}@example.com"
 
     variables = {
         "project_name": project_name,

@@ -112,12 +112,18 @@ codes:
   IMPORT_CYCLE:
     severity: error
     meaning: Bundle imports form a cycle.
+  IMPORT_EXISTS:
+    severity: error
+    meaning: scs bundle add-import names a bundle that is already imported.
   IMPORT_EXPECTED_TYPE_MISSING:
     severity: warning
     meaning: The root bundle imports no bundle of a type its own type expects.
   IMPORT_META_UNPINNED:
     severity: warning
     meaning: A meta bundle is imported without a pinned version.
+  IMPORT_NOT_FOUND:
+    severity: error
+    meaning: scs bundle pin names a bundle that the bundle does not import.
   IMPORT_TYPE_FORBIDDEN:
     severity: error
     meaning: A bundle imports a bundle type that its own type forbids.
@@ -265,6 +271,9 @@ codes:
     severity: error
     meaning: A validation rules file (built-in, project, or custom completeness rules) could not be read
       or parsed.
+  SCD_ALREADY_LISTED:
+    severity: error
+    meaning: scs bundle add-scd names an SCD the bundle already lists.
   SCD_DUPLICATE_ENTRY_ID:
     severity: error
     meaning: Two directives, prohibitions, or facts in one SCD share an id.
@@ -281,6 +290,12 @@ codes:
   SCD_ID_MISSING:
     severity: error
     meaning: An SCD has no id field.
+  SCD_NOT_FOUND:
+    severity: error
+    meaning: scs bundle add-scd names an SCD that is not in the workspace.
+  SCD_NOT_LISTED:
+    severity: error
+    meaning: scs bundle remove-scd names an SCD that the bundle (or any bundle) does not list.
   SCD_PROHIBITION_NOT_BINARY:
     severity: error
     meaning: A prohibition's subject contains a condition or qualifier instead of stating exactly what

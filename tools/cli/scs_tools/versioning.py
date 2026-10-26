@@ -17,7 +17,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import click
 import yaml
 from scs_validator import api, integrity
 from scs_validator.checks.empty_scds import is_empty
@@ -29,7 +28,7 @@ from scs_validator.provenance import is_placeholder
 from scs_validator.resolver import BundleTree, ResolvedBundle, parse_bundle_ref, resolve
 from scs_validator.workspace import CONFIG, LEGACY_ONTOLOGY_MANIFEST, ONTOLOGY_MANIFEST
 
-from scs_tools import __version__, git
+from scs_tools import __version__, git, identity
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output
 from scs_tools.workspace import find_workspace, repository_root, workspace_name
 
@@ -78,15 +77,17 @@ def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _approver(given: Optional[str], out: Output) -> str:
-    if given is None and not out.machine:
-        given = click.prompt("Approver (Name <email>)", type=str, default="", show_default=False)
+def _approver(given: Optional[str]) -> str:
+    """The approver, required in every mode and never taken from git (D-13). Git's identity
+    appears only as the suggestion."""
     approver = (given or "").strip()
     if not approver:
+        suggested = identity.person_suggestion()
         raise CommandError(
             "VERSION_APPROVER_REQUIRED",
             "A version needs an approver: pass --approved-by 'Name <email>'. It is never taken "
             "from git configuration",
+            suggestion={"approved_by": suggested} if suggested else None,
         )
     if not PERSON_RE.match(approver) or approver.startswith("role:"):
         raise CommandError(
@@ -269,11 +270,14 @@ def _commit(release: Release, envelope: Envelope, dry_run: bool) -> Optional[str
         written = {release.from_top(release.snapshot_path), release.from_top(release.manifest_path)}
         paths = [p for p in pending if p["path"] not in written]
         paths += [{"path": p, "status": "A"} for p in sorted(written)]
+        paths.sort(key=lambda p: p["path"])
         envelope.changes.append(Change("git-commit", ref="HEAD", paths=_from_root(paths, release)))
         envelope.changes.append(Change("git-tag", ref=release.tag))
         return None
 
     old = git.head(top)
+    index = git.index_file(top)
+    saved_index = index.read_bytes() if index.is_file() else None
     commit = ""
     tagged = moved = False
     try:
@@ -286,9 +290,16 @@ def _commit(release: Release, envelope: Envelope, dry_run: bool) -> Optional[str
         git.move_head(top, commit, old, f"scs bundle version {release.tag}")
         moved = True
         git.sync_index(top, release.pathspec)
-    except git.GitError as e:
+    except BaseException as e:
         _roll_back(release, old, commit if moved else None, tagged)
-        raise CommandError("GIT_COMMAND_FAILED", f"{e}; nothing was versioned")
+        if saved_index is None:
+            index.unlink(missing_ok=True)
+        else:
+            index.write_bytes(saved_index)
+        envelope.changes.clear()
+        if isinstance(e, (git.GitError, OSError)):
+            raise CommandError("GIT_COMMAND_FAILED", f"{e}; nothing was versioned")
+        raise
     envelope.changes.append(
         Change(
             "git-commit", ref=commit, paths=_from_root(git.committed_paths(top, commit), release)
@@ -349,7 +360,7 @@ def version_bundle(
     bundle_path = bundle_path.resolve()
     workspace_root = find_workspace(bundle_path.parent) or bundle_path.parent.parent
     top = _git_top(workspace_root)
-    approver = _approver(approved_by, out)
+    approver = _approver(approved_by)
 
     data = yaml.safe_load(bundle_path.read_text(encoding="utf-8")) or {}
     name = bundle_name(str(data.get("id", "")), bundle_path)

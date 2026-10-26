@@ -84,9 +84,12 @@ nearest `.scs/config` above the current directory. At the repository root withou
 | `scs --version` | n/a | `--json` returns `scs_version`, `tools_version` (D-45) |
 | `scs new domain NAME [--ontology sdlc\|cdmo\|mca\|personal]` | yes | Creates `NAME-context/`; machine mode requires `--author` (D-13) |
 | `scs new project NAME` | yes | Inside a Domain repo only (`DOMAIN_WORKSPACE_MISSING`) |
-| `scs add scd\|bundle` | yes | Overwrite requires `--force`; no prompt; reserved bundle names refused (D-33) |
+| `scs add scd\|bundle` | yes | Overwrite requires `--force`; reserved bundle names refused (D-33). `add bundle NAME --new` creates a concept with no shipped template: bundle, first SCD, ontology entry, and the root's import (D-68, D-76) |
 | `scs scd write PATH --from-file -` | yes | D-08 option 1: SCD content from stdin; validated before writing |
-| `scs bundle add-scd` / `remove-scd` / `add-import` / `pin` | yes | D-08 option 1 (`pin` in either option) |
+| `scs bundle add-scd SCD_ID [--bundle B]` | yes | D-08: adds an existing SCD in the workspace to B's `scds` (default B: the root bundle) |
+| `scs bundle remove-scd SCD_ID [--bundle B]` | yes | D-08: removes it from B's `scds` (default B: the bundle that lists it); deletes the SCD file if no other bundle lists it (D-75); an emptied concept bundle goes with its root import and ontology entry (D-69) |
+| `scs bundle add-import REF [--bundle B]` | yes | D-08: adds an import that resolves in the workspace to B (default: the root bundle) |
+| `scs bundle pin NAME --version V [--bundle B]` | yes | D-08: re-pins B's one import of `bundle:NAME` to a released version `V`; changes exactly that line |
 | `scs bundle version BUNDLE --version V --approved-by P` | yes | `--approved-by` required in every mode; no `--force`, no `--no-git`; refuses unpinned or DRAFT imports (D-14); commits the workspace (D-40) with the D-55 identity |
 | `scs bundle diff BUNDLE [--from V] [--to V\|working]` | n/a | Default `--from` = latest version (D-41 for none or legacy), `--to` = `working`; old content from the tag |
 | `scs intake set` / `scs intake record-finding` | yes | The only writers of `intake.yaml` (D-07) |

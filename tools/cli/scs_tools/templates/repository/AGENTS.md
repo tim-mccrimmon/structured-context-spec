@@ -9,7 +9,9 @@ that AI services apply to {{ domain_name }}'s work. It does not hold that work.
 Work in this repository is limited to five operations on SCS context:
 
 1. **Create** workspaces, bundles, and SCDs (`scs new`, `scs add`).
-2. **Maintain** them: edit, retire, and re-scope SCDs and bundles (`scs scd write`, `scs bundle`).
+2. **Maintain** them: edit, retire, and re-scope SCDs and bundles (`scs scd write`,
+   `scs bundle add-scd`, `remove-scd`, `add-import`, `pin`, and `scs add bundle NAME --new` for
+   a concept with no template).
 3. **Validate** them (`scs-validate`).
 4. **Version** bundles (`scs bundle version`); each version is a git tag.
 5. **Compile** bundles into runtime artifacts (`scs compile`), written to the workspace's `dist/`.

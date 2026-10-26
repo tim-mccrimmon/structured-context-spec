@@ -7,6 +7,7 @@ from pathlib import Path
 import click
 import yaml
 
+from scs_tools import maintain
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import get_template_path
 from scs_tools.utils.project_types import ONTOLOGY_MODELS
@@ -249,7 +250,7 @@ def validate():
 )
 @click.option(
     "--approved-by",
-    help="The approver, Name <email> (asked for if omitted; never taken from git config)",
+    help="The approver, Name <email> (required; never taken from git config)",
 )
 @click.option("--notes", help="Version notes")
 @click.option(
@@ -296,3 +297,119 @@ def version(
     version_bundle(
         envelope, out, bundle_file, version_number, approved_by, notes, no_validate, dry_run
     )
+
+
+def _edit_options(default: str):
+    def decorate(f):
+        for option in reversed(
+            [
+                click.option(
+                    "--bundle",
+                    "-b",
+                    "bundle_file",
+                    type=click.Path(dir_okay=False, path_type=Path),
+                    default=None,
+                    help=f"The bundle to change (default: {default})",
+                ),
+                click.option(
+                    "--workspace",
+                    default=None,
+                    help="Workspace: domain or a Project name (default: the current one)",
+                ),
+                click.option("--dry-run", is_flag=True, help="Report the change; write nothing"),
+            ]
+        ):
+            f = option(f)
+        return f
+
+    return decorate
+
+
+def _done(out: Output, envelope: Envelope, dry_run: bool) -> None:
+    verb = "Would change" if dry_run else "Changed"
+    if not envelope.changes:
+        out.echo("Nothing to change")
+    for change in envelope.changes:
+        out.echo(f"{verb}: {change.action} {change.path}")
+
+
+@bundle.command("pin")
+@click.argument("name")
+@click.option("--version", "-v", "version_number", required=True, help="A released version")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle pin")
+def pin(envelope, out, name, version_number, bundle_file, workspace, dry_run):
+    """
+    Pin an import to a released version
+
+    Changes the one import of bundle:NAME in the bundle to bundle:NAME:VERSION. The version
+    must already be released (scs bundle version).
+
+    \b
+    Examples:
+        scs bundle pin security --version 1.0.0
+        scs bundle pin bundle:security --version 1.1.0 --bundle bundles/project-bundle.yaml
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.pin(envelope, ws, bundle_file, name, version_number, dry_run)
+    _done(out, envelope, dry_run)
+
+
+@bundle.command("add-import")
+@click.argument("ref")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle add-import")
+def add_import(envelope, out, ref, bundle_file, workspace, dry_run):
+    """
+    Add an import to a Domain or Project bundle
+
+    REF is bundle:NAME (unpinned, the working concept) or bundle:NAME:VERSION. It must resolve
+    in the workspace.
+
+    \b
+    Examples:
+        scs bundle add-import security
+        scs bundle add-import bundle:security:1.0.0
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.add_import(envelope, ws, bundle_file, ref, dry_run)
+    _done(out, envelope, dry_run)
+
+
+@bundle.command("add-scd")
+@click.argument("scd_id")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle add-scd")
+def add_scd(envelope, out, scd_id, bundle_file, workspace, dry_run):
+    """
+    List an existing SCD in a bundle
+
+    \b
+    Examples:
+        scs bundle add-scd scd:project:release-gates --bundle bundles/concepts/security.yaml
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.add_scd(envelope, ws, bundle_file, scd_id, dry_run)
+    _done(out, envelope, dry_run)
+
+
+@bundle.command("remove-scd")
+@click.argument("scd_id")
+@_edit_options("the bundle that lists it")
+@machine_command("bundle remove-scd")
+def remove_scd(envelope, out, scd_id, bundle_file, workspace, dry_run):
+    """
+    Retire an SCD: remove it from its bundle
+
+    The SCD file is deleted when no other bundle lists it; released versions keep it at their
+    tags. A concept bundle left with no SCDs is removed too, with the imports of it and its
+    ontology manifest entry.
+
+    \b
+    Examples:
+        scs bundle remove-scd scd:project:tefca-participation
+        scs bundle remove-scd scd:project:threat-model --dry-run
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.remove_scd(envelope, ws, bundle_file, scd_id, dry_run)
+    _done(out, envelope, dry_run)

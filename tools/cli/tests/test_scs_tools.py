@@ -34,6 +34,7 @@ CONCEPTS = {
 }
 
 
+ADD_AUTHOR = ["--author", "Test Author", "--email", "test@structuredcontext.dev"]
 NEW_OPTIONS = [
     "--author",
     "Test Author",
@@ -331,24 +332,35 @@ def test_concept_bundles_at_the_same_version_get_their_own_manifests_and_tags(
 
 
 def test_the_approver_is_never_taken_from_git_config(tmp_path: Path, monkeypatch):
-    """ISS-047: without --approved-by the user is asked; git config user.email is not used."""
+    """D-13: without --approved-by, every mode refuses; git's identity is only a suggestion,
+    and with an approver given, git's email reaches no manifest."""
+    import json
+
     project = scaffold(tmp_path)
     gitconfig = tmp_path / "gitconfig"
-    gitconfig.write_text("[user]\n\temail = git@structuredcontext.dev\n")
+    gitconfig.write_text("[user]\n\tname = Git User\n\temail = git@structuredcontext.dev\n")
     monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(gitconfig))
-    result = _version(
-        project,
-        monkeypatch,
-        "bundles/concepts/security.yaml",
-        "--no-validate",
-        input="Jane Doe <jane@structuredcontext.dev>\n",
-    )
+    bundle = "bundles/concepts/security.yaml"
+
+    result = _version(project, monkeypatch, bundle, "--no-validate", "--json")
+    assert result.exit_code == 1
+    data = json.loads(result.stdout)
+    assert data["changes"] == []
+    [diagnostic] = data["diagnostics"]
+    assert diagnostic["code"] == "VERSION_APPROVER_REQUIRED"
+    assert diagnostic["suggestion"] == {"approved_by": "Git User <git@structuredcontext.dev>"}
+    without = {k: v for k, v in diagnostic.items() if k != "suggestion"}
+    assert "git@structuredcontext.dev" not in json.dumps(without)
+
+    result = _version(project, monkeypatch, bundle, "--no-validate", input="\n")
+    assert result.exit_code == 1
+    assert "needs an approver" in result.output
+    assert not (project / "bundles/concepts/security-v1.0.0.yaml").exists()
+
+    result = _version(project, monkeypatch, bundle, "--no-validate", "--approved-by", APPROVER)
     assert result.exit_code == 0, result.output
-    assert "Approver (Name <email>)" in result.output
-    manifest = yaml.safe_load(
-        (project / "bundles/concepts/security-v1.0.0-MANIFEST.yaml").read_text()
-    )
-    assert manifest["approval"]["approved_by"] == "Jane Doe <jane@structuredcontext.dev>"
+    for path in (project / "bundles/concepts").glob("security-v1.0.0*"):
+        assert "git@structuredcontext.dev" not in path.read_text()
 
 
 @pytest.mark.parametrize(
@@ -436,7 +448,7 @@ def test_scaffolded_skeletons_do_not_compile_until_directives_are_written(tmp_pa
 def test_add_bundle_rejects_a_domain_name_with_a_hint(tmp_path: Path, monkeypatch):
     root = scaffold(tmp_path)
     monkeypatch.chdir(root)
-    result = CliRunner().invoke(cli, ["add", "bundle", "software-development"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "software-development", *ADD_AUTHOR])
     assert result.exit_code != 0
     assert "scs new domain" in result.output
     assert not (root / "bundles" / "domains").exists()
@@ -458,7 +470,7 @@ def _init_bare_project(tmp_path: Path, monkeypatch) -> Path:
 
 def test_add_bundle_adds_a_concept_bundle(tmp_path: Path, monkeypatch):
     root = _init_bare_project(tmp_path, monkeypatch)
-    result = CliRunner().invoke(cli, ["add", "bundle", "security"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "security", *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     target = root / "bundles" / "concepts" / "security.yaml"
     assert target.is_file()
@@ -469,7 +481,7 @@ def test_add_bundle_adds_a_concept_bundle(tmp_path: Path, monkeypatch):
 
 def test_add_bundle_rejects_an_unknown_name_cleanly(tmp_path: Path, monkeypatch):
     _init_bare_project(tmp_path, monkeypatch)
-    result = CliRunner().invoke(cli, ["add", "bundle", "no-such-bundle"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "no-such-bundle", *ADD_AUTHOR])
     assert result.exit_code != 0
     assert "not found" in result.output.lower()
 
@@ -510,7 +522,9 @@ def test_bundle_info_falls_back_to_the_template_outside_a_project(tmp_path: Path
 def test_add_scd_adds_a_template_scd_that_validates(tmp_path: Path, monkeypatch):
     root = _init_bare_project(tmp_path, monkeypatch)
     for name in ["system-context", "risk-assessment", "threat-model"]:
-        result = CliRunner().invoke(cli, ["add", "scd", name, "--author", "Tim"])
+        result = CliRunner().invoke(
+            cli, ["add", "scd", name, "--author", "Tim", "--email", "tim@structuredcontext.dev"]
+        )
         assert result.exit_code == 0, result.output
         assert (
             validate_with_validator(str(root / "context" / "project" / f"{name}.yaml")).exit_code
@@ -585,7 +599,7 @@ def test_add_bundle_reminds_you_to_add_the_concept_to_the_manifest(tmp_path: Pat
     concepts[:] = [c for c in concepts if c["id"] != "concept:compliance-governance"]
     (root / MANIFEST).write_text(yaml.safe_dump(manifest))
     monkeypatch.chdir(root)
-    result = CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "compliance-governance", *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     assert MANIFEST in result.output
     assert "concept:compliance-governance" in result.output
@@ -595,14 +609,14 @@ def test_add_bundle_is_quiet_when_the_manifest_already_has_the_concept(tmp_path:
     root = scaffold(tmp_path)
     (root / "bundles" / "concepts" / "security.yaml").unlink()
     monkeypatch.chdir(root)
-    result = CliRunner().invoke(cli, ["add", "bundle", "security"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "security", *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     assert MANIFEST not in result.output
 
 
 def test_add_bundle_without_a_manifest_says_nothing_about_it(tmp_path: Path, monkeypatch):
     _init_bare_project(tmp_path, monkeypatch)
-    result = CliRunner().invoke(cli, ["add", "bundle", "security"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "security", *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     assert "domain-manifest" not in result.output
 
@@ -611,7 +625,7 @@ def test_add_bundle_without_a_manifest_says_nothing_about_it(tmp_path: Path, mon
 def test_add_bundle_works_for_every_concept(tmp_path: Path, monkeypatch, concept: str):
     """ISS-037: compliance-governance crashed ('config' is undefined) under `add bundle`."""
     root = _init_bare_project(tmp_path, monkeypatch)
-    result = CliRunner().invoke(cli, ["add", "bundle", concept])
+    result = CliRunner().invoke(cli, ["add", "bundle", concept, *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     target = root / "bundles" / "concepts" / f"{concept}.yaml"
     assert validate_with_validator("--bundle", str(target)).exit_code == 0
@@ -625,7 +639,10 @@ def test_add_bundle_lists_the_full_set_unless_a_0_6_project_type_applies(
     root = scaffold(tmp_path)
     (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
     monkeypatch.chdir(root)
-    assert CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"]).exit_code == 0
+    assert (
+        CliRunner().invoke(cli, ["add", "bundle", "compliance-governance", *ADD_AUTHOR]).exit_code
+        == 0
+    )
     text = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
     assert "hipaa-compliance" in text
 
@@ -634,7 +651,10 @@ def test_add_bundle_lists_the_full_set_unless_a_0_6_project_type_applies(
     monkeypatch.chdir(legacy)
     args = ["init", "--type", "standard", "--author", "T", "--email", "t@e.com"]
     assert CliRunner().invoke(cli, args).exit_code == 0
-    assert CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"]).exit_code == 0
+    assert (
+        CliRunner().invoke(cli, ["add", "bundle", "compliance-governance", *ADD_AUTHOR]).exit_code
+        == 0
+    )
     text = (legacy / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
     assert "hipaa-compliance" not in text
 
@@ -764,12 +784,12 @@ def test_add_bundle_and_add_scd_work_inside_an_mca_project(tmp_path: Path, monke
     (root / "context" / "project" / "governance.yaml").unlink()
     monkeypatch.chdir(root)
 
-    result = CliRunner().invoke(cli, ["add", "bundle", "governance"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "governance", *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     target = root / "bundles" / "concepts" / "governance.yaml"
     assert validate_with_validator("--bundle", str(target)).exit_code == 0
 
-    result = CliRunner().invoke(cli, ["add", "scd", "governance"])
+    result = CliRunner().invoke(cli, ["add", "scd", "governance", *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     scd_target = root / "context" / "project" / "governance.yaml"
     assert validate_with_validator(str(scd_target)).exit_code == 0
@@ -787,7 +807,7 @@ def test_add_bundle_without_ontology_model_in_config_defaults_to_sdlc(tmp_path: 
     ]
     config_file.write_text("\n".join(lines) + "\n")
 
-    result = CliRunner().invoke(cli, ["add", "bundle", "security"])
+    result = CliRunner().invoke(cli, ["add", "bundle", "security", *ADD_AUTHOR])
     assert result.exit_code == 0, result.output
     assert (root / "bundles" / "concepts" / "security.yaml").is_file()
 
@@ -880,8 +900,8 @@ def test_filled_in_prohibitions_and_facts_compile(tmp_path: Path):
 
 def test_add_bundle_and_scd_find_the_common_templates(tmp_path: Path, monkeypatch):
     root = _init_bare_project(tmp_path, monkeypatch)
-    assert CliRunner().invoke(cli, ["add", "bundle", "prohibited"]).exit_code == 0
-    assert CliRunner().invoke(cli, ["add", "scd", "prohibited"]).exit_code == 0
+    assert CliRunner().invoke(cli, ["add", "bundle", "prohibited", *ADD_AUTHOR]).exit_code == 0
+    assert CliRunner().invoke(cli, ["add", "scd", "prohibited", *ADD_AUTHOR]).exit_code == 0
     assert (root / "bundles/concepts/prohibited.yaml").is_file()
     assert (root / "context/project/prohibited.yaml").is_file()
 

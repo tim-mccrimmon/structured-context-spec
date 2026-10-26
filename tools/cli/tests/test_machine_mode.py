@@ -33,6 +33,9 @@ provenance:
 """
 
 
+AUTHOR = ["--author", "Test Author", "--email", "test@structuredcontext.dev"]
+
+
 def run(*args: str, input: str = "") -> Result:
     return CliRunner().invoke(cli, list(args), input=input)
 
@@ -238,42 +241,42 @@ def test_add_scd_and_bundle(project: Path):
     # The scaffold supplies the full set (D-64); remove what is added back below
     (project / "context" / "project" / "audit-trail.yaml").unlink()
     (project / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
-    data = assert_dry_run_matches(project, "add", "scd", "audit-trail")
+    data = assert_dry_run_matches(project, "add", "scd", "audit-trail", *AUTHOR)
     assert data["command"] == "add scd"
     assert data["changes"][0]["action"] == "create"
 
-    data = assert_dry_run_matches(project, "add", "bundle", "compliance-governance")
+    data = assert_dry_run_matches(project, "add", "bundle", "compliance-governance", *AUTHOR)
     assert data["command"] == "add bundle"
 
 
 def test_add_refuses_to_overwrite_without_force(project: Path):
-    run("add", "scd", "audit-trail")
-    result = run("add", "scd", "audit-trail", "--json")
+    run("add", "scd", "audit-trail", *AUTHOR)
+    result = run("add", "scd", "audit-trail", *AUTHOR, "--json")
     assert result.exit_code == 1
     assert codes(envelope(result)) == ["FILE_EXISTS"]
 
 
 def test_add_bundle_plan_is_reserved(project: Path):
     before = snapshot(project)
-    result = run("add", "bundle", "plan", "--json")
+    result = run("add", "bundle", "plan", *AUTHOR, "--json")
     assert result.exit_code == 1
     assert codes(envelope(result)) == ["RESERVED_BUNDLE_NAME"]
     assert snapshot(project) == before
 
 
 def test_workspace_required_at_a_domain_repository_root(domain_repo: Path):
-    result = run("add", "scd", "audit-trail", "--json")
+    result = run("add", "scd", "audit-trail", *AUTHOR, "--json")
     assert result.exit_code == 3, result.output
     assert codes(envelope(result)) == ["WORKSPACE_REQUIRED"]
 
 
 def test_workspace_option_selects_the_workspace(domain_repo: Path):
     (domain_repo / "projects" / "pump" / "context" / "project" / "audit-trail.yaml").unlink()
-    data = envelope(run("add", "scd", "audit-trail", "--workspace", "pump", "--json"))
+    data = envelope(run("add", "scd", "audit-trail", *AUTHOR, "--workspace", "pump", "--json"))
     assert data["changes"] == [
         {"action": "create", "path": "projects/pump/context/project/audit-trail.yaml"}
     ]
-    result = run("add", "scd", "audit-trail", "--workspace", "nope", "--json")
+    result = run("add", "scd", "audit-trail", *AUTHOR, "--workspace", "nope", "--json")
     assert codes(envelope(result)) == ["WORKSPACE_NOT_FOUND"]
 
 

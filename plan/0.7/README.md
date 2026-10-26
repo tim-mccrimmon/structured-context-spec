@@ -48,6 +48,7 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-05 | Done: `--json` envelope, exit codes 0-5, `--dry-run`, `scd write`, `compile` to `dist/` | `476e542` |
 | WP-03 | Done: `new domain` creates the Domain repository (AGENTS.md, CI, initial commit), `new project` inside it, `ontology/`, D-06 config keys; templates by ontology and kind (D-64), `personal` ontology with boundaries only (D-61, D-62, D-72), `created_by` as `Name <email>` | `3d36d97` |
 | WP-14 | Done: tag-based versioning, D-39 checks, `--verify-version`, `compile --version`, D-17 resolution, D-70 `SCD_EMPTY`, D-71 `PROVENANCE_PLACEHOLDER` | `2bb34c0` |
+| WP-06 | Built, not committed: author and approver rules (D-13, D-71), D-74 ontology inheritance, `--dry-run` on `new`, `bundle pin`/`add-import`/`add-scd`/`remove-scd`, `add bundle --new` (D-68, D-75, D-76), full rollback | |
 | WP-07 | Next (unblocked by WP-03) | |
 | WP-02a, WP-09, WP-11a, WP-13a | Unblocked, not started | |
 
@@ -58,21 +59,13 @@ Known gaps carried forward:
 - Rule-severity housekeeping item from WP-04 is still open.
 - The generated CI workflow installs `scs-validator>=0.7.0,<0.8` from PyPI; that works once
   0.7.0 is published (D-27, WP-11rc). The packages still report version 0.6.0.
-- `scs new` has `--json` (WP-03) but not `--dry-run` or the machine-mode `--author` rule (WP-06).
 - `scs init` still makes a standalone 0.6-style workspace with `--type`; it is not
   repository-aware.
 - `tools/cli/README.md` and the 0.5 presentation docs still show `scs new project --type`
   (WP-11rc rewrites the README).
-- `scs new` falls back to `$USER` and `$USER@example.com` when no author or email is given;
-  WP-06 removes it (D-71).
 - The exit-2 (`--strict` warnings) machine-mode test fakes the validator report. A placeholder
   `created_by` (`PROVENANCE_PLACEHOLDER`) is now a real warning-only input in bundle and
   repository mode; the test could use it.
-- WP-14 brought parts of WP-06 forward to `bundle version`: `--json`, `--dry-run`, the
-  approver rules (`Name <email>`, never from git), and rollback. WP-06 still owns the four
-  injected-failure rollback tests and `bundle pin`.
-- `scs new project` does not yet inherit the Domain's ontology (D-74, WP-06); the lifecycle
-  tests pass `--ontology personal` explicitly.
 - `scs compile` writes to `dist/`, which is untracked by default and shows in `git status`; the
   generated `.gitignore` leaves the choice to the user.
 - The examples' `created_by` values use `.example` domains and now warn as

@@ -2,7 +2,6 @@
 Add command - add SCDs or bundles to an existing SCS project
 """
 
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -13,7 +12,8 @@ from scs_validator.envelope import Change, relative
 from scs_validator.names import RESERVED_BUNDLE_NAMES, bundle_name
 from scs_validator.workspace import load_workspace
 
-from scs_tools.machine import CommandError, Envelope, Output, machine_command
+from scs_tools import identity, maintain
+from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import get_template_path, render_template, write_file
 from scs_tools.utils.project_types import get_project_type_config
 from scs_tools.workspace import repository_root, select_workspace
@@ -50,11 +50,11 @@ def _common_options(f):
     return f
 
 
-def _variables(base_path: Path, author, email) -> dict:
+def _variables(base_path: Path, author, email, out: Output) -> dict:
     now = datetime.now(timezone.utc).isoformat()
-    author_info = author or os.getenv("USER", "developer")
+    # Never invented (D-13, D-71)
+    author_info, email_info = identity.author(author, email, prompt=not out.machine)
     project_name = _bundle_owner_name(base_path)
-    email_info = email or f"{author_info}@example.com"
     return {
         "project_name": project_name,
         "author": author_info,
@@ -127,7 +127,7 @@ def scd(envelope, out, scd_name, author, email, force, dry_run, workspace):
         out,
         template_path,
         scd_file,
-        _variables(base_path, author, email),
+        _variables(base_path, author, email, out),
         force,
         dry_run,
     )
@@ -139,8 +139,29 @@ def scd(envelope, out, scd_name, author, email, force, dry_run, workspace):
 @add.command()
 @click.argument("bundle_name")
 @_common_options
+@click.option(
+    "--new",
+    "new_concept",
+    is_flag=True,
+    help="Create a concept with no shipped template: its bundle, a first SCD, its ontology "
+    "entry, and the root bundle's import of it",
+)
+@click.option("--title", default=None, help="With --new: the concept's title")
+@click.option("--description", default=None, help="With --new: the concept's description")
 @machine_command("add bundle")
-def bundle(envelope, out, bundle_name, author, email, force, dry_run, workspace):
+def bundle(
+    envelope,
+    out,
+    bundle_name,
+    author,
+    email,
+    force,
+    dry_run,
+    workspace,
+    new_concept,
+    title,
+    description,
+):
     """
     Add a concept bundle to the workspace
 
@@ -157,9 +178,32 @@ def bundle(envelope, out, bundle_name, author, email, force, dry_run, workspace)
         scs add bundle security              # Add the security concept bundle
         scs add bundle data-provenance --author "Jane Doe"  # With provenance
 
+    With --new, the concept need not have a template: the run creates
+    bundles/concepts/NAME.yaml listing a first, empty SCD context/project/NAME.yaml, adds
+    concept:NAME to the ontology manifest, and adds bundle:NAME to the root bundle's imports.
+
+    \b
+        scs add bundle groceries --new --title "Groceries" --author "Jane Doe" --email jane@acme.org
+
     See also: scs bundle list --available
     """
     from scs_tools.utils.project_types import ONTOLOGY_MODELS
+
+    if new_concept:
+        if force:
+            raise CommandError(
+                "USAGE_ERROR", "--new never overwrites; drop --force", exit_code=EXIT_USAGE
+            )
+        ws = maintain.open_workspace(workspace, None)
+        variables = _variables(ws.path, author, email, out)
+        maintain.new_concept(
+            envelope, ws, bundle_name, title, description, variables["created_by"], dry_run
+        )
+        verb = "Would create" if dry_run else "Created"
+        out.echo(f"{verb} concept {bundle_name}:")
+        for change in envelope.changes:
+            out.echo(f"  {change.action} {change.path}")
+        return
 
     if bundle_name in RESERVED_BUNDLE_NAMES:
         raise CommandError(
@@ -189,7 +233,7 @@ def bundle(envelope, out, bundle_name, author, email, force, dry_run, workspace)
             f"Available bundles: {', '.join(p.stem for p in available)}",
         )
 
-    variables = _variables(base_path, author, email)
+    variables = _variables(base_path, author, email, out)
     # Which SCDs a concept bundle lists: the full set (D-64), except in a 0.6 workspace made
     # with `scs init --type`, whose project type still applies
     project_type = _read_project_type(config_file) if ontology == "sdlc" else None

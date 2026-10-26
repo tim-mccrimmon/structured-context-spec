@@ -3,9 +3,9 @@ New command - scaffolds a Domain repository (`scs new domain`) and the Project w
 (`scs new project`) (RFC 0002 section 9)
 """
 
-import os
 import re
 import shutil
+import tempfile
 from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as pkg_version
@@ -15,8 +15,9 @@ from typing import List
 import click
 from scs_validator.envelope import SCS_VERSION, Change, relative
 from scs_validator.names import reserved_bundle_name
+from scs_validator.workspace import CONFIG, read_config
 
-from scs_tools import git
+from scs_tools import git, identity
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import (
     copy_template,
@@ -99,11 +100,11 @@ _WORKSPACE_OPTIONS = [
     click.option(
         "--ontology",
         type=click.Choice(list(ONTOLOGY_MODELS.keys())),
-        default="sdlc",
-        show_default=True,
-        help="Ontology model to scaffold against. Each supplies one template set for a Domain "
-        "and one for a Project; remove what does not apply. personal supplies only "
-        "boundaries (the prohibited concept).",
+        default=None,
+        help="Ontology model to scaffold against (a Domain: default sdlc; a Project: default "
+        "its Domain's). Each supplies one template set for a Domain and one for a Project; "
+        "remove what does not apply. personal supplies only boundaries (the prohibited "
+        "concept).",
     ),
     click.option("--author", default=None, help="Author name for provenance"),
     click.option("--email", default=None, help="Author email for provenance"),
@@ -113,6 +114,7 @@ _WORKSPACE_OPTIONS = [
         is_flag=True,
         help="Disable interactive mode (use defaults/flags only)",
     ),
+    click.option("--dry-run", is_flag=True, help="Report what would be created; write nothing"),
 ]
 
 
@@ -135,6 +137,7 @@ def domain(
     email,
     interactive,
     no_interactive,
+    dry_run,
     directory,
 ):
     """
@@ -154,18 +157,34 @@ def domain(
         scs new domain acme-health                 # Interactive mode (default)
         scs new domain acme-funding --ontology mca
         scs new domain jdoe --ontology personal
-        scs new domain acme --author "Jane Doe" --email "jane@example.com" --no-interactive
+        scs new domain acme --author "Jane Doe" --email "jane@acme-health.org" --no-interactive
 
     See also: scs new project
     """
     name, author, email = _ask("domain", out, name, author, email, interactive, no_interactive)
     _check_name(name, "domain")
+    ontology = ontology or "sdlc"
     parent = Path(directory) if directory else Path.cwd()
     repo = parent / f"{name}-context"
     if repo.exists():
         raise CommandError("WORKSPACE_EXISTS", f"'{repo}' already exists")
     if not git.available():
         raise CommandError("GIT_REQUIRED", "scs new domain needs git, and git was not found")
+    envelope.result = {"repository": str(repo), "workspace": "domain", "bundle": f"bundle:{name}"}
+    if dry_run:
+        with tempfile.TemporaryDirectory(prefix="scs-new-") as tmp:
+            target = Path(tmp) / repo.name
+            _scaffold(
+                Output(True), target, target / "domain", "domain", name, ontology, author, email
+            )
+            _create_repository_files(target, name)
+            shown = [relative(p, target) for p in _files(target)]
+        envelope.changes.extend(Change("create", path=p) for p in shown)
+        envelope.changes.append(Change("git-init", ref="main"))
+        paths = [{"path": p, "status": "A"} for p in sorted(shown)]
+        envelope.changes.append(Change("git-commit", ref="HEAD", paths=paths))
+        out.echo(f"Would create Domain repository {repo} ({len(shown)} files) and commit it")
+        return
 
     out.echo(f"Creating SCS Domain repository: {repo.name}")
     out.echo(f"Location: {repo}\n")
@@ -197,7 +216,6 @@ def domain(
     envelope.changes.extend(Change("create", path=relative(p, repo)) for p in written)
     envelope.changes.append(Change("git-init", ref="main"))
     envelope.changes.append(Change("git-commit", ref="HEAD", paths=committed))
-    envelope.result = {"repository": str(repo), "workspace": "domain", "bundle": f"bundle:{name}"}
 
     out.echo(f"\n✓ Domain repository '{repo.name}' created, with an initial commit.")
     out.echo("\nNext steps:")
@@ -228,6 +246,7 @@ def project(
     email,
     interactive,
     no_interactive,
+    dry_run,
     directory,
 ):
     """
@@ -241,15 +260,15 @@ def project(
     By default, prompts for missing required information interactively.
     Use --no-interactive to disable prompts and require all flags.
 
-    Ontology models: sdlc (default), mca, cdmo, personal. The scaffold supplies the
-    ontology's Project templates; remove what does not apply.
+    Ontology models: sdlc, mca, cdmo, personal; by default, the Domain's. The scaffold
+    supplies the ontology's Project templates; remove what does not apply.
 
     \b
     Examples:
         scs new project                           # Interactive mode (default)
         scs new project medication-adherence      # Interactive for missing fields
         scs new project my-funder --ontology mca  # Merchant Cash Advance ontology
-        scs new project my-app --author "Jane Doe" --email "jane@example.com" --no-interactive
+        scs new project my-app --author "Jane Doe" --email "jane@acme-health.org" --no-interactive
 
     See also: scs new domain, scs init (for adding SCS to existing projects)
     """
@@ -263,10 +282,21 @@ def project(
         )
     name, author, email = _ask("project", out, name, author, email, interactive, no_interactive)
     _check_name(name, "project")
+    ontology = ontology or _domain_ontology(repo)
     workspace = repo / "projects" / name
     if workspace.exists():
         shown = relative(workspace, repo)
         raise CommandError("WORKSPACE_EXISTS", f"'{shown}' already exists", path=shown)
+    envelope.result = {"repository": str(repo), "workspace": name, "bundle": f"bundle:{name}"}
+    if dry_run:
+        with tempfile.TemporaryDirectory(prefix="scs-new-") as tmp:
+            target = Path(tmp) / repo.name
+            staged = target / "projects" / name
+            _scaffold(Output(True), target, staged, "project", name, ontology, author, email)
+            files = [relative(p, target) for p in _files(staged)]
+        envelope.changes.extend(Change("create", path=p) for p in files)
+        out.echo(f"Would create Project {relative(workspace, repo)} ({len(files)} files)")
+        return
 
     out.echo(f"Creating SCS project: {name}")
     out.echo(f"Location: {workspace}\n")
@@ -277,7 +307,6 @@ def project(
         raise
 
     envelope.changes.extend(Change("create", path=relative(p, repo)) for p in _files(workspace))
-    envelope.result = {"repository": str(repo), "workspace": name, "bundle": f"bundle:{name}"}
 
     out.echo(f"\n✓ Project '{name}' created in {relative(workspace, repo)}.")
     out.echo("\nNext steps:")
@@ -287,6 +316,16 @@ def project(
     )
     out.echo("  scs-validate --strict           # at the repository root")
     out.echo(f"  scs compile {relative(workspace, repo)}/bundles/project-bundle.yaml --allow-draft")
+
+
+def _domain_ontology(repo: Path) -> str:
+    """The Domain workspace's ontology, which a new Project inherits (D-74); sdlc if unset."""
+    try:
+        config = read_config(repo / "domain" / CONFIG)
+    except ValueError:
+        config = {}
+    value = config.get("ontology") or config.get("ontology_model")
+    return value if value in ONTOLOGY_MODELS else "sdlc"
 
 
 def _check_name(name: str, kind: str) -> None:
@@ -324,32 +363,21 @@ def _check_name(name: str, kind: str) -> None:
 
 
 def _ask(kind, out, name, author, email, interactive, no_interactive):
-    """Fill in missing values: by prompting in interactive human mode, else from defaults.
-    Machine mode never prompts."""
+    """Fill in missing values by prompting in interactive human mode; otherwise they are
+    required (NO_INPUT). Machine mode never prompts."""
     label = kind.capitalize()
     should_prompt = (not no_interactive or interactive) and not out.machine
     if should_prompt:
         if not name:
             click.echo(f"=== SCS {label} Setup ===\n")
             name = click.prompt(f"{label} name", type=str)
-
-        if not author:
-            author = click.prompt("Author name", default=os.getenv("USER", ""), show_default=True)
-        if not email:
-            email = click.prompt(
-                "Author email",
-                default=f"{author}@example.com" if author else "",
-                show_default=True,
-            )
+    elif not name:
+        message = f"{label} name is required in non-interactive mode"
+        raise CommandError("NO_INPUT", message, exit_code=EXIT_USAGE)
+    # Never invented: prompted with git's values as defaults, else required (D-13, D-71)
+    author, email = identity.author(author, email, prompt=should_prompt)
+    if should_prompt:
         click.echo()
-    else:
-        if not name:
-            message = f"{label} name is required in non-interactive mode"
-            raise CommandError("NO_INPUT", message, exit_code=EXIT_USAGE)
-        if not author:
-            author = os.getenv("USER", "developer")
-        if not email:
-            email = f"{author}@example.com"
     return name, author, email
 
 

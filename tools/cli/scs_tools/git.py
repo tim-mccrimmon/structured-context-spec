@@ -147,6 +147,12 @@ def move_head(repo: Path, commit: str, old: Optional[str], reason: str) -> None:
     run(repo, "update-ref", "-m", reason, "HEAD", commit, old or "")
 
 
+def index_file(repo: Path) -> Path:
+    """The repository's index file."""
+    path = Path(run(repo, "rev-parse", "--git-path", "index").strip())
+    return path if path.is_absolute() else repo / path
+
+
 def sync_index(repo: Path, pathspec: Sequence[str]) -> None:
     """Make the real index match HEAD under `pathspec`."""
     run(repo, "reset", "-q", "--", *pathspec)
