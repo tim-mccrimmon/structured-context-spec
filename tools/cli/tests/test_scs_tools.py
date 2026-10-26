@@ -207,6 +207,27 @@ def test_versioned_snapshot_carries_the_version_and_approval(tmp_path: Path, mon
     assert "version_approved_by" not in original["provenance"]
 
 
+@pytest.mark.parametrize(
+    "extra, passed, status", [((), True, "validated"), (("--no-validate",), False, "approved")]
+)
+def test_versioning_records_what_validation_actually_did(
+    tmp_path: Path, monkeypatch, extra, passed, status
+):
+    """ISS-045: `validation_passed` and `approval_status` record the run, not a default."""
+    project = scaffold(tmp_path, "healthcare")
+    assert _version_security_bundle(project, monkeypatch, *extra).exit_code == 0
+    prov = yaml.safe_load((project / "bundles/concepts/security-v0.1.0.yaml").read_text())[
+        "provenance"
+    ]
+    assert prov["validation_passed"] is passed
+    assert prov["approval_status"] == status
+    manifest = yaml.safe_load(
+        (project / "bundles/concepts/security-v0.1.0-MANIFEST.yaml").read_text()
+    )
+    assert manifest["status"] == status
+    assert ("validation" in manifest) is passed
+
+
 def test_versioned_snapshot_validates(tmp_path: Path, monkeypatch):
     project = scaffold(tmp_path, "healthcare")
     assert _version_security_bundle(project, monkeypatch).exit_code == 0

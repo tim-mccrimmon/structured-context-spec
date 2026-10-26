@@ -140,3 +140,12 @@ def test_packaged_meta_bundle_validates():
         validate, ["--bundle", str(PACKAGED_META / "bundles" / "meta-bundle.yaml"), "--no-color"]
     )
     assert result.exit_code == 0, result.output
+
+
+def test_scs_validate_version_matches_the_package_version():
+    """`scs-validate --version` must not drift from the package metadata (ISS-042)."""
+    from importlib.metadata import version as pkg_version
+
+    result = CliRunner().invoke(validate, ["--version"])
+    assert result.exit_code == 0, result.output
+    assert result.output.strip() == f"scs-validate, version {pkg_version('scs-validator')}"

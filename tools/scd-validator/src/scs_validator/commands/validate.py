@@ -21,6 +21,7 @@ from ..utils import SCHEMA_DIR_ENV_VAR, ValidationError, ValidationResult, resol
 
 
 @click.command()
+@click.version_option(version=__version__, prog_name="scs-validate")
 @click.argument("files", nargs=-1, type=click.Path(exists=True), required=False)
 @click.option(
     "--bundle",

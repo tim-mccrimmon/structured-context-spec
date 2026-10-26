@@ -1,0 +1,9 @@
+{
+  "id": "bundle:first",
+  "type": "concept",
+  "version": "1.0.0",
+  "title": "First",
+  "description": "Listed out of id order on purpose",
+  "imports": [],
+  "scds": ["scd:project:gamma", "scd:project:alpha"]
+}

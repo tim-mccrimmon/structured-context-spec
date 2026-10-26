@@ -1,0 +1,9 @@
+{
+  "id": "bundle:second",
+  "type": "concept",
+  "version": "1.0.0",
+  "title": "Second",
+  "description": "Second",
+  "imports": [],
+  "scds": ["scd:project:beta"]
+}

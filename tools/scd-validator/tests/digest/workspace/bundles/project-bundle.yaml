@@ -1,0 +1,8 @@
+id: bundle:proj
+type: project
+version: "1.0.0"
+title: Proj
+description: Two pinned imports, listed out of order on purpose
+imports:
+  - bundle:second:1.0.0
+  - bundle:first:1.0.0
