@@ -82,7 +82,7 @@ nearest `.scs/config` above the current directory. At the repository root withou
 | Command | `--dry-run` | Notes |
 |---|---|---|
 | `scs --version` | n/a | `--json` returns `scs_version`, `tools_version` (D-45) |
-| `scs new domain NAME [--profile personal]` | yes | Creates `NAME-context/`; machine mode requires `--author` (D-13) |
+| `scs new domain NAME [--ontology sdlc\|cdmo\|mca\|personal]` | yes | Creates `NAME-context/`; machine mode requires `--author` (D-13) |
 | `scs new project NAME` | yes | Inside a Domain repo only (`DOMAIN_WORKSPACE_MISSING`) |
 | `scs add scd\|bundle` | yes | Overwrite requires `--force`; no prompt; reserved bundle names refused (D-33) |
 | `scs scd write PATH --from-file -` | yes | D-08 option 1: SCD content from stdin; validated before writing |
@@ -135,9 +135,12 @@ Registry: `schema/diagnostics/codes.yaml`, merged from per-WP fragments in
 | `VERSION_TAG_MISSING` | error | A manifest with `content_digest` has no qualified tag (D-39) |
 | `GIT_HISTORY_INCOMPLETE` | error | Repository mode on a shallow clone (D-39) |
 | `VERSION_INPUT_UNTRACKED` | error | A digest or compiler input is ignored or untracked at versioning (D-40) |
-| `GIT_REQUIRED` | error | D-38 |
+| `GIT_REQUIRED` | error | D-38; also `new domain` without git (WP-03) |
+| `GIT_COMMAND_FAILED` | error | A git command the engine ran failed; the run's writes are removed (WP-03) |
 | `WORKSPACE_REQUIRED` | error | D-42 |
 | `DOMAIN_WORKSPACE_MISSING` | error | `new project` outside a Domain repo |
+| `WORKSPACE_EXISTS` | error | `new domain` or `new project` target exists (WP-03) |
+| `WORKSPACE_NAME_INVALID` | error | A name that cannot be a directory, bundle id, and tag prefix; a concept bundle's name; a Project named `domain` (WP-03) |
 | `CONFIG_NAME_MISMATCH` | error | D-03 |
 | `DUPLICATE_ID` | error | Two documents with one id in a workspace |
 | `RESERVED_BUNDLE_NAME` | error | D-33 |

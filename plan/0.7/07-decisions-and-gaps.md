@@ -88,7 +88,7 @@ copies must match them. Section 5 states the model in full.
 |---|---|---|---|---|
 | D-21 | Meta bundle version for 0.7 | Keep `bundle:meta:0.6.0` unless meta content changes. | WP-03 || **Decided** 2026-10-25: as recommended. |
 | D-22 | Spec home for agent-interface rules | New `spec/0.7/agent-interface.md`; layout in `bundle-format.md`. | WP-02a || **Decided** 2026-10-25: as recommended. |
-| D-23 | Personal profile and ontologies | Personal ignores ontology unless one is given; `ontology: none` supported. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-23 | Personal profile and ontologies | Personal ignores ontology unless one is given; `ontology: none` supported. | WP-03 || **Decided** 2026-10-25: as recommended. **Superseded** 2026-10-26 by D-61 and D-62: Personal is an ontology; no `--profile personal`, no `ontology: none`. |
 | D-24 | Placement guide | `docs/placement/<service>.md` with `checked:` dates and sources, for Claude Enterprise, Claude Code, Cursor, GitHub Copilot, ChatGPT Enterprise. Skills ship a copy and state its `checked:` date when advising. | WP-09 || **Decided** 2026-10-25: as recommended. |
 | D-25 | UQ1: where skills live | `skills/` in this repo, versioned with the spec. | WP-10 || **Decided** 2026-10-25: as recommended. |
 | D-26 | UQ2: legacy plugins | Deprecated in 0.7, removed in 0.8. | WP-10 || **Decided** 2026-10-25: as recommended. |
@@ -109,6 +109,30 @@ copies must match them. Section 5 states the model in full.
 - RFC links point at `spec/0.6/` (WP-02a).
 - `scs-validator` URL in its pyproject differs from the repo (WP-11rc).
 
+## G. Ontologies, templates, and provenance (2026-10-26)
+
+Decided by the maintainer in a design conversation on 2026-10-26, while WP-03 was being built.
+The goal is to simplify: fewer scaffold modes and flags, with the agent and the user deciding
+what a workspace needs instead of the scaffold guessing. D-68 to D-73 are the open items those
+decisions depend on.
+
+| ID | Question | Rec. | Blocks | Decision |
+|---|---|---|---|---|
+| D-60 | What does "Domain" name? | The global tier only: the Domain workspace, bundle, and repository. `sdlc`, `cdmo`, `mca`, and `personal` are ontologies. | none | **Decided** 2026-10-26: as recommended. The ontology manifest keeps its 0.6 naming in 0.7 (D-73). |
+| D-61 | Is "personal" a profile or an ontology? | An ontology, alongside `sdlc`, `cdmo`, and `mca`, with more added as needed. `--profile personal` and `ontology: none` are removed. Supersedes D-23. RFC (§4, §9, Implementation Notes, Migration Guide). | WP-03, WP-07 | **Decided** 2026-10-26: as recommended. |
+| D-62 | What does the personal ontology contain? | One fixed concept, boundaries (the `prohibited` concept bundle). Every other concept is personal, so it is defined with the user in conversation, not shipped. Personal means one person. RFC (§4, §9). | WP-03, WP-07, WP-10 | **Decided** 2026-10-26: as recommended. |
+| D-63 | What is identity? | Provenance only: a person identifier, `Name <email>`, used in provenance fields. Not a concept, not an SCD, not compiled. The same in all of a person's Domains. The intake `owner` field narrows to this. RFC (§4, §5). | WP-03, WP-07 | **Decided** 2026-10-26: as recommended. |
+| D-64 | What selects the scaffold's templates? | The ontology and the workspace kind (Domain or Project), nothing else. The `--type` variants (`healthcare`, `fintech`, `saas`, `government`, `minimal`, `standard`) are removed. Each ontology ships one Domain set and one Project set; the agent and the user remove what does not apply, through engine commands. The Domain/Project split stays. RFC (§9, Implementation Notes). | WP-03, WP-06, WP-10 | **Decided** 2026-10-26: as recommended. |
+| D-65 | A person's Domains share nothing; is duplication between them a problem? | No. Each Domain stays self-contained and rebuildable from its own tags. A hierarchy across Domains comes from where the user places the artifacts (the client loads them in layers), and `scs stack` checks such a stack (D-67). | none | **Decided** 2026-10-26: as recommended. |
+| D-66 | When does provenance have to be right? | At validation and versioning, which are the only times it is read. The scaffold need not be final; inconsistencies are corrected then, by the tool with the user. A value that was never true (a placeholder) is corrected; a true value is never overwritten (`created_by` is not the approver). RFC (§5). | WP-06, WP-14 | **Decided** 2026-10-26: as recommended. |
+| D-67 | How does a user test layered context? | `scs stack ARTIFACT...`: a read-only preview of an ordered stack of compiled artifacts, with exact checks in the engine and a `layer-conflict` kind in the advisory review. Whether a client loads the layers is the client's behaviour, described in the placement guide. RFC (§1, §12, §13). | new WP (none assigned) | **Decided** 2026-10-26: RFC 0002 §13. |
+| D-68 | How is a concept with no shipped template created? | Needed for D-62. An engine command that creates a concept bundle, its first SCD, and the ontology manifest entry, with `--dry-run`, for example `scs add bundle NAME --new`. | WP-06, WP-10 | |
+| D-69 | What does removing an SCD clean up? | Needed for D-64. When `scs bundle remove-scd` leaves a concept bundle with no SCDs, the same run removes the concept bundle, the root bundle's import of it, and its ontology manifest entry, all listed in `changes`. | WP-06 | |
+| D-70 | How are unused (empty) SCDs made visible? | Needed for D-64. Today `scs-validate --strict` passes a scaffold of empty SCDs, and only `scs compile` warns. A warning would make every fresh scaffold fail `--strict`, which WP-03's acceptance requires to pass. Rec.: an `info` diagnostic in validation, and `bundle version` lists empty SCDs in its dry run so they are removed or kept knowingly. The validator check is a check module (WP-04's registry). | WP-14 | |
+| D-71 | What flags provenance to correct (D-66)? | The validator warns on a `created_by` that is not a person identifier (`Name <email>`); the scaffold stops writing placeholders (`$USER@example.com`) in every mode (D-13 already forbids inference in machine mode). | WP-03, WP-06, WP-14 | |
+| D-72 | What does a Project under the personal ontology get? | The same fixed concept as a personal Domain, boundaries (Project-specific prohibitions), and nothing else; other concepts are defined with the user. | WP-03 | |
+| D-73 | The ontology manifest still says "domain" (`domain-manifest.yaml`, the `domain:` key, `scs validate --domain`, RFC 0001's "Domain Ontology"). | Keep for 0.7; a rename is a schema change for a later RFC. | none | |
+
 ## RFC amendments implied
 
 Applied to RFC 0002 on 2026-10-25 as one amendment covering WP-01a and WP-01b: §1 (D-08), §3
@@ -117,3 +141,7 @@ D-04, D-05, D-15, D-38, D-40, D-52, D-55, D-57, D-58, D-59), §11 (D-16, D-39, D
 Schema Changes (D-28, D-36, D-47, D-49), Validation Rules (D-03, D-20, D-36, D-39, D-54),
 Unresolved Questions (D-01, D-25, D-26, D-27, D-28, D-29, D-30, D-31), Implementation Notes,
 and Migration Guide (D-04, D-54). §2 is unchanged (D-08 option 2 was not chosen).
+
+Applied to RFC 0002 on 2026-10-26: §1, §12, §13, Validation Rules, Implementation Notes (D-67);
+Motivation, Guide-level Explanation, §4, §5, §9, Implementation Notes, Migration Guide, and
+Unresolved Questions (D-61 to D-64, D-66, D-68 to D-73).

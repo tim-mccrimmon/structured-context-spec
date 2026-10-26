@@ -150,10 +150,12 @@ listed in order, and each starts after the previous one merges.
 
 ### WP-03 Domain repositories (ISS-048)
 - **Sections**: 3, 5. **Depends**: WP-04, WP-01a (D-01, D-03 to D-06, D-33, D-59), WP-01b (D-21,
-  D-23, D-31).
+  D-31), section 7 G (D-60 to D-64, D-71, D-72). D-23 is superseded by D-61 and D-62.
 - `scs new domain NAME` creates `NAME-context/` with `domain/`, `projects/`, `AGENTS.md` +
-  `CLAUDE.md` pointer, CI workflow, git init; `--profile personal`; `scs new project` under
-  `projects/`; ontology manifest at `ontology/`; `.scs/config` keys; `.gitignore` ignoring
+  `CLAUDE.md` pointer, CI workflow, git init; `scs new project` under `projects/`; templates chosen
+  by ontology and workspace kind only (D-64): `--type` removed, the `personal` ontology added with
+  boundaries as its only concept (D-61, D-62, D-72), no `--profile`, no `ontology: none`;
+  `created_by` is `Name <email>` (placeholder provenance waits on D-71); ontology manifest at `ontology/`; `.scs/config` keys; `.gitignore` ignoring
   `sources/` (D-59) and leaving `dist/` to the user (version commits exclude `dist/` by pathspec);
   `.gitattributes` with `* text eol=lf`; an initial commit with the D-55 identity. The CI workflow
   checks out full history and tags (`fetch-depth: 0`).
@@ -166,7 +168,9 @@ listed in order, and each starts after the previous one merges.
   - No `plan/`, `test-plan/`, `qa/` is created; `scs new domain plan` and a project named `qa`
     give `RESERVED_BUNDLE_NAME`.
   - `scs new project` outside a Domain repo gives `DOMAIN_WORKSPACE_MISSING`.
-  - Personal and organization profiles each have a scaffold test.
+  - Each ontology (`sdlc`, `cdmo`, `mca`, `personal`) has a Domain and a Project scaffold test; a
+    `personal` workspace has only the `prohibited` concept bundle. `--type` and `--profile` are
+    gone (usage error).
   - The new repo has one commit (author and committer `scs-tools <noreply@scs.invalid>`), and
     `sources/` is ignored.
 
@@ -211,7 +215,7 @@ listed in order, and each starts after the previous one merges.
 
 ### WP-14 Lifecycle integrity
 - **Sections**: 5. **Depends**: WP-05, WP-01a (D-01 to D-03, D-14 to D-19, D-38 to D-40, D-43,
-  D-49, D-52 to D-58).
+  D-49, D-52 to D-58), section 7 G (D-66, D-70, D-71).
 - Implement the integrity model in section 5: the D-39 checks as validator check modules
   (reading tagged content and manifests from git), `--verify-version`; resolver selection (D-17);
   compiler verification for DRAFT roots and no `source_digest` without a verified digest (D-16,
@@ -259,7 +263,8 @@ listed in order, and each starts after the previous one merges.
     repository-mode validation under `--strict` (D-54).
 
 ### WP-06 Machine mode for `new` and `bundle version` (ISS-049, part 2; ISS-047 remainder)
-- **Sections**: 4, 5. **Depends**: WP-03, WP-05, WP-14, WP-01a (D-01, D-08, D-13).
+- **Sections**: 4, 5. **Depends**: WP-03, WP-05, WP-14, WP-01a (D-01, D-08, D-13), section 7 G
+  (D-64, D-66, D-68, D-69, D-71).
 - `--json`/`--dry-run` on `new` and `bundle version`; `bundle pin` and (D-08 option 1)
   `add-scd`, `remove-scd`, `add-import`; approver and author rules; rollback on failure.
 - **Accept**:
@@ -273,7 +278,8 @@ listed in order, and each starts after the previous one merges.
     index, and refs as they were (four tests); `changes` is empty.
 
 ### WP-07 Intake, `derived_from`, review findings (ISS-050)
-- **Sections**: 3. **Depends**: WP-03, WP-05, WP-01a (D-07, D-20, D-28, D-29, D-30, D-34, D-35).
+- **Sections**: 3. **Depends**: WP-03, WP-05, WP-01a (D-07, D-20, D-28, D-29, D-30, D-34, D-35),
+  section 7 G (D-61 to D-63).
 - `schema/intake/intake-schema.json` for all profiles; `scs intake set` and
   `scs intake record-finding`; `derived_from` added as a property in SCD item schemas (items stay
   closed); resolution as a validator check module; timestamps normalized before schema
@@ -307,7 +313,7 @@ listed in order, and each starts after the previous one merges.
 
 ### WP-10 Agent Skills (ISS-051)
 - **Sections**: 2, 4. **Depends**: WP-02b, WP-06, WP-08, WP-09, WP-11a, M-07, WP-01a (D-08, D-19,
-  D-30, D-44, D-45, D-56), WP-01b (D-25, D-26, D-51).
+  D-30, D-44, D-45, D-56), WP-01b (D-25, D-26, D-51), section 7 G (D-62, D-64, D-68).
 - Seven skills in the open Agent Skills format, under `skills/`; reuse the conversational content
   listed in `survey/spec-and-agent-interface.md`; legacy plugins marked deprecated.
 - **Accept**: `skills-ref validate` passes on every skill. Scripted conversations per D-51, in a

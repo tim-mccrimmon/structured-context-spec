@@ -10,7 +10,13 @@
   commands for maintenance, git effects in the envelope, intake writers, layout corrections,
   whole-workspace version commits, the tag as the record of a version, and resolved questions
   (sections 1, 3, 4, 6, 7, 9, 11, Schema Changes, Validation Rules, Unresolved Questions,
-  Migration Guide)
+  Migration Guide). 2026-10-26: layered context: `scs stack` previews and checks an ordered
+  stack of compiled artifacts, and the advisory review covers conflicts between layers
+  (sections 1, 12, 13, Validation Rules, Implementation Notes). 2026-10-26: ontologies,
+  templates, and identity (`plan/0.7/07-decisions-and-gaps.md` D-60 to D-73): `personal` is an
+  ontology, identity is provenance only, templates are chosen by ontology and workspace kind,
+  provenance is corrected at validation and versioning (Motivation, Guide-level Explanation,
+  sections 4, 5, 9, Implementation Notes, Migration Guide, Unresolved Questions)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---
@@ -116,8 +122,8 @@ independence is right for compilation, but nothing ties a Project to its Domain,
 Project without one is possible, which leaves an individual developer's projects with no
 common rules at all. A Domain is the capacity someone works in, not the person: the same
 developer works under a personal Domain on their own projects and under their company's
-Domain on company work. For a single developer, the personal Domain may hold only their name,
-the fact that the work is personal, and a few rules they want everywhere.
+Domain on company work. For a single developer, the personal Domain may hold only a few rules
+they want everywhere.
 
 **Domain and Project context are placed differently.** The reason to keep Domain and Project
 context apart at all is that AI services read them from different places. Claude Enterprise,
@@ -158,9 +164,9 @@ A solo developer:
 >
 > **User:** No.
 >
-> **Agent:** Then I'll set one up first, in a new repo, `jdoe-context`: your name, the fact
-> that this is personal work, and any rules you want on every project. Anything you never
-> want an AI tool to do, on any of your work?
+> **Agent:** Then I'll set one up first, in a new repo, `jdoe-context`, with the personal
+> ontology: the rules you want on every project. Anything you never want an AI tool to do, on
+> any of your work?
 >
 > **User:** Never commit secrets or API keys.
 >
@@ -270,7 +276,9 @@ recorded, so the record shows the question was raised and who answered it.
 
 SCS covers one person working in one Domain repository at a time: creating, maintaining,
 validating, versioning, and compiling bundles. It stops at the versioned bundle and its
-compiled artifact. Placing artifacts, review by several people, approval workflows, shared
+compiled artifact. It can also show what several compiled artifacts look like together, the
+way an AI client loads them in layers, and point out where they conflict; it reads those
+artifacts and changes nothing. Placing artifacts, review by several people, approval workflows, shared
 registries, hosting, and runtime serving of context are outside SCS. If a user asks for
 those, the agent says they are outside what SCS does.
 
@@ -289,7 +297,7 @@ The agent interface MUST be limited to these operations on a local Domain reposi
 | Maintain | Add, edit, retire, and re-scope SCDs; add concept bundles; explain existing context in plain language. Each write is an engine command: `scs scd write` (content on stdin), `scs bundle add-scd`, `remove-scd`, `add-import`, `pin`. Retiring an SCD is removing it from its bundle. |
 | Validate | Run the validator; explain results; propose fixes |
 | Version | Pin imports; version bundles; record approver and notes |
-| Compile | Produce the runtime artifact defined in [runtime-artifact.md](../spec/0.6/runtime-artifact.md) |
+| Compile | Produce the runtime artifact defined in [runtime-artifact.md](../spec/0.6/runtime-artifact.md); preview and check a stack of compiled artifacts (section 13) |
 
 SCS's output ends at a validated, versioned bundle and its compiled artifact. Placing
 artifacts where AI services read them (section 10), multi-user review, approval workflows,
@@ -398,18 +406,21 @@ be built before any Project workspace in it.
 | `domain` | The existing Domain repository to work in, or `new` |
 | `workspace` | `domain`, or the name of a Project (new or existing) |
 | `regulated` | yes/no; if yes, which frameworks |
-| `ontology` | `sdlc`, `cdmo`, `mca`, or none (proposed from the above, confirmed by the user) |
+| `ontology` | `sdlc`, `cdmo`, `mca`, or `personal` (proposed from the above, confirmed by the user) |
 
-**Personal Domain profile** (`audience: individual`, `workspace: domain`)
+**Personal Domain profile** (`audience: individual`, `workspace: domain`, usually with the
+`personal` ontology)
 
 | Field | Purpose |
 |---|---|
-| `owner` | The developer's name and contact, and the capacity the Domain covers (for example, personal use only) |
+| `owner` | The developer's person identifier, `Name <email>`. Provenance only (section 5): it attributes the workspace's records and is never compiled |
 | `boundaries` | What no AI tool should do on any of their work; the source of personal prohibitions |
 | `practices` | Habits they want applied everywhere (languages, testing, commit style) |
 
-A personal Domain is deliberately small. It MAY consist of only the owner fact and a few
-prohibitions.
+A personal Domain is deliberately small. It MAY consist of only a few prohibitions. The
+`personal` ontology has one fixed concept, boundaries; everything else in a person's context is
+particular to them, so the agent defines those concepts with the user rather than starting from
+templates (section 9).
 
 **Organization profile** (`audience: organization`, or `regulated: yes`)
 
@@ -505,6 +516,16 @@ content:
         - source: doc-qm
           locator: "section 4.2.5"
 ```
+
+**Identity.** A person's identity in SCS is provenance only: a person identifier,
+`Name <email>`, in provenance fields (`provenance.created_by`, `approval.approved_by`, and the
+intake record). It is not a concept or an SCD, and it is never compiled.
+
+**When provenance must be right.** Provenance is read at validation and versioning, so that is
+where it MUST be correct. A scaffold or draft need not be final; the tools report provenance that
+is not a person identifier, and the agent corrects it with the user before a version is made. A
+value that was never true, such as a placeholder, is corrected; a true value is never replaced
+(the person who created an SCD is not necessarily the person who approves a version).
 
 The name `derived_from` avoids colliding with the existing SCD-level `provenance` object
 (`created_by`, `created_at`, `rationale`), which records who created the SCD. `derived_from`
@@ -620,6 +641,14 @@ A workspace's name is `domain` for the Domain workspace and the directory name u
 moves from `domain/domain-manifest.yaml` to `ontology/domain-manifest.yaml`, since a Domain
 workspace already lives in `domain/`; the 0.6 location is still read, with an info diagnostic.
 `scs new domain` initializes git and makes an initial commit.
+
+**Templates.** The scaffold chooses concept bundles and SCD templates by two things only: the
+ontology (`sdlc`, `cdmo`, `mca`, `personal`, and others added later) and the workspace kind
+(Domain or Project). Each ontology provides one set for a Domain workspace and one for a Project
+workspace; there are no further variants by user type. The scaffold cannot know which of them a
+user needs, so it supplies the set and the agent removes, with the user, what does not apply,
+through engine commands (section 1). The `personal` ontology supplies only its fixed concept,
+boundaries; the agent creates the user's other concepts with the user.
 
 **Source documents.** The scaffold's `.gitignore` ignores `sources/`, so source documents stay
 local (section 8) unless the user chooses to track them. `derived_from` still names the
@@ -781,6 +810,7 @@ categories:
 | `missing-protection` | No prohibition or directive covering something the intake says is present (PHI, payment data, safety-class C software) |
 | `technical-risk` | A rule that weakens security, auditability, or traceability (disabling logging, sharing credentials) |
 | `ethical-risk` | A rule that could cause harm, deception, or unfair treatment of people |
+| `layer-conflict` | A rule that contradicts a rule in another layer of the stack the user loads it with (section 13) |
 
 Rules for findings:
 
@@ -798,6 +828,57 @@ Rules for findings:
 In this RFC the review is driven by the agent's own judgment, guided by the skills. RFC 0003
 proposes *review profiles*: declarative, citable checks per framework (for example CHAI, HIPAA,
 ISO 13485) that make the review consistent across clients and auditable in its own right.
+
+### 13. Layered context
+
+Domain and Project bundles are independent: neither imports the other, and each compiles to
+its own artifact (section 9). AI clients, however, often load several artifacts at once, in
+layers. A developer with several Domains might place one artifact where every session reads it,
+an area's Domain artifact where sessions in that area read it, and a Project artifact in the
+project's repository; the client loads all three, outermost first. Each artifact validates on
+its own, but nothing in SCS so far shows what a session receives when they are combined, or
+whether they disagree.
+
+A **stack** is an ordered list of compiled artifacts, outermost layer first. SCS does not know
+where artifacts are placed (section 10), so the user or the agent supplies the stack.
+
+`scs stack ARTIFACT...` reads the artifacts in the order given and reports:
+
+- each layer: its bundle `id`, `type`, `version`, and `source_digest` when present;
+- the combined context: every rule and fact of every layer, in stack order, each with its
+  identifier and the layer it came from;
+- the findings of the checks below, as diagnostics.
+
+The command:
+
+- MUST only read. It MUST NOT write, compile, or place anything, and it MAY read artifacts from
+  any path, since the layers of a stack usually come from different Domain repositories.
+- MUST accept only runtime artifacts as defined in
+  [runtime-artifact.md](../spec/0.6/runtime-artifact.md); any other input is an error
+  (`STACK_ARTIFACT_INVALID`).
+- MUST NOT merge, reorder, or drop rules. SCS defines no precedence between layers: a rule in an
+  inner layer does not override one in an outer layer. How a client weighs layers is the
+  client's behaviour, outside SCS.
+- MUST support machine mode (section 3). Its `changes` is always empty.
+
+The engine checks a stack for what can be decided exactly:
+
+| Code | Severity | Condition |
+|---|---|---|
+| `STACK_BUNDLE_REPEATED` | error | The same bundle `id` appears in two layers, for example two versions of one bundle |
+| `STACK_PROHIBITION_DIRECTED` | warning | A directive in one layer contains, ignoring case, the `subject` of a prohibition in another layer (taken from the rule text `Prohibited: <subject>.`, runtime-artifact §2.3) |
+| `STACK_RULE_DUPLICATE` | info | Two layers carry a rule or fact with identical text, for example the meta bundle's rules in two Domain artifacts |
+| `STACK_LAYER_DRAFT` | info | A layer is a DRAFT artifact (`version` of the form `DRAFT+<digest>`) |
+
+`STACK_PROHIBITION_DIRECTED` is a textual match: it finds candidates and can miss
+contradictions phrased differently. Whether two rules actually contradict is a judgment, which
+the agent makes in the advisory review (section 12) under the kind `layer-conflict`, with the
+same rules as any other finding. The user's decision is recorded in the `intake.yaml` of the
+workspace the user is working in.
+
+Whether a client actually loads the layers of a stack, and in what order, is the client's
+behaviour. SCS does not test it; the placement guide (section 10) SHOULD describe how each
+service loads layered context.
 
 ### Schema Changes
 
@@ -860,6 +941,8 @@ tools create and check, not a schema.
 - The validator MUST NOT report a workspace's reserved directories (`plan/`, `test-plan/`,
   `qa/`) as errors or warnings in any mode, and MUST NOT validate their content.
 - A bundle named `plan`, `test-plan`, or `qa` is an error.
+- `scs stack` MUST report the checks of section 13 with the codes and severities given there.
+  Under `--strict`, its warnings give exit code 2.
 
 ---
 
@@ -974,6 +1057,21 @@ produced that way will vary in quality, and the variation will reflect on the st
    the intake skill offers to reconstruct one by asking.
 8. **Name of the agent instructions file.** *Resolved 2026-10-25:* `AGENTS.md` plus a
    `CLAUDE.md` that points to it.
+9. **Creating a concept with no template.** The `personal` ontology's concepts are defined with
+   the user, so the engine needs a command that creates a concept bundle, its first SCD, and its
+   ontology manifest entry. Open (plan D-68).
+10. **Removing what the scaffold supplied.** When removing an SCD leaves its concept bundle
+    empty, the same command should remove the concept bundle, the root bundle's import, and the
+    manifest entry. Open (plan D-69).
+11. **Making unused SCDs visible.** A scaffold of empty SCDs validates cleanly today; how
+    validation and versioning surface them without failing every fresh scaffold under
+    `--strict` is open (plan D-70). So is the check that reports provenance to correct
+    (section 5; plan D-71).
+12. **Projects under the `personal` ontology.** Rec.: the same fixed concept, boundaries, and
+    nothing else. Open (plan D-72).
+13. **The ontology manifest's naming.** It still uses "domain" (`domain-manifest.yaml`, the
+    `domain:` key), while "Domain" now names only the global tier. Kept for 0.7; a rename needs
+    its own RFC (plan D-73).
 
 ---
 
@@ -1005,8 +1103,8 @@ Proposed order. Each step is usable on its own.
    the artifact, and truthful `validation_passed`.
 2. **Domain repositories.** `scs new domain` creates the repository with `domain/`,
    `projects/`, `AGENTS.md`, and the CI workflow; `scs new project` adds a workspace under
-   `projects/` of an existing Domain repository; a `personal` Domain profile that scaffolds only
-   the `company` (owner facts) and `prohibited` concept bundles; repository-level validation
+   `projects/` of an existing Domain repository; templates chosen by ontology and workspace kind
+   only, including the `personal` ontology (boundaries only); repository-level validation
    that tolerates the reserved plan directories and rejects the reserved bundle names; compile
    output to `dist/`.
 3. **Machine mode.** `--json` and `--dry-run` across `new`, `add`, `scd`, `bundle`, `intake`,
@@ -1020,6 +1118,8 @@ Proposed order. Each step is usable on its own.
 7. **Placement guide.** Docs for the most widely used AI services, checked against each
    service's current documentation.
 8. **MCP server.** Local stdio adapter over the engine, once there is demand.
+9. **Layered context.** `scs stack` with its exact checks (section 13), the `layer-conflict`
+   review kind in the review skill, and load-order notes in the placement guide.
 
 **Acceptance test:** onboard Omarchy entirely through a chat client using the skills, with no
 direct CLI use and no reading of the spec: one Domain repository holding the Domain and two
@@ -1034,7 +1134,7 @@ optional.
 - **Layout.** Workspaces created by 0.6.0 tools move into a Domain repository: the Domain
   workspace under `domain/`, each Project under `projects/<name>/`. A Project with no Domain
   needs one; an individual developer creates a personal Domain
-  (`scs new domain --profile personal`). Git history can be carried over with `git filter-repo`
+  (`scs new domain NAME --ontology personal`). Git history can be carried over with `git filter-repo`
   or a similar tool, or the move can start a fresh history.
 - **Tags.** Existing tags of the form `v<version>` stay in history; new versions use
   `<workspace>/<bundle-name>-v<version>`.
