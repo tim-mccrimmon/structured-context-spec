@@ -4,16 +4,26 @@ Compile command - build a runtime artifact from a Domain or Project bundle
 
 import hashlib
 from pathlib import Path
+from typing import Optional
 
 import click
-from scs_validator import api
+import yaml
+from scs_validator import api, integrity
 from scs_validator.envelope import Change, diagnostics_from_results, relative
-from scs_validator.names import bundle_name
-from scs_validator.resolver import find_project_root
+from scs_validator.gitrepo import GitRepo, GitUnavailable
+from scs_validator.names import bundle_name, version_tag
+from scs_validator.resolver import find_project_root, resolve
+from scs_validator.utils import ValidationResult
 
-from scs_tools.compiler import compile_bundle, render
+from scs_tools.compiler import compile_tree, render
 from scs_tools.machine import EXIT_FILE, EXIT_USAGE, CommandError, Envelope, Output, machine_command
-from scs_tools.workspace import repository_root, within
+from scs_tools.workspace import (
+    find_domain_repository,
+    find_workspace,
+    repository_root,
+    within,
+    workspace_name,
+)
 
 
 @click.command()
@@ -39,6 +49,11 @@ from scs_tools.workspace import repository_root, within
     help="Artifact serialization",
 )
 @click.option(
+    "--version",
+    "version",
+    help="Compile this released version from its tag, with its source_digest (D-57)",
+)
+@click.option(
     "--allow-draft",
     is_flag=True,
     help="Compile DRAFT bundles; the artifact version becomes DRAFT+<digest>",
@@ -54,6 +69,7 @@ def compile(
     output: Path,
     to_stdout: bool,
     fmt: str,
+    version: Optional[str],
     allow_draft: bool,
     no_cites: bool,
     no_validate: bool,
@@ -69,11 +85,15 @@ def compile(
     <bundle-name>-<version>.yaml unless --output or --stdout says otherwise.
     See spec/0.7/runtime-artifact.md.
 
+    With --version, the released version is compiled from its tag, so the working tree's
+    edits since then do not enter it. Without it, the working bundle is compiled, and a DRAFT
+    one needs --allow-draft. Either way, every versioned bundle it pins must match its tag.
+
     \b
     Examples:
-        scs compile bundles/domain-bundle.yaml
+        scs compile bundles/domain-bundle.yaml --version 1.0.0
         scs compile bundles/project-bundle.yaml --allow-draft
-        scs compile bundles/project-bundle.yaml --stdout
+        scs compile bundles/project-bundle.yaml --version 1.0.0 --stdout
     """
     if to_stdout and (out.machine or output or dry_run):
         raise CommandError(
@@ -87,6 +107,26 @@ def compile(
         )
 
     root = repository_root(bundle_file.parent) or find_project_root(bundle_file)
+    workspace_root = find_workspace(bundle_file.resolve().parent) or find_project_root(bundle_file)
+
+    if version is not None:
+        result = _compile_version(envelope, bundle_file, workspace_root, version, not no_cites)
+        if result is None:
+            envelope.result = {"compiled": False}
+            return
+        _write(
+            envelope,
+            out,
+            result,
+            bundle_file,
+            root,
+            workspace_root,
+            output,
+            to_stdout,
+            fmt,
+            dry_run,
+        )
+        return
 
     if not no_validate:
         try:
@@ -105,7 +145,70 @@ def compile(
             out.echo("Validation failed; nothing compiled.", err=True)
             return
 
-    result = compile_bundle(bundle_file, allow_draft=allow_draft, include_cites=not no_cites)
+    tree = resolve(bundle_file)
+    integrity_result = _check_pinned(tree, workspace_root)
+    if integrity_result.errors:
+        envelope.diagnostics.extend(diagnostics_from_results([integrity_result]))
+        envelope.result = {"compiled": False}
+        return
+    result = compile_tree(tree, allow_draft=allow_draft, include_cites=not no_cites)
+    _write(
+        envelope, out, result, bundle_file, root, workspace_root, output, to_stdout, fmt, dry_run
+    )
+
+
+def _check_pinned(tree, workspace_root: Path):
+    """Pinned versions in the tree match their tags (D-16), in a git repository."""
+    try:
+        repo = GitRepo.find(workspace_root)
+    except GitUnavailable:
+        repo = None
+    if repo is None:
+        return ValidationResult("versions")
+    with repo:
+        return integrity.check_pinned(
+            tree, repo, workspace_name(workspace_root), workspace_root, require_tags=False
+        )
+
+
+def _compile_version(
+    envelope: Envelope, bundle_file: Path, workspace_root: Path, version: str, include_cites: bool
+):
+    """Compile a released version from its tag (D-57), after check 1 for that tag (D-39)."""
+    data = yaml.safe_load(bundle_file.read_text(encoding="utf-8")) or {}
+    name = bundle_name(str(data.get("id", "")), bundle_file)
+    tag = version_tag(workspace_name(workspace_root), name, version)
+    domain_repo = find_domain_repository(workspace_root)
+    if domain_repo is None:
+        raise CommandError(
+            "VERSION_NOT_FOUND",
+            f"--version reads a version tag; {workspace_root} is not in a Domain repository",
+        )
+    try:
+        repo = GitRepo.find(domain_repo)
+    except GitUnavailable as e:
+        raise CommandError("GIT_REQUIRED", f"--version reads the version's tag: {e}")
+    if repo is None:
+        raise CommandError(
+            "GIT_REQUIRED", f"--version reads the version's tag; {workspace_root} is not in git"
+        )
+    with repo:
+        found = [t for t in repo.version_tags() if t.tag == tag]
+        if not found:
+            raise CommandError(
+                "VERSION_NOT_FOUND", f"No tag {tag}: {data.get('id')} {version} was not released"
+            )
+        checked = ValidationResult("versions")
+        tagged = integrity.verify_tag(repo, found[0], checked)
+        if tagged is None or tagged.tree is None:
+            envelope.diagnostics.extend(diagnostics_from_results([checked]))
+            return None
+        return compile_tree(tagged.tree, include_cites=include_cites)
+
+
+def _write(
+    envelope, out, result, bundle_file, root, workspace_root, output, to_stdout, fmt, dry_run
+):
     for warning in result.warnings:
         envelope.warning("COMPILE_WARNING", warning)
     if result.errors or result.artifact is None:
@@ -130,9 +233,7 @@ def compile(
         return
 
     target = output or (
-        find_project_root(bundle_file)
-        / "dist"
-        / f"{bundle_name(str(artifact['id']))}-{artifact['version']}.{fmt}"
+        workspace_root / "dist" / f"{bundle_name(str(artifact['id']))}-{artifact['version']}.{fmt}"
     )
     shown = relative(target, root)
     if not within(target, root):

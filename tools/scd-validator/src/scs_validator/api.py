@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterable, List, Optional, Union
 
+from . import integrity
 from .bundle_validator import BundleValidator
 from .checks import CheckContext, run_checks
 from .completeness_validator import CompletenessValidator
@@ -367,10 +368,18 @@ def validate_repository(
             )
         )
     report.results.append(repository)
+    # Version tags and the working copies of released versions (D-39 checks 1 and 2).
+    report.results.append(integrity.verify_repository(repo, workspaces))
     for workspace in workspaces:
         log(f"Workspace {workspace.name}")
         report.workspaces.append(_validate_workspace(workspace, v, skip_completeness, strict, log))
     return report
+
+
+def verify_version(path: PathLike, tag: str) -> Report:
+    """`--verify-version`: check one version tag against its tagged content (D-39 check 1)."""
+    result, _ = integrity.verify_one(Path(path), tag)
+    return Report([result], repository=Path(path))
 
 
 def find_repository(start: PathLike) -> Optional[Path]:

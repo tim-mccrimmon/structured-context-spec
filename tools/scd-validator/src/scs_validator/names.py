@@ -17,6 +17,30 @@ RESERVED_DIRS = frozenset({"plan", "test-plan", "qa"})
 RESERVED_BUNDLE_NAMES = frozenset({"plan", "test-plan", "qa"})
 
 SNAPSHOT_RE = re.compile(r"^(?P<name>.+)-v(?P<version>\d+\.\d+\.\d+)$")
+# A version tag made by SCS 0.7: `<workspace>/<bundle-name>-v<version>` (D-02, D-39). Tags without
+# the workspace qualifier predate 0.7 and are history (D-54).
+VERSION_TAG_RE = re.compile(
+    r"^(?P<workspace>[A-Za-z0-9._-]+)/(?P<name>[A-Za-z0-9._-]+)-v(?P<version>\d+\.\d+\.\d+)$"
+)
+
+
+def version_tag(workspace: str, name: str, version: str) -> str:
+    return f"{workspace}/{name}-v{version}"
+
+
+def snapshot_name(name: str, version: str) -> str:
+    """The snapshot file of a version, beside its manifest (D-43)."""
+    return f"{name}-v{version}.yaml"
+
+
+def manifest_name(name: str, version: str) -> str:
+    """The version manifest file (D-02)."""
+    return f"{name}-v{version}-MANIFEST.yaml"
+
+
+def is_snapshot(path: Path) -> bool:
+    """A versioned snapshot, by its file name (D-43), rather than a working document."""
+    return SNAPSHOT_RE.match(path.stem) is not None
 
 
 def bundle_name(bundle_id: str, path: Optional[Path] = None) -> str:

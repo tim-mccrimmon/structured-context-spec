@@ -28,7 +28,7 @@ content:
     - name: tests
       required: true
 provenance:
-  created_by: Test Author <test@example.com>
+  created_by: Test Author <test@structuredcontext.dev>
   created_at: "2026-10-25T00:00:00Z"
 """
 
@@ -58,7 +58,7 @@ def snapshot(root: Path) -> Dict[str, bytes]:
     }
 
 
-NEW_OPTIONS = ["--author", "Test Author", "--email", "test@example.com"]
+NEW_OPTIONS = ["--author", "Test Author", "--email", "test@structuredcontext.dev"]
 
 
 def new(tmp_path: Path, kind: str = "project", name: str = "demo") -> Path:
@@ -189,7 +189,7 @@ def test_exit_5_internal_error(project: Path, monkeypatch: pytest.MonkeyPatch):
     def boom(*args: object, **kwargs: object) -> None:
         raise RuntimeError("boom")
 
-    monkeypatch.setattr(compile_module, "compile_bundle", boom)
+    monkeypatch.setattr(compile_module, "compile_tree", boom)
     result = run("compile", "bundles/project-bundle.yaml", "--json", "--no-validate")
     assert result.exit_code == 5, result.output
     data = envelope(result)

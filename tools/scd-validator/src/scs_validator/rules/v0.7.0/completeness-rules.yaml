@@ -314,34 +314,6 @@ domains:
     enabled: false
     note: "Domain-specific rules to be defined by clinical domain experts"
 
-# Stub Detection Configuration - DISABLED BY DEFAULT
-stub_detection:
-  enabled: false  # Opt-in: set to true in .scs/completeness-rules.yaml
-  description: "Detect placeholder/stub SCDs that lack real content (opt-in)"
-
-  indicators:
-    - check: "short_description"
-      threshold: 50  # Characters
-      message: "SCD description is very short (< 50 chars)"
-
-    - check: "minimal_content"
-      threshold: 2  # Fields
-      message: "SCD content has fewer than 2 fields"
-
-    - check: "generic_title"
-      patterns: ["tbd", "todo", "placeholder", "stub", "example", "template"]
-      message: "SCD title appears to be a placeholder"
-
-    - check: "no_relationships"
-      message: "SCD has no relationships defined"
-
-  stub_threshold: 2  # If 2+ indicators trigger, warn about stub
-  severity: "warning"
-
-  warning_message: >
-    SCD '{scd_id}' appears to be a stub or placeholder.
-    Consider adding more detailed content before versioning.
-
 # Customization Guidance
 customization:
   description: "Completeness validation is OPT-IN. Create .scs/completeness-rules.yaml to enable."
@@ -395,9 +367,6 @@ error_messages:
   missing_recommended_scd:
     "Concept '{concept}' is missing recommended SCD matching pattern '{pattern}': {name}"
 
-  stub_detected:
-    "SCD '{scd_id}' appears to be a stub. {indicators}"
-
   no_domain_bundle:
     "Project must import at least one domain bundle (e.g., bundle:software-development:1.0.0)"
 
@@ -424,8 +393,7 @@ validation_strategy:
       2: "For each imported domain, check required concepts (if configured)"
       3: "Verify each concept bundle has minimum SCDs (if configured)"
       4: "Check for recommended SCDs in each concept (warnings only)"
-      5: "Detect stub/placeholder SCDs (if enabled)"
-      6: "Validate standards compliance (if enabled)"
+      5: "Validate standards compliance (if enabled)"
 
   notes:
     - "Completeness validation is OPT-IN via .scs/completeness-rules.yaml"

@@ -51,3 +51,27 @@ def no_network(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(socket.socket, "connect", refuse)
     monkeypatch.setattr(socket.socket, "connect_ex", refuse)
     monkeypatch.setattr(socket, "create_connection", refuse)
+
+
+@pytest.fixture(autouse=True)
+def isolated_git(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """No git identity, and a global config that would break a naive commit or tag: signing on,
+    and hooks that fail. The engine's commits and tags must pass anyway (D-55, D-58)."""
+    hooks = tmp_path / "hooks"
+    hooks.mkdir()
+    for name in ("pre-commit", "commit-msg", "reference-transaction"):
+        hook = hooks / name
+        hook.write_text("#!/bin/sh\nexit 1\n")
+        hook.chmod(0o755)
+    config = tmp_path / "gitconfig"
+    config.write_text(
+        "[commit]\n\tgpgsign = true\n[tag]\n\tgpgSign = true\n\tforceSignAnnotated = true\n"
+        f"[core]\n\thooksPath = {hooks}\n\tautocrlf = true\n"
+    )
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    for var in ("NAME", "EMAIL"):
+        for role in ("AUTHOR", "COMMITTER"):
+            monkeypatch.delenv(f"GIT_{role}_{var}", raising=False)
+    monkeypatch.delenv("EMAIL", raising=False)
+    return config

@@ -72,28 +72,29 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
     if result.errors:
         return result
 
-    # A versioned tree must still match what was versioned; there is no override
-    # (spec/0.7/bundle-format.md §7.6). The root's digest goes into the artifact.
-    source_digest = None
-    if not drafts and root.version:
-        from scs_validator.digest import content_digest, tree_index, verify_tree
+    # Every versioned bundle in the tree must still match what was versioned, whatever the
+    # root's state, and no flag overrides it (D-16). The root's digest goes into the artifact
+    # only when it was verified against its manifest (D-18).
+    from scs_validator.digest import content_digest, tree_index, verify_tree
 
-        for check in verify_tree(tree):
-            if check.status == "mismatch":
-                changes = ", ".join(check.changes) or "unknown"
-                result.errors.append(
-                    f"{check.bundle.id} version {check.bundle.version} has changed since it was "
-                    f"versioned (its content no longer matches {check.manifest}); changed: "
-                    f"{changes}. A changed bundle needs a new version."
-                )
-            elif check.status == "unrecorded":
-                result.warnings.append(
-                    f"{check.bundle.id} version {check.bundle.version} cannot be verified: "
-                    f"{check.manifest} has no content_digest (written before SCS 0.7)."
-                )
-        if result.errors:
-            return result
-        source_digest = content_digest(root, tree_index(tree)).digest
+    source_digest = None
+    for check in verify_tree(tree):
+        if check.status == "mismatch":
+            changes = ", ".join(check.changes) or "unknown"
+            result.errors.append(
+                f"{check.bundle.id} version {check.bundle.version} has changed since it was "
+                f"versioned (its content no longer matches {check.manifest}); changed: "
+                f"{changes}. A changed bundle needs a new version."
+            )
+        elif check.status == "unrecorded":
+            result.warnings.append(
+                f"{check.bundle.id} version {check.bundle.version} cannot be verified: "
+                f"{check.manifest} has no content_digest (written before SCS 0.7)."
+            )
+        elif check.bundle is root and not drafts:
+            source_digest = content_digest(root, tree_index(tree)).digest
+    if result.errors:
+        return result
 
     # Ids carry the root bundle's name so a Domain and a Project artifact never share one,
     # even when both have an SCD of the same name.

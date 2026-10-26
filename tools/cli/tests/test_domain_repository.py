@@ -19,31 +19,8 @@ from scs_tools.cli import cli
 REPO = Path(__file__).resolve().parents[3]
 SCHEMA = REPO / "schema"
 ENVELOPE_SCHEMA = json.loads((SCHEMA / "cli" / "envelope-schema.json").read_text())
-AUTHOR = ["--author", "Test Author", "--email", "test@example.com"]
+AUTHOR = ["--author", "Test Author", "--email", "test@structuredcontext.dev"]
 OPERATIONS = ["Create", "Maintain", "Validate", "Version", "Compile"]
-
-
-@pytest.fixture(autouse=True)
-def isolated_git(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """No git identity, and a global config that would break a naive commit: signing on and a
-    pre-commit hook that fails. The engine's commit must pass anyway (D-55, D-58)."""
-    hooks = tmp_path / "hooks"
-    hooks.mkdir()
-    hook = hooks / "pre-commit"
-    hook.write_text("#!/bin/sh\nexit 1\n")
-    hook.chmod(0o755)
-    config = tmp_path / "gitconfig"
-    config.write_text(
-        "[commit]\n\tgpgsign = true\n[tag]\n\tgpgSign = true\n"
-        f"[core]\n\thooksPath = {hooks}\n\tautocrlf = true\n"
-    )
-    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
-    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
-    for var in ("NAME", "EMAIL"):
-        for role in ("AUTHOR", "COMMITTER"):
-            monkeypatch.delenv(f"GIT_{role}_{var}", raising=False)
-    monkeypatch.delenv("EMAIL", raising=False)
-    return config
 
 
 def run(*args: str) -> Result:
@@ -220,7 +197,9 @@ def test_provenance_names_a_person(tmp_path: Path):
     for path in [*(repo / "domain").rglob("*.yaml")]:
         data = yaml.safe_load(path.read_text()) or {}
         if isinstance(data, dict) and "provenance" in data:
-            assert data["provenance"]["created_by"] == "Test Author <test@example.com>", path
+            assert (
+                data["provenance"]["created_by"] == "Test Author <test@structuredcontext.dev>"
+            ), path
 
 
 def test_the_new_repository_has_one_commit_by_scs_tools(tmp_path: Path):

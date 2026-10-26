@@ -1,0 +1,49 @@
+# Diagnostic codes added by WP-14 (lifecycle integrity: tags as the record of a version, D-39).
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  VERSION_APPROVER_REQUIRED:
+    severity: error
+    meaning: scs bundle version was run without an approver; name one with --approved-by (D-13).
+  VERSION_APPROVER_INVALID:
+    severity: error
+    meaning: The approver is not a person identifier, Name <email> (D-28).
+  VERSION_INVALID:
+    severity: error
+    meaning: The version is not MAJOR.MINOR.PATCH; exit code 3.
+  VERSION_IMPORT_NOT_PINNED:
+    severity: error
+    meaning: The bundle being versioned imports a bundle without a version, at DRAFT, or that does not resolve (D-14).
+  VERSION_EXISTS:
+    severity: error
+    meaning: The version already exists (its tag, snapshot, or manifest); versions are never overwritten (D-15).
+  VERSION_INPUT_UNTRACKED:
+    severity: error
+    meaning: A file the content digest or the compiler reads is ignored by git, so the version commit would not hold it (D-40).
+  VERSION_PROVENANCE_PLACEHOLDER:
+    severity: error
+    meaning: The bundle or one of its SCDs has a placeholder created_by; correct it before versioning (D-71).
+  VERSION_NOT_FOUND:
+    severity: error
+    meaning: No version tag exists for the requested version.
+  VERSION_MANIFEST_MISSING:
+    severity: error
+    meaning: A workspace-qualified version tag points at a commit without that version's manifest (D-39).
+  VERSION_MANIFEST_INCOMPLETE:
+    severity: error
+    meaning: A manifest with a workspace-qualified tag lacks content_digest or tools_version, which every 0.7 manifest carries (D-49).
+  VERSION_TAG_MISSING:
+    severity: error
+    meaning: A manifest records a content digest but its version tag does not exist, or a pinned import has no 0.7 tag (D-39).
+  MANIFEST_ALTERED:
+    severity: error
+    meaning: The working manifest or snapshot of a version in use differs from its tagged copy, or was deleted (D-39).
+  GIT_HISTORY_INCOMPLETE:
+    severity: error
+    meaning: Repository mode in a shallow clone; version tags cannot be checked without full history and tags (D-39).
+  PROVENANCE_PLACEHOLDER:
+    severity: warning
+    meaning: A working SCD or bundle has a placeholder created_by (developer, an empty name, or an example or invalid domain) (D-71).
+  SCD_EMPTY:
+    severity: info
+    meaning: An SCD has no prohibitions, directives, or facts, so it contributes nothing to a compiled artifact (D-70).

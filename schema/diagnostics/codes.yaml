@@ -66,9 +66,6 @@ codes:
   COMPLETENESS_REQUIRED_BUNDLE_MISSING_WARNING:
     severity: warning
     meaning: A bundle does not import the number of bundles of a type that the completeness rules recommend.
-  COMPLETENESS_STUB_SCD:
-    severity: warning
-    meaning: An SCD shows enough stub indicators to look like an unfinished placeholder.
   CONCEPT_IS_A_DOMAIN:
     severity: error
     meaning: The name given to scs add bundle is a domain, which is a workspace of its own (scs new domain).
@@ -105,6 +102,10 @@ codes:
     severity: error
     meaning: A git command the engine ran failed; the message carries git's output. What the run wrote
       was removed.
+  GIT_HISTORY_INCOMPLETE:
+    severity: error
+    meaning: Repository mode in a shallow clone; version tags cannot be checked without full history and
+      tags (D-39).
   GIT_REQUIRED:
     severity: error
     meaning: The command needs git and git was not found.
@@ -138,6 +139,10 @@ codes:
   INTERNAL_ERROR:
     severity: error
     meaning: The tool failed unexpectedly; exit code 5. Report it with the message.
+  MANIFEST_ALTERED:
+    severity: error
+    meaning: The working manifest or snapshot of a version in use differs from its tagged copy, or was
+      deleted (D-39).
   MANIFEST_SCHEMA_INVALID:
     severity: error
     meaning: A version manifest does not validate against schema/manifest/version-manifest-schema.json
@@ -210,6 +215,10 @@ codes:
   PARSE_YAML_SYNTAX:
     severity: error
     meaning: The file is not valid YAML.
+  PROVENANCE_PLACEHOLDER:
+    severity: warning
+    meaning: A working SCD or bundle has a placeholder created_by (developer, an empty name, or an example
+      or invalid domain) (D-71).
   RELATIONSHIP_CITATION_INVALID:
     severity: error
     meaning: 'A std: citation target is not in the std:<standard>[:<edition>][#<clause>] form.'
@@ -259,6 +268,10 @@ codes:
   SCD_DUPLICATE_ENTRY_ID:
     severity: error
     meaning: Two directives, prohibitions, or facts in one SCD share an id.
+  SCD_EMPTY:
+    severity: info
+    meaning: An SCD has no prohibitions, directives, or facts, so it contributes nothing to a compiled
+      artifact (D-70).
   SCD_FIELD_EMPTY:
     severity: error
     meaning: A required string field (title or description) of an SCD is blank.
@@ -328,6 +341,45 @@ codes:
     severity: error
     meaning: The command line is wrong (unknown option, missing argument, conflicting options); exit code
       3.
+  VERSION_APPROVER_INVALID:
+    severity: error
+    meaning: The approver is not a person identifier, Name <email> (D-28).
+  VERSION_APPROVER_REQUIRED:
+    severity: error
+    meaning: scs bundle version was run without an approver; name one with --approved-by (D-13).
+  VERSION_EXISTS:
+    severity: error
+    meaning: The version already exists (its tag, snapshot, or manifest); versions are never overwritten
+      (D-15).
+  VERSION_IMPORT_NOT_PINNED:
+    severity: error
+    meaning: The bundle being versioned imports a bundle without a version, at DRAFT, or that does not
+      resolve (D-14).
+  VERSION_INPUT_UNTRACKED:
+    severity: error
+    meaning: A file the content digest or the compiler reads is ignored by git, so the version commit
+      would not hold it (D-40).
+  VERSION_INVALID:
+    severity: error
+    meaning: The version is not MAJOR.MINOR.PATCH; exit code 3.
+  VERSION_MANIFEST_INCOMPLETE:
+    severity: error
+    meaning: A manifest with a workspace-qualified tag lacks content_digest or tools_version, which every
+      0.7 manifest carries (D-49).
+  VERSION_MANIFEST_MISSING:
+    severity: error
+    meaning: A workspace-qualified version tag points at a commit without that version's manifest (D-39).
+  VERSION_NOT_FOUND:
+    severity: error
+    meaning: No version tag exists for the requested version.
+  VERSION_PROVENANCE_PLACEHOLDER:
+    severity: error
+    meaning: The bundle or one of its SCDs has a placeholder created_by; correct it before versioning
+      (D-71).
+  VERSION_TAG_MISSING:
+    severity: error
+    meaning: A manifest records a content digest but its version tag does not exist, or a pinned import
+      has no 0.7 tag (D-39).
   WORKSPACE_CONFIG_INVALID:
     severity: error
     meaning: A workspace's .scs/config cannot be read as key-value pairs.

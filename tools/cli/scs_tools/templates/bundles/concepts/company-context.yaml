@@ -48,7 +48,7 @@ provenance:
 # 2. Start with DRAFT version during development
 # 3. Create at least one company-overview SCD
 # 4. Validate with: scs validate [this-file].yaml
-# 5. When ready, version with: scs bundle version [this-file].yaml --version 1.0.0
+# 5. When ready, version with: scs bundle version --bundle [this-file].yaml --version 1.0.0
 # 6. Deploy with: scs deploy [versioned-bundle].yaml --to [mcp-server]
 #
 # Design Decisions:

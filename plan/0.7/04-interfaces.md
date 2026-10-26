@@ -127,6 +127,10 @@ Registry: `schema/diagnostics/codes.yaml`, merged from per-WP fragments in
 | Code | Severity | Raised by |
 |---|---|---|
 | `VERSION_APPROVER_REQUIRED` | error | `bundle version` without `--approved-by` |
+| `VERSION_APPROVER_INVALID` | error | An approver that is not `Name <email>`, or a `role:` value (D-13, WP-14) |
+| `VERSION_INVALID` | error | A version that is not `MAJOR.MINOR.PATCH` (WP-14) |
+| `VERSION_NOT_FOUND` | error | `--verify-version` or `compile --version` names a version with no tag (WP-14) |
+| `VERSION_MANIFEST_INCOMPLETE` | error | A manifest at a qualified tag without `content_digest` or `tools_version` (D-49, WP-14) |
 | `VERSION_IMPORT_NOT_PINNED` | error | D-14 |
 | `VERSION_EXISTS` | error | D-15 |
 | `VERSION_MANIFEST_MISSING` | error | A workspace-qualified tag with no manifest at the tag (D-39) |

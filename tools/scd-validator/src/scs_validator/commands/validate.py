@@ -15,6 +15,7 @@ from ..envelope import (
     Envelope,
     MachineMode,
     diagnostics_from_results,
+    relative,
 )
 from ..reporter import Reporter
 from ..utils import SCHEMA_DIR_ENV_VAR, ValidationError
@@ -52,6 +53,15 @@ class ValidateCommand(MachineMode, click.Command):
     help=(
         "Validate every workspace of a Domain repository (the default with no other input "
         "when run at a Domain repository root)"
+    ),
+)
+@click.option(
+    "--verify-version",
+    "verify_tag",
+    metavar="TAG",
+    help=(
+        "Verify one version against its tagged content, e.g. domain/security-v1.0.0 "
+        "(run in the Domain repository, or name it with --repo)"
     ),
 )
 @click.option(
@@ -108,6 +118,7 @@ def validate(
     domain: str | None,
     checkpoint: str | None,
     repo: str | None,
+    verify_tag: str | None,
     schema_dir: str | None,
     output: str,
     strict: bool,
@@ -136,6 +147,10 @@ def validate(
         \b
         # Validate every workspace of a Domain repository (run at its root)
         scs-validate --strict
+
+        \b
+        # Verify one version against its tag
+        scs-validate --verify-version domain/security-v1.0.0
 
         \b
         # Validate a domain manifest (Domain Ontology, RFC-0001)
@@ -188,7 +203,9 @@ def validate(
                 EXIT_FILE,
             )
 
-        if bundle:
+        if verify_tag:
+            report = api.verify_version(Path(repo) if repo else Path.cwd(), verify_tag)
+        elif bundle:
             report = api.validate_bundle(
                 bundle, skip_completeness=skip_completeness, strict=strict, validators=v, log=log
             )
@@ -218,6 +235,8 @@ def validate(
         if json_mode:
             envelope.result = json.loads(reporter.report_json(report, __version__, strict))
             envelope.diagnostics = diagnostics_from_results(report.all_results())
+            if report.repository is not None:
+                _paths_from(report.repository, envelope)
             envelope.exit_code = report.exit_code(strict)
             click.echo(envelope.dumps(strict))
         elif output == "json":
@@ -234,3 +253,19 @@ def validate(
 
             traceback.print_exc()
         fail("INTERNAL_ERROR", f"Unexpected error: {e}", EXIT_INTERNAL)
+
+
+def _paths_from(root: Path, envelope: Envelope) -> None:
+    """Diagnostic paths relative to the repository root (D-42). Checks report paths relative to
+    the current directory or absolute; a path that is neither (a tag, or already relative to the
+    root) is left as it is."""
+    cwd = Path.cwd()
+    for diagnostic in envelope.diagnostics:
+        if not diagnostic.path:
+            continue
+        path = Path(diagnostic.path)
+        if not path.is_absolute():
+            if not (cwd / path).exists() or cwd.resolve() == root.resolve():
+                continue
+            path = cwd / path
+        diagnostic.path = relative(path, root)

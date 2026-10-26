@@ -36,7 +36,6 @@ class CompletenessValidator:
         - Required domains present
         - Minimum SCDs per domain
         - Recommended SCDs (warnings)
-        - Stub detection
 
         Args:
             bundle: Domain or Project bundle data
@@ -76,9 +75,6 @@ class CompletenessValidator:
 
         # Validate recommended SCDs
         self._validate_recommended_scds(all_scds, rules, result, file_path)
-
-        # Stub detection
-        self._detect_stubs(all_scds, rules, result, file_path)
 
         return result
 
@@ -321,84 +317,6 @@ class CompletenessValidator:
             if keyword.lower() in scd_id.lower():
                 return True
         return False
-
-    def _detect_stubs(
-        self,
-        all_scds: List[Dict[str, Any]],
-        rules: Dict[str, Any],
-        result: ValidationResult,
-        file_path: str | None,
-    ) -> None:
-        """Detect stub/placeholder SCDs.
-
-        Args:
-            all_scds: List of all SCDs
-            rules: Completeness rules
-            result: Validation result to update
-            file_path: Optional file path
-        """
-        stub_config = rules.get("stub_detection", {})
-        if not stub_config.get("enabled", True):
-            return
-
-        indicators_config = stub_config.get("indicators", [])
-        threshold = stub_config.get("stub_threshold", 2)
-
-        for scd in all_scds:
-            scd_id = scd.get("id", "unknown")
-            version = scd.get("version", "")
-
-            # Skip DRAFT versions (stubs expected)
-            if version == "DRAFT":
-                continue
-
-            # Count stub indicators
-            stub_indicators = []
-
-            for indicator in indicators_config:
-                check = indicator.get("check")
-                message = indicator.get("message")
-
-                if check == "short_description":
-                    threshold_chars = indicator.get("threshold", 50)
-                    description = scd.get("description", "")
-                    if len(description.strip()) < threshold_chars:
-                        stub_indicators.append(message)
-
-                elif check == "minimal_content":
-                    threshold_fields = indicator.get("threshold", 2)
-                    content = scd.get("content", {})
-                    if isinstance(content, dict) and len(content) < threshold_fields:
-                        stub_indicators.append(message)
-
-                elif check == "generic_title":
-                    patterns = indicator.get("patterns", [])
-                    title = scd.get("title", "").lower()
-                    for pattern in patterns:
-                        if pattern.lower() in title:
-                            stub_indicators.append(message)
-                            break
-
-                elif check == "no_relationships":
-                    relationships = scd.get("relationships", [])
-                    if not relationships:
-                        stub_indicators.append(message)
-
-            # If enough indicators, warn about stub
-            if len(stub_indicators) >= threshold:
-                warning_msg = stub_config.get("warning_message", "SCD appears to be a stub")
-                warning_msg = warning_msg.format(
-                    scd_id=scd_id, indicators="; ".join(stub_indicators)
-                )
-                result.add_warning(
-                    ValidationWarning(
-                        warning_msg,
-                        level="completeness",
-                        scd_id=scd_id,
-                        file_path=file_path,
-                        code="COMPLETENESS_STUB_SCD",
-                    )
-                )
 
     def _add_result(
         self,

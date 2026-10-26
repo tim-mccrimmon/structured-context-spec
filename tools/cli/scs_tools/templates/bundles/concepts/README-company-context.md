@@ -147,7 +147,8 @@ scs validate my-company/bundles/company-context-bundle.yaml
 
 ```bash
 # Version at 1.0.0 when ready
-scs bundle version my-company/bundles/company-context-bundle.yaml --version 1.0.0
+scs bundle version --bundle my-company/bundles/company-context-bundle.yaml --version 1.0.0 \
+  --approved-by "Name <email>"
 ```
 
 ### Step 6: Deploy (Future)

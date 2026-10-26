@@ -28,7 +28,7 @@ MANIFEST_SCHEMA = json.loads((SCHEMA / "manifest" / "version-manifest-schema.jso
 ONTOLOGY = SCHEMA / "domain" / "examples" / "software-development-domain.yaml"
 
 PROVENANCE = """provenance:
-  created_by: Jane Doe <jane@example.com>
+  created_by: Jane Doe <jane@structuredcontext.dev>
   created_at: "2026-10-25T00:00:00Z"
   rationale: test
 """
@@ -61,7 +61,7 @@ def concept(root: Path, name: str, version: str = "DRAFT", stem: Optional[str] =
     approval = (
         ""
         if version == "DRAFT"
-        else "  version_approved_by: Jane Doe <jane@example.com>\n"
+        else "  version_approved_by: Jane Doe <jane@structuredcontext.dev>\n"
         '  version_approved_at: "2026-10-25T00:00:00Z"\n'
     )
     return write(
@@ -223,7 +223,7 @@ def test_snapshots_of_two_versions_are_not_duplicates(repo: Path):
                 {
                     "version": version,
                     "bundle": {"id": "bundle:company"},
-                    "approval": {"approved_by": "Jane Doe <jane@example.com>"},
+                    "approval": {"approved_by": "Jane Doe <jane@structuredcontext.dev>"},
                 }
             ),
         )
@@ -286,7 +286,7 @@ def test_the_manifest_schema_requires_a_person_approver(approved_by):
 
 
 def test_the_manifest_schema_accepts_a_person_without_digest_or_tools_version():
-    data = manifest("Jane Doe <jane@example.com>")
+    data = manifest("Jane Doe <jane@structuredcontext.dev>")
     assert list(Draft202012Validator(MANIFEST_SCHEMA).iter_errors(data)) == []
     data.update(content_digest="sha256:" + "0" * 64, tools_version="0.7.0")
     assert list(Draft202012Validator(MANIFEST_SCHEMA).iter_errors(data)) == []

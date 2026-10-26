@@ -93,9 +93,6 @@ required_domains:
   - id: "testing-validation"
     name: "Testing & Validation"
     minimum_scds: 1
-
-stub_detection:
-  enabled: false  # Don't check for stubs in POC
 ```
 
 ### Option 2: Explicit Rules File

@@ -47,7 +47,7 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-04 | Done: check registry, repository mode, diagnostic codes, report schema | `3e7c7a4` |
 | WP-05 | Done: `--json` envelope, exit codes 0-5, `--dry-run`, `scd write`, `compile` to `dist/` | `476e542` |
 | WP-03 | Done: `new domain` creates the Domain repository (AGENTS.md, CI, initial commit), `new project` inside it, `ontology/`, D-06 config keys; templates by ontology and kind (D-64), `personal` ontology with boundaries only (D-61, D-62, D-72), `created_by` as `Name <email>` | `3d36d97` |
-| WP-14 | Next (group 5; unblocked) | |
+| WP-14 | Built, not committed: tag-based versioning, D-39 checks, `--verify-version`, `compile --version`, D-17 resolution, D-70 `SCD_EMPTY`, D-71 `PROVENANCE_PLACEHOLDER` | |
 | WP-07 | Next (unblocked by WP-03) | |
 | WP-02a, WP-09, WP-11a, WP-13a | Unblocked, not started | |
 
@@ -55,8 +55,6 @@ Known gaps carried forward:
 
 - Bundle mode does not schema-validate the SCDs it resolves, and an unreadable SCD YAML file is
   skipped by the index without a diagnostic.
-- The CLI still writes plain-email approvers in version manifests; the 0.7 manifest schema
-  wants `Name <email>` (WP-06 / WP-14).
 - Rule-severity housekeeping item from WP-04 is still open.
 - The generated CI workflow installs `scs-validator>=0.7.0,<0.8` from PyPI; that works once
   0.7.0 is published (D-27, WP-11rc). The packages still report version 0.6.0.
@@ -67,11 +65,20 @@ Known gaps carried forward:
   (WP-11rc rewrites the README).
 - `scs new` falls back to `$USER` and `$USER@example.com` when no author or email is given;
   WP-06 removes it (D-71).
-- `test_concept_bundles_at_the_same_version_get_their_own_tags` runs `git init` in a Project
-  workspace, nesting a repository inside the Domain repository; WP-14 rewrites the versioning
-  tests.
-- The exit-2 (`--strict` warnings) machine-mode test fakes the validator report; no real input
-  found yet produces a warning without errors.
+- The exit-2 (`--strict` warnings) machine-mode test fakes the validator report. A placeholder
+  `created_by` (`PROVENANCE_PLACEHOLDER`) is now a real warning-only input in bundle and
+  repository mode; the test could use it.
+- WP-14 brought parts of WP-06 forward to `bundle version`: `--json`, `--dry-run`, the
+  approver rules (`Name <email>`, never from git), and rollback. WP-06 still owns the four
+  injected-failure rollback tests and `bundle pin`.
+- `scs new project` does not yet inherit the Domain's ontology (D-74, WP-06); the lifecycle
+  tests pass `--ontology personal` explicitly.
+- `scs compile` writes to `dist/`, which is untracked by default and shows in `git status`; the
+  generated `.gitignore` leaves the choice to the user.
+- The examples' `created_by` values use `.example` domains and now warn as
+  `PROVENANCE_PLACEHOLDER`; they are fictional organizations and are left as they are.
+- Validator messages for drift (`CONTENT_DIGEST_MISMATCH` from bundle validation) print
+  absolute paths in human output; machine mode normalizes them to the repository root.
 
 Working notes:
 

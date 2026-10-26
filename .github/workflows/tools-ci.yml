@@ -88,9 +88,9 @@ jobs:
       - name: Scaffold, validate and version a Domain repository outside the source tree
         run: |
           cd "$(mktemp -d)"
-          scs new domain smoke --author CI --email ci@example.com --no-interactive
+          scs new domain smoke --author CI --email ci@structuredcontext.dev --no-interactive
           cd smoke-context
-          scs new project app --author CI --email ci@example.com --no-interactive
+          scs new project app --author CI --email ci@structuredcontext.dev --no-interactive
           scs-validate --strict
           cd domain
           scs bundle validate
@@ -99,17 +99,16 @@ jobs:
           cd ../projects/app
           scs bundle validate
           scs validate --domain ontology/domain-manifest.yaml
-          git config user.email ci@example.com
-          git config user.name CI
-          git add -A
-          git commit -q -m "add project app"
           scs bundle version --bundle bundles/concepts/security.yaml --version 0.1.0 \
-            --approved-by ci@example.com --notes "ci smoke"
+            --approved-by "CI <ci@structuredcontext.dev>" --notes "ci smoke"
           scs-validate --bundle bundles/concepts/security-v0.1.0.yaml
+          cd ../..
+          scs-validate --strict
+          scs-validate --verify-version app/security-v0.1.0
       - name: Scaffold and validate the mca ontology outside the source tree
         run: |
           cd "$(mktemp -d)"
-          scs new domain smoke-mca --ontology mca --author CI --email ci@example.com --no-interactive
+          scs new domain smoke-mca --ontology mca --author CI --email ci@structuredcontext.dev --no-interactive
           cd smoke-mca-context
-          scs new project app --ontology mca --author CI --email ci@example.com --no-interactive
+          scs new project app --ontology mca --author CI --email ci@structuredcontext.dev --no-interactive
           scs-validate --strict

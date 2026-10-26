@@ -2,7 +2,6 @@ scs_runtime: '0.7'
 id: bundle:medtech-cdmo
 type: domain
 version: 1.0.0
-source_digest: sha256:8c499744256fe9f28061bf59d97a603a1f58934e0435ea4278992f2877f6a840
 title: MedTech CDMO Governance
 sources: ['bundle:meta:0.6.0', 'bundle:company:1.0.0', 'bundle:prohibited:1.0.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
 rules:

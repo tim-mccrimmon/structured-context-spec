@@ -270,6 +270,3 @@ codes:
   COMPLETENESS_RECOMMENDED_SCD_MISSING:
     severity: warning
     meaning: No SCD matches a pattern the completeness rules recommend for a domain.
-  COMPLETENESS_STUB_SCD:
-    severity: warning
-    meaning: An SCD shows enough stub indicators to look like an unfinished placeholder.

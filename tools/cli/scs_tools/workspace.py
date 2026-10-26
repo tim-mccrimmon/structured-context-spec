@@ -10,7 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional
 
-from scs_validator.workspace import CONFIG, is_repository
+from scs_validator.workspace import CONFIG, is_repository, read_config
 
 from scs_tools.machine import EXIT_USAGE, CommandError
 
@@ -42,6 +42,23 @@ def repository_root(start: Path) -> Optional[Path]:
         if (path / ".git").exists():
             return path
     return find_workspace(start)
+
+
+def workspace_name(workspace: Path) -> str:
+    """`domain`, or the directory name under `projects/` (D-03). Outside a Domain repository
+    (0.6 layout), the `.scs/config` name, else the directory name."""
+    workspace = workspace.resolve()
+    repo = find_domain_repository(workspace)
+    if repo is not None:
+        if workspace == (repo / "domain").resolve():
+            return "domain"
+        if workspace.parent == (repo / "projects").resolve():
+            return workspace.name
+    try:
+        config = read_config(workspace / CONFIG)
+    except ValueError:
+        config = {}
+    return config.get("name") or config.get("project_name") or workspace.name
 
 
 def within(path: Path, root: Path) -> bool:

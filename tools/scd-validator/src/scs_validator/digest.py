@@ -16,7 +16,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import yaml
 
@@ -176,10 +176,14 @@ def _shown(path: Path) -> str:
         return str(path)
 
 
-def _changes(actual: ContentDigest, recorded: Any) -> List[str]:
-    """The bundles and SCDs whose content differs from the recorded `content_inputs`."""
+def changes(
+    actual: ContentDigest, recorded: Any, display: Optional[Callable[[Path], str]] = None
+) -> List[str]:
+    """The bundles and SCDs whose content differs from the recorded `content_inputs`, each
+    named by its file (shown with `display`) and id."""
     if not isinstance(recorded, dict):
         return []
+    _shown_path = display or _shown
     current, paths = actual.inputs()
     out: List[str] = []
     for kind in ("bundles", "scds"):
@@ -191,7 +195,9 @@ def _changes(actual: ContentDigest, recorded: Any) -> List[str]:
                 out.append(f"{key} (removed)")
             elif before[key] != after[key]:
                 out.append(
-                    f"{key} (not found)" if after[key] is None else f"{_shown(paths[key])} ({key})"
+                    f"{key} (not found)"
+                    if after[key] is None
+                    else f"{_shown_path(paths[key])} ({key})"
                 )
     return out
 
@@ -208,7 +214,7 @@ def verify(bundle: ResolvedBundle, index: Index) -> Optional[Verification]:
     actual = content_digest(bundle, index)
     if actual.digest == recorded:
         return Verification(bundle, path, "verified")
-    return Verification(bundle, path, "mismatch", _changes(actual, manifest.get("content_inputs")))
+    return Verification(bundle, path, "mismatch", changes(actual, manifest.get("content_inputs")))
 
 
 def tree_index(tree: BundleTree) -> Index:

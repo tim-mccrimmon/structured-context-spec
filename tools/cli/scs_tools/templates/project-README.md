@@ -48,7 +48,11 @@ specification. It is not in this workspace; the SCS tools ship a copy.
    (what an agent should know). Cite standards with `std:` references.
 2. Validate: `scs-validate --strict` at the repository root, or `scs bundle validate` here
 3. Compile: `scs compile bundles/{{ bundle_kind }}-bundle.yaml --allow-draft`
-4. Version: `scs bundle version --bundle bundles/{{ bundle_kind }}-bundle.yaml --version 1.0.0`
+4. Version bottom-up: each concept bundle first
+   (`scs bundle version --bundle bundles/concepts/<name>.yaml --version 1.0.0 --approved-by "Name <email>"`),
+   pin it in `bundles/{{ bundle_kind }}-bundle.yaml` as `bundle:<name>:1.0.0`, then version
+   `bundles/{{ bundle_kind }}-bundle.yaml`. Each version is a git tag.
+5. Compile the released version: `scs compile bundles/{{ bundle_kind }}-bundle.yaml --version 1.0.0`
 
 See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 

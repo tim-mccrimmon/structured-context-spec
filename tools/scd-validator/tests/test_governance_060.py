@@ -17,7 +17,7 @@ REPO = Path(__file__).resolve().parents[3]
 SCHEMA = REPO / "schema"
 
 PROVENANCE = """provenance:
-  created_by: a@example.com
+  created_by: a@structuredcontext.dev
   created_at: "2026-10-19T00:00:00Z"
 """
 

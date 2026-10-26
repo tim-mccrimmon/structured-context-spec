@@ -2,18 +2,15 @@
 Bundle command - manage SCS bundles
 """
 
-import hashlib
-import subprocess
-from datetime import datetime, timezone
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version as pkg_version
 from pathlib import Path
 
 import click
 import yaml
 
+from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import get_template_path
 from scs_tools.utils.project_types import ONTOLOGY_MODELS
+from scs_tools.versioning import version_bundle
 
 
 @click.group()
@@ -238,9 +235,10 @@ def validate():
 @click.option(
     "--bundle",
     "-b",
-    type=click.Path(exists=True),
+    "bundle_file",
+    type=click.Path(dir_okay=False, path_type=Path),
     default=None,
-    help="Path to bundle file to version (default: the workspace's domain or project bundle)",
+    help="Bundle file to version (default: the workspace's domain or project bundle)",
 )
 @click.option(
     "--version",
@@ -251,515 +249,50 @@ def validate():
 )
 @click.option(
     "--approved-by",
-    help="Approver email (prompted for if omitted; never taken from git config)",
+    help="The approver, Name <email> (asked for if omitted; never taken from git config)",
 )
-@click.option(
-    "--notes",
-    help="Version notes/release notes",
-)
-@click.option(
-    "--no-git",
-    is_flag=True,
-    help="Skip git commit and tag creation",
-)
+@click.option("--notes", help="Version notes")
 @click.option(
     "--no-validate",
     is_flag=True,
-    help="Skip validation check (not recommended)",
+    help="Skip content validation (integrity checks still run; recorded in the manifest)",
 )
-@click.option(
-    "--force",
-    "-f",
-    is_flag=True,
-    help="Overwrite existing versioned bundle if it exists",
-)
-def version(bundle, version_number, approved_by, notes, no_git, no_validate, force):
-    """
-    Create a versioned, immutable snapshot of a validated bundle
-
-    This command automates Phase 3 (Version) of the SCS workflow by:
-    1. Validating the bundle (unless --no-validate)
-    2. Creating a versioned snapshot with approval metadata
-    3. Generating SHA-256 checksum
-    4. Creating a version manifest
-    5. Creating git commit and tag (unless --no-git)
-
-    \b
-    Examples:
-        # Basic usage (interactive prompts for missing info)
-        scs bundle version --version 1.0.0
-
-        # With approver and notes
-        scs bundle version --version 1.0.0 \
-            --approved-by "jane@example.com" --notes "Initial release"
-
-        # Version a specific bundle
-        scs bundle version --bundle bundles/concepts/security.yaml --version 2.1.0
-
-        # Skip git operations (manual git workflow)
-        scs bundle version --version 1.0.0 --no-git
-    """
-    click.echo("=== SCS Bundle Versioning ===\n")
-
-    bundle_path = Path(bundle) if bundle else _root_bundle(Path.cwd())
-    if not bundle_path.exists():
-        click.echo(f"Error: Bundle file not found: {bundle}", err=True)
-        raise click.Abort()
-
-    # Validate version number format (basic semantic versioning check)
-    version_parts = version_number.split(".")
-    if len(version_parts) != 3 or not all(part.isdigit() for part in version_parts):
-        click.echo(
-            f"Error: Invalid version number '{version_number}'. "
-            "Must be semantic version (e.g., 1.0.0)",
-            err=True,
-        )
-        raise click.Abort()
-
-    # The approver is a person the user names, never inferred from the environment
-    # (ISS-047, RFC 0002 sections 3 and 6).
-    if approved_by is None:
-        approved_by = click.prompt("Approver email", type=str)
-    approved_by = approved_by.strip()
-    if not approved_by:
-        click.echo("Error: An approver is required to version a bundle.", err=True)
-        raise click.Abort()
-
-    # Manifests and tags carry the bundle name, so several bundles versioned at the same
-    # version don't overwrite each other (ISS-043).
-    bundle_name = _bundle_name(bundle_path)
-    tag = f"{bundle_name}-v{version_number}"
-    if not no_git and _git_tag_exists(tag):
-        click.echo(f"Error: Git tag already exists: {tag}", err=True)
-        raise click.Abort()
-
-    # The content digest is computed by scs-validator's resolver (ISS-045).
-    try:
-        from scs_validator.digest import DigestError, content_digest
-        from scs_validator.resolver import resolve
-    except ImportError as e:
-        raise click.ClickException(
-            f"scs bundle version needs scs-validator ({e}). "
-            "Install with: pip install 'scs-tools[validator]'"
-        )
-
-    # Get version notes if not provided
-    if not notes:
-        notes = click.prompt(
-            "Version notes (or press Enter for default)",
-            default=f"Version {version_number} release",
-            show_default=True,
-        )
-
-    click.echo()
-
-    # Step 1: Validate bundle (unless skipped)
-    if not no_validate:
-        click.echo("Step 1/5: Validating bundle...")
-        validation_result = _validate_bundle(bundle_path)
-        if not validation_result["passed"]:
-            click.echo(
-                f"\n✗ Validation failed with {validation_result['errors']} error(s).",
-                err=True,
-            )
-            click.echo("Fix validation errors before versioning.", err=True)
-            click.echo("Or use --no-validate to skip (not recommended).", err=True)
-            raise click.Abort()
-        click.echo(
-            f"  ✓ Validation passed "
-            f"({validation_result['errors']} errors, {validation_result['warnings']} warnings)\n"
-        )
-    else:
-        click.echo("Step 1/5: Skipping validation (--no-validate)\n")
-
-    # Step 2: Create versioned bundle
-    click.echo("Step 2/5: Creating versioned bundle snapshot...")
-    versioned_bundle_path = _create_versioned_bundle(
-        bundle_path, version_number, approved_by, notes, force, validated=not no_validate
-    )
-    click.echo(f"  ✓ Created: {versioned_bundle_path}\n")
-
-    # Step 3: Checksum the snapshot file, and digest the content it resolves to: the snapshot,
-    # its SCDs and its imports (spec/0.7/bundle-format.md §7.6).
-    click.echo("Step 3/5: Generating checksum and content digest...")
-    checksum, file_size = _generate_checksum(versioned_bundle_path)
-    tree = resolve(versioned_bundle_path)
-    try:
-        digest = content_digest(tree.root, tree.index)
-    except DigestError as e:
-        versioned_bundle_path.unlink()
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    content_inputs, _ = digest.inputs()
-    for kind in ("bundles", "scds"):
-        for ref in [r for r, d in content_inputs[kind].items() if d is None]:
-            click.echo(f"  Warning: {ref} not found; recorded as missing", err=True)
-    click.echo(f"  ✓ SHA-256: {checksum}")
-    click.echo(f"  ✓ Content digest: {digest.digest}\n")
-
-    # Step 4: Create version manifest
-    click.echo("Step 4/5: Creating version manifest...")
-    manifest_path = _create_version_manifest(
-        bundle_path,
-        versioned_bundle_path,
-        bundle_name,
-        tag if not no_git else None,
-        version_number,
-        approved_by,
-        notes,
-        checksum,
-        file_size,
-        digest.digest,
-        content_inputs,
-        validation_result if not no_validate else None,
-    )
-    click.echo(f"  ✓ Created: {manifest_path}\n")
-
-    # Step 5: Git commit and tag
-    if not no_git:
-        click.echo("Step 5/5: Creating git commit and tag...")
-        _create_git_version(
-            versioned_bundle_path,
-            manifest_path,
-            bundle_name,
-            tag,
-            version_number,
-            checksum,
-            validation_result if not no_validate else None,
-        )
-        click.echo(f"  ✓ Committed and tagged: {tag}\n")
-    else:
-        click.echo("Step 5/5: Skipping git operations (--no-git)\n")
-
-    # Summary
-    click.echo("=" * 60)
-    click.echo("✓ Bundle versioning complete!")
-    click.echo("=" * 60)
-    click.echo(f"Version: {version_number}")
-    click.echo(f"Bundle: {versioned_bundle_path}")
-    click.echo(f"Manifest: {manifest_path}")
-    click.echo(f"Checksum: {checksum}")
-    click.echo(f"Content digest: {digest.digest}")
-    if not no_git:
-        click.echo(f"Git Tag: {tag}")
-    click.echo()
-    click.echo("Next steps:")
-    click.echo("  • Review the versioned bundle and manifest")
-    if not no_git:
-        click.echo(f"  • Push to remote: git push && git push origin {tag}")
-    click.echo("  • Proceed to Phase 4 (Build) - Configure development environments")
-    click.echo()
-
-
-def _validate_bundle(bundle_path):
-    """Validate the bundle in-process (D-37) and return its error and warning counts. Schema
-    lookup is the validator's own (``SCS_SCHEMA_DIR``, then discovery)."""
-    from scs_validator import api
-
-    try:
-        report = api.validate_bundle(bundle_path)
-    except Exception as e:
-        click.echo(f"  Warning: Could not run validation: {e}")
-        return {"passed": False, "errors": 1, "warnings": 0}
-    results = report.all_results()
-    for result in results:
-        for error in result.errors:
-            click.echo(f"  {error.format_message()}", err=True)
-    return {
-        "passed": report.exit_code() == 0,
-        "errors": sum(r.error_count for r in results),
-        "warnings": sum(r.warning_count for r in results),
-    }
-
-
-def _bundle_name(bundle_path):
-    """The bundle's name from its id (`bundle:<name>`), falling back to the file stem."""
-    from scs_validator.names import bundle_name
-
-    with open(bundle_path, "r") as f:
-        bundle_id = str((yaml.safe_load(f) or {}).get("id", ""))
-    return bundle_name(bundle_id, Path(bundle_path))
-
-
-def _git_tag_exists(tag):
-    result = subprocess.run(
-        ["git", "rev-parse", "-q", "--verify", f"refs/tags/{tag}"],
-        capture_output=True,
-        check=False,
-    )
-    return result.returncode == 0
-
-
-def _git_output(*args):
-    """Output of a git command, or None outside a repository or on error."""
-    try:
-        return (
-            subprocess.check_output(["git", *args], stderr=subprocess.DEVNULL, text=True).strip()
-            or None
-        )
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return None
-
-
-def _validator_version():
-    """Return the installed scs-validator package version, or "unknown" if it can't be read.
-
-    `_validate_bundle` runs the validator in-process (see above), so scs-validator is installed
-    in this environment and this lookup should succeed. Read from package metadata rather than
-    hardcoding a version string, which goes stale the moment either package is re-versioned.
-    """
-    try:
-        return pkg_version("scs-validator")
-    except PackageNotFoundError:
-        return "unknown"
-
-
-def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, force, validated):
-    """Create versioned bundle with approval metadata."""
-    # Load original bundle
-    with open(bundle_path, "r") as f:
-        bundle_data = yaml.safe_load(f)
-
-    # Get current timestamp
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    # The snapshot is the released bundle: it carries the released version (not DRAFT), which is
-    # what the approval fields below attest to and what `bundle:<name>:<version>` imports pin.
-    bundle_data["version"] = version_number
-
-    # Add approval metadata to provenance. Field names match the schema's
-    # required version_approved_by/version_approved_at (RFC-0001, Provenance
-    # and approval) - this command is exactly what's meant to populate them.
-    if "provenance" not in bundle_data:
-        bundle_data["provenance"] = {}
-
-    bundle_data["provenance"]["version_approved_by"] = approved_by
-    bundle_data["provenance"]["version_approved_at"] = timestamp
-    # Recorded from what happened: under --no-validate the bundle is approved, not validated.
-    bundle_data["provenance"]["approval_status"] = "validated" if validated else "approved"
-    bundle_data["provenance"]["validation_passed"] = validated
-    if validated:
-        bundle_data["provenance"]["validation_date"] = timestamp
-    bundle_data["provenance"]["version_notes"] = notes
-
-    # Create versioned filename
-    bundle_dir = bundle_path.parent
-    bundle_name = bundle_path.stem  # e.g., "project-bundle"
-    versioned_filename = f"{bundle_name}-v{version_number}.yaml"
-    versioned_path = bundle_dir / versioned_filename
-
-    # Check if file exists
-    if versioned_path.exists() and not force:
-        click.echo(
-            f"Error: Versioned bundle already exists: {versioned_path}",
-            err=True,
-        )
-        click.echo("Use --force to overwrite", err=True)
-        raise click.Abort()
-
-    # Write versioned bundle
-    with open(versioned_path, "w") as f:
-        yaml.dump(bundle_data, f, default_flow_style=False, sort_keys=False)
-
-    return versioned_path
-
-
-def _generate_checksum(file_path):
-    """Generate SHA-256 checksum of file."""
-    sha256_hash = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-
-    checksum = sha256_hash.hexdigest()
-    file_size = file_path.stat().st_size
-
-    return checksum, file_size
-
-
-def _create_version_manifest(
-    original_bundle_path,
-    versioned_bundle_path,
-    bundle_name,
-    tag,
+@click.option("--dry-run", is_flag=True, help="Report what would be written; write nothing")
+@machine_command("bundle version")
+def version(
+    envelope: Envelope,
+    out: Output,
+    bundle_file,
     version_number,
     approved_by,
     notes,
-    checksum,
-    file_size,
-    content_digest,
-    content_inputs,
-    validation_result,
+    no_validate,
+    dry_run,
 ):
-    """Create version manifest file."""
-    # Load bundle to get metadata
-    with open(original_bundle_path, "r") as f:
-        bundle_data = yaml.safe_load(f)
+    """
+    Release a bundle as a version: a snapshot, a manifest, a commit, and a tag
 
-    bundle_id = bundle_data.get("id", "unknown")
-    bundle_type = bundle_data.get("type", "project")
-    imports = bundle_data.get("imports", [])
+    The version is the git tag <workspace>/<bundle-name>-v<version> on a commit holding the
+    whole workspace except dist/. The commit's author is the approver; its committer and the
+    tag's tagger are scs-tools. Every import must be pinned to a released version that still
+    matches its tag. A version is never overwritten; make a new one instead.
 
-    # Count SCDs in project
-    context_dir = original_bundle_path.parent.parent / "context" / "project"
-    scd_count = 0
-    if context_dir.exists():
-        scd_count = len([f for f in context_dir.iterdir() if f.suffix == ".yaml"])
-
-    meta_bundles = [imp for imp in imports if imp.split(":")[1:2] == ["meta"]]
-    imported_bundles = [imp for imp in imports if imp not in meta_bundles]
-
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    manifest = {
-        "version": version_number,
-        "release_date": timestamp,
-        "status": "validated" if validation_result else "approved",
-        "project": bundle_name,
-        "bundle": {
-            "id": bundle_id,
-            "type": bundle_type,
-            "file": versioned_bundle_path.name,
-            "sha256": checksum,
-            "size_bytes": file_size,
-        },
-        "content_digest": content_digest,
-        "content_inputs": content_inputs,
-    }
-
-    if validation_result:
-        manifest["validation"] = {
-            "validator_version": _validator_version(),
-            "validation_date": timestamp,
-            "passed": validation_result["passed"],
-            "errors": validation_result["errors"],
-            "warnings": validation_result["warnings"],
-            "scd_count": scd_count,
-            "import_count": len(imports),
-        }
-
-    manifest["components"] = {
-        "meta_bundles": meta_bundles,
-        "imported_bundles": imported_bundles,
-        "total_scds": scd_count,
-    }
-
-    manifest["approval"] = {
-        "approved_by": approved_by,
-        "approved_at": timestamp,
-        "approval_notes": notes,
-    }
-
-    manifest["phases"] = {
-        "phase_1_intent": "completed",
-        "phase_2_validate": "completed" if validation_result else "skipped",
-        "phase_3_version": "completed",
-        "phase_4_build": "pending",
-    }
-
-    manifest["release_notes"] = notes
-
-    # Repository and branch come from git, not the bundle name; without git they're omitted.
-    distribution = {}
-    if tag:
-        toplevel = _git_output("rev-parse", "--show-toplevel")
-        branch = _git_output("symbolic-ref", "--short", "-q", "HEAD")
-        if toplevel:
-            distribution["repository"] = Path(toplevel).name
-        if branch:
-            distribution["branch"] = branch
-        distribution["tag"] = tag
-    distribution["immutable"] = True
-    distribution["authoritative"] = True
-    manifest["distribution"] = distribution
-
-    # Write manifest
-    manifest_filename = f"{bundle_name}-v{version_number}-MANIFEST.yaml"
-    manifest_path = versioned_bundle_path.parent / manifest_filename
-
-    with open(manifest_path, "w") as f:
-        yaml.dump(manifest, f, default_flow_style=False, sort_keys=False)
-
-    return manifest_path
-
-
-def _create_git_version(
-    versioned_bundle_path,
-    manifest_path,
-    bundle_name,
-    tag,
-    version_number,
-    checksum,
-    validation_result,
-):
-    """Create git commit and tag for the version."""
-    try:
-        # Check if git is available and we're in a repo
-        subprocess.run(
-            ["git", "rev-parse", "--git-dir"],
-            check=True,
-            capture_output=True,
-        )
-
-        # Stage files
-        subprocess.run(
-            ["git", "add", str(versioned_bundle_path), str(manifest_path)],
-            check=True,
-        )
-
-        # Create commit message
-        validation_summary = ""
-        if validation_result:
-            validation_summary = f"""
-Phase 2 (Validate) Results:
-- {validation_result.get('errors', 0)} validation errors
-- {validation_result.get('warnings', 0)} warnings
-"""
-
-        commit_message = f"""Release {tag} - Phase 3 (Version) Complete
-
-Created immutable versioned snapshot of validated SCD bundle.
-{validation_summary}
-Deliverables:
-- Versioned bundle: {versioned_bundle_path.name}
-- Version manifest: {manifest_path.name}
-- SHA-256 checksum: {checksum}
-
-This bundle is now the authoritative source of truth.
-"""
-
-        # Create commit
-        subprocess.run(
-            ["git", "commit", "-m", commit_message],
-            check=True,
-            capture_output=True,
-        )
-
-        # Create annotated tag
-        phase_2 = (
-            "✓ Phase 2: Validate - Bundle validated"
-            if validation_result
-            else "- Phase 2: Validate - skipped (--no-validate)"
-        )
-        tag_message = f"""SCD Bundle {bundle_name} v{version_number}
-
-Validation Status: {'✓ PASSED' if validation_result else 'SKIPPED (--no-validate)'}
-Bundle Checksum (SHA-256): {checksum}
-
-Phase Completion:
-✓ Phase 1: Intent - SCDs generated
-{phase_2}
-✓ Phase 3: Version - Immutable snapshot created
-
-Ready for Phase 4 (Build) - development environment configuration.
-"""
-
-        subprocess.run(
-            ["git", "tag", "-a", tag, "-m", tag_message],
-            check=True,
-        )
-
-    except subprocess.CalledProcessError as e:
-        click.echo(f"  Warning: Git operation failed: {e}", err=True)
-        click.echo("  Files were created but not committed to git", err=True)
-        raise click.Abort()
+    \b
+    Examples:
+        scs bundle version --bundle bundles/concepts/security.yaml --version 1.0.0 \\
+            --approved-by "Jane Doe <jane@acme.com>"
+        scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme.com>" --dry-run
+    """
+    if bundle_file is None:
+        found = [Path.cwd() / "bundles" / name for name in ROOT_BUNDLE_FILES]
+        found = [path for path in found if path.exists()]
+        if len(found) != 1:
+            raise CommandError(
+                "NO_INPUT",
+                "Pass the bundle to version with --bundle (no single root bundle here)",
+                exit_code=EXIT_USAGE,
+            )
+        bundle_file = found[0]
+    version_bundle(
+        envelope, out, bundle_file, version_number, approved_by, notes, no_validate, dry_run
+    )

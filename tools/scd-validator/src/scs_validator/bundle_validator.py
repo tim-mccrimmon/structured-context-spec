@@ -3,7 +3,7 @@
 from typing import Any, Dict, List
 
 from .digest import verify_tree
-from .resolver import BundleTree
+from .resolver import BundleTree, ResolvedBundle
 from .rules_loader import RulesLoader
 from .utils import ValidationError, ValidationResult, ValidationWarning
 
@@ -265,14 +265,18 @@ class BundleValidator:
             path = str(check.bundle.path)
             if check.status == "mismatch":
                 changes = ", ".join(check.changes) or "unknown (no content_inputs recorded)"
-                result.add_error(
-                    ValidationError(
-                        self.rules_loader.get_error_message(
-                            self.rules, "content_digest_mismatch", changes=changes, **fmt
-                        ),
-                        file_path=path,
-                        code="CONTENT_DIGEST_MISMATCH",
+                message = self.rules_loader.get_error_message(
+                    self.rules, "content_digest_mismatch", changes=changes, **fmt
+                )
+                order = _version_again(tree, check.bundle)
+                if len(order) > 1:
+                    message += (
+                        " Version again, bottom-up, re-pinning each in the next: "
+                        + ", then ".join(order)
+                        + "."
                     )
+                result.add_error(
+                    ValidationError(message, file_path=path, code="CONTENT_DIGEST_MISMATCH")
                 )
             elif check.status == "unrecorded":
                 result.add_warning(
@@ -503,3 +507,18 @@ class BundleValidator:
                             code="BUNDLE_META_VERSION_INVALID",
                         )
                     )
+
+
+def _version_again(tree: BundleTree, changed: ResolvedBundle) -> List[str]:
+    """The changed bundle, then every bundle in the tree that imports it, directly or not,
+    nearest first: the order to version them again (D-19)."""
+    order = [changed.id]
+    frontier = [changed]
+    while frontier:
+        importers = []
+        for edge in tree.edges:
+            if any(edge.target is b for b in frontier) and edge.importer.id not in order:
+                order.append(edge.importer.id)
+                importers.append(edge.importer)
+        frontier = importers
+    return order
