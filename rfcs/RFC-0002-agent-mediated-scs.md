@@ -22,7 +22,9 @@
   provenance is reported, versioning refuses it, and `scs new` stops inventing an author (plan
   D-71; section 5, Validation Rules, Unresolved Questions). 2026-10-26: a `personal` Project
   gets boundaries only (plan D-72; Unresolved Questions); a Project inherits the Domain's
-  ontology unless `--ontology` is given (plan D-74)
+  ontology unless `--ontology` is given (plan D-74). 2026-10-26: one engine command creates a
+  concept with no template, removing a concept's last SCD removes the concept, and the ontology
+  manifest keeps its name for 0.7 (plan D-68, D-69, D-73; Unresolved Questions)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---
@@ -1077,17 +1079,17 @@ produced that way will vary in quality, and the variation will reflect on the st
    `CLAUDE.md` that points to it.
 9. **Creating a concept with no template.** The `personal` ontology's concepts are defined with
    the user, so the engine needs a command that creates a concept bundle, its first SCD, and its
-   ontology manifest entry. Open (plan D-68).
+   ontology manifest entry. Resolved: one engine command does all three (plan D-68).
 10. **Removing what the scaffold supplied.** When removing an SCD leaves its concept bundle
     empty, the same command should remove the concept bundle, the root bundle's import, and the
-    manifest entry. Open (plan D-69).
+    manifest entry. Resolved as stated (plan D-69).
 11. **Reporting provenance to correct.** Resolved: placeholders only (section 5, Validation
     Rules; plan D-71). Unused SCDs are resolved too (Validation Rules; plan D-70).
 12. **Projects under the `personal` ontology.** Resolved: the same fixed concept, boundaries,
     and nothing else (plan D-72).
 13. **The ontology manifest's naming.** It still uses "domain" (`domain-manifest.yaml`, the
     `domain:` key), while "Domain" now names only the global tier. Kept for 0.7; a rename needs
-    its own RFC (plan D-73).
+    its own RFC. Resolved: kept for 0.7 (plan D-73).
 14. **A Project's default ontology.** Resolved: without `--ontology`, `scs new project` uses the
     Domain's ontology; `--ontology` selects any ontology (plan D-74).
 
