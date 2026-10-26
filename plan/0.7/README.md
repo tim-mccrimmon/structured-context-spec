@@ -35,3 +35,38 @@ holds the QA reviews of the plan and their disposition.
   meet.
 - RFC 0002 remains the authority on intent. Where this plan and the RFC disagree, section 7
   records it and the maintainer decides.
+
+## Build progress
+
+Updated 2026-10-25. Branch `0.7-dev`; CI green on every commit below.
+
+| WP | State | Commit |
+|---|---|---|
+| WP-01a, WP-01b | Done: decisions recorded, RFC 0002 amended (D-27 waits for WP-11a) | `938483d` |
+| WP-00 | Done: validator version from package metadata, digest test vectors | `99ee08c` |
+| WP-04 | Done: check registry, repository mode, diagnostic codes, report schema | `3e7c7a4` |
+| WP-05 | Done: `--json` envelope, exit codes 0-5, `--dry-run`, `scd write`, `compile` to `dist/` | `476e542` |
+| WP-03 | Next (group 4; unblocked) | |
+| WP-14 | Next (group 5; unblocked) | |
+| WP-07 | Waits for WP-03 | |
+| WP-02a, WP-09, WP-11a, WP-13a | Unblocked, not started | |
+
+Known gaps carried forward:
+
+- Bundle mode does not schema-validate the SCDs it resolves, and an unreadable SCD YAML file is
+  skipped by the index without a diagnostic.
+- The CLI still writes plain-email approvers in version manifests; the 0.7 manifest schema
+  wants `Name <email>` (WP-06 / WP-14).
+- Rule-severity housekeeping item from WP-04 is still open.
+- The exit-2 (`--strict` warnings) machine-mode test fakes the validator report; no real input
+  found yet produces a warning without errors.
+
+Working notes:
+
+- Change sets per WP: code, tests, `schema/diagnostics/codes.d/WP-NN.yaml` (then
+  `python tools/scd-validator/scripts/build_codes.py`), and `docs/migration.d/WP-NN.md`.
+- Before committing: both test suites; `ruff check`; `black --check` run from inside each
+  package directory (never from `tools/`, which falls back to 88 columns); `mypy src` and
+  `mypy scs_tools`; `build_codes.py --check`; `sync_schemas.py --check`.
+- Dev environment: a venv with `pip install -e "tools/scd-validator[dev]" -e tools/cli pytest
+  jsonschema`.
