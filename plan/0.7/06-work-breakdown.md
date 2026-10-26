@@ -286,6 +286,8 @@ listed in order, and each starts after the previous one merges.
   - `scs new` never writes an invented author (D-71): without `--author` and `--email`,
     non-interactive and machine mode give `NO_INPUT`; interactive mode offers git `user.name`
     and `user.email` as prompt defaults.
+  - In a `personal` Domain, `scs new project x` scaffolds a `personal` Project; with
+    `--ontology sdlc` it scaffolds an `sdlc` Project (D-74).
   - `bundle pin` changes exactly one import and appears in `changes`.
   - A failure injected after each of snapshot, manifest, commit, and tag leaves the working tree,
     index, and refs as they were (four tests); `changes` is empty.
