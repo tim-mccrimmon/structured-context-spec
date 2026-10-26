@@ -78,7 +78,7 @@ copies must match them. Section 5 states the model in full.
 | D-29 | UQ6: provenance granularity | Item-level `derived_from` only. | WP-07 || **Decided** 2026-10-25: as recommended. |
 | D-30 | UQ7: intake for pre-0.7 workspaces | Optional; the intake skill offers to reconstruct one. | WP-07, WP-10 || **Decided** 2026-10-25: as recommended. |
 | D-32 | Link from a version to the review record | `intake.yaml` is in the version commit (D-40), so the tag already holds the record in force at approval. No separate `intake_digest`. | none || **Decided** 2026-10-25: as recommended. |
-| D-34 | Intake schema shapes | Designed in WP-07; approval is milestone M-07. | WP-07 || **Decided** 2026-10-25: as recommended. |
+| D-34 | Intake schema shapes | Designed in WP-07; approval is milestone M-07. | WP-07 || **Decided** 2026-10-25: as recommended. **M-07 approved** 2026-10-26: `schema/intake/intake-schema.json` as of `e5da021`. |
 | D-35 | Intake schema location | `schema/intake/intake-schema.json`. RFC. | WP-07 || **Decided** 2026-10-25: as recommended. |
 | D-36 | Manifest schema; `approved_by` path | `schema/manifest/version-manifest-schema.json`; RFC means `approval.approved_by`. RFC (wording). | WP-04 || **Decided** 2026-10-25: as recommended. |
 
