@@ -79,6 +79,10 @@ codes:
   CONTENT_DIGEST_UNRECORDED:
     severity: warning
     meaning: A versioned bundle's manifest has no content_digest, so its content cannot be verified.
+  DERIVED_FROM_UNRESOLVED:
+    severity: warning
+    meaning: A derived_from entry names an intake answer or source document that is not in the workspace's
+      intake.yaml (D-20); fails under --strict with exit code 2.
   DOMAIN_WORKSPACE_MISSING:
     severity: error
     meaning: A Domain repository has no workspace whose .scs/config bundle_type is domain, or scs new
@@ -142,6 +146,14 @@ codes:
   INPUT_EMPTY:
     severity: error
     meaning: Content expected on stdin or in a file was empty; exit code 3.
+  INTAKE_FIELD_RESERVED:
+    severity: error
+    meaning: scs intake set names a field another writer owns (review_findings is written by scs intake
+      record-finding) or that the engine sets (intake_version, scs_version).
+  INTAKE_SCHEMA_INVALID:
+    severity: error
+    meaning: A workspace's intake.yaml does not validate against schema/intake/intake-schema.json, or
+      cannot be read; scs intake set and record-finding refuse a change that would make it so.
   INTERNAL_ERROR:
     severity: error
     meaning: The tool failed unexpectedly; exit code 5. Report it with the message.

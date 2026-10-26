@@ -135,6 +135,8 @@ decisions depended on, all decided the same day.
 | D-74 | Which ontology does `scs new project` use when `--ontology` is not given? | Today `sdlc`, whatever the Domain's ontology, so `scs new project groceries` in a personal Domain scaffolds a full SDLC Project. Rec.: inherit the Domain's ontology (its `.scs/config` `ontology`) unless `--ontology` is given; `--ontology` still selects any ontology, so a personal Domain can hold an `sdlc` Project. Raised by D-72. | WP-06 | **Decided** 2026-10-26: inherit the Domain's ontology. |
 | D-75 | What does `scs bundle remove-scd` do with the SCD file? | Deletes it when no other working bundle in the workspace lists it, listed in `changes` as `delete`; versions keep it at their tags. Otherwise only the bundle's `scds` entry is removed. Retiring an SCD is still removing it from its bundle (RFC §7). | WP-06 | **Decided** 2026-10-26: as recommended. |
 | D-76 | Does `scs add bundle NAME --new` (D-68) also import the new concept? | Yes: the same run adds `bundle:NAME` (unpinned) to the workspace's root bundle's imports, listed in `changes`, so one command leaves the workspace consistent. Mirrors D-69. | WP-06 | **Decided** 2026-10-26: as recommended. |
+| D-77 | How does `scs intake set` take values? | `scs intake set FIELD VALUE`, VALUE parsed as YAML (`-` reads stdin). For an id-keyed list (`answers` and `source_documents` by `id`, `approvers` by `person`) a single object is upserted: it replaces the entry with the same key or is appended. A list, or any other field, replaces the value. The record is validated before writing; `review_findings` is written only by `record-finding`. | WP-07 | **Decided** 2026-10-26: as recommended. |
+| D-78 | How are approvers written in `intake.yaml`? | `{person, role}`: `person` is a person identifier (`Name <email>`) or `role:<name>` (D-28), `role` an optional job title. Every person field in the record uses the identifier form. RFC §4 example amended to match. | WP-07 | **Decided** 2026-10-26: as recommended. |
 
 ## RFC amendments implied
 
@@ -148,3 +150,5 @@ and Migration Guide (D-04, D-54). §2 is unchanged (D-08 option 2 was not chosen
 Applied to RFC 0002 on 2026-10-26: §1, §12, §13, Validation Rules, Implementation Notes (D-67);
 Motivation, Guide-level Explanation, §4, §5, §9, Implementation Notes, Migration Guide, and
 Unresolved Questions (D-61 to D-64, D-66, D-68 to D-73).
+
+Applied to RFC 0002 on 2026-10-26: §4 example approvers (D-78), and its IEC 62304 citation corrected to the citations.md form (`std:iec-62304:2006-a1`).

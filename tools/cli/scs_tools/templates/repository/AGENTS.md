@@ -11,7 +11,8 @@ Work in this repository is limited to five operations on SCS context:
 1. **Create** workspaces, bundles, and SCDs (`scs new`, `scs add`).
 2. **Maintain** them: edit, retire, and re-scope SCDs and bundles (`scs scd write`,
    `scs bundle add-scd`, `remove-scd`, `add-import`, `pin`, and `scs add bundle NAME --new` for
-   a concept with no template).
+   a concept with no template), and record the intake and review decisions (`scs intake set`,
+   `scs intake record-finding`).
 3. **Validate** them (`scs-validate`).
 4. **Version** bundles (`scs bundle version`); each version is a git tag.
 5. **Compile** bundles into runtime artifacts (`scs compile`), written to the workspace's `dist/`.
@@ -29,7 +30,8 @@ application's own repository. If you are asked for it here, say so and stop.
 ```
 
 Each workspace has `.scs/config`, `bundles/` (the root bundle and `concepts/`), `context/project/`
-(the SCDs), `ontology/domain-manifest.yaml`, and `dist/` (compiled artifacts). `sources/` holds
+(the SCDs), `ontology/domain-manifest.yaml`, `intake.yaml` (the intake record, written only by
+`scs intake`), and `dist/` (compiled artifacts). `sources/` holds
 local source documents and is not committed by default. `plan/`, `test-plan/`, and `qa/` are
 reserved for a later SCS release: do not create them.
 

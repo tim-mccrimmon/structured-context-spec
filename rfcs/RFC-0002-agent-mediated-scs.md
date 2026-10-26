@@ -455,7 +455,9 @@ the intake can be resumed, revisited when circumstances change, and audited. The
 not an SCD and is not compiled. It is validated against a new schema,
 `schema/intake/intake-schema.json`. The engine commands `scs intake set` and
 `scs intake record-finding` (both with `--dry-run`) are its only writers; the agent does not
-edit the file directly.
+edit the file directly. `scs intake set FIELD VALUE` sets one field; an object given for `answers`,
+`source_documents`, or `approvers` replaces the entry with the same `id` (`person` for
+approvers) or is appended.
 
 People in the record are identified as `Name <email>`. For a repository that will be shared
 publicly, the record MAY use role-only attribution instead, written `role:<name>` (for example
@@ -474,13 +476,12 @@ organization:
   products: [catheters, implantable leads]
 certifications:
   - std:iso-13485:2016
-  - std:iec-62304:2006+A1:2015
+  - std:iec-62304:2006-a1
   - std:21-cfr-820
   - std:iso-14971:2019
 approvers:
-  - name: Jane Doe
+  - person: Jane Doe <jane@medtech-cdmo.example>
     role: Quality Manager
-    email: jane@medtech-cdmo.example
 answers:
   - id: q-boundaries-1
     question: "Is there anything AI tools must never do with design history files?"

@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://structuredcontext.dev/schema/intake/intake-schema.json",
+  "title": "SCS intake record",
+  "description": "A workspace's intake.yaml (RFC 0002 section 4): routing answers, profile answers, approvers, source documents, and review findings. Not an SCD and never compiled. Written only by scs intake set and scs intake record-finding (D-07, D-77). Only the version fields are required, so the record can be built one field at a time.",
+  "type": "object",
+  "required": ["intake_version", "scs_version"],
+  "properties": {
+    "intake_version": {"const": "1.0"},
+    "scs_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+
+    "audience": {"enum": ["individual", "organization"]},
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The Domain repository the workspace belongs to"
+    },
+    "workspace": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "domain, or the Project's name"
+    },
+    "regulated": {"type": "boolean"},
+    "ontology": {"enum": ["sdlc", "cdmo", "mca", "personal"]},
+
+    "owner": {
+      "$ref": "#/$defs/person",
+      "description": "Personal Domain profile: the developer, as a person identifier (D-63). Provenance only; never compiled"
+    },
+    "practices": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "description": "Personal Domain profile: habits to apply everywhere"
+    },
+
+    "organization": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "products": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "services": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "sites": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      },
+      "additionalProperties": false
+    },
+    "certifications": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/citation"},
+      "description": "Standards and editions in scope; drive cites"
+    },
+    "approvers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["person"],
+        "properties": {
+          "person": {"$ref": "#/$defs/attribution"},
+          "role": {"type": "string", "minLength": 1, "description": "Job title"}
+        },
+        "additionalProperties": false
+      },
+      "description": "Who approves context versions (D-78)"
+    },
+    "source_documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "title": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1, "description": "Relative to the workspace"},
+          "url": {"type": "string", "minLength": 1},
+          "revision": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      },
+      "description": "Documents the agent may draft from; derived_from.source names one by id"
+    },
+
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "purpose": {"type": "string", "minLength": 1},
+        "technology": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      },
+      "additionalProperties": false
+    },
+    "risk": {
+      "type": "object",
+      "required": ["classification"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "minLength": 1,
+          "description": "For example IEC 62304 software safety class C"
+        },
+        "cites": {"type": "array", "items": {"$ref": "#/$defs/citation"}},
+        "rationale": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "description": "Categories of data handled, such as PHI, PCI, PII"
+    },
+
+    "boundaries": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "description": "What is out of bounds; the main source of prohibitions"
+    },
+
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "answer", "answered_by", "answered_at"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "question": {"type": "string", "minLength": 1},
+          "answer": {"type": "string", "minLength": 1},
+          "answered_by": {"$ref": "#/$defs/attribution"},
+          "answered_at": {"$ref": "#/$defs/timestamp"}
+        },
+        "additionalProperties": false
+      },
+      "description": "derived_from.intake names one by id"
+    },
+
+    "review_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "target", "finding", "decision", "decided_by", "decided_at"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "kind": {
+            "enum": [
+              "framework-conflict",
+              "missing-protection",
+              "technical-risk",
+              "ethical-risk",
+              "layer-conflict"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The SCD item concerned, scd:<tier>:<name>#<item-id>, or the SCD"
+          },
+          "finding": {"type": "string", "minLength": 1},
+          "cites": {"type": "array", "items": {"$ref": "#/$defs/citation"}},
+          "decision": {"enum": ["changed", "kept", "deferred"]},
+          "rationale": {"type": "string", "minLength": 1},
+          "decided_by": {"$ref": "#/$defs/attribution"},
+          "decided_at": {"$ref": "#/$defs/timestamp"}
+        },
+        "if": {"properties": {"decision": {"const": "kept"}}, "required": ["decision"]},
+        "then": {"required": ["rationale"]},
+        "additionalProperties": false
+      },
+      "description": "Advisory review decisions (RFC 0002 section 12); written by scs intake record-finding"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+    "person": {
+      "description": "A person identifier, Name <email> (D-28, D-63)",
+      "type": "string",
+      "pattern": "^[^<>\\s][^<>]*\\s<[^<>\\s@]+@[^<>\\s@]+>$",
+      "not": {"pattern": "^role:"}
+    },
+    "role": {
+      "description": "Role-only attribution, role:<name>, allowed in intake.yaml only (D-28)",
+      "type": "string",
+      "pattern": "^role:[a-z0-9][a-z0-9._-]*$"
+    },
+    "attribution": {"oneOf": [{"$ref": "#/$defs/person"}, {"$ref": "#/$defs/role"}]},
+    "citation": {
+      "type": "string",
+      "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+    },
+    "timestamp": {
+      "description": "ISO 8601 date-time with a zone; YAML timestamps are normalized to this form before validation",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+    }
+  }
+}

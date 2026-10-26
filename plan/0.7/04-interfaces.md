@@ -92,7 +92,8 @@ nearest `.scs/config` above the current directory. At the repository root withou
 | `scs bundle pin NAME --version V [--bundle B]` | yes | D-08: re-pins B's one import of `bundle:NAME` to a released version `V`; changes exactly that line |
 | `scs bundle version BUNDLE --version V --approved-by P` | yes | `--approved-by` required in every mode; no `--force`, no `--no-git`; refuses unpinned or DRAFT imports (D-14); commits the workspace (D-40) with the D-55 identity |
 | `scs bundle diff BUNDLE [--from V] [--to V\|working]` | n/a | Default `--from` = latest version (D-41 for none or legacy), `--to` = `working`; old content from the tag |
-| `scs intake set` / `scs intake record-finding` | yes | The only writers of `intake.yaml` (D-07) |
+| `scs intake set FIELD VALUE [--workspace W]` | yes | One of the two writers of `intake.yaml` (D-07). VALUE is YAML, `-` reads stdin; an object upserts into `answers`, `source_documents` (by `id`) or `approvers` (by `person`), anything else replaces the field (D-77); an answer without `answered_at` gets the current time (UTC); the record is validated before writing |
+| `scs intake record-finding --kind K --target T --finding F --decision D --decided-by P [--id ID] [--rationale R] [--cites C]... [--decided-at TS] [--workspace W]` | yes | The other writer (D-07): upserts one `review_findings` entry; `--id` defaults to the next `rf-N`, `--decided-at` to now (UTC); `--decided-by` is never taken from git (D-13): missing gives `NO_INPUT` with a suggestion |
 | `scs compile BUNDLE [--version V \| --allow-draft]` | yes | `--version V` compiles the released snapshot with `source_digest` (D-57); without it, the working DRAFT needs `--allow-draft`. Writes `dist/<bundle-name>-<version>.yaml`; `--stdout` in human mode only (D-11); no flag bypasses a failed D-39 check |
 | `scs validate` / `scs-validate` | n/a | See below |
 

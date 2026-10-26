@@ -243,7 +243,7 @@ def test_resolver_prefers_the_pinned_version(tmp_path: Path):
 
 
 def test_standards_bundle_is_deprecated(tmp_path: Path):
-    scd(tmp_path, "scd:standards:hipaa")
+    scd(tmp_path, "scd:standards:hipaa", "  standard_name: HIPAA\n")
     root = bundle(
         tmp_path, "bundles/std.yaml", "bundle:std", "standards", scds=["scd:standards:hipaa"]
     )

@@ -307,12 +307,17 @@ listed in order, and each starts after the previous one merges.
   - Machine-mode conformance for both `scs intake` commands.
   - The RFC §4 example validates; personal and project profile fixtures validate; `role:`
     attribution validates in `intake.yaml`.
-  - `review_findings`: `kind` outside the four RFC values fails; `decision: kept` without
+  - `review_findings`: `kind` outside the five RFC values (§12, with D-67's `layer-conflict`) fails; `decision: kept` without
     `rationale` fails; missing `decided_by` or `decided_at` fails.
   - `derived_from` with both `intake` and `source` fails; an unresolved id gives
     `DERIVED_FROM_UNRESOLVED`, exit 2 under `--strict`.
   - An invalid `intake.yaml` is reported in each workspace.
   - All 0.6 example SCDs still validate; compiled output never contains `derived_from`.
+  - `scs intake set` upserts `answers`, `source_documents` (by `id`), and `approvers` (by
+    `person`) and refuses a change that would make the record invalid, writing nothing (D-77);
+    `record-finding` without `--decided-by` gives `NO_INPUT`, never git's identity.
+  - Bundle and repository validation check every SCD in the tree against its tier schema, so a
+    malformed `derived_from` fails there too (the bundle pipeline ran only the semantic pass).
 - **M-07**: maintainer approves the intake schema. WP-10 and WP-02b wait for it.
 
 ### WP-08 `scs bundle diff` (ISS-052)

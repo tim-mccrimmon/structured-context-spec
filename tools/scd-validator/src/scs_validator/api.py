@@ -209,6 +209,7 @@ def _bundle_results(
     """The bundle pipeline (levels 1-6) for one bundle, and its resolved tree."""
     syntax_result = ValidationResult("syntax")
     bundle_schema_result = ValidationResult("bundle_schema")
+    scd_schema_result = ValidationResult("schema")
     semantic_result = ValidationResult("semantic")
     bundle_result = ValidationResult("bundle")
     relationship_result = ValidationResult("relationships")
@@ -252,6 +253,7 @@ def _bundle_results(
                 log(f"  Warning: Could not load {resolved_scd.path}: {e}")
                 continue
             all_scds.append(scd_data)
+            scd_schema_result.extend(v.schema.validate_scd(scd_data, str(resolved_scd.path)))
             # Level 3: semantic
             semantic_result.extend(v.semantic.validate_scd(scd_data, str(resolved_scd.path)))
         log(f"Successfully loaded {len(all_scds)} SCDs")
@@ -273,7 +275,8 @@ def _bundle_results(
     except ValidationError as e:
         syntax_result.add_error(e)
 
-    results = [syntax_result, bundle_schema_result, semantic_result, bundle_result]
+    results = [syntax_result, bundle_schema_result, scd_schema_result, semantic_result]
+    results.append(bundle_result)
     if relationship_result.errors or relationship_result.warnings:
         results.append(relationship_result)
     if not skip_completeness and (completeness_result.errors or completeness_result.warnings):

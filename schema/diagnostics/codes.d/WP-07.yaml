@@ -1,0 +1,19 @@
+# Diagnostic codes added by WP-07 (intake record, derived_from, review findings; RFC 0002
+# sections 4, 5, 12). Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  INTAKE_SCHEMA_INVALID:
+    severity: error
+    meaning: >-
+      A workspace's intake.yaml does not validate against schema/intake/intake-schema.json, or
+      cannot be read; scs intake set and record-finding refuse a change that would make it so.
+  INTAKE_FIELD_RESERVED:
+    severity: error
+    meaning: >-
+      scs intake set names a field another writer owns (review_findings is written by
+      scs intake record-finding) or that the engine sets (intake_version, scs_version).
+  DERIVED_FROM_UNRESOLVED:
+    severity: warning
+    meaning: >-
+      A derived_from entry names an intake answer or source document that is not in the
+      workspace's intake.yaml (D-20); fails under --strict with exit code 2.

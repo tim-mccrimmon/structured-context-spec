@@ -207,7 +207,7 @@ def test_the_version_commit_holds_the_whole_workspace_and_nothing_else(repo: Pat
     commit_all(repo, "scaffold")
     app = ws(repo)
     (app / "docs" / "GETTING_STARTED.md").unlink()
-    (app / "intake.yaml").write_text("profile: project\n")
+    (app / "intake.yaml").write_text('intake_version: "1.0"\nscs_version: 0.7.0\n')
     (app / "README.md").write_text("# app\n")
     (app / "dist").mkdir()
     (app / "dist" / "old.yaml").write_text("x: 1\n")

@@ -49,13 +49,16 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-03 | Done: `new domain` creates the Domain repository (AGENTS.md, CI, initial commit), `new project` inside it, `ontology/`, D-06 config keys; templates by ontology and kind (D-64), `personal` ontology with boundaries only (D-61, D-62, D-72), `created_by` as `Name <email>` | `3d36d97` |
 | WP-14 | Done: tag-based versioning, D-39 checks, `--verify-version`, `compile --version`, D-17 resolution, D-70 `SCD_EMPTY`, D-71 `PROVENANCE_PLACEHOLDER` | `2bb34c0` |
 | WP-06 | Done: author and approver rules (D-13, D-71), D-74 ontology inheritance, `--dry-run` on `new`, `bundle pin`/`add-import`/`add-scd`/`remove-scd`, `add bundle --new` (D-68, D-75, D-76), full rollback | `0e16628` |
-| WP-07 | Next (unblocked by WP-03) | |
-| WP-02a, WP-09, WP-11a, WP-13a | Unblocked, not started | |
+| WP-07 | Built, awaiting M-07: `schema/intake/intake-schema.json`, `scs intake set`/`record-finding` (D-77, D-78), `derived_from` in SCD items, `DERIVED_FROM_UNRESOLVED`, intake checks per workspace | |
+| WP-02a, WP-08, WP-09, WP-11a, WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
 
-- Bundle mode does not schema-validate the SCDs it resolves, and an unreadable SCD YAML file is
-  skipped by the index without a diagnostic.
+- An unreadable SCD YAML file is skipped by the index without a diagnostic. (Bundle mode now
+  schema-validates the SCDs it resolves, WP-07.)
+- `dog-food/SCS-MED-CONTEXT/bundles/scs-project.yaml` and
+  `examples/llm-portability/input/scs-project.yaml` fail the bundle schema (a top-level
+  `metadata` key); neither is in CI.
 - Rule-severity housekeeping item from WP-04 is still open.
 - The generated CI workflow installs `scs-validator>=0.7.0,<0.8` from PyPI; that works once
   0.7.0 is published (D-27, WP-11rc). The packages still report version 0.6.0.
