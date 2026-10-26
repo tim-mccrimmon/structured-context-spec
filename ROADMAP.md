@@ -47,7 +47,10 @@ Make the lifecycle dependable before an agent drives it.
 ### 2. Domain repositories (ISS-048)
 
 One git repository per Domain, holding the Domain workspace and its Projects, with agent
-instructions and a CI workflow. A `personal` Domain profile for individual developers.
+instructions and a CI workflow. A `personal` Domain profile for individual developers. Each
+workspace reserves the directories `plan/`, `test-plan/`, and `qa/` and the bundle names
+`plan`, `test-plan`, and `qa` for a later release; 0.7 refuses those bundle names and ignores
+those directories.
 
 ### 3. Machine mode (ISS-049)
 

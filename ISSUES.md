@@ -939,10 +939,17 @@ suggestion for machine mode comes with ISS-049. Noted in `docs/MIGRATION-0.7.0.m
 ### ISS-048 - Domain repositories
 **Status:** open
 RFC 0002 section 9. `scs new domain` creates a git repository with `domain/`, `projects/`,
-`AGENTS.md` (plus a client pointer file), and a CI workflow; `scs new project` adds a workspace
-under `projects/` of an existing Domain repository. `personal` Domain profile (`company` and
-`prohibited` concept bundles only). Repository-level validation. Compile output to `dist/`.
-Workspace- and name-qualified tags and manifests (with ISS-043).
+`AGENTS.md` plus a `CLAUDE.md` pointer, `.gitignore` (ignores `sources/`), `.gitattributes`
+(`* text eol=lf`), and a CI workflow that fetches full history and tags; it initializes git and
+makes an initial commit. `scs new project` adds a workspace under `projects/` of an existing
+Domain repository. Workspace layout: `ontology/domain-manifest.yaml` (0.6 location still read,
+with an info diagnostic) and `context/project/`. `personal` Domain profile (`company` and
+`prohibited` concept bundles only). Repository-level validation, including `.scs/config` name
+matching the workspace directory. Compile output to `dist/`. Workspace- and name-qualified
+tags and manifests (with ISS-043). Reserved names: the directories `plan/`, `test-plan/`, and
+`qa/` at a workspace root are ignored by the validator and compiler and not created by the
+scaffold; bundles named `plan`, `test-plan`, or `qa` are refused by `scs add`, `scs new`, and
+the validator (`RESERVED_BUNDLE_NAME`). Build plan: `plan/0.7/` WP-03, WP-04.
 
 ### ISS-049 - Machine mode: `--json` and `--dry-run`
 **Status:** open
@@ -952,7 +959,8 @@ prompts and no inferred human values in machine mode; existing exit codes kept.
 
 ### ISS-050 - Intake record, `derived_from`, and review findings
 **Status:** open
-RFC 0002 sections 4, 5, and 12. `schema/intake.schema.json` (including `review_findings`);
+RFC 0002 sections 4, 5, and 12. `schema/intake/intake-schema.json` (including `review_findings`),
+written only by `scs intake set` and `scs intake record-finding`;
 optional `derived_from` on prohibitions, directives, and facts; validator rules for resolving
 ids; `compile` never emits either. Run `scripts/sync_schemas.py`.
 
@@ -960,8 +968,9 @@ ids; `compile` never emits either. Run `scripts/sync_schemas.py`.
 **Status:** open
 RFC 0002 sections 2, 4, 6, 8, and 12. Skills for intake, draft, review, validate, version,
 compile, and explain, calling the engine in machine mode, with placement advice from the guide
-(ISS-053). Open questions from the RFC to settle first: where the skills live; what happens to
-`scs-vibe` and `scs-team`; whether hosted chat sandboxes can install `scs-tools`.
+(ISS-053). Skills live in `skills/` in this repository; `scs-vibe` and `scs-team` are
+deprecated in 0.7 and removed in 0.8. Still open: whether hosted chat sandboxes can install
+`scs-tools` (fallback order PyPI, GitHub tag, bundled wheel; settled by WP-11a).
 
 ### ISS-052 - `scs bundle diff`
 **Status:** open

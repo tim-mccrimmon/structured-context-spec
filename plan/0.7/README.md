@@ -1,7 +1,7 @@
 # SCS 0.7.0 Plan
 
-- **Status**: Draft rev 4 (2026-10-25), revised after `review/plan-review-3.md`. WP-01a decided
-  (section 7 A to D); WP-01b (section E) open. Not yet approved.
+- **Status**: Rev 4 (2026-10-25). All decisions recorded (section 7) except D-27, which WP-11a
+  settles. RFC 0002 amended for WP-01a and WP-01b.
 - **Source of design**: `rfcs/RFC-0002-agent-mediated-scs.md` (accepted 2026-10-25)
 - **Backlog**: `ISSUES.md` ISS-042 to ISS-055; workstreams in `ROADMAP.md`
 

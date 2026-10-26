@@ -86,16 +86,16 @@ copies must match them. Section 5 states the model in full.
 
 | ID | Question | Rec. | Blocks | Decision |
 |---|---|---|---|---|
-| D-21 | Meta bundle version for 0.7 | Keep `bundle:meta:0.6.0` unless meta content changes. | WP-03 | |
-| D-22 | Spec home for agent-interface rules | New `spec/0.7/agent-interface.md`; layout in `bundle-format.md`. | WP-02a | |
-| D-23 | Personal profile and ontologies | Personal ignores ontology unless one is given; `ontology: none` supported. | WP-03 | |
-| D-24 | Placement guide | `docs/placement/<service>.md` with `checked:` dates and sources, for Claude Enterprise, Claude Code, Cursor, GitHub Copilot, ChatGPT Enterprise. Skills ship a copy and state its `checked:` date when advising. | WP-09 | |
-| D-25 | UQ1: where skills live | `skills/` in this repo, versioned with the spec. | WP-10 | |
-| D-26 | UQ2: legacy plugins | Deprecated in 0.7, removed in 0.8. | WP-10 | |
+| D-21 | Meta bundle version for 0.7 | Keep `bundle:meta:0.6.0` unless meta content changes. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-22 | Spec home for agent-interface rules | New `spec/0.7/agent-interface.md`; layout in `bundle-format.md`. | WP-02a || **Decided** 2026-10-25: as recommended. |
+| D-23 | Personal profile and ontologies | Personal ignores ontology unless one is given; `ontology: none` supported. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-24 | Placement guide | `docs/placement/<service>.md` with `checked:` dates and sources, for Claude Enterprise, Claude Code, Cursor, GitHub Copilot, ChatGPT Enterprise. Skills ship a copy and state its `checked:` date when advising. | WP-09 || **Decided** 2026-10-25: as recommended. |
+| D-25 | UQ1: where skills live | `skills/` in this repo, versioned with the spec. | WP-10 || **Decided** 2026-10-25: as recommended. |
+| D-26 | UQ2: legacy plugins | Deprecated in 0.7, removed in 0.8. | WP-10 || **Decided** 2026-10-25: as recommended. |
 | D-27 | UQ3: installing in chat sandboxes | Fallback order recorded now: PyPI; GitHub tag; a wheel bundled with the skill. The choice per client is an output of WP-11a, not part of WP-01b. | WP-10 (via WP-11a) | |
-| D-31 | UQ8: agent instructions file | `AGENTS.md` plus a `CLAUDE.md` pointer. | WP-03 | |
-| D-50 | Target chat clients | WP-11a: Claude.ai, Claude Code, Cursor, Codex, GitHub Copilot. WP-13 runs in Claude.ai. | WP-11a, WP-13 | |
-| D-51 | Skill behavior test harness | Claude Agent SDK with the skills loaded from `skills/`, model pinned in the harness config (`claude-sonnet-5-5` at the start; changes recorded). Each scripted conversation runs 5 times with a filesystem snapshot per turn. MUST assertions pass in 5 of 5 runs, SHOULD assertions in 4 of 5. | WP-10 | |
+| D-31 | UQ8: agent instructions file | `AGENTS.md` plus a `CLAUDE.md` pointer. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-50 | Target chat clients | WP-11a: Claude.ai, Claude Code, Cursor, Codex, GitHub Copilot. WP-13 runs in Claude.ai. | WP-11a, WP-13 || **Decided** 2026-10-25: as recommended. |
+| D-51 | Skill behavior test harness | Claude Agent SDK with the skills loaded from `skills/`, model pinned in the harness config (`claude-sonnet-5-5` at the start; changes recorded). Each scripted conversation runs 5 times with a filesystem snapshot per turn. MUST assertions pass in 5 of 5 runs, SHOULD assertions in 4 of 5. | WP-10 || **Decided** 2026-10-25: as recommended. |
 
 ## F. Housekeeping (no decision needed; fold into the named WP)
 
@@ -111,9 +111,9 @@ copies must match them. Section 5 states the model in full.
 
 ## RFC amendments implied
 
-If the recommendations stand, RFC 0002 changes in: §1 (D-08), §2 (D-08 option 2 only), §3 (D-09,
-D-42), §4 (D-07, D-35), §6 reading (D-44), §7 (D-08), §9 (D-02, D-04, D-05, and D-40: a version
-tag holds the whole workspace), §11 (D-39: verification reads the tag; tags are the record),
-Schema Changes (D-47), Migration Guide (D-54), and the wording of Validation Rules (D-20,
-D-36, D-39, D-54). WP-01a and WP-01b
-each commit their amendment as one change.
+Applied to RFC 0002 on 2026-10-25 as one amendment covering WP-01a and WP-01b: §1 (D-08), §3
+(D-09, D-12, D-42), §4 (D-07, D-28, D-35), §6 (D-44), §7 (D-08, D-41), §9 (D-01, D-02, D-03,
+D-04, D-05, D-15, D-38, D-40, D-52, D-55, D-57, D-58, D-59), §11 (D-16, D-39, D-53, D-57),
+Schema Changes (D-28, D-36, D-47, D-49), Validation Rules (D-03, D-20, D-36, D-39, D-54),
+Unresolved Questions (D-01, D-25, D-26, D-27, D-28, D-29, D-30, D-31), Implementation Notes,
+and Migration Guide (D-04, D-54). §2 is unchanged (D-08 option 2 was not chosen).
