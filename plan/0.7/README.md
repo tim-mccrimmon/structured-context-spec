@@ -1,7 +1,7 @@
 # SCS 0.7.0 Plan
 
 - **Status**: Rev 5 (2026-10-26). Decisions recorded (section 7) except D-27, which WP-11a
-  settles, and D-68, D-69, D-72, and D-73 (section 7 G), still open. RFC 0002 amended for WP-01a, WP-01b, and
+  settles, and D-68, D-69, D-73, and D-74 (section 7 G), still open. RFC 0002 amended for WP-01a, WP-01b, and
   section 7 G.
 - **Source of design**: `rfcs/RFC-0002-agent-mediated-scs.md` (accepted 2026-10-25)
 - **Backlog**: `ISSUES.md` ISS-042 to ISS-055; workstreams in `ROADMAP.md`
@@ -47,7 +47,7 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-00 | Done: validator version from package metadata, digest test vectors | `99ee08c` |
 | WP-04 | Done: check registry, repository mode, diagnostic codes, report schema | `3e7c7a4` |
 | WP-05 | Done: `--json` envelope, exit codes 0-5, `--dry-run`, `scd write`, `compile` to `dist/` | `476e542` |
-| WP-03 | Done: `new domain` creates the Domain repository (AGENTS.md, CI, initial commit), `new project` inside it, `ontology/`, D-06 config keys; templates by ontology and kind (D-64), `personal` ontology with boundaries only (D-61, D-62, D-72 recommendation), `created_by` as `Name <email>` | `3d36d97` |
+| WP-03 | Done: `new domain` creates the Domain repository (AGENTS.md, CI, initial commit), `new project` inside it, `ontology/`, D-06 config keys; templates by ontology and kind (D-64), `personal` ontology with boundaries only (D-61, D-62, D-72), `created_by` as `Name <email>` | `3d36d97` |
 | WP-14 | Next (group 5; unblocked) | |
 | WP-07 | Next (unblocked by WP-03) | |
 | WP-02a, WP-09, WP-11a, WP-13a | Unblocked, not started | |
@@ -67,8 +67,7 @@ Known gaps carried forward:
 - `tools/cli/README.md` and the 0.5 presentation docs still show `scs new project --type`
   (WP-11rc rewrites the README).
 - `scs new` falls back to `$USER` and `$USER@example.com` when no author or email is given;
-  WP-06 removes it (D-71). D-72 is implemented as recommended but still open; D-68, D-69, D-72,
-  and D-73 await decisions.
+  WP-06 removes it (D-71). D-68, D-69, D-73, and D-74 await decisions.
 - `test_concept_bundles_at_the_same_version_get_their_own_tags` runs `git init` in a Project
   workspace, nesting a repository inside the Domain repository; WP-14 rewrites the versioning
   tests.

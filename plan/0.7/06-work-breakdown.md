@@ -274,7 +274,7 @@ listed in order, and each starts after the previous one merges.
 
 ### WP-06 Machine mode for `new` and `bundle version` (ISS-049, part 2; ISS-047 remainder)
 - **Sections**: 4, 5. **Depends**: WP-03, WP-05, WP-14, WP-01a (D-01, D-08, D-13), section 7 G
-  (D-64, D-66, D-68, D-69, D-71).
+  (D-64, D-66, D-68, D-69, D-71, D-74).
 - `--json`/`--dry-run` on `new` and `bundle version`; `bundle pin` and (D-08 option 1)
   `add-scd`, `remove-scd`, `add-import`; approver and author rules; rollback on failure.
 - **Accept**:

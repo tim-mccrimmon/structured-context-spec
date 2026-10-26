@@ -20,7 +20,9 @@
   empty SCDs are reported as `SCD_EMPTY` (info) and listed before versioning; stub detection is
   removed (plan D-70; Validation Rules, Unresolved Questions). 2026-10-26: only placeholder
   provenance is reported, versioning refuses it, and `scs new` stops inventing an author (plan
-  D-71; section 5, Validation Rules, Unresolved Questions)
+  D-71; section 5, Validation Rules, Unresolved Questions). 2026-10-26: a `personal` Project
+  gets boundaries only (plan D-72; Unresolved Questions); a Project's default ontology is an
+  open question (plan D-74)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---
@@ -1081,11 +1083,13 @@ produced that way will vary in quality, and the variation will reflect on the st
     manifest entry. Open (plan D-69).
 11. **Reporting provenance to correct.** Resolved: placeholders only (section 5, Validation
     Rules; plan D-71). Unused SCDs are resolved too (Validation Rules; plan D-70).
-12. **Projects under the `personal` ontology.** Rec.: the same fixed concept, boundaries, and
-    nothing else. Open (plan D-72).
+12. **Projects under the `personal` ontology.** Resolved: the same fixed concept, boundaries,
+    and nothing else (plan D-72).
 13. **The ontology manifest's naming.** It still uses "domain" (`domain-manifest.yaml`, the
     `domain:` key), while "Domain" now names only the global tier. Kept for 0.7; a rename needs
     its own RFC (plan D-73).
+14. **A Project's default ontology.** `scs new project` without `--ontology` uses `sdlc`,
+    whatever the Domain's ontology. Rec.: inherit the Domain's ontology. Open (plan D-74).
 
 ---
 
