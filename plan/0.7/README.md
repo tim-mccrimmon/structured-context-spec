@@ -47,7 +47,7 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-04 | Done: check registry, repository mode, diagnostic codes, report schema | `3e7c7a4` |
 | WP-05 | Done: `--json` envelope, exit codes 0-5, `--dry-run`, `scd write`, `compile` to `dist/` | `476e542` |
 | WP-03 | Done: `new domain` creates the Domain repository (AGENTS.md, CI, initial commit), `new project` inside it, `ontology/`, D-06 config keys; templates by ontology and kind (D-64), `personal` ontology with boundaries only (D-61, D-62, D-72), `created_by` as `Name <email>` | `3d36d97` |
-| WP-14 | Built, not committed: tag-based versioning, D-39 checks, `--verify-version`, `compile --version`, D-17 resolution, D-70 `SCD_EMPTY`, D-71 `PROVENANCE_PLACEHOLDER` | |
+| WP-14 | Done: tag-based versioning, D-39 checks, `--verify-version`, `compile --version`, D-17 resolution, D-70 `SCD_EMPTY`, D-71 `PROVENANCE_PLACEHOLDER` | `2bb34c0` |
 | WP-07 | Next (unblocked by WP-03) | |
 | WP-02a, WP-09, WP-11a, WP-13a | Unblocked, not started | |
 
