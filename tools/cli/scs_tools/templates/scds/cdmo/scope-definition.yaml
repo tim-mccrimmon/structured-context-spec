@@ -17,6 +17,6 @@ content:
   out_of_scope: "TODO - items explicitly out of scope"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Scope Definition skeleton from the Medical-Device CDMO ontology"

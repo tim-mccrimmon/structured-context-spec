@@ -16,6 +16,6 @@ content:
   constraints: "TODO - each constraint and the reason for it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Architecture Constraints skeleton from the Medical-Device CDMO ontology"

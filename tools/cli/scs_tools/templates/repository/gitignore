@@ -1,0 +1,23 @@
+# Source documents stay local unless you choose to track them (SCS 0.7, D-59). An SCD's
+# derived_from still names the document; the compiler never reads sources/.
+sources/
+
+# dist/ holds compiled artifacts. Version commits leave it out either way; ignore it here too if
+# you do not want artifacts in the repository.
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+secrets/
+*.key
+*.pem
+credentials.json

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import re
-import shutil
 from pathlib import Path
 from typing import Dict, List
 
@@ -59,23 +58,24 @@ def snapshot(root: Path) -> Dict[str, bytes]:
     }
 
 
+NEW_OPTIONS = ["--author", "Test Author", "--email", "test@example.com"]
+
+
 def new(tmp_path: Path, kind: str = "project", name: str = "demo") -> Path:
-    result = run(
-        "new",
-        kind,
-        name,
-        "--type",
-        "minimal",
-        "--dir",
-        str(tmp_path),
-        "--author",
-        "Test Author",
-        "--email",
-        "test@example.com",
-        "--no-interactive",
-    )
+    """A workspace made by `scs new` in a Domain repository: `new domain NAME` returns
+    `NAME-context/domain`; `new project NAME` is added to `acme-context/`, created if need be."""
+    if kind == "domain":
+        result = run(
+            "new", "domain", name, "--dir", str(tmp_path), *NEW_OPTIONS, "--no-interactive"
+        )
+        assert result.exit_code == 0, result.output
+        return tmp_path / f"{name}-context" / "domain"
+    repo = tmp_path / "acme-context"
+    if not repo.exists():
+        new(tmp_path, "domain", "acme")
+    result = run("new", "project", name, "--dir", str(repo), *NEW_OPTIONS, "--no-interactive")
     assert result.exit_code == 0, result.output
-    return tmp_path / name
+    return repo / "projects" / name
 
 
 @pytest.fixture
@@ -95,17 +95,16 @@ def domain(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture
 def domain_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """A Domain repository: domain/ plus one Project workspace, with the cwd at its root."""
-    repo = tmp_path / "acme-context"
-    repo.mkdir()
-    shutil.move(str(new(tmp_path, "domain", "acme")), repo / "domain")
-    (repo / "projects").mkdir()
-    shutil.move(str(new(tmp_path, "project", "pump")), repo / "projects" / "pump")
+    repo = new(tmp_path, "domain", "acme").parent
+    new(tmp_path, "project", "pump")
     monkeypatch.chdir(repo)
     return repo
 
 
-def assert_dry_run_matches(root: Path, *args: str, input: str = "") -> Dict:
-    """`--dry-run` reports the same changes as the real run and writes nothing."""
+def assert_dry_run_matches(workspace: Path, *args: str, input: str = "") -> Dict:
+    """`--dry-run` reports the same changes as the real run and writes nothing. Envelope paths
+    are relative to the Domain repository root (D-42)."""
+    root = workspace.parents[1] if workspace.parent.name == "projects" else workspace.parent
     before = snapshot(root)
     dry = envelope(run(*args, "--json", "--dry-run", input=input))
     assert snapshot(root) == before
@@ -211,9 +210,9 @@ def test_validate_envelope_carries_the_report(project: Path):
 def test_compile_writes_dist_bundle_name_version(domain: Path):
     data = assert_dry_run_matches(domain, "compile", "bundles/domain-bundle.yaml", "--allow-draft")
     path = data["result"]["path"]
-    assert re.fullmatch(r"dist/demo-DRAFT\+[0-9a-f]{8}\.yaml", path)
+    assert re.fullmatch(r"domain/dist/demo-DRAFT\+[0-9a-f]{8}\.yaml", path)
     assert data["changes"] == [{"action": "create", "path": path}]
-    assert (domain / path).is_file()
+    assert (domain.parent / path).is_file()
 
     again = envelope(run("compile", "bundles/domain-bundle.yaml", "--allow-draft", "--json"))
     assert again["changes"] == [] and again["result"]["sha256"] == data["result"]["sha256"]
@@ -236,6 +235,9 @@ def test_compile_stdout_conflicts_with_json(project: Path):
 
 
 def test_add_scd_and_bundle(project: Path):
+    # The scaffold supplies the full set (D-64); remove what is added back below
+    (project / "context" / "project" / "audit-trail.yaml").unlink()
+    (project / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
     data = assert_dry_run_matches(project, "add", "scd", "audit-trail")
     assert data["command"] == "add scd"
     assert data["changes"][0]["action"] == "create"
@@ -266,6 +268,7 @@ def test_workspace_required_at_a_domain_repository_root(domain_repo: Path):
 
 
 def test_workspace_option_selects_the_workspace(domain_repo: Path):
+    (domain_repo / "projects" / "pump" / "context" / "project" / "audit-trail.yaml").unlink()
     data = envelope(run("add", "scd", "audit-trail", "--workspace", "pump", "--json"))
     assert data["changes"] == [
         {"action": "create", "path": "projects/pump/context/project/audit-trail.yaml"}
@@ -279,7 +282,8 @@ def test_scd_write_from_stdin(project: Path):
     data = assert_dry_run_matches(
         project, "scd", "write", target, "--from-file", "-", input=VALID_SCD
     )
-    assert data["result"] == {"path": target, "id": "scd:project:release-gates", "written": True}
+    shown = f"projects/demo/{target}"  # relative to the repository root (D-42)
+    assert data["result"] == {"path": shown, "id": "scd:project:release-gates", "written": True}
     assert (project / target).read_text() == VALID_SCD
 
 

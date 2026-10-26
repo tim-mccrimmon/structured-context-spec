@@ -17,7 +17,7 @@ codes:
     meaning: A workspace's .scs/config cannot be read as key-value pairs.
   DOMAIN_WORKSPACE_MISSING:
     severity: error
-    meaning: A Domain repository has no workspace whose .scs/config bundle_type is domain.
+    meaning: A Domain repository has no workspace whose .scs/config bundle_type is domain, or scs new project was run outside a Domain repository.
   DOMAIN_WORKSPACE_MULTIPLE:
     severity: error
     meaning: A Domain repository has more than one workspace whose .scs/config bundle_type is domain.

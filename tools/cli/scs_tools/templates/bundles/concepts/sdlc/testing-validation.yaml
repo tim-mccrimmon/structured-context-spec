@@ -12,6 +12,6 @@ scds:
   - scd:project:qa-procedures
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Testing & Validation concept bundle for {{ project_name }}"

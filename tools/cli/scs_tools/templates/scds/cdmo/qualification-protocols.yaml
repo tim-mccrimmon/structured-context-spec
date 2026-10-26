@@ -16,6 +16,6 @@ content:
   protocols: "TODO - each protocol, its scope, and where its evidence is kept"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Qualification Protocols skeleton from the Medical-Device CDMO ontology"

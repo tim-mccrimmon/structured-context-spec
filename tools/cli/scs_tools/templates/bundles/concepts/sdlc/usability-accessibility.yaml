@@ -12,6 +12,6 @@ scds:
   - scd:project:error-handling-ux
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Usability & Accessibility concept bundle for {{ project_name }}"

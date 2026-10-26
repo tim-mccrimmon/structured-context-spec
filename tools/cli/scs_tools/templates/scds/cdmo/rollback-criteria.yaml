@@ -16,6 +16,6 @@ content:
   procedure: "TODO - the rollback procedure and who decides"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Rollback Criteria skeleton from the Medical-Device CDMO ontology"

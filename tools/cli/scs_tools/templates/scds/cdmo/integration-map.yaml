@@ -16,6 +16,6 @@ content:
   interfaces: "TODO - each interface, its direction, and its protocol"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Integration Map skeleton from the Medical-Device CDMO ontology"

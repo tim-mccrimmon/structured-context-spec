@@ -16,6 +16,6 @@ content:
   workflows: "TODO - each workflow type, the autonomy level allowed, and the sign-off required"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Agent Autonomy Rules skeleton from the Medical-Device CDMO ontology"

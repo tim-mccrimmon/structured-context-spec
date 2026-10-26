@@ -110,6 +110,6 @@ relationships:
   #   description: "Breach notification procedures satisfy HIPAA requirements"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Incident response procedures for {{ project_name }}"

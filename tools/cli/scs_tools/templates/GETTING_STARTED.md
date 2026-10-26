@@ -45,16 +45,16 @@ content:
 Compile the bundle into the file a runtime injects:
 
 ```bash
-scs compile bundles/{{ bundle_kind }}-bundle.yaml -o compiled/{{ project_name }}.yaml --allow-draft
+scs compile bundles/{{ bundle_kind }}-bundle.yaml --allow-draft   # writes dist/
 ```
 
 ### Domain Ontology
 
-`domain/domain-manifest.yaml` is your project's Domain Ontology: the concepts (categories) your
+`ontology/domain-manifest.yaml` is your workspace's Domain Ontology: the concepts (categories) your
 guardrails are organized around, one per concept bundle in `bundles/concepts/`. It starts flat, using
-the Software Development reference ontology. Add depth as you need it (a taxonomy with `parent`,
+{% if ontology == 'personal' %}only the Prohibited concept (your boundaries){% else %}the {{ domain_name }} reference ontology{% endif %}. Add depth as you need it (a taxonomy with `parent`,
 `depends-on` / `relates-to` relationships, and `satisfies` citations of the standards a concept addresses),
-and check it with `scs validate --domain domain/domain-manifest.yaml`.
+and check it with `scs validate --domain ontology/domain-manifest.yaml`.
 
 ### SCDs (Structured Context Documents)
 
@@ -138,32 +138,6 @@ Start with all SCDs in DRAFT status. Move to ACTIVE when you're confident the co
 2. **Add More SCDs**: Create additional SCDs as your project needs them
 3. **Version Control**: Commit your changes to track evolution over time
 4. **Review Regularly**: Keep SCDs up-to-date as your project evolves
-
-## SCS Project Type: {{ project_type }}
-
-Your project is configured as a **{{ project_type }}** project, which includes:
-
-{% if project_type == 'healthcare' -%}
-- HIPAA compliance requirements
-- CHAI (Coalition for Health AI) adherence
-- TEFCA participation (if applicable)
-- Healthcare-specific security and privacy controls
-{% elif project_type == 'fintech' -%}
-- PCI-DSS compliance
-- SOX controls
-- Financial services security requirements
-{% elif project_type == 'saas' -%}
-- GDPR compliance
-- SOC 2 controls
-- Multi-tenancy considerations
-{% elif project_type == 'minimal' -%}
-- Essential architecture SCDs
-- Core security requirements
-- Basic deployment and operations
-{% else -%}
-- Standard compliance and governance
-- Complete domain coverage
-{% endif %}
 
 ## Resources
 

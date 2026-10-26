@@ -16,6 +16,6 @@ content:
   exit_criteria: "TODO - when hypercare ends"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Hypercare Plan skeleton from the Medical-Device CDMO ontology"

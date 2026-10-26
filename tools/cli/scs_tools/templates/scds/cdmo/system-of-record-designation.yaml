@@ -16,6 +16,6 @@ content:
   systems: "TODO - each record type and its system of record"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "System of Record Designation skeleton from the Medical-Device CDMO ontology"

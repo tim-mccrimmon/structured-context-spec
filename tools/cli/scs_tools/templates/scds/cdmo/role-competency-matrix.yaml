@@ -17,6 +17,6 @@ content:
   roles: "TODO - each role and its required training"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Role Competency Matrix skeleton from the Medical-Device CDMO ontology"

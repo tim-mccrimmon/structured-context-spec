@@ -30,7 +30,7 @@ content:
   - TODO — e.g., new-vs-repeat customer treatment, if it affects collections
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: Skeleton generated from the MCA ontology; awaiting real decisions from the person with standing
     over this concept before it can be approved.

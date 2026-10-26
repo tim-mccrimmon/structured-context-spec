@@ -17,6 +17,6 @@ content:
   triggers: "TODO - each trigger and who evaluates it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "CAPA Triggers skeleton from the Medical-Device CDMO ontology"

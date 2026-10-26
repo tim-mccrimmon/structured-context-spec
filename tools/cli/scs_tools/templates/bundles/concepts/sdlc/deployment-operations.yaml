@@ -12,6 +12,6 @@ scds:
   - scd:project:incident-response
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Deployment & Operations concept bundle for {{ project_name }}"

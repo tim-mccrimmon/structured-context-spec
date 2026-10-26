@@ -81,6 +81,6 @@ relationships:
   #   description: "PHI identification depends on data model"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "HIPAA compliance for {{ project_name }}"

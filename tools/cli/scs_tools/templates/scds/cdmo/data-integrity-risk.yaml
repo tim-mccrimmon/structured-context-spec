@@ -16,6 +16,6 @@ content:
   risks: "TODO - each data-integrity risk and its control"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Data Integrity Risk skeleton from the Medical-Device CDMO ontology"

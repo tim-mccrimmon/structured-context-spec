@@ -16,6 +16,6 @@ content:
   systems: "TODO - each system, the access an assistant has, and who grants it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Access Control Model skeleton from the Medical-Device CDMO ontology"

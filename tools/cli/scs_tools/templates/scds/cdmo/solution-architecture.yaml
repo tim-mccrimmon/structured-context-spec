@@ -16,6 +16,6 @@ content:
   components: "TODO - the systems and configuration in the target design"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Solution Architecture skeleton from the Medical-Device CDMO ontology"

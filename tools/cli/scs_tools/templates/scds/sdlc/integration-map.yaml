@@ -64,6 +64,6 @@ relationships:
   #   description: "Data exchange follows data handling policies"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Integration map for {{ project_name }}"

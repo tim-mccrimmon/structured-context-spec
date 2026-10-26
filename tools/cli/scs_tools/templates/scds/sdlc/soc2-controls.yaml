@@ -70,6 +70,6 @@ relationships:
   #   description: "SOC2 controls address identified threats"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "SOC 2 compliance controls for {{ project_name }}"

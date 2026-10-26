@@ -18,6 +18,6 @@ content:
   client_agreement: "TODO - the clause of the client's quality agreement each prohibition comes from"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Prohibited Uses skeleton from the Medical-Device CDMO ontology"

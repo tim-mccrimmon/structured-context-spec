@@ -73,6 +73,6 @@ relationships:
   #   description: "Data handling satisfies GDPR requirements"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Data handling policies for {{ project_name }}"

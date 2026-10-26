@@ -17,6 +17,6 @@ content:
   mechanism: "TODO - how segregation is enforced (workspaces, access groups, indexes)"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Client Program Segregation skeleton from the Medical-Device CDMO ontology"

@@ -50,6 +50,6 @@ relationships: []
   #   description: "How this SCD satisfies the requirement"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Constraints and assumptions for {{ project_name }}"

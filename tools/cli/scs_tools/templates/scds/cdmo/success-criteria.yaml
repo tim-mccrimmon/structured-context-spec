@@ -16,6 +16,6 @@ content:
   criteria: "TODO - each criterion and how it is measured"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Success Criteria skeleton from the Medical-Device CDMO ontology"

@@ -8,6 +8,6 @@ imports: []
 scds:
 - scd:project:servicing-collections
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: 'Concept bundle for the MCA reference ontology: Servicing & Collections.'

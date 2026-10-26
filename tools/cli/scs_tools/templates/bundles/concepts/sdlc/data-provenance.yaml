@@ -12,6 +12,6 @@ scds:
   - scd:project:retention-policy
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Data & Provenance concept bundle for {{ project_name }}"

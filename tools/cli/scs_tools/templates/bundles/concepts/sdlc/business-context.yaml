@@ -15,6 +15,6 @@ scds:
   - scd:project:success-criteria
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Business context concept bundle for {{ project_name }}"

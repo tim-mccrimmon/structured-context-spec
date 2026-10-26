@@ -17,6 +17,6 @@ content:
   matrix: "TODO - the probability and severity scales and the acceptability matrix"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Risk Acceptability Criteria skeleton from the Medical-Device CDMO ontology"

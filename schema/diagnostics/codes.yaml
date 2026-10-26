@@ -84,7 +84,8 @@ codes:
     meaning: A versioned bundle's manifest has no content_digest, so its content cannot be verified.
   DOMAIN_WORKSPACE_MISSING:
     severity: error
-    meaning: A Domain repository has no workspace whose .scs/config bundle_type is domain.
+    meaning: A Domain repository has no workspace whose .scs/config bundle_type is domain, or scs new
+      project was run outside a Domain repository.
   DOMAIN_WORKSPACE_MULTIPLE:
     severity: error
     meaning: A Domain repository has more than one workspace whose .scs/config bundle_type is domain.
@@ -100,6 +101,13 @@ codes:
   FILE_UNREADABLE:
     severity: error
     meaning: A file named on the command line cannot be read; exit code 4.
+  GIT_COMMAND_FAILED:
+    severity: error
+    meaning: A git command the engine ran failed; the message carries git's output. What the run wrote
+      was removed.
+  GIT_REQUIRED:
+    severity: error
+    meaning: The command needs git and git was not found.
   IMPORT_CYCLE:
     severity: error
     meaning: Bundle imports form a cycle.
@@ -323,6 +331,13 @@ codes:
   WORKSPACE_CONFIG_INVALID:
     severity: error
     meaning: A workspace's .scs/config cannot be read as key-value pairs.
+  WORKSPACE_EXISTS:
+    severity: error
+    meaning: The Domain repository or Project workspace scs new would create already exists.
+  WORKSPACE_NAME_INVALID:
+    severity: error
+    meaning: A Domain or Project name cannot be a directory, bundle id, and tag prefix (bad characters),
+      names a concept bundle, or is a Project named domain; exit code 3.
   WORKSPACE_NOT_FOUND:
     severity: error
     meaning: No workspace was found (no .scs/config above the current directory, or no workspace by the

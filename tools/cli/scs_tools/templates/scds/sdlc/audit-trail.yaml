@@ -114,6 +114,6 @@ relationships:
   #   description: "All components must implement audit logging"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Audit trail requirements for {{ project_name }}"

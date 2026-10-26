@@ -16,6 +16,6 @@ content:
   criteria: "TODO - each criterion, its protocol, and its threshold"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Acceptance Criteria skeleton from the Medical-Device CDMO ontology"

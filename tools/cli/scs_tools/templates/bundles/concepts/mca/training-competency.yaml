@@ -7,6 +7,6 @@ imports: []
 scds:
 - scd:project:training-competency
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: 'Concept bundle for the MCA reference ontology: Training & Competency.'

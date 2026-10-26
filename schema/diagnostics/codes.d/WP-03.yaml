@@ -1,0 +1,16 @@
+# Diagnostic codes added by WP-03 (Domain repositories: scs new domain, scs new project).
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  WORKSPACE_EXISTS:
+    severity: error
+    meaning: The Domain repository or Project workspace scs new would create already exists.
+  WORKSPACE_NAME_INVALID:
+    severity: error
+    meaning: A Domain or Project name cannot be a directory, bundle id, and tag prefix (bad characters), names a concept bundle, or is a Project named domain; exit code 3.
+  GIT_REQUIRED:
+    severity: error
+    meaning: The command needs git and git was not found.
+  GIT_COMMAND_FAILED:
+    severity: error
+    meaning: A git command the engine ran failed; the message carries git's output. What the run wrote was removed.

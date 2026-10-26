@@ -105,6 +105,6 @@ relationships:
   #   description: "Alerts feed into incident response process"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Observability strategy for {{ project_name }}"

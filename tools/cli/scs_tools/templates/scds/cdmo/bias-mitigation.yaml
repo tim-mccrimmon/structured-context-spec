@@ -16,6 +16,6 @@ content:
   method: "TODO - the concrete check, its threshold, and when it runs"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Bias Mitigation skeleton from the Medical-Device CDMO ontology"

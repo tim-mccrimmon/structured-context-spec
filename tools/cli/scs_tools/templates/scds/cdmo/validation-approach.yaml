@@ -17,6 +17,6 @@ content:
   lifecycle: "TODO - the IQ/OQ/PQ approach for each category"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Validation Approach skeleton from the Medical-Device CDMO ontology"

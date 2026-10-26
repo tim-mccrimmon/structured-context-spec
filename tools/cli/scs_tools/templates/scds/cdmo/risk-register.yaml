@@ -16,6 +16,6 @@ content:
   register: "TODO - where the register is kept and who owns it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Risk Register skeleton from the Medical-Device CDMO ontology"

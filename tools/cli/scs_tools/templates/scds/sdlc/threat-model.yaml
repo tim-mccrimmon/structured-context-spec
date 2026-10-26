@@ -74,6 +74,6 @@ relationships:
   #   description: "Threat mitigations satisfy SOC2 security controls"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Threat model for {{ project_name }}"

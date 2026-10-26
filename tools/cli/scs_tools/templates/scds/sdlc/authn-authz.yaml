@@ -71,6 +71,6 @@ relationships:
   #   description: "AuthZ boundaries constrain component interactions"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Authentication and authorization model for {{ project_name }}"

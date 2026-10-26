@@ -17,6 +17,6 @@ content:
   periods: "TODO - each record type and its retention period"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Record Retention skeleton from the Medical-Device CDMO ontology"

@@ -57,6 +57,6 @@ relationships:
   #   description: "System boundaries constrain component design"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Initial system context for {{ project_name }}"

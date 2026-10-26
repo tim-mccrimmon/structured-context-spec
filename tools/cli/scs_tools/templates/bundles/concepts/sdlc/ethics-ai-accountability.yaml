@@ -12,6 +12,6 @@ scds:
   - scd:project:model-bias
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Ethics & AI Accountability concept bundle for {{ project_name }}"

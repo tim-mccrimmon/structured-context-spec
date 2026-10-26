@@ -16,6 +16,6 @@ content:
   business_case: "TODO - why the program exists and who sponsors it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Program Objectives skeleton from the Medical-Device CDMO ontology"

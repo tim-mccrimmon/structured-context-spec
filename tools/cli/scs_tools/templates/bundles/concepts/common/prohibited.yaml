@@ -10,6 +10,6 @@ scds:
   - scd:project:prohibited
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Prohibited Tools and Practices concept bundle for {{ project_name }}"

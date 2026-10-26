@@ -24,6 +24,6 @@ content:
   #   cites: ["std:soc2:2017"]
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Company facts for {{ project_name }}"

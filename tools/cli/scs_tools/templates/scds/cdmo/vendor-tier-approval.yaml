@@ -16,6 +16,6 @@ content:
   vendors: "TODO - each vendor, its approved tiers, and the approval date"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Vendor Tier Approval skeleton from the Medical-Device CDMO ontology"

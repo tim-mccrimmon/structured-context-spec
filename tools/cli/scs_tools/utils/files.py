@@ -24,10 +24,10 @@ _JINJA_ENV.filters["yaml_dq"] = yaml_dq
 
 
 def create_directory_structure(base_path: Path, project_name: str):
-    """Create the SCS 0.6.0 workspace directory structure"""
+    """Create the SCS 0.7 workspace directory structure"""
     dirs = [
         "bundles/concepts",  # Concept bundles (e.g., architecture, security)
-        "domain",  # Domain Ontology manifest
+        "ontology",  # Domain Ontology manifest (0.6: domain/)
         "context/project",  # Project-tier SCDs
         "docs",  # Documentation
         ".scs",  # Configuration

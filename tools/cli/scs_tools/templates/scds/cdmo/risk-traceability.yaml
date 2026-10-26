@@ -16,6 +16,6 @@ content:
   trace: "TODO - how risk, requirement, and deliverable ids are linked"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Risk Traceability skeleton from the Medical-Device CDMO ontology"

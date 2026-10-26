@@ -1,14 +1,15 @@
-# Domain Ontology manifest for {{ project_name }} (SCS 0.6.0, RFC-0001).
+# Domain Ontology manifest for {{ project_name }} (SCS 0.7.0, RFC-0001).
 #
 # The ontology is the industry baseline: the concepts (categories) your guardrails are organized
-# around. This project starts with the {{ domain_name }} reference ontology, one concept per
+# around. {% if ontology == 'personal' %}This workspace uses the personal ontology: its only fixed concept is boundaries
+# (prohibited); add the concepts your own context needs{% else %}This workspace starts with the {{ domain_name }} reference ontology{% endif %}, one concept per
 # concept bundle in bundles/concepts/. Add depth as you need it beyond what's here:
 #   parent: concept:<id>                        a taxonomy (a concept under another concept)
 #   relationships: [{type: depends-on, target: concept:<id>}]      (also: relates-to)
 #   satisfies: [std:<standard>[:<edition>][#<clause>]]   standards a concept addresses (citations)
 # Once a concept bundle has a released version, add `bundle: bundle:<name>:<version>` to its entry.
 #
-# Check it with:  scs validate --domain domain/domain-manifest.yaml
+# Check it with:  scs validate --domain ontology/domain-manifest.yaml
 
 domain:
   id: "domain:{{ domain_id }}"

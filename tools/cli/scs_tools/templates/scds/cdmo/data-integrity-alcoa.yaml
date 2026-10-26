@@ -17,6 +17,6 @@ content:
   criteria: "TODO - how each ALCOA+ attribute is met for AI-assisted records"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Data Integrity (ALCOA+) skeleton from the Medical-Device CDMO ontology"

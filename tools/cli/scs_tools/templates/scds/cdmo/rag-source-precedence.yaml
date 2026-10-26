@@ -17,6 +17,6 @@ content:
   conflict_rule: "TODO - what to do when sources of equal rank disagree"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Source Precedence skeleton from the Medical-Device CDMO ontology"

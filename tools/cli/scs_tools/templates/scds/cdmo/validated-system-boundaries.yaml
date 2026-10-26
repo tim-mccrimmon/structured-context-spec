@@ -16,6 +16,6 @@ content:
   systems: "TODO - each validated system and the actions permitted in it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Validated System Boundaries skeleton from the Medical-Device CDMO ontology"

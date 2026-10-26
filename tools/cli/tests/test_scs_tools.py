@@ -18,7 +18,7 @@ from scs_tools.cli import cli
 REPO = Path(__file__).resolve().parents[3]
 SCHEMA = REPO / "schema"
 
-PROJECT_TYPES = ["healthcare", "fintech", "saas", "government", "standard", "minimal"]
+ONTOLOGIES = ["sdlc", "cdmo", "mca", "personal"]
 CONCEPTS = {
     "architecture",
     "business-context",
@@ -34,26 +34,29 @@ CONCEPTS = {
 }
 
 
-def scaffold(tmp_path: Path, project_type: str, kind: str = "project") -> Path:
-    result = CliRunner().invoke(
-        cli,
-        [
-            "new",
-            kind,
-            "demo",
-            "--type",
-            project_type,
-            "--dir",
-            str(tmp_path),
-            "--author",
-            "Test Author",
-            "--email",
-            "test@example.com",
-            "--no-interactive",
-        ],
-    )
+NEW_OPTIONS = ["--author", "Test Author", "--email", "test@example.com", "--no-interactive"]
+
+
+def new_workspace(tmp_path: Path, kind: str = "project", name: str = "demo", *options: str) -> Path:
+    """A workspace made by `scs new`, in a Domain repository (0.7). `new domain NAME` creates
+    `NAME-context/` and returns its `domain/`; `new project NAME` adds `projects/NAME/` to the
+    repository `acme-context/`, creating that first if need be."""
+    if kind == "domain":
+        args = ["new", "domain", name, "--dir", str(tmp_path), *options, *NEW_OPTIONS]
+        result = CliRunner().invoke(cli, args)
+        assert result.exit_code == 0, result.output
+        return tmp_path / f"{name}-context" / "domain"
+    repo = tmp_path / "acme-context"
+    if not repo.exists():
+        new_workspace(tmp_path, "domain", "acme")
+    args = ["new", "project", name, "--dir", str(repo), *options, *NEW_OPTIONS]
+    result = CliRunner().invoke(cli, args)
     assert result.exit_code == 0, result.output
-    return tmp_path / "demo"
+    return repo / "projects" / name
+
+
+def scaffold(tmp_path: Path, kind: str = "project", ontology: str = "sdlc") -> Path:
+    return new_workspace(tmp_path, kind, "demo", "--ontology", ontology)
 
 
 def validate_with_validator(*args: str):
@@ -64,29 +67,26 @@ def validate_with_validator(*args: str):
 
 @pytest.fixture(scope="module")
 def healthcare_project(tmp_path_factory) -> Path:
-    return scaffold(tmp_path_factory.mktemp("proj"), "healthcare")
+    return scaffold(tmp_path_factory.mktemp("proj"))
 
 
 # ---------------------------------------------------------------------------- scaffold
 
 
-@pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_scaffold_creates_the_expected_structure(tmp_path: Path, project_type: str):
-    root = scaffold(tmp_path, project_type)
+def test_scaffold_creates_the_expected_structure(tmp_path: Path):
+    root = scaffold(tmp_path)
     for rel in [
         "bundles/project-bundle.yaml",
         ".scs/config",
-        "VERSION",
         "README.md",
         "docs/GETTING_STARTED.md",
     ]:
         assert (root / rel).is_file(), rel
     generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
-    if project_type == "minimal":
-        assert {"architecture", "security", "deployment-operations"} <= generated <= CONCEPTS
-    else:
-        assert generated == CONCEPTS
-    assert len(list((root / "context" / "project").glob("*.yaml"))) >= 11
+    assert generated == CONCEPTS
+    # The full template set (D-64): nothing is left out by project type
+    scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
+    assert {"hipaa-compliance", "chai-adherence", "tefca-participation"} <= scds
     # 0.6.0: no meta, standards, or domain bundles in a Project workspace
     assert sorted(p.name for p in (root / "bundles").iterdir()) == [
         "concepts",
@@ -94,9 +94,9 @@ def test_scaffold_creates_the_expected_structure(tmp_path: Path, project_type: s
     ]
 
 
-@pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_scaffold_uses_concept_terminology_and_starts_as_draft(tmp_path: Path, project_type: str):
-    root = scaffold(tmp_path, project_type)
+@pytest.mark.parametrize("kind", ["domain", "project"])
+def test_scaffold_uses_concept_terminology_and_starts_as_draft(tmp_path: Path, kind: str):
+    root = scaffold(tmp_path, kind)
     for path in (root / "bundles").rglob("*.yaml"):
         data = yaml.safe_load(path.read_text())
         assert data["type"] != "concern", path
@@ -105,17 +105,19 @@ def test_scaffold_uses_concept_terminology_and_starts_as_draft(tmp_path: Path, p
     assert concept["type"] == "concept"
 
 
-@pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_every_scaffolded_bundle_validates(tmp_path: Path, project_type: str):
-    root = scaffold(tmp_path, project_type)
+@pytest.mark.parametrize("kind", ["domain", "project"])
+@pytest.mark.parametrize("ontology", ONTOLOGIES)
+def test_every_scaffolded_bundle_validates(tmp_path: Path, ontology: str, kind: str):
+    root = scaffold(tmp_path, kind, ontology)
     for path in sorted((root / "bundles").rglob("*.yaml")):
         result = validate_with_validator("--bundle", str(path))
         assert result.exit_code == 0, f"{path.relative_to(root)}\n{result.output}"
 
 
-@pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_every_scaffolded_scd_validates(tmp_path: Path, project_type: str):
-    root = scaffold(tmp_path, project_type)
+@pytest.mark.parametrize("kind", ["domain", "project"])
+@pytest.mark.parametrize("ontology", ONTOLOGIES)
+def test_every_scaffolded_scd_validates(tmp_path: Path, ontology: str, kind: str):
+    root = scaffold(tmp_path, kind, ontology)
     for path in sorted((root / "context" / "project").glob("*.yaml")):
         result = validate_with_validator(str(path))
         assert result.exit_code == 0, f"{path.name}\n{result.output}"
@@ -185,7 +187,7 @@ def _version_security_bundle(project: Path, monkeypatch, *extra: str):
 
 def test_bundle_version_runs_with_validation_enabled(tmp_path: Path, monkeypatch):
     """ISS-026: versioning must not depend on the (previously broken) `scs validate` command."""
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     result = _version_security_bundle(project, monkeypatch)
     assert result.exit_code == 0, result.output
     assert (project / "bundles/concepts/security-v0.1.0.yaml").is_file()
@@ -193,7 +195,7 @@ def test_bundle_version_runs_with_validation_enabled(tmp_path: Path, monkeypatch
 
 def test_versioned_snapshot_carries_the_version_and_approval(tmp_path: Path, monkeypatch):
     """ISS-027: the snapshot must say 0.1.0 inside, not DRAFT, and record the approval."""
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     result = _version_security_bundle(project, monkeypatch, "--no-validate")
     assert result.exit_code == 0, result.output
     snap = yaml.safe_load((project / "bundles/concepts/security-v0.1.0.yaml").read_text())
@@ -214,7 +216,7 @@ def test_versioning_records_what_validation_actually_did(
     tmp_path: Path, monkeypatch, extra, passed, status
 ):
     """ISS-045: `validation_passed` and `approval_status` record the run, not a default."""
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     assert _version_security_bundle(project, monkeypatch, *extra).exit_code == 0
     prov = yaml.safe_load((project / "bundles/concepts/security-v0.1.0.yaml").read_text())[
         "provenance"
@@ -229,7 +231,7 @@ def test_versioning_records_what_validation_actually_did(
 
 
 def test_versioned_snapshot_validates(tmp_path: Path, monkeypatch):
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     assert _version_security_bundle(project, monkeypatch).exit_code == 0
     snapshot = project / "bundles/concepts/security-v0.1.0.yaml"
     result = validate_with_validator("--bundle", str(snapshot))
@@ -239,7 +241,7 @@ def test_versioned_snapshot_validates(tmp_path: Path, monkeypatch):
 
 def test_a_versioned_snapshot_without_approval_fields_is_rejected(tmp_path: Path, monkeypatch):
     """The DRAFT exemption must not apply once the snapshot carries a real version."""
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     assert _version_security_bundle(project, monkeypatch).exit_code == 0
     snapshot = project / "bundles/concepts/security-v0.1.0.yaml"
     data = yaml.safe_load(snapshot.read_text())
@@ -253,7 +255,7 @@ def test_a_versioned_snapshot_without_approval_fields_is_rejected(tmp_path: Path
 def test_manifest_checksum_matches_the_snapshot(tmp_path: Path, monkeypatch):
     import hashlib
 
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     assert _version_security_bundle(project, monkeypatch, "--no-validate").exit_code == 0
     snapshot = project / "bundles/concepts/security-v0.1.0.yaml"
     manifest = yaml.safe_load(
@@ -264,7 +266,7 @@ def test_manifest_checksum_matches_the_snapshot(tmp_path: Path, monkeypatch):
 
 
 def test_versioning_refuses_to_overwrite_without_force(tmp_path: Path, monkeypatch):
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     assert _version_security_bundle(project, monkeypatch, "--no-validate").exit_code == 0
     again = _version_security_bundle(project, monkeypatch, "--no-validate")
     assert again.exit_code != 0
@@ -292,7 +294,7 @@ def _version(project: Path, monkeypatch, bundle: str, *extra: str, input=None):
 
 def test_concept_bundles_at_the_same_version_keep_their_own_manifests(tmp_path: Path, monkeypatch):
     """ISS-043: every concept bundle versioned at 1.0.0 used to write the same manifest."""
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     for name in ("security", "architecture"):
         result = _version(
             project,
@@ -319,7 +321,7 @@ def test_concept_bundles_at_the_same_version_get_their_own_tags(tmp_path: Path, 
     """ISS-043: git tags are name-qualified, so the second bundle doesn't collide."""
     import subprocess
 
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     monkeypatch.setenv("GIT_CONFIG_GLOBAL", "/dev/null")
     monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
     for var in ("GIT_AUTHOR", "GIT_COMMITTER"):
@@ -360,7 +362,7 @@ def test_concept_bundles_at_the_same_version_get_their_own_tags(tmp_path: Path, 
 
 def test_the_approver_is_never_taken_from_git_config(tmp_path: Path, monkeypatch):
     """ISS-047: without --approved-by the user is asked; git config user.email is not used."""
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     gitconfig = tmp_path / "gitconfig"
     gitconfig.write_text("[user]\n\temail = git@example.com\n")
     monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(gitconfig))
@@ -383,7 +385,7 @@ def test_the_approver_is_never_taken_from_git_config(tmp_path: Path, monkeypatch
 @pytest.mark.parametrize("approver", [None, "", "   "])
 def test_versioning_without_an_approver_fails(tmp_path: Path, monkeypatch, approver):
     """ISS-047: no approver (no input, or a blank one) means no version."""
-    project = scaffold(tmp_path, "healthcare")
+    project = scaffold(tmp_path)
     extra = () if approver is None else ("--approved-by", approver)
     result = _version(
         project,
@@ -400,11 +402,11 @@ def test_versioning_without_an_approver_fails(tmp_path: Path, monkeypatch, appro
 # ------------------------------------- root bundle imports (ISS-033, SCS 0.6.0 layout)
 
 
-@pytest.mark.parametrize("project_type", PROJECT_TYPES)
+@pytest.mark.parametrize("ontology", ONTOLOGIES)
 def test_project_bundle_imports_exactly_the_concept_bundles_generated(
-    tmp_path: Path, project_type: str
+    tmp_path: Path, ontology: str
 ):
-    root = scaffold(tmp_path, project_type)
+    root = scaffold(tmp_path, "project", ontology)
     generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
     project = yaml.safe_load((root / "bundles/project-bundle.yaml").read_text())
     assert project["type"] == "project" and project["id"] == "bundle:demo"
@@ -412,11 +414,11 @@ def test_project_bundle_imports_exactly_the_concept_bundles_generated(
     assert imported == generated
 
 
-@pytest.mark.parametrize("project_type", ["standard", "minimal"])
+@pytest.mark.parametrize("ontology", ONTOLOGIES)
 def test_new_domain_scaffolds_a_domain_bundle_importing_meta_and_concepts(
-    tmp_path: Path, project_type: str
+    tmp_path: Path, ontology: str
 ):
-    root = scaffold(tmp_path, project_type, kind="domain")
+    root = scaffold(tmp_path, "domain", ontology)
     assert sorted(p.name for p in (root / "bundles").iterdir()) == [
         "concepts",
         "domain-bundle.yaml",
@@ -431,13 +433,13 @@ def test_new_domain_scaffolds_a_domain_bundle_importing_meta_and_concepts(
 
 
 def test_new_domain_workspace_validates(tmp_path: Path):
-    root = scaffold(tmp_path, "standard", kind="domain")
+    root = scaffold(tmp_path, "domain")
     result = validate_with_validator("--bundle", str(root / "bundles/domain-bundle.yaml"))
     assert result.exit_code == 0, result.output
 
 
 def test_bundle_validate_shortcut_finds_the_domain_bundle(tmp_path: Path, monkeypatch):
-    root = scaffold(tmp_path, "minimal", kind="domain")
+    root = scaffold(tmp_path, "domain")
     monkeypatch.chdir(root)
     monkeypatch.setenv("SCS_SCHEMA_DIR", str(SCHEMA))
     # No project-bundle.yaml here: before 0.6.0 the shortcut aborted
@@ -447,7 +449,7 @@ def test_bundle_validate_shortcut_finds_the_domain_bundle(tmp_path: Path, monkey
 
 
 def test_scaffolded_skeletons_do_not_compile_until_directives_are_written(tmp_path: Path):
-    root = scaffold(tmp_path, "minimal", kind="domain")
+    root = scaffold(tmp_path, "domain")
     result = CliRunner().invoke(
         cli,
         [
@@ -465,7 +467,7 @@ def test_scaffolded_skeletons_do_not_compile_until_directives_are_written(tmp_pa
 
 
 def test_add_bundle_rejects_a_domain_name_with_a_hint(tmp_path: Path, monkeypatch):
-    root = scaffold(tmp_path, "minimal")
+    root = scaffold(tmp_path)
     monkeypatch.chdir(root)
     result = CliRunner().invoke(cli, ["add", "bundle", "software-development"])
     assert result.exit_code != 0
@@ -552,25 +554,31 @@ def test_add_scd_adds_a_template_scd_that_validates(tmp_path: Path, monkeypatch)
 # ------------------------------------------- Domain Ontology manifest in the scaffold (ISS-029)
 
 SDLC_ONTOLOGY_EXAMPLE = REPO / "schema" / "domain" / "examples" / "software-development-domain.yaml"
-MANIFEST = "domain/domain-manifest.yaml"
+MANIFEST = "ontology/domain-manifest.yaml"
 
 
 def _manifest_concepts(root: Path) -> list[dict]:
     return yaml.safe_load((root / MANIFEST).read_text())["domain"]["ontology"]["concepts"]
 
 
-@pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_scaffold_generates_a_valid_domain_ontology_manifest(tmp_path: Path, project_type: str):
-    root = scaffold(tmp_path, project_type)
+@pytest.mark.parametrize("kind", ["domain", "project"])
+@pytest.mark.parametrize("ontology", ONTOLOGIES)
+def test_scaffold_generates_a_valid_domain_ontology_manifest(
+    tmp_path: Path, ontology: str, kind: str
+):
+    root = scaffold(tmp_path, kind, ontology)
     assert (root / MANIFEST).is_file()
     result = validate_with_validator("--domain", str(root / MANIFEST))
     assert result.exit_code == 0, result.output
     assert "0 errors" in result.output and "0 warnings" in result.output
 
 
-@pytest.mark.parametrize("project_type", PROJECT_TYPES)
-def test_manifest_ontology_lists_exactly_the_generated_concepts(tmp_path: Path, project_type: str):
-    root = scaffold(tmp_path, project_type)
+@pytest.mark.parametrize("kind", ["domain", "project"])
+@pytest.mark.parametrize("ontology", ONTOLOGIES)
+def test_manifest_ontology_lists_exactly_the_generated_concepts(
+    tmp_path: Path, ontology: str, kind: str
+):
+    root = scaffold(tmp_path, kind, ontology)
     generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
     assert {c["id"] for c in _manifest_concepts(root)} == {f"concept:{g}" for g in generated}
 
@@ -583,13 +591,13 @@ def test_manifest_uses_the_reference_sdlc_ontology_wording(tmp_path: Path):
         c["id"]: (c["name"], c.get("description"))
         for c in yaml.safe_load(SDLC_ONTOLOGY_EXAMPLE.read_text())["domain"]["ontology"]["concepts"]
     }
-    root = scaffold(tmp_path, "healthcare")
+    root = scaffold(tmp_path)
     scaffolded = {c["id"]: (c["name"], c.get("description")) for c in _manifest_concepts(root)}
     assert scaffolded == reference
 
 
 def test_manifest_declares_the_software_development_domain(tmp_path: Path):
-    root = scaffold(tmp_path, "standard")
+    root = scaffold(tmp_path)
     domain = yaml.safe_load((root / MANIFEST).read_text())["domain"]
     assert domain["id"] == "domain:software-development"
     assert domain["version"] == "0.1.0"
@@ -597,12 +605,18 @@ def test_manifest_declares_the_software_development_domain(tmp_path: Path):
 
 
 def test_getting_started_points_at_the_ontology_manifest(tmp_path: Path):
-    root = scaffold(tmp_path, "standard")
+    root = scaffold(tmp_path)
     assert MANIFEST in (root / "docs" / "GETTING_STARTED.md").read_text()
 
 
 def test_add_bundle_reminds_you_to_add_the_concept_to_the_manifest(tmp_path: Path, monkeypatch):
-    root = scaffold(tmp_path, "minimal")
+    root = scaffold(tmp_path)
+    # Remove the concept the way a user pruning the scaffold would: bundle and manifest entry
+    (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
+    manifest = yaml.safe_load((root / MANIFEST).read_text())
+    concepts = manifest["domain"]["ontology"]["concepts"]
+    concepts[:] = [c for c in concepts if c["id"] != "concept:compliance-governance"]
+    (root / MANIFEST).write_text(yaml.safe_dump(manifest))
     monkeypatch.chdir(root)
     result = CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"])
     assert result.exit_code == 0, result.output
@@ -611,7 +625,7 @@ def test_add_bundle_reminds_you_to_add_the_concept_to_the_manifest(tmp_path: Pat
 
 
 def test_add_bundle_is_quiet_when_the_manifest_already_has_the_concept(tmp_path: Path, monkeypatch):
-    root = scaffold(tmp_path, "healthcare")
+    root = scaffold(tmp_path)
     (root / "bundles" / "concepts" / "security.yaml").unlink()
     monkeypatch.chdir(root)
     result = CliRunner().invoke(cli, ["add", "bundle", "security"])
@@ -636,15 +650,26 @@ def test_add_bundle_works_for_every_concept(tmp_path: Path, monkeypatch, concept
     assert validate_with_validator("--bundle", str(target)).exit_code == 0
 
 
-def test_add_bundle_honours_the_project_types_compliance_settings(tmp_path: Path, monkeypatch):
-    """A healthcare project's compliance bundle lists the HIPAA SCDs; a standard one does not."""
-    for project_type, expect_hipaa in (("healthcare", True), ("standard", False)):
-        root = scaffold(tmp_path / project_type, project_type)
-        (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
-        monkeypatch.chdir(root)
-        assert CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"]).exit_code == 0
-        text = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
-        assert ("hipaa-compliance" in text) is expect_hipaa
+def test_add_bundle_lists_the_full_set_unless_a_0_6_project_type_applies(
+    tmp_path: Path, monkeypatch
+):
+    """A 0.7 workspace gets the full compliance bundle (D-64); a 0.6 workspace made with
+    `scs init --type standard` still leaves the HIPAA SCDs out."""
+    root = scaffold(tmp_path)
+    (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
+    monkeypatch.chdir(root)
+    assert CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"]).exit_code == 0
+    text = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
+    assert "hipaa-compliance" in text
+
+    legacy = tmp_path / "legacy"
+    legacy.mkdir()
+    monkeypatch.chdir(legacy)
+    args = ["init", "--type", "standard", "--author", "T", "--email", "t@e.com"]
+    assert CliRunner().invoke(cli, args).exit_code == 0
+    assert CliRunner().invoke(cli, ["add", "bundle", "compliance-governance"]).exit_code == 0
+    text = (legacy / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
+    assert "hipaa-compliance" not in text
 
 
 # ------------------------------------------------------ --ontology mca (ISS-029)
@@ -671,25 +696,7 @@ MCA_CONCEPTS = {
 
 
 def scaffold_mca(tmp_path: Path) -> Path:
-    result = CliRunner().invoke(
-        cli,
-        [
-            "new",
-            "project",
-            "demo",
-            "--ontology",
-            "mca",
-            "--dir",
-            str(tmp_path),
-            "--author",
-            "Test Author",
-            "--email",
-            "test@example.com",
-            "--no-interactive",
-        ],
-    )
-    assert result.exit_code == 0, result.output
-    return tmp_path / "demo"
+    return new_workspace(tmp_path, "project", "demo", "--ontology", "mca")
 
 
 def test_mca_scaffold_generates_exactly_the_16_mca_concepts(tmp_path: Path):
@@ -698,31 +705,12 @@ def test_mca_scaffold_generates_exactly_the_16_mca_concepts(tmp_path: Path):
     assert generated == MCA_CONCEPTS
 
 
-def test_mca_scaffold_ignores_type(tmp_path: Path):
-    """--type is sdlc-only; passing it alongside --ontology mca changes nothing about the
-    scaffold (still the full 16-concept set, not a --type variant)."""
-    result = CliRunner().invoke(
-        cli,
-        [
-            "new",
-            "project",
-            "demo",
-            "--ontology",
-            "mca",
-            "--type",
-            "minimal",
-            "--dir",
-            str(tmp_path),
-            "--author",
-            "A",
-            "--email",
-            "a@example.com",
-            "--no-interactive",
-        ],
-    )
-    assert result.exit_code == 0, result.output
-    generated = {p.stem for p in (tmp_path / "demo" / "bundles" / "concepts").glob("*.yaml")}
-    assert generated == MCA_CONCEPTS
+@pytest.mark.parametrize("option", [["--type", "minimal"], ["--profile", "personal"]])
+def test_new_has_no_type_or_profile(tmp_path: Path, option: list):
+    """Templates depend on the ontology and the workspace kind only (D-61, D-64)."""
+    result = CliRunner().invoke(cli, ["new", "domain", "x", "--dir", str(tmp_path), *option])
+    assert result.exit_code == 3
+    assert not (tmp_path / "x-context").exists()
 
 
 def test_mca_project_bundle_imports_exactly_the_16_concepts(tmp_path: Path):
@@ -793,13 +781,14 @@ def test_mca_reference_data_matches_the_shipped_ontology_example():
 def test_mca_scd_config_records_the_ontology_model(tmp_path: Path):
     root = scaffold_mca(tmp_path)
     config = (root / ".scs" / "config").read_text()
-    assert "ontology_model: mca" in config
-    assert "scs_version: 0.1.0" not in config  # was hardcoded stale; now the real package version
+    assert "ontology: mca" in config
+    assert "scs_version: 0.7.0" in config  # the spec version (D-06)
+    assert "tools_version: " in config
 
 
 def test_sdlc_scaffold_still_records_sdlc_as_the_ontology_model(tmp_path: Path):
-    root = scaffold(tmp_path, "standard")
-    assert "ontology_model: sdlc" in (root / ".scs" / "config").read_text()
+    root = scaffold(tmp_path)
+    assert "ontology: sdlc" in (root / ".scs" / "config").read_text()
 
 
 def test_add_bundle_and_add_scd_work_inside_an_mca_project(tmp_path: Path, monkeypatch):
@@ -867,42 +856,33 @@ def test_bundle_info_falls_back_to_the_mca_template_outside_a_project(tmp_path: 
 
 
 def test_new_domain_adds_company_and_prohibited_concepts(tmp_path: Path):
-    root = scaffold(tmp_path, "minimal", kind="domain")
+    root = scaffold(tmp_path, "domain")
     domain = yaml.safe_load((root / "bundles/domain-bundle.yaml").read_text())
     assert domain["imports"][1:3] == ["bundle:company", "bundle:prohibited"]
     for rel in ["context/project/company-profile.yaml", "context/project/prohibited.yaml"]:
         assert (root / rel).is_file(), rel
         assert validate_with_validator(str(root / rel)).exit_code == 0
-    manifest = yaml.safe_load((root / "domain/domain-manifest.yaml").read_text())
+    manifest = yaml.safe_load((root / MANIFEST).read_text())
     ids = [c["id"] for c in manifest["domain"]["ontology"]["concepts"]]
     assert ids[:2] == ["concept:company", "concept:prohibited"]
-    assert (
-        validate_with_validator("--domain", str(root / "domain/domain-manifest.yaml")).exit_code
-        == 0
-    )
+    assert validate_with_validator("--domain", str(root / MANIFEST)).exit_code == 0
 
 
 def test_new_project_does_not_add_the_domain_wide_concepts(tmp_path: Path):
-    root = scaffold(tmp_path, "standard")
+    root = scaffold(tmp_path)
     assert not (root / "bundles/concepts/prohibited.yaml").exists()
     assert not (root / "context/project/company-profile.yaml").exists()
 
 
 def test_new_mca_domain_validates(tmp_path: Path):
-    result = CliRunner().invoke(
-        cli,
-        ["new", "domain", "funder", "--ontology", "mca", "--dir", str(tmp_path)]
-        + ["--author", "A", "--email", "a@example.com", "--no-interactive"],
-    )
-    assert result.exit_code == 0, result.output
-    root = tmp_path / "funder"
+    root = new_workspace(tmp_path, "domain", "funder", "--ontology", "mca")
     assert (root / "bundles/concepts/prohibited.yaml").is_file()
     result = validate_with_validator("--bundle", str(root / "bundles/domain-bundle.yaml"))
     assert result.exit_code == 0, result.output
 
 
 def test_filled_in_prohibitions_and_facts_compile(tmp_path: Path):
-    root = scaffold(tmp_path, "minimal", kind="domain")
+    root = scaffold(tmp_path, "domain")
     prohibited = root / "context/project/prohibited.yaml"
     prohibited.write_text(
         prohibited.read_text().replace(
@@ -963,9 +943,8 @@ PROJECT_ONLY_SCDS = {
 }
 
 
-@pytest.mark.parametrize("project_type", ["healthcare", "standard"])
-def test_sdlc_domain_uses_the_global_profile(tmp_path: Path, project_type: str):
-    root = scaffold(tmp_path, project_type, kind="domain")
+def test_sdlc_domain_uses_the_global_profile(tmp_path: Path):
+    root = scaffold(tmp_path, "domain")
     scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
     assert not scds & PROJECT_ONLY_SCDS
     assert {"engineering-practices", "audit-requirements", "policy-enforcement"} <= scds
@@ -975,7 +954,7 @@ def test_sdlc_domain_uses_the_global_profile(tmp_path: Path, project_type: str):
 
 
 def test_sdlc_domain_concept_bundles_list_only_generated_scds(tmp_path: Path):
-    root = scaffold(tmp_path, "standard", kind="domain")
+    root = scaffold(tmp_path, "domain")
     generated = {f"scd:project:{p.stem}" for p in (root / "context" / "project").glob("*.yaml")}
     listed = set()
     for path in (root / "bundles" / "concepts").glob("*.yaml"):
@@ -990,7 +969,7 @@ def test_sdlc_domain_concept_bundles_list_only_generated_scds(tmp_path: Path):
 
 
 def test_sdlc_project_keeps_the_full_profile(tmp_path: Path):
-    root = scaffold(tmp_path, "standard")
+    root = scaffold(tmp_path)
     scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
     assert PROJECT_ONLY_SCDS <= scds
     assert "engineering-practices" not in scds
@@ -1003,13 +982,7 @@ CDMO_EXAMPLE = REPO / "examples" / "medical-device-cdmo"
 
 
 def scaffold_cdmo(tmp_path: Path, kind: str = "project") -> Path:
-    result = CliRunner().invoke(
-        cli,
-        ["new", kind, "demo", "--ontology", "cdmo", "--dir", str(tmp_path)]
-        + ["--author", "A", "--email", "a@example.com", "--no-interactive"],
-    )
-    assert result.exit_code == 0, result.output
-    return tmp_path / "demo"
+    return new_workspace(tmp_path, kind, "demo", "--ontology", "cdmo")
 
 
 def test_cdmo_reference_data_matches_the_shipped_ontology_and_example():
@@ -1073,7 +1046,7 @@ def test_cdmo_domain_uses_the_global_profile(tmp_path: Path):
     assert not scds & {"prohibited-uses", "risk-register", "cutover-plan", "program-objectives"}
     concepts = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
     assert not concepts & {"business-context", "system-architecture", "implementation-cutover"}
-    manifest = root / "domain" / "domain-manifest.yaml"
+    manifest = root / MANIFEST
     assert validate_with_validator("--domain", str(manifest)).exit_code == 0
     entries = yaml.safe_load(manifest.read_text())["domain"]["ontology"]["concepts"]
     risk = next(c for c in entries if c["id"] == "concept:risk-management")

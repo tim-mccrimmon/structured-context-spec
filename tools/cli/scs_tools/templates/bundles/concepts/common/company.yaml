@@ -10,6 +10,6 @@ scds:
   - scd:project:company-profile
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Company concept bundle for {{ project_name }}"

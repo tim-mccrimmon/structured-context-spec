@@ -16,6 +16,6 @@ content:
   controls: "TODO - the DLP controls in place and the channels they cover"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Data Loss Prevention skeleton from the Medical-Device CDMO ontology"

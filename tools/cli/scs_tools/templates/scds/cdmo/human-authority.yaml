@@ -16,6 +16,6 @@ content:
   gates: "TODO - each gate, what it covers, and who signs"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Human Authority skeleton from the Medical-Device CDMO ontology"

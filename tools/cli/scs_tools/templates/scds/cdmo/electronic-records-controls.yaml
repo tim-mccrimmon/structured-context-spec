@@ -18,6 +18,6 @@ content:
   signature_rules: "TODO - who may sign which records, and how"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Electronic Records Controls skeleton from the Medical-Device CDMO ontology"

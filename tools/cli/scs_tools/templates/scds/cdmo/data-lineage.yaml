@@ -16,6 +16,6 @@ content:
   flows: "TODO - each source, target, transformation, and reconciliation check"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Data Lineage skeleton from the Medical-Device CDMO ontology"

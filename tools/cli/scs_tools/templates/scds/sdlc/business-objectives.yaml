@@ -49,6 +49,6 @@ relationships:
   # - data-model depends-on business-objectives
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Business objectives for {{ project_name }}"

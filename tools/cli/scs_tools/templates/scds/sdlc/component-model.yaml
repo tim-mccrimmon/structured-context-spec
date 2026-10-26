@@ -59,6 +59,6 @@ relationships:
   #   description: "Component boundaries satisfy PHI isolation requirements"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Component model for {{ project_name }}"

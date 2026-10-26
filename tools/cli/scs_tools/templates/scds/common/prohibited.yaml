@@ -1,5 +1,5 @@
 # SCD Template: Prohibited Tools and Practices
-# Purpose: Things that are forbidden in all of the organization's work, without exception.
+# Purpose: Things that are forbidden in all of {% if bundle_kind == 'project' %}the work on {{ project_name }}{% else %}{{ project_name }}'s work{% endif %}, without exception.
 #
 # A prohibition is binary. Write only what is prohibited (`subject`), as a noun phrase; the
 # compiler writes the rule as "Prohibited: <subject>." Validation rejects a subject that
@@ -12,7 +12,8 @@
 #   reason:  why, for reviewers (not compiled)
 #   cites:   standard citations, e.g. std:hipaa#164.312(a)(1) (compiled)
 #
-# Projects cannot override these; changing one means a new version of the Domain bundle.
+{% if bundle_kind != 'project' %}# Projects cannot override these; changing one means a new version of the Domain bundle.
+{% endif %}
 
 id: scd:project:prohibited
 type: project
@@ -34,6 +35,6 @@ content:
   #   subject: "committing credentials, keys, or tokens to any repository"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Prohibitions for {{ project_name }}"

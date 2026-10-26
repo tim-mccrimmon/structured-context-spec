@@ -17,6 +17,6 @@ content:
   hierarchy: "TODO - the document levels and who approves each"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Document Control skeleton from the Medical-Device CDMO ontology"

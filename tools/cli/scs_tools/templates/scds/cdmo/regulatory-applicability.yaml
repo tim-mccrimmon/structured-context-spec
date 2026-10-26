@@ -21,6 +21,6 @@ content:
   not_applicable: "TODO - regulations considered and ruled out, with the reason"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Regulatory Applicability skeleton from the Medical-Device CDMO ontology"

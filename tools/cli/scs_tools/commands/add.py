@@ -5,10 +5,13 @@ Add command - add SCDs or bundles to an existing SCS project
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 import click
+import yaml
 from scs_validator.envelope import Change, relative
-from scs_validator.names import RESERVED_BUNDLE_NAMES
+from scs_validator.names import RESERVED_BUNDLE_NAMES, bundle_name
+from scs_validator.workspace import load_workspace
 
 from scs_tools.machine import CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import get_template_path, render_template, write_file
@@ -50,18 +53,14 @@ def _common_options(f):
 def _variables(base_path: Path, author, email) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     author_info = author or os.getenv("USER", "developer")
-    project_name = base_path.name
-    config_file = base_path / ".scs" / "config"
-    if config_file.exists():
-        with open(config_file, "r") as f:
-            for line in f:
-                if line.startswith("project_name:"):
-                    project_name = line.split(":", 1)[1].strip()
-                    break
+    project_name = _bundle_owner_name(base_path)
+    email_info = email or f"{author_info}@example.com"
     return {
         "project_name": project_name,
         "author": author_info,
-        "email": email or f"{author_info}@example.com",
+        "email": email_info,
+        # Provenance identifies a person as `Name <email>` (D-28, D-63)
+        "created_by": f"{author_info} <{email_info}>",
         "created_at": now,
     }
 
@@ -191,9 +190,11 @@ def bundle(envelope, out, bundle_name, author, email, force, dry_run, workspace)
         )
 
     variables = _variables(base_path, author, email)
-    # Project-type settings (e.g. which compliance SCDs a concept bundle lists) - sdlc only
+    # Which SCDs a concept bundle lists: the full set (D-64), except in a 0.6 workspace made
+    # with `scs init --type`, whose project type still applies
+    project_type = _read_project_type(config_file) if ontology == "sdlc" else None
     variables["config"] = (
-        get_project_type_config(_read_project_type(config_file)) if ontology == "sdlc" else {}
+        get_project_type_config(project_type) if project_type else {"exclude_scds": []}
     )
     bundle_file = base_path / "bundles" / "concepts" / f"{bundle_name}.yaml"
     _write(envelope, out, template_path, bundle_file, variables, force, dry_run)
@@ -205,24 +206,46 @@ def bundle(envelope, out, bundle_name, author, email, force, dry_run, workspace)
     _remind_about_ontology(base_path, bundle_name, out)
 
 
+def _bundle_owner_name(base_path: Path) -> str:
+    """The name templates call `project_name`: the root bundle's name (`bundle:<name>`), else
+    the 0.6 `project_name` config key, else the workspace directory's name. In a 0.7 Domain
+    workspace the config `name` is `domain` (D-03), not the organization's name."""
+    for path in sorted((base_path / "bundles").glob("*-bundle.yaml")):
+        try:
+            data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except (yaml.YAMLError, OSError, UnicodeDecodeError):
+            continue
+        if isinstance(data, dict) and str(data.get("id", "")).startswith("bundle:"):
+            return bundle_name(data["id"])
+    config_file = base_path / ".scs" / "config"
+    if config_file.exists():
+        for line in config_file.read_text(encoding="utf-8").splitlines():
+            if line.startswith("project_name:"):
+                return line.split(":", 1)[1].strip()
+    return base_path.name
+
+
 def _remind_about_ontology(base_path: Path, concept: str, out: Output):
     """If the project has a Domain Ontology manifest that lacks this concept, say how to add it"""
-    manifest = base_path / "domain" / "domain-manifest.yaml"
-    if not manifest.is_file():
+    found = load_workspace(base_path.name, base_path).ontology_manifest()
+    if found is None:
         return
+    manifest = found
     concept_id = f"concept:{concept}"
     if f"id: {concept_id}" in manifest.read_text(encoding="utf-8"):
         return
     out.echo(
-        f"\nNote: {concept_id} is not in domain/domain-manifest.yaml yet. Add it under\n"
+        f"\nNote: {concept_id} is not in {manifest.relative_to(base_path).as_posix()} yet. "
+        "Add it under\n"
         f"ontology.concepts so the ontology matches your concept bundles:\n"
         f"  - id: {concept_id}\n"
         f'    name: "..."'
     )
 
 
-def _read_project_type(config_file: Path) -> str:
-    """Project type recorded in .scs/config, or 'standard' if it is missing or unknown"""
+def _read_project_type(config_file: Path) -> Optional[str]:
+    """Project type recorded in .scs/config by `scs init --type` (0.6), or None. 0.7 workspaces
+    have none: their templates depend on the ontology only (D-64)."""
     from scs_tools.utils.project_types import PROJECT_TYPES
 
     if config_file.exists():
@@ -231,18 +254,18 @@ def _read_project_type(config_file: Path) -> str:
                 value = line.split(":", 1)[1].strip()
                 if value in PROJECT_TYPES:
                     return value
-    return "standard"
+    return None
 
 
 def _read_ontology_model(config_file: Path) -> str:
-    """Ontology model recorded in .scs/config, or 'sdlc' if missing or unknown. Projects
-    scaffolded before the --ontology selector existed have no ontology_model line at all -
-    'sdlc' is also the correct default for those."""
+    """Ontology model recorded in .scs/config (`ontology`, or the 0.6 key `ontology_model`), or
+    'sdlc' if missing or unknown. Projects scaffolded before the --ontology selector existed
+    have neither line - 'sdlc' is also the correct default for those."""
     from scs_tools.utils.project_types import ONTOLOGY_MODELS
 
     if config_file.exists():
         for line in config_file.read_text(encoding="utf-8").splitlines():
-            if line.startswith("ontology_model:"):
+            if line.startswith(("ontology:", "ontology_model:")):
                 value = line.split(":", 1)[1].strip()
                 if value in ONTOLOGY_MODELS:
                     return value

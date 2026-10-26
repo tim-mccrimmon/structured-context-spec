@@ -13,7 +13,7 @@ import click
 import yaml
 
 from scs_tools.utils.files import get_template_path
-from scs_tools.utils.project_types import ONTOLOGY_MODELS, PROJECT_TYPES
+from scs_tools.utils.project_types import ONTOLOGY_MODELS
 
 
 @click.group()
@@ -67,18 +67,11 @@ def list(available):
             click.echo(f"Available concept bundles - ontology model '{model}':\n")
             for concept_name in model_config["concepts"]:
                 click.echo(f"  • {concept_name}")
+            if not model_config["concepts"]:
+                click.echo("  (none shipped: concepts are defined with the user)")
             click.echo()
 
-        click.echo("Domain bundles: create one with 'scs new domain <name> [--ontology ...]'.\n")
-
-        click.echo("Project types and their bundles (sdlc ontology only):\n")
-        for ptype, config in PROJECT_TYPES.items():
-            click.echo(f"  {ptype}:")
-            click.echo(f"    Description: {config['description']}")
-            if config.get("minimal"):
-                click.echo("    Concept bundles: 3 (architecture, security, deployment-operations)")
-            else:
-                click.echo("    Concept bundles: all 11")
+        click.echo("Domain bundles: create one with 'scs new domain <name> [--ontology ...]'.")
         return
 
     # List bundles in current project

@@ -17,6 +17,6 @@ content:
   criteria: "TODO - each criterion and the evidence required"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "AI Vendor Qualification skeleton from the Medical-Device CDMO ontology"

@@ -13,6 +13,6 @@ scds:
   - scd:project:ai-vendor-qualification
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Supplier Qualification concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

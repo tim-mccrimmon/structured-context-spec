@@ -73,6 +73,6 @@ relationships:
   #   description: "Technology choices constrain infrastructure options"
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Technology stack definition for {{ project_name }}"

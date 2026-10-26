@@ -45,6 +45,6 @@ content:
 relationships: []
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Engineering practices for {{ project_name }}"

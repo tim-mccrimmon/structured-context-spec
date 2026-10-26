@@ -16,6 +16,6 @@ content:
   triggers: "TODO - each trigger and who initiates requalification"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Requalification Triggers skeleton from the Medical-Device CDMO ontology"

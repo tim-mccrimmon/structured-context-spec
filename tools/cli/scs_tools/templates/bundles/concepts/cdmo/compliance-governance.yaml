@@ -14,6 +14,6 @@ scds:
   - scd:project:prohibited-uses
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Compliance & Governance concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"

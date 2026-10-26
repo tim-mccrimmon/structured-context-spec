@@ -17,6 +17,6 @@ content:
   method: "TODO - the assessment method and its outputs"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Supplier Assessment skeleton from the Medical-Device CDMO ontology"

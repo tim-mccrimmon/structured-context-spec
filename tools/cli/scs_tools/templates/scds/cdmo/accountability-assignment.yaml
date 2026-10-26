@@ -16,6 +16,6 @@ content:
   assignments: "TODO - each output type and the role accountable for it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Accountability Assignment skeleton from the Medical-Device CDMO ontology"

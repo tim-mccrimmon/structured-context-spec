@@ -16,6 +16,6 @@ content:
   classes: "TODO - each class, its definition, examples, and handling rules"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Data Classification skeleton from the Medical-Device CDMO ontology"

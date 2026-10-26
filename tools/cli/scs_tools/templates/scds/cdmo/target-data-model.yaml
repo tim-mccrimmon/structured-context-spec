@@ -16,6 +16,6 @@ content:
   objects: "TODO - each object, its key fields, and its system of record"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Target Data Model skeleton from the Medical-Device CDMO ontology"

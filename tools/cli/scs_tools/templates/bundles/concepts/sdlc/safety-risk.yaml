@@ -11,6 +11,6 @@ scds:
   - scd:project:safety-checklist
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Safety & Risk concept bundle for {{ project_name }}"

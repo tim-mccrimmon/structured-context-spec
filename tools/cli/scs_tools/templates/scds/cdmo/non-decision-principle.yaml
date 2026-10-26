@@ -16,6 +16,6 @@ content:
   reserved_decisions: "TODO - the decision types reserved for people"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Non-Decision Principle skeleton from the Medical-Device CDMO ontology"
