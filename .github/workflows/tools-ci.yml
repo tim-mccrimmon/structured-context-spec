@@ -85,27 +85,31 @@ jobs:
         run: |
           pip wheel --no-deps -w dist ./tools/scd-validator ./tools/cli
           pip install dist/*.whl
-      - name: Scaffold, validate and version outside the source tree
+      - name: Scaffold, validate and version a Domain repository outside the source tree
         run: |
           cd "$(mktemp -d)"
-          scs new project smoke --type healthcare --author CI --email ci@example.com --no-interactive
-          cd smoke
+          scs new domain smoke --author CI --email ci@example.com --no-interactive
+          cd smoke-context
+          scs new project app --author CI --email ci@example.com --no-interactive
+          scs-validate --strict
+          cd domain
           scs bundle validate
-          scs validate --domain domain/domain-manifest.yaml
+          scs validate --domain ontology/domain-manifest.yaml
           for f in context/project/*.yaml; do scs-validate "$f" > /dev/null; done
-          git init -q .
+          cd ../projects/app
+          scs bundle validate
+          scs validate --domain ontology/domain-manifest.yaml
           git config user.email ci@example.com
           git config user.name CI
           git add -A
-          git commit -q -m init
+          git commit -q -m "add project app"
           scs bundle version --bundle bundles/concepts/security.yaml --version 0.1.0 \
             --approved-by ci@example.com --notes "ci smoke"
           scs-validate --bundle bundles/concepts/security-v0.1.0.yaml
-      - name: Scaffold and validate the mca ontology model outside the source tree
+      - name: Scaffold and validate the mca ontology outside the source tree
         run: |
           cd "$(mktemp -d)"
-          scs new project smoke-mca --ontology mca --author CI --email ci@example.com --no-interactive
-          cd smoke-mca
-          scs bundle validate
-          scs validate --domain domain/domain-manifest.yaml
-          for f in context/project/*.yaml; do scs-validate "$f" > /dev/null; done
+          scs new domain smoke-mca --ontology mca --author CI --email ci@example.com --no-interactive
+          cd smoke-mca-context
+          scs new project app --ontology mca --author CI --email ci@example.com --no-interactive
+          scs-validate --strict
