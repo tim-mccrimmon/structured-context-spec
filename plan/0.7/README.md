@@ -1,7 +1,7 @@
 # SCS 0.7.0 Plan
 
 - **Status**: Rev 5 (2026-10-26). Decisions recorded (section 7) except D-27, which WP-11a
-  settles, and D-68 to D-73 (section 7 G), still open. RFC 0002 amended for WP-01a, WP-01b, and
+  settles, and D-68, D-69, and D-71 to D-73 (section 7 G), still open. RFC 0002 amended for WP-01a, WP-01b, and
   section 7 G.
 - **Source of design**: `rfcs/RFC-0002-agent-mediated-scs.md` (accepted 2026-10-25)
 - **Backlog**: `ISSUES.md` ISS-042 to ISS-055; workstreams in `ROADMAP.md`
@@ -67,7 +67,8 @@ Known gaps carried forward:
 - `tools/cli/README.md` and the 0.5 presentation docs still show `scs new project --type`
   (WP-11rc rewrites the README).
 - `scs new` falls back to `$USER` and `$USER@example.com` when no author or email is given; D-71
-  is open. D-72 is implemented as recommended but still open; D-68 to D-73 await decisions.
+  is open. D-72 is implemented as recommended but still open; D-68, D-69, and D-71 to D-73
+  await decisions (D-70 decided).
 - `test_concept_bundles_at_the_same_version_get_their_own_tags` runs `git init` in a Project
   workspace, nesting a repository inside the Domain repository; WP-14 rewrites the versioning
   tests.

@@ -148,6 +148,7 @@ Registry: `schema/diagnostics/codes.yaml`, merged from per-WP fragments in
 | `DIFF_VERSION_NOT_FOUND` | error | D-41 |
 | `DERIVED_FROM_UNRESOLVED` | warning | D-20 |
 | `ONTOLOGY_LEGACY_LOCATION` | info | D-04 |
+| `SCD_EMPTY` | info | D-70; replaces `COMPLETENESS_STUB_SCD`, which is removed |
 | `DIFF_LEGACY_BASELINE` | info | D-41 |
 
 ## Skill-to-engine contract

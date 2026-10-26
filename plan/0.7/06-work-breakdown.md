@@ -221,7 +221,9 @@ listed in order, and each starts after the previous one merges.
   compiler verification for DRAFT roots and no `source_digest` without a verified digest (D-16,
   D-18); `scs compile --version V` (D-57); manifest format by tag form (D-49); versioning guards (D-14, D-15, D-38, D-53); snapshot naming (D-43); whole-workspace
   version commit limited to the workspace pathspec, with the D-55/D-58 identity, annotated tag,
-  and git settings overridden (D-40, D-58); actionable drift diagnostic (D-19).
+  and git settings overridden (D-40, D-58); actionable drift diagnostic (D-19); empty SCDs as
+  `SCD_EMPTY` (info) in validation and listed by `bundle version --dry-run`, with the 0.6 stub
+  detection and `COMPLETENESS_STUB_SCD` removed (D-70).
 - **Accept**, one test each:
   - Versioning a root with a DRAFT or unpinned import gives `VERSION_IMPORT_NOT_PINNED`, with and
     without `--no-validate`.
@@ -257,6 +259,9 @@ listed in order, and each starts after the previous one merges.
   - Compiling a DRAFT root whose pinned import has drifted fails; no flag combination bypasses it.
   - An unpinned import resolves to the working file after the import has been versioned.
   - The drift diagnostic names the changed files and the bundles to version again, bottom-up.
+  - A fresh scaffold passes `--strict` and reports each SCD with no prohibitions, directives, or
+    facts as `SCD_EMPTY` (info); `bundle version --dry-run` lists the bundle's empty SCDs;
+    `COMPLETENESS_STUB_SCD` is not in `codes.yaml` (D-70).
   - An SCD or bundle under `plan/`, `test-plan/`, or `qa/` is not indexed, resolved, or compiled,
     and produces no diagnostic.
   - A 0.6 fixture repo with `v1.0.0` tags, after versioning each bundle once under 0.7, passes

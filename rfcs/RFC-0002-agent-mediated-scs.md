@@ -16,7 +16,9 @@
   templates, and identity (`plan/0.7/07-decisions-and-gaps.md` D-60 to D-73): `personal` is an
   ontology, identity is provenance only, templates are chosen by ontology and workspace kind,
   provenance is corrected at validation and versioning (Motivation, Guide-level Explanation,
-  sections 4, 5, 9, Implementation Notes, Migration Guide, Unresolved Questions)
+  sections 4, 5, 9, Implementation Notes, Migration Guide, Unresolved Questions). 2026-10-26:
+  empty SCDs are reported as `SCD_EMPTY` (info) and listed before versioning; stub detection is
+  removed (plan D-70; Validation Rules, Unresolved Questions)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---
@@ -941,6 +943,11 @@ tools create and check, not a schema.
 - The validator MUST NOT report a workspace's reserved directories (`plan/`, `test-plan/`,
   `qa/`) as errors or warnings in any mode, and MUST NOT validate their content.
 - A bundle named `plan`, `test-plan`, or `qa` is an error.
+- An SCD with no `prohibitions`, `directives`, or `facts` contributes nothing to a compiled
+  artifact. The validator MUST report it as `SCD_EMPTY` (info), so a fresh scaffold still passes
+  `--strict`, and `scs bundle version --dry-run` MUST list the bundle's empty SCDs, so they are
+  removed or kept knowingly before a release. The 0.6 stub detection (`COMPLETENESS_STUB_SCD`)
+  is removed.
 - `scs stack` MUST report the checks of section 13 with the codes and severities given there.
   Under `--strict`, its warnings give exit code 2.
 
@@ -1063,10 +1070,9 @@ produced that way will vary in quality, and the variation will reflect on the st
 10. **Removing what the scaffold supplied.** When removing an SCD leaves its concept bundle
     empty, the same command should remove the concept bundle, the root bundle's import, and the
     manifest entry. Open (plan D-69).
-11. **Making unused SCDs visible.** A scaffold of empty SCDs validates cleanly today; how
-    validation and versioning surface them without failing every fresh scaffold under
-    `--strict` is open (plan D-70). So is the check that reports provenance to correct
-    (section 5; plan D-71).
+11. **Reporting provenance to correct.** Which check reports a `created_by` that is not a person
+    identifier (section 5) is open (plan D-71). Unused SCDs are resolved (Validation Rules; plan
+    D-70).
 12. **Projects under the `personal` ontology.** Rec.: the same fixed concept, boundaries, and
     nothing else. Open (plan D-72).
 13. **The ontology manifest's naming.** It still uses "domain" (`domain-manifest.yaml`, the
