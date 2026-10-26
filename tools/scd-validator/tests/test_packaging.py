@@ -44,8 +44,8 @@ REQUIRED_RULE_FILES = [
 
 def test_default_rules_ship_inside_the_package():
     for name in REQUIRED_RULE_FILES:
-        assert (PACKAGED_RULES / "v0.6.0" / name).is_file(), name
-    assert RulesLoader().rules_dir.resolve() == (PACKAGED_RULES / "v0.6.0").resolve()
+        assert (PACKAGED_RULES / "v0.7.0" / name).is_file(), name
+    assert RulesLoader().rules_dir.resolve() == (PACKAGED_RULES / "v0.7.0").resolve()
 
 
 @pytest.mark.parametrize("rel", REQUIRED_SCHEMAS)
@@ -149,3 +149,36 @@ def test_scs_validate_version_matches_the_package_version():
     result = CliRunner().invoke(validate, ["--version"])
     assert result.exit_code == 0, result.output
     assert result.output.strip() == f"scs-validate, version {pkg_version('scs-validator')}"
+
+
+def test_the_codes_registry_is_built_from_its_fragments():
+    """schema/diagnostics/codes.yaml is generated from codes.d/ (D-10)."""
+    import subprocess
+    import sys
+
+    script = Path(__file__).resolve().parents[1] / "scripts" / "build_codes.py"
+    result = subprocess.run(
+        [sys.executable, str(script), "--check"], capture_output=True, text=True, check=False
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize(
+    "bundle",
+    [
+        "examples/two-tier-governance/org/bundles/domain-bundle.yaml",
+        "examples/two-tier-governance/infusion-pump-fw/bundles/project-bundle.yaml",
+    ],
+)
+def test_json_report_validates_against_the_report_schema(bundle: str):
+    import json
+
+    from jsonschema import Draft202012Validator
+
+    result = CliRunner().invoke(
+        validate,
+        ["--bundle", str(REPO / bundle), "--output", "json", "--schema-dir", str(REPO_SCHEMA)],
+    )
+    report = json.loads(result.output)
+    schema = json.loads((REPO_SCHEMA / "validator" / "report-schema.json").read_text())
+    Draft202012Validator(schema).validate(report)

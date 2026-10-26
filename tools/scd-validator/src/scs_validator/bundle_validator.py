@@ -47,6 +47,7 @@ class BundleValidator:
                 ValidationError(
                     "Bundle missing required 'type' field",
                     file_path=file_path,
+                    code="BUNDLE_TYPE_MISSING",
                 )
             )
             return result
@@ -57,14 +58,23 @@ class BundleValidator:
             error_msg = self.rules_loader.get_error_message(
                 self.rules, "legacy_concern_type", bundle_id=bundle_id
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_LEGACY_CONCERN_TYPE")
+            )
             return result
 
         if self.rules.get("bundle_types", {}).get(bundle_type, {}).get("deprecated"):
             warning_msg = self.rules_loader.get_error_message(
                 self.rules, "deprecated_standards_bundle", bundle_id=bundle_id
             )
-            result.add_warning(ValidationWarning(warning_msg, level="bundle", file_path=file_path))
+            result.add_warning(
+                ValidationWarning(
+                    warning_msg,
+                    level="bundle",
+                    file_path=file_path,
+                    code="BUNDLE_STANDARDS_DEPRECATED",
+                )
+            )
 
         for ref in bundle.get("scds") or []:
             if str(ref).startswith("scd:standards:") and bundle_type != "standards":
@@ -72,7 +82,12 @@ class BundleValidator:
                     self.rules, "deprecated_standards_scd", ref=ref
                 )
                 result.add_warning(
-                    ValidationWarning(warning_msg, level="bundle", file_path=file_path)
+                    ValidationWarning(
+                        warning_msg,
+                        level="bundle",
+                        file_path=file_path,
+                        code="BUNDLE_STANDARDS_SCD_DEPRECATED",
+                    )
                 )
 
         # Validate XOR constraint
@@ -103,6 +118,7 @@ class BundleValidator:
                         self.rules, "import_cycle", cycle=" -> ".join(cycle)
                     ),
                     file_path=str(tree.root.path),
+                    code="IMPORT_CYCLE",
                 )
             )
 
@@ -121,6 +137,7 @@ class BundleValidator:
                                 self.rules, "unresolved_import", ref=edge.ref, **fmt
                             ),
                             file_path=path,
+                            code="IMPORT_UNRESOLVED",
                         )
                     )
                     continue
@@ -136,6 +153,7 @@ class BundleValidator:
                             ),
                             level="bundle",
                             file_path=path,
+                            code="IMPORT_VERSION_MISMATCH",
                         )
                     )
                 import_type = edge.target.type or "unknown"
@@ -151,6 +169,7 @@ class BundleValidator:
                                 **fmt,
                             ),
                             file_path=path,
+                            code="IMPORT_TYPE_FORBIDDEN",
                         )
                     )
                 elif (
@@ -168,6 +187,7 @@ class BundleValidator:
                                 **fmt,
                             ),
                             file_path=path,
+                            code="IMPORT_TYPE_NOT_ALLOWED",
                         )
                     )
                 if import_type == "meta" and ":" not in edge.ref[len("bundle:") :]:
@@ -178,6 +198,7 @@ class BundleValidator:
                             ),
                             level="bundle",
                             file_path=path,
+                            code="IMPORT_META_UNPINNED",
                         )
                     )
 
@@ -194,6 +215,7 @@ class BundleValidator:
                                 **fmt,
                             ),
                             file_path=path,
+                            code="IMPORT_TYPE_LIMIT_EXCEEDED",
                         )
                     )
 
@@ -212,6 +234,7 @@ class BundleValidator:
                                 ),
                                 level="bundle",
                                 file_path=path,
+                                code="IMPORT_EXPECTED_TYPE_MISSING",
                             )
                         )
 
@@ -225,6 +248,7 @@ class BundleValidator:
                     ),
                     level="bundle",
                     file_path=str(tree.root.path),
+                    code="BUNDLE_SCD_UNRESOLVED",
                 )
             )
 
@@ -247,6 +271,7 @@ class BundleValidator:
                             self.rules, "content_digest_mismatch", changes=changes, **fmt
                         ),
                         file_path=path,
+                        code="CONTENT_DIGEST_MISMATCH",
                     )
                 )
             elif check.status == "unrecorded":
@@ -257,6 +282,7 @@ class BundleValidator:
                         ),
                         level="bundle",
                         file_path=path,
+                        code="CONTENT_DIGEST_UNRECORDED",
                     )
                 )
         return result
@@ -303,10 +329,17 @@ class BundleValidator:
             )
 
             if severity == "error":
-                result.add_error(ValidationError(error_msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(error_msg, file_path=file_path, code="BUNDLE_XOR_VIOLATION")
+                )
             else:
                 result.add_warning(
-                    ValidationWarning(error_msg, level="bundle", file_path=file_path)
+                    ValidationWarning(
+                        error_msg,
+                        level="bundle",
+                        file_path=file_path,
+                        code="BUNDLE_XOR_VIOLATION_WARNING",
+                    )
                 )
 
     def _validate_bundle_type_rules(
@@ -335,6 +368,7 @@ class BundleValidator:
                     f"Unknown bundle type '{bundle_type}' - no validation rules found",
                     level="bundle",
                     file_path=file_path,
+                    code="BUNDLE_TYPE_UNKNOWN",
                 )
             )
             return
@@ -396,7 +430,9 @@ class BundleValidator:
                 actual=array_len,
                 required=min_val,
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_TOO_FEW_ITEMS")
+            )
 
         # Check maximum
         max_val = constraints.get("max")
@@ -409,7 +445,9 @@ class BundleValidator:
                 actual=array_len,
                 allowed=max_val,
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_TOO_MANY_ITEMS")
+            )
 
         # Check required (must have at least 1)
         required = constraints.get("required", False)
@@ -420,7 +458,9 @@ class BundleValidator:
                 field=field_name,
                 bundle_type=bundle_type,
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_REQUIRED_FIELD_EMPTY")
+            )
 
     def _validate_meta_bundle(
         self,
@@ -456,5 +496,10 @@ class BundleValidator:
                         pattern=version_pattern,
                     )
                     result.add_warning(
-                        ValidationWarning(error_msg, level="bundle", file_path=file_path)
+                        ValidationWarning(
+                            error_msg,
+                            level="bundle",
+                            file_path=file_path,
+                            code="BUNDLE_META_VERSION_INVALID",
+                        )
                     )

@@ -2,22 +2,12 @@
 
 import sys
 from pathlib import Path
-from typing import List
 
 import click
 
-from .. import __version__
-from ..bundle_validator import BundleValidator
-from ..completeness_validator import CompletenessValidator
-from ..ontology_validator import OntologyValidator
-from ..parser import Parser
-from ..relationship_validator import RelationshipValidator
+from .. import __version__, api
 from ..reporter import Reporter
-from ..resolver import resolve
-from ..rules_loader import RulesLoader
-from ..schema_validator import SchemaValidator
-from ..semantic_validator import SemanticValidator
-from ..utils import SCHEMA_DIR_ENV_VAR, ValidationError, ValidationResult, resolve_schema_dir
+from ..utils import SCHEMA_DIR_ENV_VAR, ValidationError
 
 
 @click.command()
@@ -40,6 +30,15 @@ from ..utils import SCHEMA_DIR_ENV_VAR, ValidationError, ValidationResult, resol
     "-c",
     type=click.Path(exists=True),
     help="Validate a checkpoint record file (any-ai-actor-model.md, RFC-0001/ISS-006)",
+)
+@click.option(
+    "--repo",
+    "-r",
+    type=click.Path(exists=True, file_okay=False),
+    help=(
+        "Validate every workspace of a Domain repository (the default with no other input "
+        "when run at a Domain repository root)"
+    ),
 )
 @click.option(
     "--schema-dir",
@@ -88,6 +87,7 @@ def validate(
     bundle: str | None,
     domain: str | None,
     checkpoint: str | None,
+    repo: str | None,
     schema_dir: str | None,
     output: str,
     strict: bool,
@@ -113,6 +113,10 @@ def validate(
         scs validate --bundle context/bundle.yaml
 
         \b
+        # Validate every workspace of a Domain repository (run at its root)
+        scs-validate --strict
+
+        \b
         # Validate a domain manifest (Domain Ontology, RFC-0001)
         scs validate --domain domain-manifest.yaml
 
@@ -128,12 +132,16 @@ def validate(
         # JSON output
         scs validate --bundle context/bundle.yaml --output json
     """
-    try:
-        # Determine schema directory (--schema-dir, $SCS_SCHEMA_DIR, then discovery)
-        schema_path, searched = resolve_schema_dir(schema_dir)
 
-        if schema_path is None or not schema_path.exists():
-            looked = "\n".join(f"  {p}" for p in searched) if searched else f"  {schema_path}"
+    def log(message: str) -> None:
+        if verbose:
+            click.echo(message)
+
+    try:
+        try:
+            v = api.Validators(schema_dir, completeness_rules)
+        except api.SchemaDirNotFound as e:
+            looked = "\n".join(f"  {p}" for p in e.searched)
             click.echo(
                 "Error: Schema directory not found.\n"
                 f"Looked in:\n{looked}\n"
@@ -142,61 +150,35 @@ def validate(
             )
             sys.exit(4)
 
-        # Initialize rules loader and validators
-        parser = Parser()
-        rules_loader = RulesLoader()
-        schema_validator = SchemaValidator(schema_path)
-        semantic_validator = SemanticValidator(rules_loader)
-        bundle_validator = BundleValidator(rules_loader)
-        relationship_validator = RelationshipValidator(rules_loader)
-        ontology_validator = OntologyValidator(rules_loader)
-
-        # Initialize completeness validator with custom rules if provided
-        completeness_rules_path = Path(completeness_rules) if completeness_rules else None
-        completeness_validator = CompletenessValidator(rules_loader, completeness_rules_path)
-
-        reporter = Reporter(use_color=not no_color)
-
-        results: List[ValidationResult] = []
-
         if bundle:
-            # Validate bundle
-            results = validate_bundle(
-                bundle,
-                parser,
-                schema_validator,
-                semantic_validator,
-                bundle_validator,
-                relationship_validator,
-                completeness_validator,
-                verbose,
-                skip_completeness,
+            report = api.validate_bundle(
+                bundle, skip_completeness=skip_completeness, strict=strict, validators=v, log=log
             )
         elif domain:
-            # Validate domain manifest (Domain Ontology, RFC-0001)
-            results = validate_domain(domain, parser, schema_validator, ontology_validator, verbose)
+            report = api.validate_domain_manifest(domain, validators=v, log=log)
         elif checkpoint:
-            # Validate checkpoint record (any-ai-actor-model.md, RFC-0001/ISS-006)
-            results = validate_checkpoint(checkpoint, parser, schema_validator, verbose)
+            report = api.validate_checkpoint(checkpoint, validators=v, log=log)
         elif files:
-            # Validate individual files
-            results = validate_files(files, parser, schema_validator, semantic_validator, verbose)
+            report = api.validate_files(files, validators=v, log=log)
+        elif repo or api.find_repository(Path.cwd()):
+            report = api.validate_repository(
+                Path(repo) if repo else Path.cwd(),
+                skip_completeness=skip_completeness,
+                strict=strict,
+                validators=v,
+                log=log,
+            )
         else:
             click.echo("Error: No files or bundle specified\n", err=True)
             click.echo(click.get_current_context().get_help())
             sys.exit(3)
 
-        # Generate report
+        reporter = Reporter(use_color=not no_color)
         if output == "json":
-            report = reporter.report_json(results, __version__, strict)
+            click.echo(reporter.report_json(report, __version__, strict))
         else:
-            report = reporter.report_text(results, __version__, strict)
-
-        click.echo(report)
-
-        # Determine exit code
-        exit_code = determine_exit_code(results, strict)
-        sys.exit(exit_code)
+            click.echo(reporter.report_text(report, __version__, strict))
+        sys.exit(report.exit_code(strict))
 
     except ValidationError as e:
         click.echo(f"Error: {e}", err=True)
@@ -208,242 +190,3 @@ def validate(
 
             traceback.print_exc()
         sys.exit(5)
-
-
-def validate_domain(
-    domain_path: str,
-    parser: Parser,
-    schema_validator: SchemaValidator,
-    ontology_validator: OntologyValidator,
-    verbose: bool,
-) -> List[ValidationResult]:
-    """Validate a domain manifest: schema, then Domain Ontology rules (RFC-0001).
-
-    Only the manifest itself is validated - SCDs and concept bundles aren't
-    loaded here, so Domain Ontology rules 6 and 7 (which need that broader
-    context) are skipped in this path.
-    """
-    syntax_result = ValidationResult("syntax")
-    schema_result = ValidationResult("domain_manifest_schema")
-    ontology_result = ValidationResult("ontology")
-
-    if verbose:
-        click.echo(f"Validating domain manifest {domain_path}...")
-
-    try:
-        manifest = parser.load_domain_manifest(Path(domain_path))
-
-        schema_result = schema_validator.validate_domain_manifest(manifest, domain_path)
-        if not schema_result.passed:
-            # Still run ontology rules - concern residue (rule 8) is useful
-            # even when the schema is otherwise invalid (e.g. legacy
-            # 'concerns' field triggers both a schema error and rule 8).
-            pass
-
-        ontology_result = ontology_validator.validate_domain_manifest(manifest, domain_path)
-
-    except ValidationError as e:
-        syntax_result.add_error(e)
-
-    return [syntax_result, schema_result, ontology_result]
-
-
-def validate_checkpoint(
-    checkpoint_path: str,
-    parser: Parser,
-    schema_validator: SchemaValidator,
-    verbose: bool,
-) -> List[ValidationResult]:
-    """Validate a checkpoint record: schema only (any-ai-actor-model.md, RFC-0001/ISS-006).
-
-    A checkpoint record is not an SCD - it's a small, runtime-generated audit
-    shape with no relationships/completeness/ontology dimension to check.
-    """
-    syntax_result = ValidationResult("syntax")
-    schema_result = ValidationResult("checkpoint_record_schema")
-
-    if verbose:
-        click.echo(f"Validating checkpoint record {checkpoint_path}...")
-
-    try:
-        record = parser.load_checkpoint_record(Path(checkpoint_path))
-        schema_result = schema_validator.validate_checkpoint_record(record, checkpoint_path)
-    except ValidationError as e:
-        syntax_result.add_error(e)
-
-    return [syntax_result, schema_result]
-
-
-def validate_files(
-    file_paths: tuple,
-    parser: Parser,
-    schema_validator: SchemaValidator,
-    semantic_validator: SemanticValidator,
-    verbose: bool,
-) -> List[ValidationResult]:
-    """Validate individual SCD files."""
-    syntax_result = ValidationResult("syntax")
-    schema_result = ValidationResult("schema")
-    semantic_result = ValidationResult("semantic")
-
-    files_checked = 0
-
-    for file_path_str in file_paths:
-        file_path = Path(file_path_str)
-
-        if verbose:
-            click.echo(f"Validating {file_path}...")
-
-        try:
-            # Parse file (syntax validation)
-            scd = parser.load_scd(file_path)
-            files_checked += 1
-
-            # Schema validation
-            result = schema_validator.validate_scd(scd, str(file_path))
-            schema_result.errors.extend(result.errors)
-            schema_result.warnings.extend(result.warnings)
-            if not result.passed:
-                schema_result.passed = False
-
-            # Semantic validation
-            result = semantic_validator.validate_scd(scd, str(file_path))
-            semantic_result.errors.extend(result.errors)
-            semantic_result.warnings.extend(result.warnings)
-            if not result.passed:
-                semantic_result.passed = False
-
-        except ValidationError as e:
-            syntax_result.add_error(e)
-
-    syntax_result.details["files_checked"] = files_checked
-    schema_result.details["files_checked"] = files_checked
-    semantic_result.details["files_checked"] = files_checked
-
-    return [syntax_result, schema_result, semantic_result]
-
-
-def validate_bundle(
-    bundle_path: str,
-    parser: Parser,
-    schema_validator: SchemaValidator,
-    semantic_validator: SemanticValidator,
-    bundle_validator: BundleValidator,
-    relationship_validator: RelationshipValidator,
-    completeness_validator: CompletenessValidator,
-    verbose: bool,
-    skip_completeness: bool,
-) -> List[ValidationResult]:
-    """Validate an SCD bundle."""
-    syntax_result = ValidationResult("syntax")
-    bundle_schema_result = ValidationResult("bundle_schema")
-    semantic_result = ValidationResult("semantic")
-    bundle_result = ValidationResult("bundle")
-    relationship_result = ValidationResult("relationships")
-    completeness_result = ValidationResult("completeness")
-
-    if verbose:
-        click.echo(f"Validating bundle {bundle_path}...")
-
-    try:
-        # Level 1: Parse bundle (syntax validation)
-        bundle = parser.load_bundle(Path(bundle_path))
-        bundle_id = bundle.get("id", "unknown")
-        bundle_type = bundle.get("type", "unknown")
-
-        if verbose:
-            click.echo(f"Bundle ID: {bundle_id}")
-            click.echo(f"Bundle Type: {bundle_type}")
-
-        # Level 2: Validate bundle schema
-        bundle_schema_result = schema_validator.validate_bundle(bundle, bundle_path)
-        if not bundle_schema_result.passed:
-            # Stop the pipeline here (SCD loading/relationships/completeness
-            # all assume a well-formed bundle) - but still run the Level 5
-            # type-specific check, since it can add a clearer, actionable
-            # message on top of the generic schema error (e.g. RFC-0001
-            # Validation rule 8's migration hint for a legacy 'concern' type,
-            # which the schema's enum error alone doesn't provide).
-            bundle_result = bundle_validator.validate_bundle(bundle, bundle_path)
-            results = [syntax_result, bundle_schema_result]
-            if bundle_result.errors or bundle_result.warnings:
-                results.append(bundle_result)
-            return results
-
-        # Level 5: Validate bundle organization (XOR constraint, bundle type rules)
-        bundle_result = bundle_validator.validate_bundle(bundle, bundle_path)
-
-        # Resolve the import tree. Any bundle type can be the root: Domain and Project
-        # bundles are independent trees (SCS 0.6.0).
-        tree = resolve(Path(bundle_path))
-        for tree_result in (
-            bundle_validator.validate_tree(tree),
-            bundle_validator.validate_digests(tree),
-        ):
-            bundle_result.errors.extend(tree_result.errors)
-            bundle_result.warnings.extend(tree_result.warnings)
-            if not tree_result.passed:
-                bundle_result.passed = False
-
-        if verbose:
-            click.echo(f"Resolved {len(tree.bundles) - 1} imported bundles, {len(tree.scds)} SCDs")
-
-        all_scds = []
-        for resolved_scd in tree.scds:
-            try:
-                scd_data = parser.load_scd(resolved_scd.path)
-            except Exception as e:
-                if verbose:
-                    click.echo(f"  Warning: Could not load {resolved_scd.path}: {e}")
-                continue
-            all_scds.append(scd_data)
-
-            # Level 3: Semantic validation for this SCD
-            result = semantic_validator.validate_scd(scd_data, str(resolved_scd.path))
-            semantic_result.errors.extend(result.errors)
-            semantic_result.warnings.extend(result.warnings)
-            if not result.passed:
-                semantic_result.passed = False
-
-        if verbose:
-            click.echo(f"Successfully loaded {len(all_scds)} SCDs")
-
-        # Level 4: Relationship validation
-        if all_scds:
-            relationship_result = relationship_validator.validate_relationships(
-                all_scds, bundle_type, bundle_path
-            )
-
-        # Level 6: Completeness validation (if not skipped)
-        if not skip_completeness and bundle_type in ("project", "domain"):
-            completeness_result = completeness_validator.validate_completeness(
-                bundle, all_scds, bundle_path, tree.project_root, tree=tree
-            )
-        elif skip_completeness and verbose:
-            click.echo("Skipping completeness validation (--skip-completeness)")
-
-    except ValidationError as e:
-        syntax_result.add_error(e)
-
-    results = [syntax_result, bundle_schema_result, semantic_result, bundle_result]
-
-    if relationship_result.errors or relationship_result.warnings:
-        results.append(relationship_result)
-
-    if not skip_completeness and (completeness_result.errors or completeness_result.warnings):
-        results.append(completeness_result)
-
-    return results
-
-
-def determine_exit_code(results: List[ValidationResult], strict: bool) -> int:
-    """Determine exit code based on validation results."""
-    has_errors = any(not r.passed for r in results)
-    has_warnings = any(r.warning_count > 0 for r in results)
-
-    if has_errors:
-        return 1
-    elif strict and has_warnings:
-        return 2
-    else:
-        return 0

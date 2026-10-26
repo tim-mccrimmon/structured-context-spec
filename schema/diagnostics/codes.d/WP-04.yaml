@@ -1,0 +1,29 @@
+# Diagnostic codes added by WP-04 (validator: workspace and repository checks).
+# Fragments in this directory are merged into ../codes.yaml by
+# tools/scd-validator/scripts/build_codes.py. Edit fragments, not codes.yaml.
+
+codes:
+  RESERVED_BUNDLE_NAME:
+    severity: error
+    meaning: A bundle is named plan, test-plan, or qa, which are reserved for a later release (D-33).
+  DUPLICATE_ID:
+    severity: error
+    meaning: Two documents in one workspace share an id (bundles share an id and version) (D-43).
+  CONFIG_NAME_MISMATCH:
+    severity: error
+    meaning: The name in a workspace's .scs/config differs from the workspace name, domain or its directory under projects/ (D-03).
+  WORKSPACE_CONFIG_INVALID:
+    severity: error
+    meaning: A workspace's .scs/config cannot be read as key-value pairs.
+  DOMAIN_WORKSPACE_MISSING:
+    severity: error
+    meaning: A Domain repository has no workspace whose .scs/config bundle_type is domain.
+  DOMAIN_WORKSPACE_MULTIPLE:
+    severity: error
+    meaning: A Domain repository has more than one workspace whose .scs/config bundle_type is domain.
+  MANIFEST_SCHEMA_INVALID:
+    severity: error
+    meaning: A version manifest does not validate against schema/manifest/version-manifest-schema.json (D-28, D-36).
+  ONTOLOGY_LEGACY_LOCATION:
+    severity: info
+    meaning: The ontology manifest is at the 0.6 location domain/domain-manifest.yaml; 0.7 reads it from ontology/domain-manifest.yaml (D-04).

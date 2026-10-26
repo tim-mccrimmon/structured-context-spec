@@ -3,9 +3,19 @@
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 SCHEMA_DIR_ENV_VAR = "SCS_SCHEMA_DIR"
+
+# Called with (severity, code) whenever a diagnostic is created. The test suite registers one
+# to check that every diagnostic it produces has a registered code (D-10).
+DIAGNOSTIC_HOOKS: List[Callable[[str, Optional[str]], None]] = []
+
+
+def _created(severity: str, code: Optional[str]) -> None:
+    for hook in DIAGNOSTIC_HOOKS:
+        hook(severity, code)
+
 
 # Standard citation reference: std:<standard>[:<edition>][#<clause>] (spec/0.6/citations.md)
 CITATION_RE = re.compile(r"^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$")
@@ -14,11 +24,21 @@ CITATION_RE = re.compile(r"^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-
 class ValidationError(Exception):
     """Custom exception for validation errors."""
 
-    def __init__(self, message: str, scd_id: str | None = None, file_path: str | None = None):
+    severity = "error"
+
+    def __init__(
+        self,
+        message: str,
+        scd_id: str | None = None,
+        file_path: str | None = None,
+        code: str | None = None,
+    ):
         self.message = message
         self.scd_id = scd_id
         self.file_path = file_path
+        self.code = code
         super().__init__(self.format_message())
+        _created(self.severity, code)
 
     def format_message(self) -> str:
         """Format the error message with context."""
@@ -34,13 +54,22 @@ class ValidationError(Exception):
 class ValidationWarning:
     """Represents a validation warning."""
 
+    severity = "warning"
+
     def __init__(
-        self, message: str, level: str, scd_id: str | None = None, file_path: str | None = None
+        self,
+        message: str,
+        level: str,
+        scd_id: str | None = None,
+        file_path: str | None = None,
+        code: str | None = None,
     ):
         self.message = message
         self.level = level
         self.scd_id = scd_id
         self.file_path = file_path
+        self.code = code
+        _created(self.severity, code)
 
     def __str__(self) -> str:
         """String representation of warning."""
@@ -53,6 +82,13 @@ class ValidationWarning:
         return " ".join(parts)
 
 
+class ValidationInfo(ValidationWarning):
+    """An informational diagnostic. Never fails validation or changes the exit code, under
+    --strict either (D-10)."""
+
+    severity = "info"
+
+
 class ValidationResult:
     """Container for validation results."""
 
@@ -61,6 +97,7 @@ class ValidationResult:
         self.passed = True
         self.errors: list[ValidationError] = []
         self.warnings: list[ValidationWarning] = []
+        self.infos: list[ValidationInfo] = []
         self.details: Dict[str, Any] = {}
 
     def add_error(self, error: ValidationError) -> None:
@@ -71,6 +108,18 @@ class ValidationResult:
     def add_warning(self, warning: ValidationWarning) -> None:
         """Add a warning to the result."""
         self.warnings.append(warning)
+
+    def add_info(self, info: ValidationInfo) -> None:
+        """Add an informational diagnostic to the result."""
+        self.infos.append(info)
+
+    def extend(self, other: "ValidationResult") -> None:
+        """Add another result's diagnostics to this one."""
+        self.errors.extend(other.errors)
+        self.warnings.extend(other.warnings)
+        self.infos.extend(other.infos)
+        if not other.passed:
+            self.passed = False
 
     @property
     def error_count(self) -> int:

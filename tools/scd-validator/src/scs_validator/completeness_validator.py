@@ -123,6 +123,8 @@ class CompletenessValidator:
                         message,
                         result,
                         file_path,
+                        error_code="COMPLETENESS_REQUIRED_BUNDLE_MISSING",
+                        warning_code="COMPLETENESS_REQUIRED_BUNDLE_MISSING_WARNING",
                     )
             elif req_min is not None:
                 # Minimum count required
@@ -132,6 +134,8 @@ class CompletenessValidator:
                         message,
                         result,
                         file_path,
+                        error_code="COMPLETENESS_REQUIRED_BUNDLE_MISSING",
+                        warning_code="COMPLETENESS_REQUIRED_BUNDLE_MISSING_WARNING",
                     )
 
     @staticmethod
@@ -213,7 +217,14 @@ class CompletenessValidator:
                 error_msg = self.rules_loader.get_error_message(
                     rules, "missing_domain", domain=domain_name
                 )
-                self._add_result(severity, error_msg, result, file_path)
+                self._add_result(
+                    severity,
+                    error_msg,
+                    result,
+                    file_path,
+                    error_code="COMPLETENESS_DOMAIN_MISSING",
+                    warning_code="COMPLETENESS_DOMAIN_MISSING_WARNING",
+                )
                 continue
 
             # Check minimum SCDs in domain
@@ -226,7 +237,14 @@ class CompletenessValidator:
                     actual=actual_scds,
                     required=min_scds,
                 )
-                self._add_result(severity, error_msg, result, file_path)
+                self._add_result(
+                    severity,
+                    error_msg,
+                    result,
+                    file_path,
+                    error_code="COMPLETENESS_DOMAIN_TOO_FEW_SCDS",
+                    warning_code="COMPLETENESS_DOMAIN_TOO_FEW_SCDS_WARNING",
+                )
 
     def _validate_recommended_scds(
         self,
@@ -279,7 +297,10 @@ class CompletenessValidator:
                     if rec_severity == "warning":
                         result.add_warning(
                             ValidationWarning(
-                                warning_msg, level="completeness", file_path=file_path
+                                warning_msg,
+                                level="completeness",
+                                file_path=file_path,
+                                code="COMPLETENESS_RECOMMENDED_SCD_MISSING",
                             )
                         )
 
@@ -371,7 +392,11 @@ class CompletenessValidator:
                 )
                 result.add_warning(
                     ValidationWarning(
-                        warning_msg, level="completeness", scd_id=scd_id, file_path=file_path
+                        warning_msg,
+                        level="completeness",
+                        scd_id=scd_id,
+                        file_path=file_path,
+                        code="COMPLETENESS_STUB_SCD",
                     )
                 )
 
@@ -381,6 +406,8 @@ class CompletenessValidator:
         message: str,
         result: ValidationResult,
         file_path: str | None,
+        error_code: str,
+        warning_code: str,
     ) -> None:
         """Add error or warning based on severity.
 
@@ -389,10 +416,14 @@ class CompletenessValidator:
             message: Message text
             result: Validation result to update
             file_path: Optional file path
+            error_code: Diagnostic code when emitted as an error
+            warning_code: Diagnostic code when emitted as a warning
         """
         if severity == "error":
-            result.add_error(ValidationError(message, file_path=file_path))
+            result.add_error(ValidationError(message, file_path=file_path, code=error_code))
         else:
             result.add_warning(
-                ValidationWarning(message, level="completeness", file_path=file_path)
+                ValidationWarning(
+                    message, level="completeness", file_path=file_path, code=warning_code
+                )
             )

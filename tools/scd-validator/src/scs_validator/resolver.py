@@ -18,6 +18,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
 
+from .names import RESERVED_DIRS
+
 PACKAGED_META = Path(__file__).resolve().parent / "meta"
 BUNDLE_REF = re.compile(r"^bundle:(?P<name>[a-zA-Z0-9._-]+)(?::(?P<version>\d+\.\d+\.\d+))?$")
 LAYOUT_DIRS = {"bundles", "domains", "concepts"}
@@ -87,7 +89,11 @@ def _yaml_files(root: Path) -> Iterable[Path]:
     for path in sorted(root.rglob("*")):
         if path.suffix not in (".yaml", ".yml") or not path.is_file():
             continue
-        if any(part in SKIP_DIRS for part in path.relative_to(root).parts):
+        parts = path.relative_to(root).parts
+        if any(part in SKIP_DIRS for part in parts):
+            continue
+        # Reserved directories at the root of a workspace are not read (RFC 0002 §9).
+        if len(parts) > 1 and parts[0] in RESERVED_DIRS:
             continue
         yield path
 

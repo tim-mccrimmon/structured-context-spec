@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://structuredcontext.dev/schema/validator-report.schema.json",
+  "title": "SCS Validator Report",
+  "description": "The JSON report written by `scs-validate --output json`. In repository mode the top level holds repository-level findings and a summary over every workspace, and `workspaces` holds one section per workspace. Every finding carries a code registered in schema/diagnostics/codes.yaml and its severity (D-10).",
+  "type": "object",
+  "required": ["validator_version", "strict_mode", "validation_levels", "errors", "warnings", "infos", "summary"],
+  "properties": {
+    "validator_version": {"type": "string"},
+    "strict_mode": {"type": "boolean"},
+    "validation_levels": {"$ref": "#/$defs/levels"},
+    "errors": {"$ref": "#/$defs/findings"},
+    "warnings": {"$ref": "#/$defs/findings"},
+    "infos": {"$ref": "#/$defs/findings"},
+    "summary": {"$ref": "#/$defs/summary"},
+    "repository": {"type": "string", "description": "Repository mode: the Domain repository validated"},
+    "workspaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "path", "validation_levels", "errors", "warnings", "infos", "summary"],
+        "properties": {
+          "name": {"type": "string", "description": "domain, or the directory name under projects/"},
+          "path": {"type": "string"},
+          "validation_levels": {"$ref": "#/$defs/levels"},
+          "errors": {"$ref": "#/$defs/findings"},
+          "warnings": {"$ref": "#/$defs/findings"},
+          "infos": {"$ref": "#/$defs/findings"},
+          "summary": {"$ref": "#/$defs/summary"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "dependentRequired": {"workspaces": ["repository"], "repository": ["workspaces"]},
+  "$defs": {
+    "levels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status", "error_count", "warning_count"],
+        "properties": {
+          "status": {"enum": ["passed", "failed"]},
+          "error_count": {"type": "integer", "minimum": 0},
+          "warning_count": {"type": "integer", "minimum": 0},
+          "files_checked": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "severity", "code", "message", "scd_id", "file_path"],
+        "properties": {
+          "level": {"type": "string"},
+          "severity": {"enum": ["error", "warning", "info"]},
+          "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+          "message": {"type": "string"},
+          "scd_id": {"type": ["string", "null"]},
+          "file_path": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total_errors", "total_warnings", "total_infos", "status"],
+      "properties": {
+        "total_errors": {"type": "integer", "minimum": 0},
+        "total_warnings": {"type": "integer", "minimum": 0},
+        "total_infos": {"type": "integer", "minimum": 0},
+        "status": {"enum": ["valid", "valid_with_warnings", "failed"]}
+      },
+      "additionalProperties": false
+    }
+  }
+}

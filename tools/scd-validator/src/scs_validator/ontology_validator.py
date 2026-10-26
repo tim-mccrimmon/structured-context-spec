@@ -93,9 +93,18 @@ class OntologyValidator:
             msg = self.rules_loader.get_error_message(self.rules, "legacy_concerns_field")
             severity = rule.get("severity", "error")
             if severity == "error":
-                result.add_error(ValidationError(msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(msg, file_path=file_path, code="ONTOLOGY_LEGACY_CONCERNS_FIELD")
+                )
             else:
-                result.add_warning(ValidationWarning(msg, level="ontology", file_path=file_path))
+                result.add_warning(
+                    ValidationWarning(
+                        msg,
+                        level="ontology",
+                        file_path=file_path,
+                        code="ONTOLOGY_LEGACY_CONCERNS_FIELD_WARNING",
+                    )
+                )
 
     def _validate_ids_and_uniqueness(
         self,
@@ -118,7 +127,9 @@ class OntologyValidator:
                 msg = self.rules_loader.get_error_message(
                     self.rules, "invalid_concept_id", concept_id=concept_id, pattern=pattern
                 )
-                result.add_error(ValidationError(msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(msg, file_path=file_path, code="ONTOLOGY_CONCEPT_ID_INVALID")
+                )
                 continue  # malformed ids don't join the valid set
 
             if concept_id in seen:
@@ -128,7 +139,9 @@ class OntologyValidator:
                     concept_id=concept_id,
                     domain_id=domain_id,
                 )
-                result.add_error(ValidationError(msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(msg, file_path=file_path, code="ONTOLOGY_DUPLICATE_CONCEPT_ID")
+                )
 
             seen.add(concept_id)
             valid_ids.add(concept_id)
@@ -164,7 +177,9 @@ class OntologyValidator:
                     parent_id=parent_id,
                     domain_id=domain_id,
                 )
-                result.add_error(ValidationError(msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(msg, file_path=file_path, code="ONTOLOGY_PARENT_NOT_FOUND")
+                )
                 continue  # don't walk an unresolved edge for cycle detection
 
             parent_graph[concept_id] = [parent_id]
@@ -175,7 +190,9 @@ class OntologyValidator:
                 msg = self.rules_loader.get_error_message(
                     self.rules, "parent_cycle", cycle=" -> ".join(cycle)
                 )
-                result.add_error(ValidationError(msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(msg, file_path=file_path, code="ONTOLOGY_PARENT_CYCLE")
+                )
 
     def _validate_relationships(
         self,
@@ -250,7 +267,9 @@ class OntologyValidator:
                 type=rel_type,
                 allowed_types=", ".join(relationship_types),
             )
-            result.add_error(ValidationError(msg, file_path=file_path))
+            result.add_error(
+                ValidationError(msg, file_path=file_path, code="ONTOLOGY_RELATIONSHIP_TYPE_INVALID")
+            )
             return
 
         type_rule = rel_rules.get(rel_type, {})
@@ -266,7 +285,11 @@ class OntologyValidator:
                     target=target,
                     domain_id=domain_id,
                 )
-                result.add_error(ValidationError(msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        msg, file_path=file_path, code="ONTOLOGY_RELATIONSHIP_TARGET_NOT_FOUND"
+                    )
+                )
 
         elif target_kind == "citation":
             # Citations are checked for form only, never resolved (citations.md §7).
@@ -277,7 +300,14 @@ class OntologyValidator:
                     concept_id=concept_id,
                     target=target,
                 )
-                result.add_warning(ValidationWarning(msg, level="ontology", file_path=file_path))
+                result.add_warning(
+                    ValidationWarning(
+                        msg,
+                        level="ontology",
+                        file_path=file_path,
+                        code="ONTOLOGY_SATISFIES_TARGET_DEPRECATED",
+                    )
+                )
             elif not CITATION_RE.match(target):
                 msg = self.rules_loader.get_error_message(
                     self.rules,
@@ -285,7 +315,11 @@ class OntologyValidator:
                     concept_id=concept_id,
                     target=target,
                 )
-                result.add_error(ValidationError(msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        msg, file_path=file_path, code="ONTOLOGY_SATISFIES_TARGET_INVALID"
+                    )
+                )
 
     def _validate_depends_on_acyclic(
         self,
@@ -317,7 +351,9 @@ class OntologyValidator:
             msg = self.rules_loader.get_error_message(
                 self.rules, "depends_on_cycle", cycle=" -> ".join(cycle)
             )
-            result.add_error(ValidationError(msg, file_path=file_path))
+            result.add_error(
+                ValidationError(msg, file_path=file_path, code="ONTOLOGY_DEPENDS_ON_CYCLE")
+            )
 
     def _validate_scd_concept_resolution(
         self,
@@ -346,7 +382,14 @@ class OntologyValidator:
                     concept_id=concept_id,
                     domain_id=domain_id,
                 )
-                result.add_error(ValidationError(msg, scd_id=scd_id, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        msg,
+                        scd_id=scd_id,
+                        file_path=file_path,
+                        code="ONTOLOGY_SCD_CONCEPT_NOT_FOUND",
+                    )
+                )
 
     def _validate_concept_bundle_agreement(
         self,
@@ -406,10 +449,19 @@ class OntologyValidator:
                         bundle_concept=owning_concept,
                     )
                     if severity == "error":
-                        result.add_error(ValidationError(msg, file_path=file_path))
+                        result.add_error(
+                            ValidationError(
+                                msg, file_path=file_path, code="ONTOLOGY_CONCEPT_BUNDLE_MISMATCH"
+                            )
+                        )
                     else:
                         result.add_warning(
-                            ValidationWarning(msg, level="ontology", file_path=file_path)
+                            ValidationWarning(
+                                msg,
+                                level="ontology",
+                                file_path=file_path,
+                                code="ONTOLOGY_CONCEPT_BUNDLE_MISMATCH_WARNING",
+                            )
                         )
 
     @staticmethod

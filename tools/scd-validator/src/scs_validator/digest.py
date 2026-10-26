@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
+from .names import bundle_name
 from .resolver import PACKAGED_META, BundleTree, Index, ResolvedBundle
 
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -138,7 +139,7 @@ def content_digest(
 
 def version_manifest_names(bundle_id: str, version: str) -> List[str]:
     """File names a bundle's version manifest may have, newest convention first."""
-    name = bundle_id.split(":", 1)[1] if ":" in bundle_id else bundle_id
+    name = bundle_name(bundle_id)
     return [f"{name}-v{version}-MANIFEST.yaml", f"VERSION-{version}-MANIFEST.yaml"]
 
 

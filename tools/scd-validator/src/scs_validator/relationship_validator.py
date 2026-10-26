@@ -105,6 +105,7 @@ class RelationshipValidator:
                     f"Relationship missing 'type' field in SCD '{source_id}'",
                     scd_id=source_id,
                     file_path=file_path,
+                    code="RELATIONSHIP_TYPE_MISSING",
                 )
             )
             return
@@ -115,6 +116,7 @@ class RelationshipValidator:
                     f"Relationship missing 'target' field in SCD '{source_id}'",
                     scd_id=source_id,
                     file_path=file_path,
+                    code="RELATIONSHIP_TARGET_MISSING",
                 )
             )
             return
@@ -129,7 +131,14 @@ class RelationshipValidator:
                     [rt.get("type") for rt in self.rules.get("relationship_types", [])]
                 ),
             )
-            result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+            result.add_error(
+                ValidationError(
+                    error_msg,
+                    scd_id=source_id,
+                    file_path=file_path,
+                    code="RELATIONSHIP_TYPE_INVALID",
+                )
+            )
             return
 
         # Standard citations are checked for form only, never resolved (citations.md §7)
@@ -138,12 +147,26 @@ class RelationshipValidator:
                 error_msg = self.rules_loader.get_error_message(
                     self.rules, "citation_target_wrong_type", source=source_id, type=rel_type
                 )
-                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        error_msg,
+                        scd_id=source_id,
+                        file_path=file_path,
+                        code="RELATIONSHIP_CITATION_WRONG_TYPE",
+                    )
+                )
             elif not CITATION_RE.match(target_id):
                 error_msg = self.rules_loader.get_error_message(
                     self.rules, "invalid_citation", source=source_id, target=target_id
                 )
-                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        error_msg,
+                        scd_id=source_id,
+                        file_path=file_path,
+                        code="RELATIONSHIP_CITATION_INVALID",
+                    )
+                )
             return
 
         if target_id.startswith("scd:standards:"):
@@ -152,7 +175,11 @@ class RelationshipValidator:
             )
             result.add_warning(
                 ValidationWarning(
-                    warning_msg, level="relationships", scd_id=source_id, file_path=file_path
+                    warning_msg,
+                    level="relationships",
+                    scd_id=source_id,
+                    file_path=file_path,
+                    code="RELATIONSHIP_STANDARDS_TARGET_DEPRECATED",
                 )
             )
 
@@ -161,7 +188,14 @@ class RelationshipValidator:
             error_msg = self.rules_loader.get_error_message(
                 self.rules, "self_reference", scd_id=source_id, type=rel_type
             )
-            result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+            result.add_error(
+                ValidationError(
+                    error_msg,
+                    scd_id=source_id,
+                    file_path=file_path,
+                    code="RELATIONSHIP_SELF_REFERENCE",
+                )
+            )
             return
 
         # Validate target exists
@@ -176,7 +210,14 @@ class RelationshipValidator:
                     source=source_id,
                     type=rel_type,
                 )
-                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        error_msg,
+                        scd_id=source_id,
+                        file_path=file_path,
+                        code="RELATIONSHIP_TARGET_NOT_FOUND",
+                    )
+                )
             else:
                 # Warning for standalone domain bundles
                 warning_msg = (
@@ -185,7 +226,11 @@ class RelationshipValidator:
                 )
                 result.add_warning(
                     ValidationWarning(
-                        warning_msg, level="relationships", scd_id=source_id, file_path=file_path
+                        warning_msg,
+                        level="relationships",
+                        scd_id=source_id,
+                        file_path=file_path,
+                        code="RELATIONSHIP_TARGET_NOT_IN_BUNDLE",
                     )
                 )
             return
@@ -207,7 +252,14 @@ class RelationshipValidator:
                     to_tier=target_tier,
                     allowed=", ".join(allowed),
                 )
-                result.add_error(ValidationError(error_msg, scd_id=source_id, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        error_msg,
+                        scd_id=source_id,
+                        file_path=file_path,
+                        code="RELATIONSHIP_TIER_CONSTRAINT",
+                    )
+                )
 
     def _detect_circular_dependencies(
         self,
@@ -270,7 +322,12 @@ class RelationshipValidator:
                         self.rules, "circular_dependency", cycle=cycle_str
                     )
                     result.add_warning(
-                        ValidationWarning(error_msg, level="relationships", file_path=file_path)
+                        ValidationWarning(
+                            error_msg,
+                            level="relationships",
+                            file_path=file_path,
+                            code="RELATIONSHIP_CYCLE",
+                        )
                     )
                     return True
 

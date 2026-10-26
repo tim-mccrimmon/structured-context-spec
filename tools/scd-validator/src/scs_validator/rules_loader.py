@@ -19,13 +19,15 @@ class RulesLoader:
             rules_dir: Directory containing rules files. If None, uses default location.
         """
         if rules_dir is None:
-            # Default: rules/v0.6.0 relative to this module
-            self.rules_dir = Path(__file__).parent / "rules" / "v0.6.0"
+            # Default: rules/v0.7.0 relative to this module
+            self.rules_dir = Path(__file__).parent / "rules" / "v0.7.0"
         else:
             self.rules_dir = Path(rules_dir)
 
         if not self.rules_dir.exists():
-            raise ValidationError(f"Rules directory not found: {self.rules_dir}")
+            raise ValidationError(
+                f"Rules directory not found: {self.rules_dir}", code="RULES_DIR_NOT_FOUND"
+            )
 
         self._rules_cache: Dict[str, Dict[str, Any]] = {}
 
@@ -84,7 +86,8 @@ class RulesLoader:
                 return self._load_yaml_file(custom_rules_path)
             except Exception as e:
                 raise ValidationError(
-                    f"Failed to load custom completeness rules from {custom_rules_path}: {e}"
+                    f"Failed to load custom completeness rules from {custom_rules_path}: {e}",
+                    code="RULES_LOAD_FAILED",
                 )
 
         # 2. Project-specific rules
@@ -95,7 +98,8 @@ class RulesLoader:
                     return self._load_yaml_file(project_rules)
                 except Exception as e:
                     raise ValidationError(
-                        f"Failed to load project completeness rules from {project_rules}: {e}"
+                        f"Failed to load project completeness rules from {project_rules}: {e}",
+                        code="RULES_LOAD_FAILED",
                     )
 
         # 3. Default rules
@@ -118,14 +122,18 @@ class RulesLoader:
 
         rules_path = self.rules_dir / filename
         if not rules_path.exists():
-            raise ValidationError(f"Rules file not found: {rules_path}")
+            raise ValidationError(
+                f"Rules file not found: {rules_path}", code="RULES_FILE_NOT_FOUND"
+            )
 
         try:
             rules = self._load_yaml_file(rules_path)
             self._rules_cache[filename] = rules
             return rules
         except Exception as e:
-            raise ValidationError(f"Failed to load rules file {filename}: {e}")
+            raise ValidationError(
+                f"Failed to load rules file {filename}: {e}", code="RULES_LOAD_FAILED"
+            )
 
     @staticmethod
     def _load_yaml_file(file_path: Path) -> Dict[str, Any]:

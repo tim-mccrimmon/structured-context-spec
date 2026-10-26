@@ -494,10 +494,11 @@ def _validate_bundle(bundle_path):
 
 def _bundle_name(bundle_path):
     """The bundle's name from its id (`bundle:<name>`), falling back to the file stem."""
+    from scs_validator.names import bundle_name
+
     with open(bundle_path, "r") as f:
-        bundle_id = (yaml.safe_load(f) or {}).get("id", "")
-    parts = bundle_id.split(":")
-    return parts[1] if len(parts) >= 2 and parts[0] == "bundle" and parts[1] else bundle_path.stem
+        bundle_id = str((yaml.safe_load(f) or {}).get("id", ""))
+    return bundle_name(bundle_id, Path(bundle_path))
 
 
 def _git_tag_exists(tag):
