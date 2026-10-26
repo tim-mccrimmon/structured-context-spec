@@ -18,7 +18,9 @@
   provenance is corrected at validation and versioning (Motivation, Guide-level Explanation,
   sections 4, 5, 9, Implementation Notes, Migration Guide, Unresolved Questions). 2026-10-26:
   empty SCDs are reported as `SCD_EMPTY` (info) and listed before versioning; stub detection is
-  removed (plan D-70; Validation Rules, Unresolved Questions)
+  removed (plan D-70; Validation Rules, Unresolved Questions). 2026-10-26: only placeholder
+  provenance is reported, versioning refuses it, and `scs new` stops inventing an author (plan
+  D-71; section 5, Validation Rules, Unresolved Questions)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---
@@ -521,11 +523,14 @@ content:
 
 **Identity.** A person's identity in SCS is provenance only: a person identifier,
 `Name <email>`, in provenance fields (`provenance.created_by`, `approval.approved_by`, and the
-intake record). It is not a concept or an SCD, and it is never compiled.
+intake record). It is not a concept or an SCD, and it is never compiled. `approval.approved_by`
+MUST be a person identifier; `created_by` MAY instead name a team or organization.
 
 **When provenance must be right.** Provenance is read at validation and versioning, so that is
-where it MUST be correct. A scaffold or draft need not be final; the tools report provenance that
-is not a person identifier, and the agent corrects it with the user before a version is made. A
+where it MUST be correct. A scaffold or draft need not be final; the tools report placeholder
+provenance, and the agent corrects it with the user before a version is made. The tools MUST NOT
+invent provenance: `scs new` offers the git identity only as a suggestion and otherwise requires
+`--author` and `--email`. A
 value that was never true, such as a placeholder, is corrected; a true value is never replaced
 (the person who created an SCD is not necessarily the person who approves a version).
 
@@ -948,6 +953,10 @@ tools create and check, not a schema.
   `--strict`, and `scs bundle version --dry-run` MUST list the bundle's empty SCDs, so they are
   removed or kept knowingly before a release. The 0.6 stub detection (`COMPLETENESS_STUB_SCD`)
   is removed.
+- A placeholder `created_by` (an empty name, `developer`, or an address at `example.com`,
+  `example.org`, `example.net`, or a `.example` or `.invalid` domain) is a warning
+  (`PROVENANCE_PLACEHOLDER`), and `scs bundle version` MUST refuse to version over one
+  (`VERSION_PROVENANCE_PLACEHOLDER`). Any other `created_by` value passes.
 - `scs stack` MUST report the checks of section 13 with the codes and severities given there.
   Under `--strict`, its warnings give exit code 2.
 
@@ -1070,9 +1079,8 @@ produced that way will vary in quality, and the variation will reflect on the st
 10. **Removing what the scaffold supplied.** When removing an SCD leaves its concept bundle
     empty, the same command should remove the concept bundle, the root bundle's import, and the
     manifest entry. Open (plan D-69).
-11. **Reporting provenance to correct.** Which check reports a `created_by` that is not a person
-    identifier (section 5) is open (plan D-71). Unused SCDs are resolved (Validation Rules; plan
-    D-70).
+11. **Reporting provenance to correct.** Resolved: placeholders only (section 5, Validation
+    Rules; plan D-71). Unused SCDs are resolved too (Validation Rules; plan D-70).
 12. **Projects under the `personal` ontology.** Rec.: the same fixed concept, boundaries, and
     nothing else. Open (plan D-72).
 13. **The ontology manifest's naming.** It still uses "domain" (`domain-manifest.yaml`, the

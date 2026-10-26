@@ -155,7 +155,8 @@ listed in order, and each starts after the previous one merges.
   `CLAUDE.md` pointer, CI workflow, git init; `scs new project` under `projects/`; templates chosen
   by ontology and workspace kind only (D-64): `--type` removed, the `personal` ontology added with
   boundaries as its only concept (D-61, D-62, D-72), no `--profile`, no `ontology: none`;
-  `created_by` is `Name <email>` (placeholder provenance waits on D-71); ontology manifest at `ontology/`; `.scs/config` keys; `.gitignore` ignoring
+  `created_by` is `Name <email>` (the scaffold's `$USER@example.com` fallback is removed in
+  WP-06, D-71); ontology manifest at `ontology/`; `.scs/config` keys; `.gitignore` ignoring
   `sources/` (D-59) and leaving `dist/` to the user (version commits exclude `dist/` by pathspec);
   `.gitattributes` with `* text eol=lf`; an initial commit with the D-55 identity. The CI workflow
   checks out full history and tags (`fetch-depth: 0`).
@@ -223,7 +224,8 @@ listed in order, and each starts after the previous one merges.
   version commit limited to the workspace pathspec, with the D-55/D-58 identity, annotated tag,
   and git settings overridden (D-40, D-58); actionable drift diagnostic (D-19); empty SCDs as
   `SCD_EMPTY` (info) in validation and listed by `bundle version --dry-run`, with the 0.6 stub
-  detection and `COMPLETENESS_STUB_SCD` removed (D-70).
+  detection and `COMPLETENESS_STUB_SCD` removed (D-70); placeholder `created_by` as `PROVENANCE_PLACEHOLDER`
+  (warning) and refused by `bundle version` (`VERSION_PROVENANCE_PLACEHOLDER`) (D-71).
 - **Accept**, one test each:
   - Versioning a root with a DRAFT or unpinned import gives `VERSION_IMPORT_NOT_PINNED`, with and
     without `--no-validate`.
@@ -262,6 +264,9 @@ listed in order, and each starts after the previous one merges.
   - A fresh scaffold passes `--strict` and reports each SCD with no prohibitions, directives, or
     facts as `SCD_EMPTY` (info); `bundle version --dry-run` lists the bundle's empty SCDs;
     `COMPLETENESS_STUB_SCD` is not in `codes.yaml` (D-70).
+  - `created_by: "CI <ci@example.com>"` gives `PROVENANCE_PLACEHOLDER`; `scs-maintainers`,
+    `Tim McCrimmon`, and `security-team@medtech.com` give nothing; `bundle version` over the
+    placeholder gives `VERSION_PROVENANCE_PLACEHOLDER` and makes no commit (D-71).
   - An SCD or bundle under `plan/`, `test-plan/`, or `qa/` is not indexed, resolved, or compiled,
     and produces no diagnostic.
   - A 0.6 fixture repo with `v1.0.0` tags, after versioning each bundle once under 0.7, passes
@@ -278,6 +283,9 @@ listed in order, and each starts after the previous one merges.
     `changes` empty, and the git email only in `diagnostics[].suggestion`; with git `user.email`
     set, no manifest contains it unless passed as `--approved-by`. Same for `new`/`add` without
     `--author`. Human mode without `--approved-by` also refuses.
+  - `scs new` never writes an invented author (D-71): without `--author` and `--email`,
+    non-interactive and machine mode give `NO_INPUT`; interactive mode offers git `user.name`
+    and `user.email` as prompt defaults.
   - `bundle pin` changes exactly one import and appears in `changes`.
   - A failure injected after each of snapshot, manifest, commit, and tag leaves the working tree,
     index, and refs as they were (four tests); `changes` is empty.
