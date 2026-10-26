@@ -58,6 +58,7 @@ class BundleTree:
     scds: List[ResolvedSCD] = field(default_factory=list)
     unresolved_scds: List[Tuple[str, str]] = field(default_factory=list)
     cycles: List[List[str]] = field(default_factory=list)
+    index: Optional["Index"] = None
 
     @property
     def unresolved_imports(self) -> List[ImportEdge]:
@@ -167,7 +168,7 @@ def resolve(
         data=data,
         path=bundle_path,
     )
-    tree = BundleTree(root=root, project_root=project_root)
+    tree = BundleTree(root=root, project_root=project_root, index=index)
     seen_scds: Dict[str, bool] = {}
 
     def visit(bundle: ResolvedBundle, stack: List[str]) -> None:

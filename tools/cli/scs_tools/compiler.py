@@ -1,4 +1,4 @@
-"""Compile a Domain or Project bundle into a runtime artifact (spec/0.6/runtime-artifact.md).
+"""Compile a Domain or Project bundle into a runtime artifact (spec/0.7/runtime-artifact.md).
 
 The artifact holds prohibitions and directives as rules, and facts, in a fixed order, with no
 volatile content, so identical source always produces identical bytes.
@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-RUNTIME_FORMAT = "0.6"
+RUNTIME_FORMAT = "0.7"
 COMPILABLE_TYPES = ("domain", "project")
 
 
@@ -71,6 +71,29 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
         )
     if result.errors:
         return result
+
+    # A versioned tree must still match what was versioned; there is no override
+    # (spec/0.7/bundle-format.md §7.6). The root's digest goes into the artifact.
+    source_digest = None
+    if not drafts and root.version:
+        from scs_validator.digest import content_digest, tree_index, verify_tree
+
+        for check in verify_tree(tree):
+            if check.status == "mismatch":
+                changes = ", ".join(check.changes) or "unknown"
+                result.errors.append(
+                    f"{check.bundle.id} version {check.bundle.version} has changed since it was "
+                    f"versioned (its content no longer matches {check.manifest}); changed: "
+                    f"{changes}. A changed bundle needs a new version."
+                )
+            elif check.status == "unrecorded":
+                result.warnings.append(
+                    f"{check.bundle.id} version {check.bundle.version} cannot be verified: "
+                    f"{check.manifest} has no content_digest (written before SCS 0.7)."
+                )
+        if result.errors:
+            return result
+        source_digest = content_digest(root, tree_index(tree)).digest
 
     # Ids carry the root bundle's name so a Domain and a Project artifact never share one,
     # even when both have an SCD of the same name.
@@ -153,10 +176,10 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
         "id": root.id,
         "type": root.type,
         "version": version,
-        "title": title,
-        "sources": sources,
-        "rules": [identity, *rules],
     }
+    if source_digest:
+        result.artifact["source_digest"] = source_digest
+    result.artifact.update({"title": title, "sources": sources, "rules": [identity, *rules]})
     if facts:
         result.artifact["facts"] = facts
     return result

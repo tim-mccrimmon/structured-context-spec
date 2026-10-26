@@ -340,6 +340,16 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
         click.echo(f"Error: Git tag already exists: {tag}", err=True)
         raise click.Abort()
 
+    # The content digest is computed by scs-validator's resolver (ISS-045).
+    try:
+        from scs_validator.digest import DigestError, content_digest
+        from scs_validator.resolver import resolve
+    except ImportError as e:
+        raise click.ClickException(
+            f"scs bundle version needs scs-validator ({e}). "
+            "Install with: pip install 'scs-tools[validator]'"
+        )
+
     # Get version notes if not provided
     if not notes:
         notes = click.prompt(
@@ -372,14 +382,27 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
     # Step 2: Create versioned bundle
     click.echo("Step 2/5: Creating versioned bundle snapshot...")
     versioned_bundle_path = _create_versioned_bundle(
-        bundle_path, version_number, approved_by, notes, force
+        bundle_path, version_number, approved_by, notes, force, validated=not no_validate
     )
     click.echo(f"  ✓ Created: {versioned_bundle_path}\n")
 
-    # Step 3: Generate checksum
-    click.echo("Step 3/5: Generating SHA-256 checksum...")
+    # Step 3: Checksum the snapshot file, and digest the content it resolves to: the snapshot,
+    # its SCDs and its imports (spec/0.7/bundle-format.md §7.6).
+    click.echo("Step 3/5: Generating checksum and content digest...")
     checksum, file_size = _generate_checksum(versioned_bundle_path)
-    click.echo(f"  ✓ SHA-256: {checksum}\n")
+    tree = resolve(versioned_bundle_path)
+    try:
+        digest = content_digest(tree.root, tree.index)
+    except DigestError as e:
+        versioned_bundle_path.unlink()
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    content_inputs, _ = digest.inputs()
+    for kind in ("bundles", "scds"):
+        for ref in [r for r, d in content_inputs[kind].items() if d is None]:
+            click.echo(f"  Warning: {ref} not found; recorded as missing", err=True)
+    click.echo(f"  ✓ SHA-256: {checksum}")
+    click.echo(f"  ✓ Content digest: {digest.digest}\n")
 
     # Step 4: Create version manifest
     click.echo("Step 4/5: Creating version manifest...")
@@ -393,6 +416,8 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
         notes,
         checksum,
         file_size,
+        digest.digest,
+        content_inputs,
         validation_result if not no_validate else None,
     )
     click.echo(f"  ✓ Created: {manifest_path}\n")
@@ -421,6 +446,7 @@ def version(bundle, version_number, approved_by, notes, no_git, no_validate, for
     click.echo(f"Bundle: {versioned_bundle_path}")
     click.echo(f"Manifest: {manifest_path}")
     click.echo(f"Checksum: {checksum}")
+    click.echo(f"Content digest: {digest.digest}")
     if not no_git:
         click.echo(f"Git Tag: {tag}")
     click.echo()
@@ -508,7 +534,7 @@ def _validator_version():
         return "unknown"
 
 
-def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, force):
+def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, force, validated):
     """Create versioned bundle with approval metadata."""
     # Load original bundle
     with open(bundle_path, "r") as f:
@@ -529,9 +555,11 @@ def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, fo
 
     bundle_data["provenance"]["version_approved_by"] = approved_by
     bundle_data["provenance"]["version_approved_at"] = timestamp
-    bundle_data["provenance"]["approval_status"] = "validated"
-    bundle_data["provenance"]["validation_passed"] = True
-    bundle_data["provenance"]["validation_date"] = timestamp
+    # Recorded from what happened: under --no-validate the bundle is approved, not validated.
+    bundle_data["provenance"]["approval_status"] = "validated" if validated else "approved"
+    bundle_data["provenance"]["validation_passed"] = validated
+    if validated:
+        bundle_data["provenance"]["validation_date"] = timestamp
     bundle_data["provenance"]["version_notes"] = notes
 
     # Create versioned filename
@@ -579,6 +607,8 @@ def _create_version_manifest(
     notes,
     checksum,
     file_size,
+    content_digest,
+    content_inputs,
     validation_result,
 ):
     """Create version manifest file."""
@@ -604,7 +634,7 @@ def _create_version_manifest(
     manifest = {
         "version": version_number,
         "release_date": timestamp,
-        "status": "validated",
+        "status": "validated" if validation_result else "approved",
         "project": bundle_name,
         "bundle": {
             "id": bundle_id,
@@ -613,6 +643,8 @@ def _create_version_manifest(
             "sha256": checksum,
             "size_bytes": file_size,
         },
+        "content_digest": content_digest,
+        "content_inputs": content_inputs,
     }
 
     if validation_result:
@@ -640,7 +672,7 @@ def _create_version_manifest(
 
     manifest["phases"] = {
         "phase_1_intent": "completed",
-        "phase_2_validate": "completed",
+        "phase_2_validate": "completed" if validation_result else "skipped",
         "phase_3_version": "completed",
         "phase_4_build": "pending",
     }
@@ -724,14 +756,19 @@ This bundle is now the authoritative source of truth.
         )
 
         # Create annotated tag
+        phase_2 = (
+            "✓ Phase 2: Validate - Bundle validated"
+            if validation_result
+            else "- Phase 2: Validate - skipped (--no-validate)"
+        )
         tag_message = f"""SCD Bundle {bundle_name} v{version_number}
 
-Validation Status: {'✓ PASSED' if validation_result and validation_result['passed'] else '✗ FAILED'}
+Validation Status: {'✓ PASSED' if validation_result else 'SKIPPED (--no-validate)'}
 Bundle Checksum (SHA-256): {checksum}
 
 Phase Completion:
 ✓ Phase 1: Intent - SCDs generated
-✓ Phase 2: Validate - Bundle validated
+{phase_2}
 ✓ Phase 3: Version - Immutable snapshot created
 
 Ready for Phase 4 (Build) - development environment configuration.

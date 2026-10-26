@@ -35,6 +35,14 @@ contract** for structured context.
 
 See `docs/MIGRATION-0.6.0.md`.
 
+### What changed in 0.7.0
+
+- **Versioned bundles are verifiably immutable.** Versioning records a content digest over
+  the bundle's full resolved content; validators and compilers verify it, and a mismatch is
+  an error (§7.3, §7.6, §9.6).
+
+See `docs/MIGRATION-0.7.0.md`.
+
 ---
 
 ## 2. What Is an SCS Bundle?
@@ -507,6 +515,11 @@ Once versioned (e.g., `1.0.0`), a bundle MUST remain immutable. Changes require 
 4. Bundle becomes immutable contract
 5. Future changes create new versions (e.g., `1.1.0`)
 
+Immutability covers the bundle's full resolved content: its manifest, every SCD it lists, and
+every bundle it imports. Editing an SCD after `1.0.0` changes what `1.0.0` means, so it is a
+change to the bundle. Tools make this checkable with a content digest (§7.6). Git tags locate
+versions; they are not the guarantee, since a tag can be moved.
+
 ### 7.4 Independent Versioning
 
 Concept bundles MAY version independently of the bundle that imports them:
@@ -519,6 +532,70 @@ Concept bundles MAY version independently of the bundle that imports them:
 A Domain bundle binds meta-tier SCDs (through the pinned meta bundle) and the organization's
 project-tier SCDs (through its concept bundles). A Project bundle binds project-tier SCDs
 only.
+
+### 7.6 Content Digest
+
+A versioned bundle's **content digest** identifies its full resolved content. Tools that
+version a bundle MUST record it; tools that read a versioned bundle verify against it.
+
+**Canonical form.** Each document (a bundle manifest or an SCD) is parsed and serialized as
+JSON with keys sorted, no insignificant whitespace, and non-ASCII characters unescaped,
+encoded as UTF-8. Mapping keys are serialized as strings. A YAML date is serialized as
+`YYYY-MM-DD`; a YAML timestamp as ISO 8601 (`YYYY-MM-DDTHH:MM:SS`, with fractional seconds
+when present and a `+HH:MM` offset when it has a time zone). Because documents are parsed
+first, edits to comments, key order, quoting, or layout do not change a digest; edits to
+content do. A document's digest is `sha256:` followed by the lowercase hexadecimal SHA-256 of
+its canonical form.
+
+**Content digest.** The content digest of a bundle is the digest of the JSON array
+
+```
+[ <digest of the bundle manifest>,
+  [[<SCD id>, <digest of the SCD>], ...],              // SCDs it lists, sorted by id
+  [[<import reference>, <content digest of import>], ...] ]  // its imports, sorted by reference
+```
+
+serialized in canonical form. Import references are taken as written
+(`bundle:design-controls:1.0.0`). An SCD that cannot be found, or an import that does not
+resolve to a bundle of the pinned version, contributes `null`, so adding it later changes
+the digest. Imports are digested recursively, so the root's digest covers the whole tree.
+
+**Version manifest.** `scs bundle version` writes a version manifest beside the versioned
+bundle, named `<bundle-name>-v<version>-MANIFEST.yaml`. It MUST contain `content_digest`, and
+SHOULD contain `content_inputs`: the digest of every bundle manifest and SCD in the tree, used
+only to name what changed on a mismatch.
+
+```yaml
+content_digest: sha256:ec9de04bb0bb4cb2768d91ce4e9011cfaf77ebb72c614266e008f4f6e7cf9ff3
+content_inputs:
+  bundles:
+    bundle:design-controls:1.0.0: sha256:0c3c13b0ade13d2c1fc9faecdab0afd7d83f4adfd4c5b508b9355d496297260a
+    bundle:medtech-cdmo:1.1.0: sha256:134cbd2fb451d3c4d801e589c0bac7162e8912eb918a3b517367979d4619c62b
+    # ... every other bundle in the tree
+  scds:
+    scd:project:design-change-control: sha256:58ec9b92125a111a1e35037d32b51d78a2b245e783950e1eaeac8d7b3e62991f
+    # ... every other SCD in the tree
+```
+
+The versioned bundle's `provenance` records `validation_passed` and `approval_status` from
+what happened: a bundle versioned without validation records `validation_passed: false` and
+`approval_status: approved` rather than `validated`.
+
+**Verification.** A validator or compiler given a versioned bundle recomputes its content
+digest and compares it with its version manifest's `content_digest`:
+
+- A mismatch is an error in every mode. The diagnostic SHOULD name the bundles and SCDs whose
+  content changed. A compiler MUST refuse to compile, with no override; a changed bundle needs
+  a new version.
+- A version manifest with no `content_digest` (written before 0.7) produces a warning that
+  the bundle cannot be verified. Versioning it again at a new version makes it verifiable.
+- A versioned bundle with no version manifest (for example, one published with the
+  specification, such as the meta bundle) has nothing to verify against and is not reported.
+
+Every versioned bundle in a tree that has a version manifest is verified, not only the root.
+A compiled artifact carries the root's content digest as `source_digest`
+([runtime-artifact.md](runtime-artifact.md) §3.1), so a rendering can be checked against the
+exact content it came from.
 
 ---
 
@@ -594,6 +671,11 @@ Tools MUST validate that:
 - `provenance.version_approved_by` and `version_approved_at` are present once `version` is
   a real semantic version — not required while `version: "DRAFT"` (RFC-0001, Provenance and
   approval)
+
+### 9.6 Content Digest (versioned bundles with a version manifest)
+- The recomputed content digest matches the version manifest's `content_digest` (§7.6); a
+  mismatch is an error in every mode
+- A version manifest with no `content_digest` is a warning
 
 Tools MAY also perform:
 - Compliance completeness checks

@@ -1,7 +1,8 @@
-scs_runtime: '0.6'
+scs_runtime: '0.7'
 id: bundle:infusion-pump-fw
 type: project
 version: 0.3.0
+source_digest: sha256:949a908938ef1d0cb47d7d936b6a9a3c257a063de56a4edb9f18438c5476778e
 title: Infusion Pump Firmware
 sources: []
 rules:

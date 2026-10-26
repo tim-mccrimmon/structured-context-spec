@@ -2,6 +2,7 @@
 
 from typing import Any, Dict, List
 
+from .digest import verify_tree
 from .resolver import BundleTree
 from .rules_loader import RulesLoader
 from .utils import ValidationError, ValidationResult, ValidationWarning
@@ -227,6 +228,37 @@ class BundleValidator:
                 )
             )
 
+        return result
+
+    def validate_digests(self, tree: BundleTree) -> ValidationResult:
+        """Check every versioned bundle in the tree against the content digest in its version
+        manifest (spec/0.7/bundle-format.md §7.6). A mismatch is an error in every mode."""
+        result = ValidationResult("bundle")
+        for check in verify_tree(tree):
+            fmt = dict(
+                bundle_id=check.bundle.id, version=check.bundle.version, manifest=check.manifest
+            )
+            path = str(check.bundle.path)
+            if check.status == "mismatch":
+                changes = ", ".join(check.changes) or "unknown (no content_inputs recorded)"
+                result.add_error(
+                    ValidationError(
+                        self.rules_loader.get_error_message(
+                            self.rules, "content_digest_mismatch", changes=changes, **fmt
+                        ),
+                        file_path=path,
+                    )
+                )
+            elif check.status == "unrecorded":
+                result.add_warning(
+                    ValidationWarning(
+                        self.rules_loader.get_error_message(
+                            self.rules, "content_digest_unrecorded", **fmt
+                        ),
+                        level="bundle",
+                        file_path=path,
+                    )
+                )
         return result
 
     def _validate_xor_constraint(

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from pathlib import Path
 
 import pytest
 import yaml
 from click.testing import CliRunner
+from scs_validator.commands.validate import validate as validator_cmd
 
 from scs_tools.cli import cli
 
@@ -81,11 +83,18 @@ def test_artifact_has_no_volatile_content():
         assert volatile not in text
 
 
-def test_provenance_changes_do_not_change_the_artifact(org: Path, tmp_path: Path):
-    before = compile_(str(org / "bundles" / "domain-bundle.yaml"), "--no-validate").stdout
+def test_provenance_changes_change_only_the_source_digest(org: Path, tmp_path: Path):
+    """Reviewer-only fields don't reach the rules or facts. They are still part of the versioned
+    source, so source_digest records that the source changed (ISS-045)."""
+    before = yaml.safe_load(
+        compile_(str(org / "bundles" / "domain-bundle.yaml"), "--no-validate").stdout
+    )
     scd = org / "context" / "project" / "ai-review.yaml"
     edit(scd, "rationale: Initial approved version", "rationale: Reworded rationale")
-    after = compile_(str(org / "bundles" / "domain-bundle.yaml"), "--no-validate").stdout
+    after = yaml.safe_load(
+        compile_(str(org / "bundles" / "domain-bundle.yaml"), "--no-validate").stdout
+    )
+    assert before.pop("source_digest") != after.pop("source_digest")
     assert before == after
 
 
@@ -328,3 +337,106 @@ def test_rule_ids_are_unique_across_domain_and_project_artifacts(tmp_path: Path)
     assert "medtech-cdmo/ai-review/AI-001" in domain_ids
     assert "infusion-pump-fw/ai-review/AI-001" in project_ids
     assert not domain_ids & project_ids
+
+
+# -------------------------------------------------------- verifiable immutability (ISS-045)
+
+
+def _version_domain(org: Path, monkeypatch, *extra: str):
+    monkeypatch.chdir(org)
+    monkeypatch.setenv("SCS_SCHEMA_DIR", str(REPO / "schema"))
+    return CliRunner().invoke(
+        cli,
+        [
+            "bundle",
+            "version",
+            "--bundle",
+            "bundles/domain-bundle.yaml",
+            "--version",
+            "1.1.0",
+            "--approved-by",
+            "qa@example.com",
+            "--notes",
+            "n",
+            "--no-git",
+            *extra,
+        ],
+    )
+
+
+def _manifest(org: Path) -> dict:
+    return yaml.safe_load((org / "bundles" / "medtech-cdmo-v1.1.0-MANIFEST.yaml").read_text())
+
+
+def test_versioning_records_the_content_digest_and_compile_carries_it(org: Path, monkeypatch):
+    result = _version_domain(org, monkeypatch)
+    assert result.exit_code == 0, result.output
+    manifest = _manifest(org)
+    assert re.fullmatch(r"sha256:[0-9a-f]{64}", manifest["content_digest"])
+    inputs = manifest["content_inputs"]
+    assert set(inputs) == {"bundles", "scds"}
+    assert {"bundle:medtech-cdmo:1.1.0", "bundle:design-controls:1.0.0"} <= set(inputs["bundles"])
+    assert "scd:project:design-change-control" in inputs["scds"]
+    snapshot = org / "bundles" / "domain-bundle-v1.1.0.yaml"
+    compiled = compile_(str(snapshot))
+    assert compiled.exit_code == 0, compiled.output
+    artifact = yaml.safe_load(compiled.stdout)
+    assert artifact["version"] == "1.1.0"
+    assert artifact["source_digest"] == manifest["content_digest"]
+
+
+def test_an_edited_scd_fails_verification_and_compile_refuses(org: Path, monkeypatch):
+    assert _version_domain(org, monkeypatch).exit_code == 0
+    edit(
+        org / "context" / "project" / "design-change-control.yaml",
+        "Design changes require documented review and approval before implementation.",
+        "Design changes may be implemented before review.",
+    )
+    snapshot = org / "bundles" / "domain-bundle-v1.1.0.yaml"
+    compiled = compile_(str(snapshot), "--no-validate")
+    assert compiled.exit_code != 0
+    assert "has changed since it was versioned" in compiled.output
+    validated = CliRunner().invoke(
+        validator_cmd,
+        ["--bundle", str(snapshot), "--no-color", "--schema-dir", str(REPO / "schema")],
+    )
+    assert validated.exit_code == 1, validated.output
+    assert "design-change-control.yaml" in validated.output
+
+
+def test_comment_and_formatting_edits_keep_the_digest(org: Path, monkeypatch):
+    assert _version_domain(org, monkeypatch).exit_code == 0
+    scd = org / "context" / "project" / "design-change-control.yaml"
+    scd.write_text("# a reviewer's note\n" + scd.read_text().replace("\n", "\n\n", 1))
+    snapshot = org / "bundles" / "domain-bundle-v1.1.0.yaml"
+    assert compile_(str(snapshot), "--no-validate").exit_code == 0
+
+
+def test_no_validate_records_that_validation_did_not_run(org: Path, monkeypatch):
+    assert _version_domain(org, monkeypatch, "--no-validate").exit_code == 0
+    prov = yaml.safe_load((org / "bundles" / "domain-bundle-v1.1.0.yaml").read_text())["provenance"]
+    assert prov["validation_passed"] is False
+    assert prov["approval_status"] == "approved"
+    assert "validation_date" not in prov
+    manifest = _manifest(org)
+    assert manifest["status"] == "approved"
+    assert "validation" not in manifest
+
+
+def test_a_manifest_without_a_content_digest_warns(org: Path, monkeypatch):
+    """Version manifests written before 0.7 can't be verified; that is a warning."""
+    assert _version_domain(org, monkeypatch).exit_code == 0
+    manifest = _manifest(org)
+    del manifest["content_digest"], manifest["content_inputs"]
+    (org / "bundles" / "medtech-cdmo-v1.1.0-MANIFEST.yaml").unlink()
+    (org / "bundles" / "VERSION-1.1.0-MANIFEST.yaml").write_text(yaml.safe_dump(manifest))
+    snapshot = org / "bundles" / "domain-bundle-v1.1.0.yaml"
+    compiled = compile_(str(snapshot), "--no-validate")
+    assert compiled.exit_code == 0, compiled.output
+    assert "cannot be verified" in compiled.output
+    validated = CliRunner().invoke(
+        validator_cmd,
+        ["--bundle", str(snapshot), "--no-color", "--schema-dir", str(REPO / "schema"), "--strict"],
+    )
+    assert validated.exit_code == 2, validated.output
+    assert "cannot be verified" in validated.output

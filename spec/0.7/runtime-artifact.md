@@ -165,10 +165,11 @@ in which two rules or facts share an identifier.
 ### 3.1 Structure
 
 ```yaml
-scs_runtime: '0.6'
+scs_runtime: '0.7'
 id: bundle:medtech-cdmo
 type: domain
 version: 1.0.0
+source_digest: sha256:8c499744256fe9f28061bf59d97a603a1f58934e0435ea4278992f2877f6a840
 title: MedTech CDMO Governance
 sources: ['bundle:meta:0.6.0', 'bundle:company:1.0.0', 'bundle:prohibited:1.0.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
 rules:
@@ -193,10 +194,11 @@ facts:
 
 | Field | Required | Description |
 |---|---|---|
-| `scs_runtime` | yes | Artifact format version. `"0.6"` for this specification |
+| `scs_runtime` | yes | Artifact format version. `"0.7"` for this specification |
 | `id` | yes | The compiled bundle's `id` |
 | `type` | yes | `domain` or `project` |
 | `version` | yes | The bundle's version, or `DRAFT+<digest>` (§3.4) |
+| `source_digest` | versioned only | The root bundle's content digest ([bundle-format.md](bundle-format.md) §7.6); omitted for a `DRAFT` compile |
 | `title` | yes | The bundle's title |
 | `sources` | yes | Every bundle in the resolved tree except the root, as `bundle:<name>:<version>`, in resolution order |
 | `rules` | yes | The self-identification rule, then one rule per prohibition, then one per directive (§3.2) |
@@ -253,7 +255,15 @@ record the artifact's hash for audit. A compiler:
 4. SHOULD emit UTF-8 with `\n` line endings and a trailing newline.
 
 Provenance is deliberately excluded. The approved, versioned source bundle is the record of
-who approved what; the artifact identifies that bundle by `id` and `version`.
+who approved what; the artifact identifies that bundle by `id`, `version`, and
+`source_digest`.
+
+`source_digest` is derived from the source content, so it does not conflict with rule 2: it
+changes only when the versioned source changes. Because it covers the whole source (including
+provenance and fields that are not compiled), an edit that leaves every rule and fact the
+same still changes it. A versioned bundle must not change (bundle-format.md §7.3), so for a
+versioned bundle this only happens when the source was altered after versioning, which is
+what the field is there to show.
 
 ### 3.6 Serialization
 
@@ -271,13 +281,18 @@ A conformant compiler, given a Domain or Project bundle:
 1. Validates the bundle tree and stops on any validation error.
 2. Resolves every import and SCD; an unresolved import or SCD is an error.
 3. Refuses `DRAFT` bundles anywhere in the tree unless drafts are allowed (§3.4).
-4. Collects prohibitions, directives, and facts in the order of §3.2 and builds identifiers
+4. For a tree with no `DRAFT` bundles, verifies every bundle that has a version manifest
+   against its recorded content digest (bundle-format.md §7.6) and MUST refuse on a mismatch.
+   There is no override; a changed bundle needs a new version. A version manifest with no
+   content digest produces a warning that the bundle cannot be verified.
+5. Collects prohibitions, directives, and facts in the order of §3.2 and builds identifiers
    (§2.5). Whitespace in text, including line breaks from folded YAML, is collapsed to single
    spaces.
-5. Rejects duplicate identifiers, empty entries, and entries containing `TODO`.
-6. Rejects a tree that yields no prohibitions, directives, or facts.
-7. Reports each SCD that contributes nothing (warning).
-8. Emits the artifact (§3).
+6. Rejects duplicate identifiers, empty entries, and entries containing `TODO`.
+7. Rejects a tree that yields no prohibitions, directives, or facts.
+8. Reports each SCD that contributes nothing (warning).
+9. Emits the artifact (§3), with `source_digest` set to the root bundle's content digest
+   when the tree has no `DRAFT` bundles.
 
 ---
 

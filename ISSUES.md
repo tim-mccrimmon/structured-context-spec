@@ -889,7 +889,7 @@ Done: line removed from all 48 cdmo templates (scope comes from the including bu
 ISS-041). sdlc and mca templates never carried it.
 
 ### ISS-045 - Versioned bundles are not verifiably immutable
-**Status:** open
+**Status:** done (2026-10-25)
 Found 2026-10-25 while reviewing RFC 0002. `bundle-format.md` §7.3 says a versioned bundle MUST
 remain immutable, and the versioned bundle is SCS's source of truth, but the tooling does not enforce
 or verify it:
@@ -908,6 +908,14 @@ digests of its pinned imports), each file parsed and serialized canonically (JSO
 `runtime-artifact.md` §3.6 does for artifacts), and record it in the version manifest; verify it in `scs-validate` and before `scs compile` (a mismatch is
 an error); carry it in the compiled artifact as `source_digest`. Record `validation_passed` from the
 actual result. Proposed in RFC 0002 section 11. Related: ISS-014, ISS-027, ISS-043.
+Done: `scs_validator/digest.py` computes the digest as specified in `spec/0.7/bundle-format.md`
+§7.6; `scs bundle version` records `content_digest` and `content_inputs` (every bundle and SCD
+in the tree, for naming changed files) and records `validation_passed`/`approval_status` from what
+happened. `scs-validate` and `scs compile` verify every versioned bundle in the tree that has a
+version manifest (no override); a manifest without a digest warns; a versioned bundle with no
+manifest (hand-versioned examples, the meta bundle) is not reported. Artifacts are now
+`scs_runtime: '0.7'` with `source_digest` (spec/0.7 started for this, `runtime-artifact.md` §3.1,
+§3.5, §4). Source digest covers non-compiled fields, so a reviewer-only edit changes it.
 
 ## RFC 0002 implementation (0.7.0)
 

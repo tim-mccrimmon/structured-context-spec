@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://structuredcontext.dev/schema/runtime-artifact.schema.json",
   "title": "SCS Runtime Artifact",
-  "description": "A compiled Domain or Project bundle: the self-contained governance context a runtime delivers to an AI agent (spec/0.6/runtime-artifact.md).",
+  "description": "A compiled Domain or Project bundle: the self-contained governance context a runtime delivers to an AI agent (spec/0.7/runtime-artifact.md).",
   "type": "object",
   "required": ["scs_runtime", "id", "type", "version", "title", "sources", "rules"],
   "properties": {
     "scs_runtime": {
       "type": "string",
-      "const": "0.6",
+      "enum": ["0.6", "0.7"],
       "description": "Artifact format version"
     },
     "id": {
@@ -25,6 +25,11 @@
       "type": "string",
       "pattern": "^(\\d+\\.\\d+\\.\\d+|DRAFT\\+[0-9a-f]{8})$",
       "description": "The bundle's semantic version, or DRAFT+<8 hex digest> for an explicitly allowed draft"
+    },
+    "source_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Content digest of the versioned root bundle the artifact was compiled from (bundle-format.md §7.6). Absent for DRAFT compiles and in 0.6 artifacts"
     },
     "title": {
       "type": "string",

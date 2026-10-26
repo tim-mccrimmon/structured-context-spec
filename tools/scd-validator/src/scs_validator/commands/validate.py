@@ -375,11 +375,14 @@ def validate_bundle(
         # Resolve the import tree. Any bundle type can be the root: Domain and Project
         # bundles are independent trees (SCS 0.6.0).
         tree = resolve(Path(bundle_path))
-        tree_result = bundle_validator.validate_tree(tree)
-        bundle_result.errors.extend(tree_result.errors)
-        bundle_result.warnings.extend(tree_result.warnings)
-        if not tree_result.passed:
-            bundle_result.passed = False
+        for tree_result in (
+            bundle_validator.validate_tree(tree),
+            bundle_validator.validate_digests(tree),
+        ):
+            bundle_result.errors.extend(tree_result.errors)
+            bundle_result.warnings.extend(tree_result.warnings)
+            if not tree_result.passed:
+                bundle_result.passed = False
 
         if verbose:
             click.echo(f"Resolved {len(tree.bundles) - 1} imported bundles, {len(tree.scds)} SCDs")

@@ -342,6 +342,12 @@ error_messages:
   unresolved_scd:
     "SCD '{ref}' listed in bundle '{bundle_id}' could not be resolved to an SCD file."
 
+  content_digest_mismatch:
+    "Bundle '{bundle_id}' version {version} has changed since it was versioned: its content no longer matches the content_digest in {manifest}. Changed: {changes}. A changed bundle needs a new version."
+
+  content_digest_unrecorded:
+    "Bundle '{bundle_id}' version {version} cannot be verified: its version manifest {manifest} has no content_digest (written before SCS 0.7). Version it again at a new version to make it verifiable."
+
   import_cycle:
     "Circular bundle imports: {cycle}."
 
