@@ -5,6 +5,8 @@
 - **Tracking Issue**: `ISSUES.md` ISS-042 – ISS-055
 - **Author(s)**: Tim McCrimmon (@tim-mccrimmon)
 - **Status**: Accepted (2026-10-25; comment period waived by the maintainer)
+- **Amended**: 2026-10-25: workspaces reserve directory and bundle names for a later release
+  (section 9)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---
@@ -570,6 +572,10 @@ medtech-cdmo-context/
         └── dist/
 ```
 
+**Reserved directories.** `plan/`, `test-plan/`, and `qa/` are reserved in every workspace
+for use by a later release. 0.7 defines no content for them, the scaffold does not create
+them, and the validator and compiler do not read them.
+
 **Agent instructions.** The scaffold MUST generate an agent instructions file stating that the
 repository manages SCS context for one named Domain and its Projects, that work in it is
 limited to creating, maintaining, validating, versioning, and compiling that context, and that
@@ -583,7 +589,8 @@ several workspaces, and their concept bundles, are versioned in one repository, 
 qualified by workspace and bundle name: `<workspace>/<bundle-name>-v<version>`, where
 `<workspace>` is `domain` or the Project name (for example `domain/company-v1.0.0`,
 `infusion-pump-fw/design-controls-v1.0.0`). Version manifests MUST be named the same way, so
-no two bundles share a manifest file (ISS-043).
+no two bundles share a manifest file (ISS-043). The bundle names `plan`, `test-plan`, and `qa`
+are reserved for a later release, so its tags cannot collide with a bundle's.
 
 **Compiled output.** `scs compile` SHOULD write to the workspace's `dist/` directory, named
 `<bundle-name>-<version>.yaml`. Whether `dist/` is committed is the user's choice; every
@@ -726,6 +733,9 @@ tools create and check, not a schema.
 - Run at the root of a Domain repository, the validator SHOULD validate the Domain workspace
   and every Project workspace, and report a Domain repository with no `domain/` workspace, or
   with more than one, as an error.
+- The validator MUST NOT report a workspace's reserved directories (`plan/`, `test-plan/`,
+  `qa/`) as errors or warnings in any mode, and MUST NOT validate their content.
+- A bundle named `plan`, `test-plan`, or `qa` is an error.
 
 ---
 
@@ -873,8 +883,9 @@ Proposed order. Each step is usable on its own.
 2. **Domain repositories.** `scs new domain` creates the repository with `domain/`,
    `projects/`, `AGENTS.md`, and the CI workflow; `scs new project` adds a workspace under
    `projects/` of an existing Domain repository; a `personal` Domain profile that scaffolds only
-   the `company` (owner facts) and `prohibited` concept bundles; repository-level validation;
-   compile output to `dist/`.
+   the `company` (owner facts) and `prohibited` concept bundles; repository-level validation
+   that tolerates the reserved plan directories and rejects the reserved bundle names; compile
+   output to `dist/`.
 3. **Machine mode.** `--json` and `--dry-run` across `new`, `add`, `bundle`, `validate`, and
    `compile`; the result envelope; no prompts in machine mode.
 4. **Intake schema and `derived_from`.** `intake.schema.json`, the `derived_from` field,
