@@ -1,43 +1,46 @@
 # SCS Tools
 
-Complete CLI toolkit for creating, managing, and validating Structured Context Specification (SCS) projects.
+The `scs` command creates, edits, versions, and compiles Structured Context Specification (SCS)
+context in a Domain repository.
 
-## Overview
+- **Create** a Domain repository for an organization or a person, and Project workspaces in it
+- **Add** concept bundles and SCDs from an ontology's templates, or new concepts of your own
+- **Write** SCDs and the intake record through validated commands
+- **Version** a bundle as a git tag with a snapshot and an approval manifest
+- **Validate** SCDs, bundles, and whole repositories
+- **Compile** a Domain or Project bundle into a deterministic runtime artifact
 
-`scs-tools` provides everything you need to work with SCS projects:
+Every command that changes files has `--dry-run` and `--json` (machine mode), so an agent or a
+script can drive the tools and read back exactly what changed.
 
-- **Scaffold** Domain (organization) and Project bundle workspaces from an ontology model
-- **Initialize** SCS in existing projects
-- **Add** SCDs and concept bundles incrementally
-- **Manage** and version bundles
-- **Validate** SCDs and bundles against the specification
-- **Compile** a Domain or Project bundle into a runtime artifact
+## Packages
 
-## Do I Need Both Tools?
+SCS ships two packages with distinct commands:
 
-**No - just install `scs-tools`.**
+- **`scs-tools`** (this package): the `scs` command
+- **`scs-validator`** (`tools/scd-validator`): the `scs-validate` command and the validation
+  engine `scs` uses
 
-The SCS ecosystem includes two packages:
-- **`scs-tools`** (this package) - Full CLI toolkit for project management
-- **`scs-validator`** (in `scs-spec/tools/scd-validator`) - Standalone validator
-
-The `scs-validator` is included as a dependency of `scs-tools`, so installing `scs-tools` gives you everything. The standalone validator is only needed if you want validation without the project management features.
+`scs compile`, `scs bundle validate`, and `scs bundle version` need `scs-validator`. Install
+both.
 
 ## Installation
 
-Requires Python 3.11 or later. The tools are not yet published to PyPI; the `scs-tools` package
-there is an old 0.1.0 release. Install `scs-validator` alongside `scs-tools`: `scs compile` and
-`scs bundle validate` need it.
+Requires Python 3.11 or later and git. The 0.7 tools are not yet on PyPI (the `scs-tools`
+package there is an old 0.1.0 release), and they still report version 0.6.0 until the release
+candidate.
 
 ### From GitHub (no clone)
 
 ```bash
 pip install \
-  "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/scd-validator" \
-  "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/cli"
+  "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@0.7-dev#subdirectory=tools/scd-validator" \
+  "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@0.7-dev#subdirectory=tools/cli"
 ```
 
-### From Source
+Use `@v0.6.0` in place of `@0.7-dev` for the released 0.6 tools.
+
+### From source
 
 ```bash
 git clone https://github.com/tim-mccrimmon/structured-context-spec.git
@@ -45,576 +48,197 @@ cd structured-context-spec
 pip install -e tools/scd-validator -e tools/cli
 ```
 
-### For Development
+For development, `pip install -e "tools/scd-validator[dev]" -e tools/cli pytest jsonschema`.
+
+## Quick start
 
 ```bash
-cd scs-cli
-pip install -e ".[dev]"
+scs new domain acme-health --author "Jane Doe" --email jane@acme-health.org
+cd acme-health-context
+scs new project patient-portal
+
+# Edit the SCDs under domain/context/ and projects/patient-portal/context/, then:
+scs-validate --strict
+
+cd domain
+scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme-health.org>"
+scs compile bundles/domain-bundle.yaml --version 1.0.0
 ```
+
+## The Domain repository
+
+SCS 0.7 keeps an owner's context in one git repository, `<name>-context/`. It holds one Domain
+workspace (governance that applies to all of the owner's work) and one workspace per Project
+(governance for one project). The two kinds of bundle are independent: a Project bundle does not
+import the Domain bundle, and a runtime applies the two side by side.
+
+```
+acme-health-context/
+├── AGENTS.md                      # How an agent works in this repository (CLAUDE.md points here)
+├── CLAUDE.md
+├── .github/workflows/scs-validate.yml   # CI: scs-validate --strict
+├── domain/                        # The Domain workspace
+│   ├── bundles/
+│   │   ├── domain-bundle.yaml     # The Domain bundle; imports the concept bundles
+│   │   └── concepts/              # One concept bundle per ontology concept
+│   ├── context/project/           # SCD files
+│   ├── ontology/                  # The ontology manifest
+│   ├── docs/
+│   ├── intake.yaml                # Intake record, once `scs intake` writes it
+│   └── .scs/config
+└── projects/
+    └── patient-portal/            # A Project workspace, same layout,
+        └── bundles/project-bundle.yaml   # with a Project bundle in place of the Domain bundle
+```
+
+`dist/` in a workspace holds compiled artifacts. It is not part of a version.
 
 ## Commands
 
-The `scs` command provides six main subcommands.
+Run `scs <command> --help` for the full options of any command.
 
-### 1. `scs new` - Create Domain and Project Workspaces
-
-SCS 0.6.0 has two independent governance bundles. `scs new domain` creates an organization's
-Domain bundle (governance for all work); `scs new project` creates a Project bundle (governance
-for one project). Neither imports the other.
+### `scs new` - Domain repositories and Project workspaces
 
 ```bash
-# An organization's Domain bundle, from the software-development ontology
-scs new domain acme-health
+scs new domain acme-health                   # sdlc ontology (default)
+scs new domain acme-funding --ontology mca   # merchant cash advance
+scs new domain acme-cdmo --ontology cdmo     # medical-device CDMO
+scs new domain jdoe --ontology personal      # a person: boundaries only
 
-# From the merchant cash advance ontology
-scs new domain acme-funding --ontology mca
-
-# From the medical-device CDMO ontology
-scs new domain acme-cdmo --ontology cdmo
+scs new project patient-portal               # run inside the Domain repository
+scs new project my-funder --ontology mca     # default: the Domain's ontology
 ```
 
-Every Domain workspace gets `company` (facts about the organization) and `prohibited`
-(binary prohibitions) concept bundles. For the sdlc ontology, a Domain workspace uses the
-**Global profile**: only SCDs that state organization-wide policy or standards (tech stack,
-security, compliance, retention, engineering practices, operations, AI use). SCDs that
-describe one system, such as problem definition, system context, threat model, performance
-targets, and the risk register, are scaffolded only by `scs new project`. The cdmo ontology
-has the same split: a Domain workspace gets organization-wide policy (compliance, data,
-security, validation approach, risk acceptability, AI accountability, training, QMS records,
-supplier qualification), and client-program SCDs (objectives, architecture, requirements,
-risk register, cutover) are scaffolded only for a Project.
+`scs new domain` creates the repository, AGENTS.md, the CI workflow, and an initial commit.
+`scs new project` adds `projects/<name>/` to the repository that contains the current directory
+(or `--dir`).
 
-Project workspaces:
+Each ontology supplies one template set for a Domain and one for a Project; remove what does not
+apply. A Domain gets organization-wide policy and standards (for sdlc: tech stack, security,
+compliance, retention, engineering practices, operations, AI use), plus `company` and
+`prohibited`. SCDs that describe one system, such as system context, threat model, and the risk
+register, are scaffolded only for a Project. A personal Domain gets only boundaries (the
+`prohibited` concept); its other concepts are defined with the user.
+
+Without `--no-interactive`, missing information is prompted for. The author comes from
+`--author` and `--email` or the prompt; it is never invented.
+
+### `scs add` - Concept bundles and SCDs
 
 ```bash
-# Basic usage - creates standard project
-scs new project my-project
-
-# Healthcare application (HIPAA, CHAI, TEFCA)
-scs new project medication-adherence --type healthcare
-
-# Financial services (PCI-DSS, SOX)
-scs new project banking-app --type fintech
-
-# SaaS product (GDPR, SOC2)
-scs new project my-saas --type saas
-
-# Government application (NIST, FedRAMP)
-scs new project gov-portal --type government
-
-# Minimal project (11 essential SCDs)
-scs new project prototype --type minimal
-
-# Standard project (38 minimum SCDs)
-scs new project my-app --type standard
+scs add bundle security                       # a concept bundle from the ontology's templates
+scs add bundle groceries --new --title "Groceries"   # a concept with no template
+scs add scd threat-model                      # one SCD from a template
+scs add scd tech-stack --workspace domain     # into a named workspace
 ```
 
-**Options:**
-```bash
-# Specify output directory
-scs new project my-app --dir /path/to/projects
+`--new` creates the concept bundle, a first empty SCD, its ontology entry, and the root bundle's
+import of it. `scs bundle list --available` lists the templates.
 
-# Add author information
-scs new project my-app --author "Jane Doe" --email "jane@example.com"
-
-# Interactive mode (prompts for all options)
-scs new project my-app --interactive
-```
-
-### 2. `scs init` - Initialize Existing Projects
-
-Add SCS structure to an existing project.
+### `scs scd write` - Write an SCD
 
 ```bash
-# Initialize in current directory
-scs init
-
-# Initialize with specific project type
-scs init --type healthcare
-
-# Initialize in specific directory
-scs init --dir /path/to/existing/project
+scs scd write context/project/release-gates.yaml --from-file draft.yaml
+scs scd write context/project/release-gates.yaml --from-file - < draft.yaml --dry-run
 ```
 
-### 3. `scs add` - Add SCDs and Bundles
+The content is validated against the SCD schema and rules first; an invalid SCD is not written.
 
-Incrementally add SCDs or domain bundles to your project.
+### `scs intake` - The intake record
 
 ```bash
-# Add a specific SCD
-scs add scd system-context
-
-# Add a domain bundle
-scs add bundle security
-
-# Add multiple SCDs
-scs add scd authn-authz data-protection threat-model
-
-# Add domain bundle with all related SCDs
-scs add bundle compliance-governance --with-scds
+scs intake set audience organization
+scs intake set certifications '[std:iso-13485:2016, std:iec-62304:2006-a1]'
+scs intake set approvers '{person: Jane Doe <jane@acme-health.org>, role: QA Lead}'
+scs intake record-finding --help
 ```
 
-### 4. `scs bundle` - Manage Bundles
+`intake.yaml` holds a workspace's intake answers, approvers, source documents, and review
+findings. It is not an SCD and is never compiled.
 
-Create and manage SCD bundles.
+### `scs bundle` - Inspect, edit, and version bundles
 
 ```bash
-# Create a bundle from SCDs
-scs bundle create --name my-bundle --scds context/project/*.yaml
-
-# List all bundles
-scs bundle list
-
-# Update a bundle
-scs bundle update bundles/project-bundle.yaml
-
-# Validate bundle completeness
-scs bundle check bundles/project-bundle.yaml
+scs bundle list                         # bundles in the workspace
+scs bundle info security
+scs bundle validate                     # the root bundle and everything it imports
+scs bundle add-import bundle:security
+scs bundle add-scd --help
+scs bundle remove-scd --help            # retire an SCD
+scs bundle pin --help                   # pin an import to a released version
+scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme-health.org>"
 ```
 
-### 5. `scs validate` - Validate SCDs and Bundles
+`scs bundle version` releases a bundle as the git tag `<workspace>/<bundle-name>-v<version>` on
+a commit holding the workspace, with a snapshot and a manifest. The commit's author is the
+approver, who must be named with `--approved-by` (it is never taken from git config). Every
+import must be pinned to a released version that still matches its tag. A version is never
+overwritten.
 
-Validate SCS documents against the specification. This command wraps the `scs-validator` tool.
+### `scs validate` and `scs-validate` - Validation
 
 ```bash
-# Validate a single SCD file
-scs validate context/project/system-context.yaml
-
-# Validate multiple SCD files
-scs validate context/project/*.yaml
-
-# Validate a bundle
-scs validate --bundle bundles/project-bundle.yaml
-
-# Strict mode (fail on warnings)
-scs validate --bundle bundles/project-bundle.yaml --strict
-
-# JSON output
-scs validate --bundle bundles/project-bundle.yaml --output json
-
-# Skip completeness checks
-scs validate --bundle bundles/project-bundle.yaml --skip-completeness
+scs-validate --strict                          # every workspace, at the repository root
+scs-validate --verify-version domain/security-v1.0.0
+scs validate context/project/tech-stack.yaml   # one or more SCDs
+scs validate --bundle bundles/domain-bundle.yaml --strict --output json
 ```
 
-**Validation Options:**
-- `--bundle` - Validate a bundle file instead of individual SCDs
-- `--schema-dir` - Specify custom schema directory
-- `--output [text|json]` - Output format (default: text)
-- `--strict` - Fail on warnings (exit code 2)
-- `--no-color` - Disable colored output
-- `--verbose` - Verbose output
-- `--skip-completeness` - Skip Level 6 completeness validation
+`scs validate` uses the `scs-validator` engine. Validation runs in passes: syntax, schema,
+semantic, relationship, bundle and completeness, and, in a repository, integrity (digests, tags,
+and manifests). Every finding has a registered diagnostic code and a severity; `info` findings
+never change the exit code.
 
-**Note:** The `scs validate` command uses the `scs-validator` package under the hood. For detailed validation documentation, see the [SCS Validator README](https://github.com/tim-mccrimmon/scs-spec/tree/main/tools/scd-validator).
-
-### 6. `scs compile` - Build Runtime Artifacts
-
-Compile a Domain or Project bundle into one compact, deterministic file of rules for a runtime
-to inject (`spec/0.6/runtime-artifact.md`). Only SCD `content.prohibitions`, `content.directives`, and
-`content.facts` are compiled.
+### `scs compile` - Runtime artifacts
 
 ```bash
-scs compile bundles/domain-bundle.yaml -o compiled/global.yaml
-scs compile bundles/project-bundle.yaml -o compiled/projects/my-app.yaml
-scs compile bundles/project-bundle.yaml --allow-draft      # DRAFT -> version DRAFT+<digest>
-scs compile bundles/project-bundle.yaml --format json --no-cites
+scs compile bundles/domain-bundle.yaml --version 1.0.0     # from the tag
+scs compile bundles/project-bundle.yaml --allow-draft      # working tree; version DRAFT+<digest>
+scs compile bundles/project-bundle.yaml --version 1.0.0 --stdout --format json
 ```
 
-The bundle is validated first (`--no-validate` skips it). Needs `scs-tools[validator]`.
-
-### Help
-
-Get help for any command:
-
-```bash
-scs --help
-scs new --help
-scs init --help
-scs add --help
-scs bundle --help
-scs validate --help
-scs compile --help
-```
-
-## Workspace Structure
-
-A generated Project workspace has this structure (a Domain workspace is the same, with
-`bundles/domain-bundle.yaml` in place of `project-bundle.yaml`):
-
-```
-my-project/
-├── bundles/
-│   ├── project-bundle.yaml    # The Project bundle; imports the concept bundles
-│   └── concepts/              # One concept bundle per ontology concept
-│       ├── architecture.yaml
-│       ├── security.yaml
-│       └── ...
-├── domain/
-│   └── domain-manifest.yaml   # The Domain Ontology
-├── context/                   # SCD files
-│   └── project/              # Project-tier SCDs
-│       ├── system-context.yaml
-│       ├── tech-stack.yaml
-│       ├── integration-map.yaml
-│       ├── component-model.yaml
-│       ├── authn-authz.yaml
-│       ├── data-protection.yaml
-│       └── ... (30+ more SCDs)
-├── docs/
-│   └── GETTING_STARTED.md
-├── .scs/
-│   └── config
-├── .gitignore
-├── README.md
-└── VERSION
-```
-
-## Concept Bundles (sdlc ontology)
-
-The sdlc ontology model scaffolds these concept bundles:
-
-1. **Architecture**: System design, tech stack, integrations, components
-2. **Security**: Authentication, data protection, threat model
-3. **Performance & Reliability**: Response time, availability, fault tolerance, scalability
-4. **Usability & Accessibility**: UX principles, accessibility compliance, error handling
-5. **Compliance & Governance**: Regulatory requirements (HIPAA, SOC2, etc.)
-6. **Data & Provenance**: Data model, lineage tracking, retention policies
-7. **Testing & Validation**: Test coverage, validation plans, QA procedures
-8. **Deployment & Operations**: Infrastructure, observability, incident response
-9. **Safety & Risk**: Risk assessment, safety checklists
-10. **Ethics & AI Accountability**: AI usage policy, audit trails, bias mitigation
-
-## SCD Templates
-
-Each SCD template includes:
-
-- Proper YAML structure with id, type, version, status
-- Domain and topic tags
-- Comprehensive content placeholders with examples
-- Provenance tracking
-- Inline documentation and guidance
-
-## Project Types Comparison
-
-| Feature | Minimal | Standard | Healthcare | Fintech | SaaS | Government |
-|---------|---------|----------|------------|---------|------|------------|
-| Architecture SCDs | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Security SCDs | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Performance SCDs | - | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Compliance SCDs | - | ✓ | ✓ | ✓ | ✓ | ✓ |
-| HIPAA/CHAI | - | - | ✓ | - | - | - |
-| PCI-DSS/SOX | - | - | - | ✓ | - | - |
-| GDPR | - | - | - | - | ✓ | - |
-| NIST/FedRAMP | - | - | - | - | - | ✓ |
-| Total SCDs | ~11 | ~38 | ~38 | ~38 | ~38 | ~38 |
-
-## Validation
-
-The `scs validate` command provides comprehensive validation:
-
-### Validation Levels
-
-1. **Syntax Validation** - Ensures YAML/JSON is well-formed
-2. **Schema Validation** - Validates against tier-specific JSON schemas
-3. **Semantic Validation** - Checks type/tier matching, semver, provenance
-4. **Relationship Validation** - Validates references between SCDs
-5. **Bundle Completeness** - Ensures all required SCDs are present
-6. **Compliance Validation** - Domain-specific requirement checks
-
-### Exit Codes
-
-- `0` - Validation passed (no errors)
-- `1` - Validation failed (errors found)
-- `2` - Validation passed with warnings (when `--strict` enabled)
-- `3` - Invalid command-line arguments
-- `4` - File not found or permission error
-- `5` - Internal validator error
-
-## What is SCS?
-
-The Structured Context Specification (SCS) provides a standardized way to organize project context for AI-assisted development, compliance, and governance.
-
-SCS enables:
-
-- **AI Context Injection**: Provide LLMs with precise, relevant context
-- **Compliance Evidence**: Map requirements to implementation
-- **Knowledge Management**: Version-controlled project knowledge
-- **Team Alignment**: Shared understanding of decisions and rationale
-- **Audit Trails**: Track what was decided, when, and why
-
-## OICP Control Plane Integration
-
-The `scs-tools` CLI creates and validates bundles **locally** (file-based workflow). For **Context as a Service** deployment, use the OICP Control Plane.
-
-### Publishing to OICP Control Plane
-
-Once you've built and validated bundles locally, publish them to the OICP Registry:
-
-```bash
-# Build and validate locally
-scs new project my-healthcare-app --type healthcare
-cd my-healthcare-app
-scs validate --bundle bundles/project-bundle.yaml
-
-# Publish to OICP Control Plane (via API)
-curl -X POST http://localhost:8000/api/bundles \
-  -H "Content-Type: application/json" \
-  -d @bundles/project-bundle.yaml
-
-# Create tag for agents to subscribe to
-curl -X POST http://localhost:8000/api/tags \
-  -H "Content-Type: application/json" \
-  -d '{
-    "tag": "my-app:latest",
-    "bundle_id": "bundle:my-healthcare-app:1.0.0"
-  }'
-```
-
-### Context Streaming to AI Agents
-
-Once published, AI agents can subscribe to your bundles:
-
-```python
-# Agent subscribes to tag and receives context stream
-import grpc
-from context_service import context_service_pb2_grpc
-
-stream = context_service.Subscribe(
-    tag="my-app:latest",
-    agent_id="agent-001"
-)
-
-# Agent receives context and automatic updates
-for message in stream:
-    # Use context in agent execution
-    ...
-```
-
-**Benefits of OICP Deployment:**
-- **Real-time updates**: Update context across all agents instantly (zero downtime)
-- **Perfect audit trail**: Track what context each agent had at any timestamp
-- **Version management**: Tags + semantic versioning (like Docker)
-- **Import resolution**: Automatically resolve bundle dependencies
-
-**See Also:**
-- [Control Plane README](/control-plane/README.md) - OICP architecture and APIs
-- [Agent Integration Test Case](/test-plan/AGENT-CONTEXT-INJECTION.md) - How agents use context
-- [Context Service README](/control-plane/context_service/README.md) - gRPC streaming details
-
-## Common Workflows
-
-### Starting a New Healthcare Project
-
-```bash
-# Create project
-scs new project patient-portal --type healthcare --author "Dr. Smith"
-cd patient-portal
-
-# Customize SCDs
-# Edit context/project/system-context.yaml
-# Edit context/project/hipaa-compliance.yaml
-# Edit context/project/chai-adherence.yaml
-
-# Validate your work
-scs validate --bundle bundles/project-bundle.yaml
-
-# Create versioned bundle for AI context
-scs bundle create --name v1.0.0 --scds context/project/*.yaml
-```
-
-### Adding SCS to Existing Project
-
-```bash
-# Navigate to your project
-cd my-existing-project
-
-# Initialize SCS
-scs init --type saas
-
-# Add specific domains you need
-scs add bundle security --with-scds
-scs add bundle compliance-governance --with-scds
-
-# Customize for your project
-# Edit the generated SCDs
-
-# Validate
-scs validate context/project/*.yaml
-```
-
-### Incremental SCD Development
-
-```bash
-# Start minimal
-scs new project mvp --type minimal
-
-# Add SCDs as you need them
-scs add scd system-context
-scs add scd tech-stack
-scs add scd authn-authz
-
-# Validate incrementally
-scs validate context/project/system-context.yaml
-
-# When ready, add full domain
-scs add bundle security --with-scds
-
-# Validate complete bundle
-scs validate --bundle bundles/project-bundle.yaml --strict
-```
-
-## Examples
-
-### Healthcare Application
-
-```bash
-scs new project medication-adherence --type healthcare
-cd medication-adherence
-
-# The project includes:
-# - HIPAA compliance SCDs
-# - CHAI adherence SCDs
-# - TEFCA interoperability SCDs
-# - Standard security, architecture, operations
-
-# Customize and validate
-scs validate --bundle bundles/project-bundle.yaml
-```
-
-### SaaS Product
-
-```bash
-scs new project todo-app --type saas
-cd todo-app
-
-# The project includes:
-# - GDPR compliance SCDs
-# - SOC2 controls
-# - Multi-tenancy architecture
-# - Standard security and operations
-
-# Validate
-scs validate --bundle bundles/project-bundle.yaml --strict
-```
-
-### Minimal Prototype
-
-```bash
-scs new project mvp --type minimal
-cd mvp
-
-# Includes only essential SCDs:
-# - System context
-# - Tech stack
-# - Authentication/authorization
-# - Data protection
-# - Deployment config
-# - (11 core SCDs)
-
-# Expand later with:
-scs add bundle performance-reliability --with-scds
-scs add bundle compliance-governance --with-scds
-```
-
-## CI/CD Integration
-
-### GitHub Actions Example
-
-```yaml
-name: Validate SCS
-
-on: [push, pull_request]
-
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install SCS Tools
-        run: |
-          pip install \
-            "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/scd-validator" \
-            "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/cli"
-
-      - name: Validate SCS Bundle
-        run: |
-          scs validate --bundle bundles/project-bundle.yaml \
-            --strict \
-            --output json > validation-report.json
-
-      - name: Upload validation report
-        uses: actions/upload-artifact@v3
-        with:
-          name: validation-report
-          path: validation-report.json
-```
-
-### Pre-commit Hook
-
-```bash
-#!/bin/bash
-# .git/hooks/pre-commit
-
-echo "Validating SCS bundle..."
-scs validate --bundle bundles/project-bundle.yaml --strict
-
-if [ $? -ne 0 ]; then
-  echo "❌ SCS validation failed"
-  exit 1
-fi
-
-echo "✓ SCS validation passed"
-```
+The artifact is one self-contained file of the bundle's prohibitions, directives, and facts,
+written to `dist/<bundle-name>-<version>.yaml`. It has no timestamps, so the same source always
+gives the same bytes. With `--version`, the released content is compiled from its tag and the
+artifact carries its `source_digest`. See `spec/0.7/runtime-artifact.md`.
+
+### `scs init`
+
+`scs init` still creates a standalone 0.6-style workspace and is not repository-aware. Use
+`scs new domain` and `scs new project` instead.
+
+## Machine mode
+
+`--json` writes one JSON result envelope to stdout: `ok`, the files and git effects in
+`changes`, and diagnostics with codes. `--dry-run` reports the same changes and writes nothing.
+On failure, the run rolls back and `changes` lists what remains (normally nothing). See
+`plan/0.7/04-interfaces.md` until the 0.7 agent-interface spec is published.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | Success |
+| 1 | Errors found |
+| 2 | Warnings, with `--strict` |
+| 3 | Invalid arguments |
+| 4 | File not found or permission error |
+| 5 | Internal error |
+
+## CI
+
+`scs new domain` writes `.github/workflows/scs-validate.yml`, which runs `scs-validate --strict`
+at the repository root on every push and pull request. It installs `scs-validator` from PyPI, so
+it works once 0.7.0 is published.
 
 ## Resources
 
-- [SCS Specification](https://github.com/tim-mccrimmon/scs-spec)
-- [SCS Validator](https://github.com/tim-mccrimmon/scs-spec/tree/main/tools/scd-validator) - Standalone validation tool
-- [Documentation](https://github.com/tim-mccrimmon/scs-spec/tree/main/docs)
-- [Minimum Project SCDs](https://github.com/tim-mccrimmon/scs-spec/blob/main/docs/random_docs/minimum-project-scds.md)
-- [Examples](https://github.com/tim-mccrimmon/scs-spec/tree/main/examples)
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-See [CONTRIBUTING.md](https://github.com/tim-mccrimmon/scs-spec/blob/main/CONTRIBUTING.md) for details.
+- [SCS specification](../../spec/0.7/)
+- [Migration guide, 0.6 to 0.7](../../docs/MIGRATION-0.7.0.md)
+- [Validator](../scd-validator/)
+- [Examples](../../examples/)
+- [Contributing](../../CONTRIBUTING.md)
 
 ## License
 
-Apache 2.0 License - see LICENSE file for details
-
-## Support
-
-- [GitHub Issues](https://github.com/tim-mccrimmon/scs-spec/issues)
-- [Discussions](https://github.com/tim-mccrimmon/scs-spec/discussions)
-
-## Version
-
-Current version: 0.1.0
-
-## Changelog
-
-### 0.1.0 (Initial Release)
-
-- Project scaffolding with `scs new project`
-- Project initialization with `scs init`
-- Incremental SCD/bundle addition with `scs add`
-- Bundle management with `scs bundle`
-- Integrated validation with `scs validate`
-- Support for 6 project types (minimal, standard, healthcare, fintech, saas, government)
-- 38 SCD templates across 10 domains
-- Jinja2 templating system
-- Comprehensive documentation
+Apache 2.0

@@ -51,8 +51,6 @@ structured-context-spec/
 ├── tools/                  # CLI and validator tools
 │   ├── cli/                # scs CLI
 │   └── scd-validator/      # YAML structure validator
-├── dog-food/               # SCS documenting itself with SCS
-│   └── SCS-MED-CONTEXT/    # Bundles + SCDs for SCS's own context
 ├── context/                # Additional spec context documents
 ├── docs/                   # Non-spec documentation
 └── CONTRIBUTING.md         # Contribution guide
@@ -159,18 +157,6 @@ See `rfcs/README.md` for full process details.
   - Domain and Project bundles are independent trees, compiled separately
 - **Relationships** — Explicit edges between SCDs for graph traversal (`references`, `applies_to`, `governed_by`)
 - **Validation**: Loose (structure only) in Phase 1 / DRAFT; strict in Phase 2 / versioned
-
----
-
-## Dogfooding Pattern (`dog-food/`)
-
-The spec documents itself using SCS. This is:
-- Proof that SCS works in practice
-- The reference implementation for what good bundles look like
-- Actual context used when developing the spec
-
-`dog-food/SCS-MED-CONTEXT/` contains the live bundles and SCDs for SCS itself.
-When working on the spec, load this context to see SCS applied to SCS.
 
 ---
 

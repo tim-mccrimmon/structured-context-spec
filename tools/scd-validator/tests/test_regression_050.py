@@ -27,9 +27,6 @@ BUNDLE_TYPES = {"project", "meta", "standards", "concept", "domain"}
 # example, and standards is deprecated in 0.6.0.
 EXAMPLE_BUNDLE_TYPES = {"project", "concept", "domain"}
 
-# third-party model output kept as evidence of cross-model testing; not a validity target
-EXCLUDED_DIRS = {"llm-portability"}
-
 
 def run(*args: str, schema: bool = True):
     argv = list(args) + ["--no-color"]
@@ -53,11 +50,7 @@ def _doc_id(path: Path) -> str:
 
 
 def _example_files() -> list[Path]:
-    return [
-        p
-        for p in sorted(EXAMPLES.rglob("*.yaml"))
-        if not (EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts))
-    ]
+    return sorted(EXAMPLES.rglob("*.yaml"))
 
 
 def _example_bundles() -> list[Path]:

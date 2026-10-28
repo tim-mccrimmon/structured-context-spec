@@ -56,16 +56,12 @@ Known gaps carried forward:
 
 - An unreadable SCD YAML file is skipped by the index without a diagnostic. (Bundle mode now
   schema-validates the SCDs it resolves, WP-07.)
-- `dog-food/SCS-MED-CONTEXT/bundles/scs-project.yaml` and
-  `examples/llm-portability/input/scs-project.yaml` fail the bundle schema (a top-level
-  `metadata` key); neither is in CI.
 - Rule-severity housekeeping item from WP-04 is still open.
 - The generated CI workflow installs `scs-validator>=0.7.0,<0.8` from PyPI; that works once
   0.7.0 is published (D-27, WP-11rc). The packages still report version 0.6.0.
 - `scs init` still makes a standalone 0.6-style workspace with `--type`; it is not
   repository-aware.
-- `tools/cli/README.md` and the 0.5 presentation docs still show `scs new project --type`
-  (WP-11rc rewrites the README).
+- The 0.5 presentation docs still show `scs new project --type`.
 - The exit-2 (`--strict` warnings) machine-mode test fakes the validator report. A placeholder
   `created_by` (`PROVENANCE_PLACEHOLDER`) is now a real warning-only input in bundle and
   repository mode; the test could use it.
