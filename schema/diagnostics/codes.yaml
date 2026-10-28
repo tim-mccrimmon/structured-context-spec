@@ -83,6 +83,13 @@ codes:
     severity: warning
     meaning: A derived_from entry names an intake answer or source document that is not in the workspace's
       intake.yaml (D-20); fails under --strict with exit code 2.
+  DIFF_LEGACY_BASELINE:
+    severity: info
+    meaning: The bundle has no SCS 0.7 version, so scs bundle diff compares with its pre-0.7 snapshot,
+      which records the bundle file only; SCDs in both are listed as not compared (D-41).
+  DIFF_VERSION_NOT_FOUND:
+    severity: error
+    meaning: scs bundle diff was given a --from or --to version that has no tag (D-41).
   DOMAIN_WORKSPACE_MISSING:
     severity: error
     meaning: A Domain repository has no workspace whose .scs/config bundle_type is domain, or scs new

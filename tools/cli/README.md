@@ -166,8 +166,15 @@ scs bundle add-import bundle:security
 scs bundle add-scd --help
 scs bundle remove-scd --help            # retire an SCD
 scs bundle pin --help                   # pin an import to a released version
+scs bundle diff                         # latest version -> working tree
+scs bundle diff --from 1.0.0 --to 1.1.0 --json
 scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme-health.org>"
 ```
+
+`scs bundle diff` shows what changed since the latest version (or between two versions, with
+`--from` and `--to`): SCDs, prohibitions, directives, facts, citations, and imports, across the
+bundle's whole tree. It writes nothing, and its output is deterministic, so it is the summary to
+review before `scs bundle version`.
 
 `scs bundle version` releases a bundle as the git tag `<workspace>/<bundle-name>-v<version>` on
 a commit holding the workspace, with a snapshot and a manifest. The commit's author is the
