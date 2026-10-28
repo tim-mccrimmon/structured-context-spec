@@ -51,7 +51,9 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-06 | Done: author and approver rules (D-13, D-71), D-74 ontology inheritance, `--dry-run` on `new`, `bundle pin`/`add-import`/`add-scd`/`remove-scd`, `add bundle --new` (D-68, D-75, D-76), full rollback | `0e16628` |
 | WP-07 | Done, M-07 approved 2026-10-26: `schema/intake/intake-schema.json`, `scs intake set`/`record-finding` (D-77, D-78), `derived_from` in SCD items, `DERIVED_FROM_UNRESOLVED`, intake checks per workspace | `e5da021` |
 | Housekeeping | Done 2026-10-28: `scs init` removed; `WORKSPACE_FILE_UNREADABLE` from validate and compile; unread rule-YAML severities removed; old dog-food and llm-portability bundles deleted; CLI README rewritten (`docs/migration.d/housekeeping.md`) | |
-| WP-02a, WP-08, WP-09, WP-11a, WP-13a | Unblocked, not started | |
+| WP-08 | Done 2026-10-28: `scs bundle diff` over the resolved tree (SCDs, items with changed fields, citations, imports), D-41 baselines, `DIFF_VERSION_NOT_FOUND`, `DIFF_LEGACY_BASELINE` | |
+| WP-09 | In progress 2026-10-28 | |
+| WP-02a, WP-11a, WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
 
