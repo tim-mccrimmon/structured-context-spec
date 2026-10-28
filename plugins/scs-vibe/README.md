@@ -1,5 +1,9 @@
 # SCS Vibe - Structured Context for Vibe Coders
 
+> **Deprecated (SCS 0.7).** This plugin is built on the model SCS used before 0.6 and writes
+> context directly into application repositories. It is removed in 0.8. Use the
+> [SCS Agent Skills](../../skills/README.md) instead.
+
 > Stop Claude from coding you into corners. In 15 minutes.
 
 ## The Problem

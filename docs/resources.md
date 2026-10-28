@@ -74,10 +74,8 @@ cd structured-context-spec
 # Explore the spec
 ls spec/0.3/
 
-# Try a plugin (local development)
-claude --plugin-dir plugins/scs-vibe
-# or
-claude --plugin-dir plugins/scs-team
+# Try the Agent Skills in Claude Code (see skills/README.md)
+cp -R skills/scs-* ~/.claude/skills/
 ```
 
 For detailed guides, see the [Quick Start Guide](quick-start-guide.md) and [SCD Authoring Guide](scd-guide.md).

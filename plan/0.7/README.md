@@ -57,10 +57,14 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-02b | Done 2026-10-28: `spec/0.7/agent-interface.md` (scope, layers, machine mode, intake, provenance, confirmation, diff, drafting, advisory review); `derived_from` in core-model §4.1 and the tier docs; validation rules in bundle-format §9.7-§9.9; stacks in runtime-artifact §5; trace covers every RFC 0002 section | |
 | WP-16 | Done 2026-10-28 (D-67 in 0.7): `scs stack` (read-only, machine mode, the four checks, `STACK_ARTIFACT_INVALID`); placement pages already describe layered loading (WP-09), README gains "Previewing a stack" | |
 | WP-11a | In progress 2026-10-28: `0.7.0rc0` of both packages on TestPyPI (throwaway branch `testpypi/0.7.0rc0`); `docs/install-matrix.md` has Claude Code (local, auto mode) and Claude.ai rows; Claude.ai cannot reach TestPyPI, so the release candidate goes to PyPI or as a bundled wheel; Cursor, Codex, Copilot deferred (Tim, later) | |
+| WP-10 | Built 2026-10-28, behaviour harness deferred: seven skills in `skills/` (Agent Skills format, `agentskills validate` passes), shared `scs_engine.py` (version check, install plan in D-27 order, wheel staging, `run`), `skills/sync.py`, `tests/test_skills.py`; legacy plugins marked deprecated (D-26). Not yet accepted: the D-51 harness (assertions a-k) is deferred by Tim; WP-11rc may proceed with it recorded as a gap | |
 | WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
 
+- Deferred 2026-10-28: the D-51 skill behaviour harness (WP-10 acceptance a-k). Estimated
+  $15-50 on `claude-sonnet-5-5`; needs a dedicated Anthropic API key. Until it runs, the skills'
+  RFC 0002 §6 behaviour is specified but not demonstrated.
 - Open: should `BUNDLE_SCD_UNRESOLVED` be an error? It is a warning so that ontology templates
   and reference domains (`examples/medical-device-cdmo/`) can list SCD slots not yet written;
   `scs compile` already refuses them. Making it an error fails those examples.

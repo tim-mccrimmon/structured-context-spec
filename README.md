@@ -139,17 +139,18 @@ structured-context-spec/
 ├── examples/          # Example bundles
 ├── docs/              # Guides
 ├── rfcs/              # Proposals for spec changes
-└── plugins/           # Claude Code plugins (pre-0.6; see below)
+├── skills/            # Agent Skills for operating SCS (0.7)
+└── plugins/           # Claude Code plugins (deprecated; see below)
 ```
 
 ---
 
-## Claude Code Plugins (pre-0.6)
+## Agent Skills
 
-The `scs-vibe` and `scs-team` plugins in [`plugins/`](plugins/) offered an early
-conversational path into SCS for Claude Code. They're built on the model SCS used before
-0.6.0 (concern bundles) and haven't been updated. They remain available for reference; RFC
-0002 proposes a portable replacement built on Agent Skills.
+The [SCS Agent Skills](skills/README.md) let an AI assistant build, validate, version, and
+compile a Domain repository for you, confirming each change with you first. They replace the
+`scs-vibe` and `scs-team` plugins in [`plugins/`](plugins/), which are built on the model SCS
+used before 0.6.0, are deprecated in 0.7, and are removed in 0.8.
 
 ---
 
