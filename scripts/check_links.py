@@ -5,6 +5,7 @@ External links (http, mailto) and in-page anchors are not checked. Links inside 
 ignored, and so is released history (FROZEN).
 """
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -29,6 +30,19 @@ def pages():
             yield ROOT / name
 
 
+def exists(path: Path) -> bool:
+    """Exists with this exact spelling, as on a case-sensitive file system (CI runs on Linux)."""
+    path = Path(os.path.normpath(path))
+    if not path.exists():
+        return False
+    for part in [path, *path.parents]:
+        if part.parent == part or part == ROOT.parent:
+            break
+        if part.name not in os.listdir(part.parent):
+            return False
+    return True
+
+
 def broken(page: Path):
     text = INLINE_CODE_RE.sub("", FENCE_RE.sub("", page.read_text(encoding="utf-8")))
     for target in LINK_RE.findall(text):
@@ -36,7 +50,7 @@ def broken(page: Path):
             continue
         path = target.split("#", 1)[0]
         resolved = (ROOT / path.lstrip("/")) if path.startswith("/") else (page.parent / path)
-        if not resolved.exists():
+        if not exists(resolved):
             yield target
 
 

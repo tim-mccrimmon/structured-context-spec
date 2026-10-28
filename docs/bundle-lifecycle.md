@@ -749,4 +749,4 @@ Change Management (repeat as needed)
 
 - Open an [issue](https://github.com/tim-mccrimmon/scs-spec/issues)
 - Start a [discussion](https://github.com/tim-mccrimmon/scs-spec/discussions)
-- See the [FAQ](faq.md)
+- See the [FAQ](FAQ.md)
