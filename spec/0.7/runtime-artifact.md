@@ -2,7 +2,7 @@
 
 **Version:** 0.7.0 (Draft)
 **Status:** Work in Progress
-**Last Updated:** 2026-10-25
+**Last Updated:** 2026-10-28
 
 ---
 
@@ -34,6 +34,10 @@ A runtime artifact contains three kinds of SCD content and nothing else:
 Other SCD content (summaries, rationale, architecture narratives, decisions) is context for
 the people who author and review governance; it is not compiled. An SCD with none of the
 three contributes nothing to the artifact.
+
+Within a compiled item, only its text, identifier, and (when requested) its citations are
+emitted. A compiler MUST NOT emit an item's `derived_from` (`core-model.md` §4.1), and nothing
+from the intake record, including review findings, is compiled.
 
 `content.directives` is distinct from `content.rules`, which references rule sets held by an
 external rules engine for enforcement. Directives are instructions an agent reads; rule sets
@@ -281,10 +285,10 @@ A conformant compiler, given a Domain or Project bundle:
 1. Validates the bundle tree and stops on any validation error.
 2. Resolves every import and SCD; an unresolved import or SCD is an error.
 3. Refuses `DRAFT` bundles anywhere in the tree unless drafts are allowed (§3.4).
-4. For a tree with no `DRAFT` bundles, verifies every bundle that has a version manifest
-   against its recorded content digest (bundle-format.md §7.6) and MUST refuse on a mismatch.
-   There is no override; a changed bundle needs a new version. A version manifest with no
-   content digest produces a warning that the bundle cannot be verified.
+4. Verifies every versioned bundle in the tree against its recorded content digest
+   (bundle-format.md §7.6, §7.7), including when the root is `DRAFT`, and MUST refuse on a
+   mismatch. There is no override; a changed bundle needs a new version. A version manifest
+   with no content digest produces a warning that the bundle cannot be verified.
 5. Collects prohibitions, directives, and facts in the order of §3.2 and builds identifiers
    (§2.5). Whitespace in text, including line breaks from folded YAML, is collapsed to single
    spaces.
@@ -296,12 +300,65 @@ A conformant compiler, given a Domain or Project bundle:
 
 ---
 
-## 5. Schema
+## 5. Stacks
+
+Domain and Project bundles are independent, and each compiles to its own artifact. AI clients
+often load several artifacts at once, in layers: for example, a personal Domain artifact every
+session reads, an area's Domain artifact for sessions in that area, and a Project artifact in
+the project's repository, loaded outermost first. Each artifact validates on its own; a stack
+preview shows what the layers give a session together, and where they may disagree.
+
+A **stack** is an ordered list of compiled artifacts, outermost layer first. SCS does not know
+where artifacts are placed (`overview.md` §1.1), so the user or the agent supplies the stack.
+
+### 5.1 Preview
+
+`scs stack ARTIFACT...` reads the artifacts in the order given and reports:
+
+- each layer: its `id`, `type`, `version`, and `source_digest` when present;
+- the combined context: every rule and fact of every layer, in stack order, each with its
+  identifier and the layer it came from;
+- the findings of the checks in §5.2, as diagnostics.
+
+The command:
+
+- MUST only read. It MUST NOT write, compile, or place anything. It MAY read artifacts from any
+  path, since the layers of a stack usually come from different Domain repositories.
+- MUST accept only runtime artifacts as defined in this document; any other input is an error
+  (`STACK_ARTIFACT_INVALID`).
+- MUST NOT merge, reorder, or drop rules. SCS defines no precedence between layers: a rule in
+  an inner layer does not override one in an outer layer. How a client weighs layers is the
+  client's behaviour, outside SCS.
+- MUST support machine mode (`agent-interface.md` §4). Its `changes` is always empty.
+
+### 5.2 Checks
+
+The command MUST report these checks with the codes and severities given. Under `--strict`,
+its warnings give exit code 2.
+
+| Code | Severity | Condition |
+|---|---|---|
+| `STACK_BUNDLE_REPEATED` | error | The same bundle `id` appears in two layers, for example two versions of one bundle |
+| `STACK_PROHIBITION_DIRECTED` | warning | A directive in one layer contains, ignoring case, the `subject` of a prohibition in another layer (taken from the rule text `Prohibited: <subject>.`, §2.3) |
+| `STACK_RULE_DUPLICATE` | info | Two layers carry a rule or fact with identical text, for example the meta bundle's rules in two Domain artifacts |
+| `STACK_LAYER_DRAFT` | info | A layer is a `DRAFT` artifact (`version` of the form `DRAFT+<digest>`, §3.4) |
+
+`STACK_PROHIBITION_DIRECTED` is a textual match: it finds candidates and can miss
+contradictions phrased differently. Whether two rules actually contradict is a judgment, made
+in the advisory review under the kind `layer-conflict` (`agent-interface.md` §11).
+
+Whether a client actually loads the layers of a stack, and in what order, is the client's
+behaviour. SCS does not test it; the placement guide (`docs/placement/`) SHOULD describe how
+each service loads layered context.
+
+---
+
+## 6. Schema
 
 `schema/runtime/runtime-artifact-schema.json`.
 
 ---
 
-## 6. Feedback
+## 7. Feedback
 
 Feedback on the runtime artifact should be submitted via GitHub Issues.

@@ -1,7 +1,7 @@
 # SCS 0.7.0 — Meta-Tier SCDs  
 **Version:** 0.7.0 (Draft)  
 **Status:** Work in Progress  
-**Last Updated:** 2026-10-25  
+**Last Updated:** 2026-10-28  
 
 ---
 
@@ -94,6 +94,9 @@ Every Meta-Tier SCD MUST include:
 | `content`      | Structured fields (see below)                        |
 | `relationships`| Optional references to other SCDs                    |
 | `provenance`   | Metadata about authorship, creation, and updates     |
+
+Items in `content.prohibitions`, `content.directives`, and `content.facts` MAY carry
+`derived_from` (`core-model.md` §4.1). It is never compiled.
 
 ### 4.2 Example Skeleton
 

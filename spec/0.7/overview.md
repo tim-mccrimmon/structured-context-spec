@@ -52,7 +52,7 @@ in a local Domain repository ([bundle-format.md](bundle-format.md) §8):
 | Maintain | Adding, editing, retiring, and re-scoping SCDs; adding concept bundles |
 | Validate | Schemas, rules, and integrity checks, with registered diagnostic codes |
 | Version | Pinned imports; versions recorded as git tags with an approver and a content digest |
-| Compile | The runtime artifact ([runtime-artifact.md](runtime-artifact.md)) |
+| Compile | The runtime artifact ([runtime-artifact.md](runtime-artifact.md)), and a read-only preview of a stack of artifacts loaded together (§5 there) |
 
 SCS's output ends at a validated, versioned bundle and its compiled artifact. The versioned
 bundle is the source of truth; the compiled artifact, and anything derived from it for a

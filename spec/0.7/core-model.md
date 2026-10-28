@@ -107,6 +107,28 @@ This structure ensures:
 - machine-readability
 - schema validation
 
+### 4.1 Item Provenance
+
+Items in `content.prohibitions`, `content.directives`, and `content.facts` MAY carry a
+`derived_from` list recording where the item came from. Each entry has exactly one of `intake`
+(the id of an answer in the workspace's intake record, `bundle-format.md` §8.4) or `source` (the
+id of a source document in it), plus an optional `locator` string:
+
+```yaml
+content:
+  directives:
+    - id: DC-007
+      directive: "Draft DHF changes as redlines for human review."
+      derived_from:
+        - source: doc-qm
+          locator: "section 4.2.5"
+```
+
+`derived_from` records where an individual item came from; the SCD-level `provenance` object
+records who created the SCD. `derived_from` is never compiled (`runtime-artifact.md` §2.1). An
+id that does not resolve in the workspace's intake record is a warning
+(`DERIVED_FROM_UNRESOLVED`). Agents that draft items record it (`agent-interface.md` §6).
+
 ---
 
 ## 5. SCD Tiers (Type Model)

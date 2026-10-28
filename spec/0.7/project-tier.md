@@ -1,7 +1,7 @@
 # SCS 0.7.0 — Project-Tier SCDs  
 **Version:** 0.7.0 (Draft)  
 **Status:** Work in Progress  
-**Last Updated:** 2026-10-25  
+**Last Updated:** 2026-10-28  
 
 ---
 
@@ -109,6 +109,7 @@ Project-Tier SCDs follow the general SCD structure described in the Core Model.
 |------------|-------------------------------------------------------------------------------|
 | `cites`    | Citation references to the external standards this SCD implements (e.g., `std:iso-13485:2016#7.3.9`) — `citations.md`. Carries no standard text. |
 | `concept`  | The Domain Ontology concept this SCD realizes (e.g., `concept:risk-management`) — `domain-ontology.md`, RFC-0001. Optional at the schema level, but expected for an SCD that lives in a concept bundle. |
+| `derived_from` | On items in `content.prohibitions`, `content.directives`, and `content.facts`: the intake answer or source document the item came from — `core-model.md` §4.1. Never compiled. |
 
 ---
 

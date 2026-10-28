@@ -54,6 +54,8 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-08 | Done 2026-10-28: `scs bundle diff` over the resolved tree (SCDs, items with changed fields, citations, imports), D-41 baselines, `DIFF_VERSION_NOT_FOUND`, `DIFF_LEGACY_BASELINE` | |
 | WP-09 | Done 2026-10-28, provisional: `docs/placement/` for the five D-24 services; ChatGPT Help Center claims marked unconfirmed (403 on fetch); expected to change in 0.8 | |
 | WP-02a | Done 2026-10-28: Domain repositories (bundle-format §8), version verification (§7.7-§7.8), scope (overview §1.1), terminology, governance §8-§9; `spec/0.7/rfc-0002-trace.md` (10 statements pending for `agent-interface.md` in WP-02b); new overview opening | |
+| WP-02b | Done 2026-10-28: `spec/0.7/agent-interface.md` (scope, layers, machine mode, intake, provenance, confirmation, diff, drafting, advisory review); `derived_from` in core-model §4.1 and the tier docs; validation rules in bundle-format §9.7-§9.9; stacks in runtime-artifact §5; trace covers every RFC 0002 section | |
+| WP-16 | Added 2026-10-28 (D-67 in 0.7): `scs stack`; spec text in WP-02b; not started | |
 | WP-11a, WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:

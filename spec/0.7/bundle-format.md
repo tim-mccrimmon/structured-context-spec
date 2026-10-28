@@ -577,9 +577,13 @@ resolve to a bundle of the pinned version, contributes `null`, so adding it late
 the digest. Imports are digested recursively, so the root's digest covers the whole tree.
 
 **Version manifest.** `scs bundle version` writes a version manifest beside the versioned
-bundle, named `<bundle-name>-v<version>-MANIFEST.yaml`. It MUST contain `content_digest`, and
-SHOULD contain `content_inputs`: the digest of every bundle manifest and SCD in the tree, used
-only to name what changed on a mismatch.
+bundle, named `<bundle-name>-v<version>-MANIFEST.yaml`, which validates against
+`schema/manifest/version-manifest-schema.json`. It MUST contain `content_digest`
+(`sha256:<64 hex digits>`) and `tools_version`, and SHOULD contain `content_inputs`: the digest
+of every bundle manifest and SCD in the tree, used only to name what changed on a mismatch. A
+manifest is recognized as 0.7 by its workspace-qualified tag (§8.5), not by a field value; the
+schema keeps `content_digest` and `tools_version` optional so manifests written before 0.7
+still validate, and the requirement is checked with the tags (§7.7).
 
 ```yaml
 content_digest: sha256:ec9de04bb0bb4cb2768d91ce4e9011cfaf77ebb72c614266e008f4f6e7cf9ff3
@@ -739,8 +743,9 @@ bundle); a person's other concepts are defined with them. What does not apply is
 A workspace MAY hold an **intake record**, `intake.yaml` at the workspace root
 (`domain/intake.yaml`, `projects/<name>/intake.yaml`). It records the answers that scaffolding
 and drafting were based on, the approvers, source documents, and review findings, so an intake
-can be resumed, revisited, and audited. It is not an SCD and is never compiled. It is validated
-against `schema/intake/intake-schema.json`.
+can be resumed, revisited, and audited. It is not an SCD and is never compiled. When present,
+it MUST validate against `schema/intake/intake-schema.json` (`INTAKE_SCHEMA_INVALID`). The
+engine's intake commands are its only writers (`agent-interface.md` §5.3).
 
 People in the record are identified as `Name <email>`. For a repository that will be shared
 publicly, the record MAY use role-only attribution instead, written `role:<name>` (for example
@@ -849,6 +854,36 @@ Tools MUST validate that:
   mismatch is an error in every mode
 - A version manifest with no `content_digest` is a warning
 - In a Domain repository, the three checks of §7.7 pass
+
+### 9.7 Domain Repository and Workspaces
+- A workspace's `.scs/config` `name` MUST match its workspace name (`CONFIG_NAME_MISMATCH`, §8.3)
+- Run at the root of a Domain repository, the validator SHOULD validate the Domain workspace
+  and every Project workspace, and report a repository with no workspace whose
+  `.scs/config` `bundle_type` is `domain`, or with more than one, as an error
+  (`DOMAIN_WORKSPACE_MISSING`, `DOMAIN_WORKSPACE_MULTIPLE`)
+- The validator MUST NOT report a workspace's reserved directories (`plan/`, `test-plan/`,
+  `qa/`) as errors or warnings in any mode, and MUST NOT validate their content (§8.6)
+- A bundle named `plan`, `test-plan`, or `qa` is an error (`RESERVED_BUNDLE_NAME`, §8.5)
+
+### 9.8 Provenance
+- A version manifest's `approval.approved_by` MUST be a person identifier, `Name <email>`; the
+  version manifest schema rejects empty and `role:` values
+- A placeholder `created_by` (an empty name, `developer`, or an address at `example.com`,
+  `example.org`, `example.net`, or a `.example` or `.invalid` domain) is a warning
+  (`PROVENANCE_PLACEHOLDER`), and a tool that versions a bundle MUST refuse to version over one
+  (`VERSION_PROVENANCE_PLACEHOLDER`). Any other `created_by` value passes
+- A `derived_from.intake` id MUST resolve to an `answers[].id` in the workspace's intake record,
+  and a `derived_from.source` id to a `source_documents[].id`; an unresolved id is a warning
+  (`DERIVED_FROM_UNRESOLVED`), so it fails under `--strict` with exit code 2 (`core-model.md`
+  §4.1)
+
+### 9.9 Empty SCDs
+- An SCD with no `prohibitions`, `directives`, or `facts` contributes nothing to a compiled
+  artifact. The validator MUST report it as `SCD_EMPTY` (info), so a fresh scaffold still passes
+  `--strict`
+- A tool that versions a bundle MUST list the bundle's empty SCDs in its dry run, so they are
+  removed or kept knowingly before a release
+- The 0.6 stub detection (`COMPLETENESS_STUB_SCD`) is removed
 
 Tools MAY also perform:
 - Compliance completeness checks

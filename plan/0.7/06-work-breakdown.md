@@ -47,6 +47,7 @@ graph TD
   WP06 --> WP10
   WP08[WP-08 bundle diff] --> WP10
   WP09[WP-09 Placement guide] --> WP10
+  WP16[WP-16 scs stack] --> WP10
   WP11a[WP-11a Install matrix + D-27] --> WP10
   WP10[WP-10 Skills] --> WP11rc[WP-11rc Release candidate]
   WP11rc --> WP13[WP-13 Acceptance]
@@ -68,8 +69,8 @@ WP-11rc, WP-13, WP-11. Near-critical: WP-07 to M-07 to WP-02b to WP-10.
 | 4 | WP-05, WP-03 | WP-04 (WP-03 also WP-01b) |
 | 5 | WP-14, WP-07 | WP-05 (WP-07 also WP-03) |
 | 6 | WP-06; M-07 then WP-02b | WP-14 + WP-03; WP-07 |
-| 7 | WP-08 | WP-06 |
-| 8 | WP-10 | WP-02b, WP-06, WP-08, WP-09, WP-11a, M-07 |
+| 7 | WP-08, WP-16 | WP-06; WP-02b |
+| 8 | WP-10 | WP-02b, WP-06, WP-08, WP-09, WP-11a, WP-16, M-07 |
 | 9 | WP-11rc, WP-13, WP-11, WP-15 | in sequence |
 
 ## File ownership
@@ -88,6 +89,7 @@ listed in order, and each starts after the previous one merges.
 | `commands/new.py`, `init.py`, `utils/files.py`, templates | WP-03, then WP-06 |
 | `commands/bundle.py` | WP-05 (in-process validator), then WP-14 (naming, guards, commit), then WP-06 (machine mode, pin, add/remove commands, rollback) |
 | `commands/diff.py` | WP-08 |
+| `commands/stack.py` | WP-16 |
 | `commands/intake.py`, intake schema, SCD item schemas | WP-07 |
 | `schema/runtime/`, `schema/cli/` | WP-05 |
 | `schema/diagnostics/codes.d/WP-nn.yaml` | each WP its own fragment; WP-04 owns the merge step and `codes.yaml` |
@@ -95,7 +97,7 @@ listed in order, and each starts after the previous one merges.
 | `pyproject.toml` (both) | WP-05 (mypy), then WP-11rc. WP-11a builds from a throwaway branch |
 | `spec/0.7/` | WP-02a, then WP-02b |
 | `skills/` | WP-10 |
-| `docs/placement/` | WP-09 |
+| `docs/placement/` | WP-09, then WP-16 (layered loading) |
 
 ## Work packages
 
@@ -335,8 +337,20 @@ listed in order, and each starts after the previous one merges.
   separate Domain and Project placement, and the recommendation that renderings keep the bundle
   id, version, and digest.
 
+### WP-16 `scs stack` (RFC 0002 §13, D-67)
+- **Depends**: WP-02b (spec text, `runtime-artifact.md` §5), WP-05 (machine mode).
+- `commands/stack.py`: `scs stack ARTIFACT...`, read-only, machine mode with empty `changes`;
+  inputs validated against `schema/runtime/`; layers, combined context in stack order, and the
+  four checks. Codes in `codes.d/WP-16.yaml`: `STACK_ARTIFACT_INVALID`, `STACK_BUNDLE_REPEATED`,
+  `STACK_PROHIBITION_DIRECTED`, `STACK_RULE_DUPLICATE`, `STACK_LAYER_DRAFT`. Each
+  `docs/placement/` page gains how the service loads layered context (provisional, as WP-09).
+  Migration fragment `docs/migration.d/WP-16.md`.
+- **Accept**: tests cover each check and its severity; a non-artifact input, an artifact from
+  another directory, and `--strict` (warning gives exit 2); nothing is written (filesystem
+  snapshot before and after); output order equals argument order; no rule is merged or dropped.
+
 ### WP-10 Agent Skills (ISS-051)
-- **Sections**: 2, 4. **Depends**: WP-02b, WP-06, WP-08, WP-09, WP-11a, M-07, WP-01a (D-08, D-19,
+- **Sections**: 2, 4. **Depends**: WP-02b, WP-06, WP-08, WP-09, WP-11a, WP-16, M-07, WP-01a (D-08, D-19,
   D-30, D-44, D-45, D-56), WP-01b (D-25, D-26, D-51), section 7 G (D-62, D-64, D-68).
 - Seven skills in the open Agent Skills format, under `skills/`; reuse the conversational content
   listed in `survey/spec-and-agent-interface.md`; legacy plugins marked deprecated.
