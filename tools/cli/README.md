@@ -27,19 +27,20 @@ both.
 
 ## Installation
 
-Requires Python 3.11 or later and git. The 0.7 tools are not yet on PyPI (the `scs-tools`
-package there is an old 0.1.0 release), and they still report version 0.6.0 until the release
-candidate.
-
-### From GitHub (no clone)
+Requires Python 3.11 or later and git. `scs-tools` depends on `scs-validator`, so one install
+gives both `scs` and `scs-validate`.
 
 ```bash
-pip install \
-  "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@0.7-dev#subdirectory=tools/scd-validator" \
-  "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@0.7-dev#subdirectory=tools/cli"
+pip install "scs-tools==0.7.0"
 ```
 
-Use `@v0.6.0` in place of `@0.7-dev` for the released 0.6 tools.
+Pin the version: the `scs-tools` 0.1.0 already on PyPI is an old pre-0.6 release. Until 0.7.0
+is published, the release candidate is on TestPyPI:
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ \
+  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc1"
+```
 
 ### From source
 
@@ -56,12 +57,19 @@ For development, `pip install -e "tools/scd-validator[dev]" -e tools/cli pytest 
 ```bash
 scs new domain acme-health --author "Jane Doe" --email jane@acme-health.org
 cd acme-health-context
-scs new project patient-portal
+scs new project patient-portal --author "Jane Doe" --email jane@acme-health.org
 
 # Edit the SCDs under domain/context/ and projects/patient-portal/context/, then:
 scs-validate --strict
 
 cd domain
+scs compile bundles/domain-bundle.yaml --allow-draft      # preview
+
+# Release: version each concept bundle, pin it, then version the Domain bundle
+scs bundle version --bundle bundles/concepts/security.yaml --version 1.0.0 \
+    --approved-by "Jane Doe <jane@acme-health.org>"
+scs bundle pin security --version 1.0.0
+# ...the same for every other imported concept bundle, then:
 scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme-health.org>"
 scs compile bundles/domain-bundle.yaml --version 1.0.0
 ```

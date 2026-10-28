@@ -27,9 +27,9 @@ Welcome to the Structured Context Specification (SCS) documentation. This direct
 ## Reference Materials
 
 ### Specification
-- **[Normative Specification](../spec/0.3/)** - The complete SCS specification
+- **[Normative Specification](../spec/0.7/)** - The complete SCS specification
   - [Overview](../spec/0.3/overview.md) - High-level introduction
-  - [Core Model](../spec/0.3/core-model.md) - Data structures and relationships
+  - [Core Model](../spec/0.7/core-model.md) - Data structures and relationships
   - [Meta Tier](../spec/0.3/meta-tier.md) - Semantic foundation
   - [Project Tier](../spec/0.3/project-tier.md) - Project-specific context
   - [Standards Tier](../spec/0.3/standards-tier.md) - External obligations
@@ -42,8 +42,7 @@ Welcome to the Structured Context Specification (SCS) documentation. This direct
 - **[YAML Templates](../templates/)** - Ready-to-use SCD and bundle templates
 
 ### Examples
-- **[Domain Documentation Examples](domain-docs/)** - Real-world implementations
-  - [Med Adherence Project](domain-docs/med-adherence-examples/)
+- **[Examples](../examples/)** - Reference domains
 
 ---
 
@@ -58,13 +57,12 @@ Welcome to the Structured Context Specification (SCS) documentation. This direct
 ## Project Resources
 
 ### Governance & Contributing
-- **[GOVERNANCE.md](../GOVERNANCE.md)** - Governance model and RFC process
+- **[RFC process](../rfcs/README.md)** - How spec changes are proposed and decided
 - **[CONTRIBUTING.md](../CONTRIBUTING.md)** - How to contribute
 - **[CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md)** - Community standards
 
 ### License
-- **[LICENSE.md](../LICENSE.md)** - Apache 2.0 license terms
-- **[NOTICE.md](../NOTICE.md)** - Attribution and notices
+- **[LICENSE](../LICENSE)** - Apache 2.0 license terms
 
 ---
 
@@ -85,21 +83,21 @@ Welcome to the Structured Context Specification (SCS) documentation. This direct
 → Read [Validation Guide](validation-guide.md), then use the [SCD Validator](../tools/scd-validator/)
 
 **"I want to see examples"**
-→ Browse [domain-docs/](domain-docs/)
+→ Browse [examples/](../examples/)
 
 **"I'm building tools that use SCS"**
-→ Study the [JSON Schemas](../schema/) and [Core Model](../spec/0.3/core-model.md)
+→ Study the [JSON Schemas](../schema/) and [Core Model](../spec/0.7/core-model.md)
 
 **"I want to understand the specification formally"**
-→ Read the [Normative Specification](../spec/0.3/)
+→ Read the [Normative Specification](../spec/0.7/)
 
 ---
 
 ## Version
 
-This documentation corresponds to **SCS v0.5.0**.
+This documentation corresponds to **SCS v0.7.0**.
 
-For information about changes between versions, see the project [CHANGELOG](../CHANGELOG.md) (when available).
+For changes between versions, see the migration guides in this directory, starting with [MIGRATION-0.7.0.md](MIGRATION-0.7.0.md).
 
 ---
 

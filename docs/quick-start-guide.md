@@ -433,4 +433,3 @@ Version **0.3**
 Created: 2025-12-09
 Updated: 2025-12-09
 
-**Next:** Try the [Reference Implementation Guide](./reference-implementation-guide-v0.3.md) for a complete, production-ready example.

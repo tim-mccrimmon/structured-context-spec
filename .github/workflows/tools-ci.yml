@@ -12,6 +12,7 @@ on:
       - "schema/**"
       - "meta/**"
       - "examples/**"
+      - "skills/**"
       - ".github/workflows/tools-ci.yml"
   pull_request:
     paths:
@@ -19,6 +20,7 @@ on:
       - "schema/**"
       - "meta/**"
       - "examples/**"
+      - "skills/**"
       - ".github/workflows/tools-ci.yml"
 
 jobs:

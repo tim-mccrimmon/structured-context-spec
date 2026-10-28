@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scs-validator"
-version = "0.6.0"
+version = "0.7.0rc1"
 description = "Validator for Structured Context Specification (SCS) documents and bundles"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -49,9 +49,9 @@ dev = [
 scs-validate = "scs_validator.commands.validate:validate"
 
 [project.urls]
-Homepage = "https://github.com/tim-mccrimmon/scs-spec"
-Repository = "https://github.com/tim-mccrimmon/scs-spec"
-Issues = "https://github.com/tim-mccrimmon/scs-spec/issues"
+Homepage = "https://github.com/tim-mccrimmon/structured-context-spec"
+Repository = "https://github.com/tim-mccrimmon/structured-context-spec"
+Issues = "https://github.com/tim-mccrimmon/structured-context-spec/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -2,7 +2,6 @@
 
 ## How It Works
 
-![Create, Validate, Version Structured Context](../images/scs-create-validate-version.png)
 
 SCS follows a three-stage workflow: **Create, Validate, Version.**
 

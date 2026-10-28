@@ -58,6 +58,7 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-16 | Done 2026-10-28 (D-67 in 0.7): `scs stack` (read-only, machine mode, the four checks, `STACK_ARTIFACT_INVALID`); placement pages already describe layered loading (WP-09), README gains "Previewing a stack" | |
 | WP-11a | In progress 2026-10-28: `0.7.0rc0` of both packages on TestPyPI (throwaway branch `testpypi/0.7.0rc0`); `docs/install-matrix.md` has Claude Code (local, auto mode) and Claude.ai rows; Claude.ai cannot reach TestPyPI, so the release candidate goes to PyPI or as a bundled wheel; Cursor, Codex, Copilot deferred (Tim, later) | |
 | WP-10 | Built 2026-10-28, behaviour harness deferred: seven skills in `skills/` (Agent Skills format, `agentskills validate` passes), shared `scs_engine.py` (version check, install plan in D-27 order, wheel staging, `run`), `skills/sync.py`, `tests/test_skills.py`; legacy plugins marked deprecated (D-26). Not yet accepted: the D-51 harness (assertions a-k) is deferred by Tim; WP-11rc may proceed with it recorded as a gap | |
+| WP-11rc | In progress 2026-10-28 (D-79: TestPyPI, not PyPI): both packages at `0.7.0rc1`, validator pinned `>=0.7.0rc1,<0.8`, stale `tools/cli/setup.py` removed, validator URLs fixed; `publish.yml` (manual, trusted publishing), `docs-ci.yml` (links, migration guide, skill copies); `docs/MIGRATION-0.7.0.md` assembled by `scripts/assemble_migration.py`; `RELEASE-NOTES-0.7.0.md`; READMEs install `scs-tools==0.7.0`; `skills/package.py` builds skill ZIPs with bundled wheels. rc1 on TestPyPI 2026-10-28 and installs with the documented command. Open: re-run the Claude rows | |
 | WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
@@ -69,7 +70,7 @@ Known gaps carried forward:
   and reference domains (`examples/medical-device-cdmo/`) can list SCD slots not yet written;
   `scs compile` already refuses them. Making it an error fails those examples.
 - The generated CI workflow installs `scs-validator>=0.7.0,<0.8` from PyPI; that works once
-  0.7.0 is published (D-27, WP-11rc). The packages still report version 0.6.0.
+  0.7.0 is published to PyPI (D-27, D-79); rc-generated repositories fail that CI step until then.
 - The 0.5 presentation docs still show `scs new project --type`.
 - The exit-2 (`--strict` warnings) machine-mode test fakes the validator report. A placeholder
   `created_by` (`PROVENANCE_PLACEHOLDER`) is now a real warning-only input in bundle and

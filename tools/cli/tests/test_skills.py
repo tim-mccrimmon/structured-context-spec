@@ -10,6 +10,7 @@ import re
 import shlex
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -170,3 +171,34 @@ def test_install_plan_installs_nothing_and_pins_the_version(capsys):
 def test_run_refuses_anything_but_the_engine(capsys):
     assert engine().run(["rm", "-rf", "/"]) == 3
     assert json.loads(capsys.readouterr().out)["ok"] is False
+
+
+def test_package_builds_one_zip_per_skill_with_bundled_wheels(tmp_path: Path):
+    wheels = tmp_path / "wheels"
+    wheels.mkdir()
+    for name in ("scs_tools-0.7.0rc1-py3-none-any.whl", "scs_validator-0.7.0rc1-py3-none-any.whl"):
+        (wheels / name).write_bytes(b"wheel")
+    out = tmp_path / "out"
+    result = subprocess.run(
+        [sys.executable, str(SKILLS / "package.py"), "--out", str(out), "--wheels", str(wheels)],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert sorted(p.stem for p in out.glob("*.zip")) == NAMES
+    with zipfile.ZipFile(out / "scs-intake.zip") as archive:
+        names = set(archive.namelist())
+    assert "scs-intake/SKILL.md" in names
+    assert "scs-intake/assets/wheels/scs_tools-0.7.0rc1-py3-none-any.whl" in names
+    assert all(n.startswith("scs-intake/") for n in names)
+
+
+def test_package_refuses_an_incomplete_wheel_set(tmp_path: Path):
+    (tmp_path / "scs_tools-0.7.0rc1-py3-none-any.whl").write_bytes(b"wheel")
+    result = subprocess.run(
+        [sys.executable, str(SKILLS / "package.py"), "--out", str(tmp_path / "o")]
+        + ["--wheels", str(tmp_path)],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode != 0

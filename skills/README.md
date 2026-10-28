@@ -25,8 +25,10 @@ Checked 2026-10-28 against [Claude Code: skills](https://code.claude.com/docs/en
 
 - **Claude Code:** copy each skill directory to `~/.claude/skills/<skill-name>/` (all your work)
   or to `.claude/skills/<skill-name>/` in the Domain repository.
-- **Claude (claude.ai):** zip each skill directory and upload it under **Customize > Skills**
-  (**+**, **Create skill**, **Upload a skill**). Code execution must be on. On Team and
+- **Claude (claude.ai):** upload each skill as a ZIP under **Customize > Skills**
+  (**+**, **Create skill**, **Upload a skill**). `python skills/package.py --out <dir>` builds
+  the ZIPs; add `--wheels <dir>` to bundle the scs-tools and scs-validator wheels, since
+  Claude's sandbox may not reach the package index you need. Code execution must be on. On Team and
   Enterprise plans an owner enables code execution and skills, and can upload skills for the
   whole organization.
 

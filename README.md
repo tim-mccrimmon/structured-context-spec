@@ -65,29 +65,31 @@ what form you render it into, is up to you.
 ## Quick Start
 
 ```bash
-# Python 3.11 or later. Installs the 0.6.0 tools from GitHub (not yet published to PyPI).
-pip install \
-  "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/scd-validator" \
-  "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/cli"
+# Python 3.11 or later, and git
+pip install "scs-tools==0.7.0"          # installs scs and scs-validate
 
-scs new domain my-org --ontology sdlc     # organization-wide (or personal) context
-cd my-org
-scs bundle validate
-scs compile bundles/domain-bundle.yaml --allow-draft -o global.yaml
+scs new domain acme-health --author "Jane Doe" --email jane@acme-health.org
+cd acme-health-context
+scs new project patient-portal --author "Jane Doe" --email jane@acme-health.org
+scs-validate --strict
+
+# Fill in the SCDs under domain/context/, then preview the compiled context
+cd domain
+scs compile bundles/domain-bundle.yaml --allow-draft
 ```
 
-Fill in the scaffolded SCDs, validate until it's clean, then version it with a named approver
-(`scs bundle version --version 1.0.0 --approved-by you@example.com`) and compile without
-`--allow-draft`. `scs new project my-app` does the same for a Project.
+Until 0.7.0 is on PyPI, the release candidate is on TestPyPI; see
+[RELEASE-NOTES-0.7.0.md](RELEASE-NOTES-0.7.0.md#testing-the-release-candidate). Don't install an
+unpinned `scs-tools` from PyPI: the package there is an old 0.1.0 release.
 
-- [Quick start guide](docs/quick-start-guide.md)
-- [Bundle lifecycle](docs/bundle-lifecycle.md)
+To release a version, version each concept bundle you use, pin it in the Domain bundle, then
+version the Domain bundle, each with a named approver (`--approved-by "Name <email>"`). The
+[CLI documentation](tools/cli/README.md) walks through it, and the
+[Agent Skills](skills/README.md) let an assistant do it with you.
+
 - [CLI documentation](tools/cli/README.md)
-- [Migrating to 0.6.0](docs/MIGRATION-0.6.0.md)
-
-The `scs-tools` package on PyPI is an old 0.1.0 release; don't use it. Publishing 0.7.0 to PyPI
-is planned (see [ROADMAP.md](ROADMAP.md)). Known issues in the 0.6.0 tooling are tracked in
-[ISSUES.md](ISSUES.md).
+- [Migrating to 0.7.0](docs/MIGRATION-0.7.0.md)
+- [Known issues](ISSUES.md)
 
 ---
 

@@ -1,0 +1,69 @@
+name: publish
+
+# Builds scs-validator and scs-tools, smoke-tests the wheels, and uploads both to TestPyPI or
+# PyPI. Run by hand only (Actions > publish > Run workflow). Uses trusted publishing: each index
+# needs a trusted publisher for both projects (this repository, workflow `publish.yml`, and the
+# environment named below), so no token is stored in the repository. WP-11rc.
+
+on:
+  workflow_dispatch:
+    inputs:
+      index:
+        description: "Where to upload"
+        type: choice
+        options: [testpypi, pypi]
+        default: testpypi
+
+jobs:
+  build:
+    name: build and smoke-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build both packages
+        run: |
+          pip install build
+          python -m build --outdir dist tools/scd-validator
+          python -m build --outdir dist tools/cli
+      - name: The two packages carry one version
+        run: |
+          ls dist
+          test "$(ls dist/*.whl | sed -E 's/.*-([^-]+)-py3-none-any\.whl/\1/' | sort -u | wc -l)" -eq 1
+      - name: Install the wheels in a clean environment and check the version
+        run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/pip install dist/*.whl
+          version="$(ls dist/scs_tools-*.whl | sed -E 's/.*scs_tools-([^-]+)-.*/\1/')"
+          /tmp/smoke/bin/scs --version | grep -F "$version"
+          /tmp/smoke/bin/scs-validate --version | grep -F "$version"
+          cd "$(mktemp -d)"
+          /tmp/smoke/bin/scs new domain smoke --author CI --email ci@structuredcontext.dev --no-interactive
+          cd smoke-context && /tmp/smoke/bin/scs-validate --strict
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  upload:
+    name: upload to ${{ inputs.index }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.index }}
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Upload to TestPyPI
+        if: inputs.index == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+      - name: Upload to PyPI
+        if: inputs.index == 'pypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
