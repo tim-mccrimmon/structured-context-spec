@@ -56,7 +56,7 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-02a | Done 2026-10-28: Domain repositories (bundle-format §8), version verification (§7.7-§7.8), scope (overview §1.1), terminology, governance §8-§9; `spec/0.7/rfc-0002-trace.md` (10 statements pending for `agent-interface.md` in WP-02b); new overview opening | |
 | WP-02b | Done 2026-10-28: `spec/0.7/agent-interface.md` (scope, layers, machine mode, intake, provenance, confirmation, diff, drafting, advisory review); `derived_from` in core-model §4.1 and the tier docs; validation rules in bundle-format §9.7-§9.9; stacks in runtime-artifact §5; trace covers every RFC 0002 section | |
 | WP-16 | Done 2026-10-28 (D-67 in 0.7): `scs stack` (read-only, machine mode, the four checks, `STACK_ARTIFACT_INVALID`); placement pages already describe layered loading (WP-09), README gains "Previewing a stack" | |
-| WP-11a | In progress 2026-10-28: `0.7.0rc0` of both packages on TestPyPI (throwaway branch `testpypi/0.7.0rc0`); `docs/install-matrix.md` has the Claude Code row; Claude.ai, Cursor, Codex, Copilot rows need Tim | |
+| WP-11a | In progress 2026-10-28: `0.7.0rc0` of both packages on TestPyPI (throwaway branch `testpypi/0.7.0rc0`); `docs/install-matrix.md` has Claude Code (local, auto mode) and Claude.ai rows; Claude.ai cannot reach TestPyPI, so the release candidate goes to PyPI or as a bundled wheel; Cursor, Codex, Copilot deferred (Tim, later) | |
 | WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
