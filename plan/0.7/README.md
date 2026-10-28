@@ -53,7 +53,8 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | Housekeeping | Done 2026-10-28: `scs init` removed; `WORKSPACE_FILE_UNREADABLE` from validate and compile; unread rule-YAML severities removed; old dog-food and llm-portability bundles deleted; CLI README rewritten (`docs/migration.d/housekeeping.md`) | |
 | WP-08 | Done 2026-10-28: `scs bundle diff` over the resolved tree (SCDs, items with changed fields, citations, imports), D-41 baselines, `DIFF_VERSION_NOT_FOUND`, `DIFF_LEGACY_BASELINE` | |
 | WP-09 | Done 2026-10-28, provisional: `docs/placement/` for the five D-24 services; ChatGPT Help Center claims marked unconfirmed (403 on fetch); expected to change in 0.8 | |
-| WP-02a, WP-11a, WP-13a | Unblocked, not started | |
+| WP-02a | Done 2026-10-28: Domain repositories (bundle-format §8), version verification (§7.7-§7.8), scope (overview §1.1), terminology, governance §8-§9; `spec/0.7/rfc-0002-trace.md` (10 statements pending for `agent-interface.md` in WP-02b); new overview opening | |
+| WP-11a, WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
 
