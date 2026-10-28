@@ -52,7 +52,7 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-07 | Done, M-07 approved 2026-10-26: `schema/intake/intake-schema.json`, `scs intake set`/`record-finding` (D-77, D-78), `derived_from` in SCD items, `DERIVED_FROM_UNRESOLVED`, intake checks per workspace | `e5da021` |
 | Housekeeping | Done 2026-10-28: `scs init` removed; `WORKSPACE_FILE_UNREADABLE` from validate and compile; unread rule-YAML severities removed; old dog-food and llm-portability bundles deleted; CLI README rewritten (`docs/migration.d/housekeeping.md`) | |
 | WP-08 | Done 2026-10-28: `scs bundle diff` over the resolved tree (SCDs, items with changed fields, citations, imports), D-41 baselines, `DIFF_VERSION_NOT_FOUND`, `DIFF_LEGACY_BASELINE` | |
-| WP-09 | In progress 2026-10-28 | |
+| WP-09 | Done 2026-10-28, provisional: `docs/placement/` for the five D-24 services; ChatGPT Help Center claims marked unconfirmed (403 on fetch); expected to change in 0.8 | |
 | WP-02a, WP-11a, WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
