@@ -3,15 +3,27 @@ Bundle command - manage SCS bundles
 """
 
 from pathlib import Path
+from typing import Optional, Tuple
 
 import click
 import yaml
+from scs_validator.envelope import relative
+from scs_validator.intake import normalize
+from scs_validator.names import is_snapshot
 
 from scs_tools import maintain
-from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
+from scs_tools.machine import (
+    EXIT_FILE,
+    EXIT_USAGE,
+    CommandError,
+    Envelope,
+    Output,
+    machine_command,
+)
 from scs_tools.utils.files import get_template_path
 from scs_tools.utils.project_types import ONTOLOGY_MODELS
 from scs_tools.versioning import version_bundle
+from scs_tools.workspace import find_workspace, repository_root, select_workspace
 
 
 @click.group()
@@ -44,6 +56,26 @@ def _root_bundle(base_path: Path) -> Path:
     return found[0]
 
 
+def _base(workspace: Optional[str]) -> Tuple[Path, Optional[Path], Path]:
+    """The directory list and info read from, the workspace it is in, and the path base."""
+    if workspace:
+        base = select_workspace(workspace)
+        return base, base, repository_root(base) or base
+    cwd = Path.cwd()
+    found = find_workspace(cwd.resolve())
+    return cwd, found, (repository_root(found) or found) if found else cwd
+
+
+def _read(path: Path, shown: str) -> dict:
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (yaml.YAMLError, OSError, UnicodeDecodeError) as e:
+        raise CommandError(
+            "FILE_UNREADABLE", f"{shown} could not be read: {e}", exit_code=EXIT_FILE, path=shown
+        )
+    return normalize(data) if isinstance(data, dict) else {}
+
+
 @bundle.command()
 @click.option(
     "--available",
@@ -51,7 +83,13 @@ def _root_bundle(base_path: Path) -> Path:
     is_flag=True,
     help="List all available bundle templates",
 )
-def list(available):
+@click.option(
+    "--workspace",
+    default=None,
+    help="Workspace: domain or a Project name (default: the current directory)",
+)
+@machine_command("bundle list")
+def list(envelope: Envelope, out: Output, available: bool, workspace: Optional[str]) -> None:
     """
     List bundles in the current project or available templates
 
@@ -59,62 +97,94 @@ def list(available):
     Examples:
         scs bundle list           # List bundles in current project
         scs bundle list --available  # List all available templates
+        scs bundle list --workspace domain --json
     """
     if available:
+        envelope.result = {
+            "available": {
+                model: [*model_config["concepts"]]
+                for model, model_config in ONTOLOGY_MODELS.items()
+            }
+        }
         for model, model_config in ONTOLOGY_MODELS.items():
-            click.echo(f"Available concept bundles - ontology model '{model}':\n")
+            out.echo(f"Available concept bundles - ontology model '{model}':\n")
             for concept_name in model_config["concepts"]:
-                click.echo(f"  • {concept_name}")
+                out.echo(f"  • {concept_name}")
             if not model_config["concepts"]:
-                click.echo("  (none shipped: concepts are defined with the user)")
-            click.echo()
+                out.echo("  (none shipped: concepts are defined with the user)")
+            out.echo()
 
-        click.echo("Domain bundles: create one with 'scs new domain <name> [--ontology ...]'.")
+        out.echo("Domain bundles: create one with 'scs new domain <name> [--ontology ...]'.")
         return
 
-    # List bundles in current project
-    base_path = Path.cwd()
+    base_path, _, root = _base(workspace)
     bundles_dir = base_path / "bundles"
 
     if not bundles_dir.exists():
-        click.echo(
-            "Error: No bundles directory found. Not an SCS project?\n"
-            "Run 'scs new domain' to create one or 'scs bundle list --available' to see templates.",
-            err=True,
+        raise CommandError(
+            "WORKSPACE_NOT_FOUND",
+            "No bundles directory found. Not an SCS project? Run 'scs new domain' to create "
+            "one or 'scs bundle list --available' to see templates.",
         )
-        raise click.Abort()
 
-    click.echo("Root bundle:\n")
+    found = []
+    out.echo("Root bundle:\n")
 
     for bundle_file in ROOT_BUNDLE_FILES:
         bundle_path = bundles_dir / bundle_file
         if bundle_path.exists():
-            with open(bundle_path, "r") as f:
-                data = yaml.safe_load(f)
-                bundle_id = data.get("id", "unknown")
-                bundle_type = data.get("type", "unknown")
-                version = data.get("version", "unknown")
-                click.echo(f"  • {bundle_file}")
-                click.echo(f"    ID: {bundle_id}")
-                click.echo(f"    Type: {bundle_type}")
-                click.echo(f"    Version: {version}\n")
+            shown = relative(bundle_path, root)
+            data = _read(bundle_path, shown)
+            entry = {
+                "path": shown,
+                "kind": "root",
+                "id": data.get("id"),
+                "type": data.get("type"),
+                "version": data.get("version"),
+            }
+            found.append(entry)
+            out.echo(f"  • {bundle_file}")
+            out.echo(f"    ID: {data.get('id', 'unknown')}")
+            out.echo(f"    Type: {data.get('type', 'unknown')}")
+            out.echo(f"    Version: {data.get('version', 'unknown')}\n")
 
     # Check for concept bundles
     concepts_dir = bundles_dir / "concepts"
     if concepts_dir.exists():
-        click.echo("Concept bundles:\n")
-        for bundle_file in sorted(concepts_dir.glob("*.yaml")):
-            with open(bundle_file, "r") as f:
-                data = yaml.safe_load(f) or {}
-            click.echo(f"  • {bundle_file.name}")
-            click.echo(f"    ID: {data.get('id', 'unknown')}")
-            click.echo(f"    Version: {data.get('version', 'unknown')}")
-            click.echo(f"    SCDs: {len(data.get('scds') or [])}\n")
+        out.echo("Concept bundles:\n")
+        for concept_file in sorted(concepts_dir.glob("*.yaml")):
+            if is_snapshot(concept_file) or concept_file.name.endswith("-MANIFEST.yaml"):
+                continue
+            shown = relative(concept_file, root)
+            data = _read(concept_file, shown)
+            scds = data.get("scds") or []
+            found.append(
+                {
+                    "path": shown,
+                    "kind": "concept",
+                    "id": data.get("id"),
+                    "type": data.get("type"),
+                    "version": data.get("version"),
+                    "scds": len(scds),
+                }
+            )
+            out.echo(f"  • {concept_file.name}")
+            out.echo(f"    ID: {data.get('id', 'unknown')}")
+            out.echo(f"    Version: {data.get('version', 'unknown')}")
+            out.echo(f"    SCDs: {len(scds)}\n")
+
+    envelope.result = {"bundles": found}
 
 
 @bundle.command()
 @click.argument("bundle_name")
-def info(bundle_name):
+@click.option(
+    "--workspace",
+    default=None,
+    help="Workspace: domain or a Project name (default: the current directory)",
+)
+@machine_command("bundle info")
+def info(envelope: Envelope, out: Output, bundle_name: str, workspace: Optional[str]) -> None:
     """
     Show detailed information about a bundle
 
@@ -125,9 +195,9 @@ def info(bundle_name):
     Examples:
         scs bundle info architecture         # Show architecture bundle details
         scs bundle info security             # Show security bundle details
-        scs bundle info compliance-governance # Show compliance details
+        scs bundle info security --json      # The whole bundle, in the envelope's result
     """
-    base_path = Path.cwd()
+    base_path, _, root = _base(workspace)
 
     # Try to find bundle in project first
     bundle_locations = [
@@ -141,6 +211,7 @@ def info(bundle_name):
             bundle_path = loc
             break
 
+    source = "workspace"
     # If not found in project, check the concept bundle templates - prefer the current
     # workspace's own ontology model (if any), then fall back to searching every model.
     if not bundle_path:
@@ -157,58 +228,60 @@ def info(bundle_name):
                 break
         if template_path:
             bundle_path = template_path
-            click.echo("(Showing template bundle, not in current project)\n")
+            source = "template"
+            out.echo("(Showing template bundle, not in current project)\n")
         else:
-            click.echo(
-                f"Error: Bundle '{bundle_name}' not found in project or templates.",
-                err=True,
+            raise CommandError(
+                "BUNDLE_NOT_FOUND", f"Bundle '{bundle_name}' not found in project or templates."
             )
-            raise click.Abort()
 
     # Load and display bundle info
-    with open(bundle_path, "r") as f:
-        data = yaml.safe_load(f)
+    shown = bundle_name if source == "template" else relative(bundle_path, root)
+    data = _read(bundle_path, shown)
+    envelope.result = {"source": source, "bundle": data}
+    if source == "workspace":
+        envelope.result["path"] = shown
 
-    click.echo(f"Bundle: {bundle_name}\n")
-    click.echo(f"ID: {data.get('id', 'N/A')}")
-    click.echo(f"Type: {data.get('type', 'N/A')}")
-    click.echo(f"Version: {data.get('version', 'N/A')}")
-    click.echo(f"Title: {data.get('title', 'N/A')}")
-    click.echo(f"Description: {data.get('description', 'N/A')}")
+    out.echo(f"Bundle: {bundle_name}\n")
+    out.echo(f"ID: {data.get('id', 'N/A')}")
+    out.echo(f"Type: {data.get('type', 'N/A')}")
+    out.echo(f"Version: {data.get('version', 'N/A')}")
+    out.echo(f"Title: {data.get('title', 'N/A')}")
+    out.echo(f"Description: {data.get('description', 'N/A')}")
 
     if "domain" in data:
-        click.echo(f"Domain: {data['domain']}")
+        out.echo(f"Domain: {data['domain']}")
 
     if "concerns" in data:
-        click.echo("\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
+        out.echo("\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
         for concern in data["concerns"]:
-            click.echo(f"  • {concern}")
+            out.echo(f"  • {concern}")
 
     if "ontology" in data:
         concepts = data["ontology"].get("concepts", [])
-        click.echo(f"\nOntology concepts ({len(concepts)}):")
+        out.echo(f"\nOntology concepts ({len(concepts)}):")
         for concept in concepts:
-            click.echo(f"  • {concept.get('id', 'unknown')}")
+            out.echo(f"  • {concept.get('id', 'unknown')}")
 
     if "scds" in data:
         scds = data["scds"]
-        click.echo(f"\nSCDs ({len(scds)}):")
+        out.echo(f"\nSCDs ({len(scds)}):")
         for scd in scds:
-            click.echo(f"  • {scd}")
+            out.echo(f"  • {scd}")
 
     if "imports" in data:
         imports = data["imports"]
-        click.echo(f"\nImports ({len(imports)}):")
+        out.echo(f"\nImports ({len(imports)}):")
         for imp in imports:
-            click.echo(f"  • {imp}")
+            out.echo(f"  • {imp}")
 
     if "provenance" in data:
         prov = data["provenance"]
-        click.echo("\nProvenance:")
-        click.echo(f"  Created by: {prov.get('created_by', 'N/A')}")
-        click.echo(f"  Created at: {prov.get('created_at', 'N/A')}")
+        out.echo("\nProvenance:")
+        out.echo(f"  Created by: {prov.get('created_by', 'N/A')}")
+        out.echo(f"  Created at: {prov.get('created_at', 'N/A')}")
         if "rationale" in prov:
-            click.echo(f"  Rationale: {prov['rationale']}")
+            out.echo(f"  Rationale: {prov['rationale']}")
 
 
 @bundle.command()

@@ -16,3 +16,9 @@
   warn: completeness rules, the bundle `xor_constraint`, and the ontology `concern_residue` and
   `concept_bundle_agreement`. The unused `validation_modes` and `scd_uniqueness` blocks are
   gone. No finding changes severity.
+- **`scs bundle list` and `scs bundle info` have `--json` and `--workspace`.** Under `--json`,
+  `list` returns the root and concept bundles (path, kind, id, type, version, and SCD count for
+  concepts), or the available templates by ontology with `--available`; `info` returns the whole
+  bundle and whether it came from the workspace or a template. `info` on an unknown name is
+  `BUNDLE_NOT_FOUND`. `list` no longer shows versioned snapshots and manifests in
+  `bundles/concepts/` as concept bundles.

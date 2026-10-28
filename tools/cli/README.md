@@ -10,8 +10,9 @@ context in a Domain repository.
 - **Validate** SCDs, bundles, and whole repositories
 - **Compile** a Domain or Project bundle into a deterministic runtime artifact
 
-Every command that changes files has `--dry-run` and `--json` (machine mode), so an agent or a
-script can drive the tools and read back exactly what changed.
+Every command that changes files has `--dry-run` and `--json` (machine mode), and the commands
+that read (`bundle list`, `bundle info`, `bundle diff`, `validate`) have `--json`, so an agent or
+a script can drive the tools and read back exactly what changed.
 
 ## Packages
 
@@ -160,7 +161,7 @@ findings. It is not an SCD and is never compiled.
 
 ```bash
 scs bundle list                         # bundles in the workspace
-scs bundle info security
+scs bundle info security --json         # the whole bundle, as a JSON envelope
 scs bundle validate                     # the root bundle and everything it imports
 scs bundle add-import bundle:security
 scs bundle add-scd --help

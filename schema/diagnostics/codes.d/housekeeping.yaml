@@ -5,3 +5,6 @@ codes:
   WORKSPACE_FILE_UNREADABLE:
     severity: warning
     meaning: A YAML file in the workspace could not be read or parsed and was skipped, so any SCD or bundle in it is not seen; fix it or delete it.
+  BUNDLE_NOT_FOUND:
+    severity: error
+    meaning: scs bundle info names a bundle that is neither in the workspace nor a concept bundle template.

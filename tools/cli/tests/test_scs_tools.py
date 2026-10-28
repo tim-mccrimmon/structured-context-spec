@@ -6,6 +6,7 @@ validate pass-through (ISS-026) and bundle versioning (ISS-005b, ISS-027).
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -334,7 +335,6 @@ def test_concept_bundles_at_the_same_version_get_their_own_manifests_and_tags(
 def test_the_approver_is_never_taken_from_git_config(tmp_path: Path, monkeypatch):
     """D-13: without --approved-by, every mode refuses; git's identity is only a suggestion,
     and with an approver given, git's email reaches no manifest."""
-    import json
 
     project = scaffold(tmp_path)
     gitconfig = tmp_path / "gitconfig"
@@ -524,6 +524,70 @@ def test_bundle_info_falls_back_to_the_template_outside_a_project(tmp_path: Path
     result = CliRunner().invoke(cli, ["bundle", "info", "security"])
     assert result.exit_code == 0, result.output
     assert "template bundle" in result.output.lower()
+
+
+def test_bundle_list_json_lists_root_and_concepts(healthcare_project: Path, monkeypatch):
+    monkeypatch.chdir(healthcare_project)
+    result = CliRunner().invoke(cli, ["bundle", "list", "--json"])
+    assert result.exit_code == 0, result.output
+    data = json.loads(result.stdout)
+    assert data["ok"] and data["command"] == "bundle list" and data["changes"] == []
+    bundles = data["result"]["bundles"]
+    assert (
+        bundles[0]["kind"] == "root"
+        and bundles[0]["path"] == "projects/demo/bundles/project-bundle.yaml"
+    )
+    concepts = {b["id"] for b in bundles if b["kind"] == "concept"}
+    assert concepts == {f"bundle:{c}" for c in CONCEPTS}
+
+
+def test_bundle_list_json_by_workspace_from_the_repository_root(
+    healthcare_project: Path, monkeypatch
+):
+    monkeypatch.chdir(healthcare_project.parent.parent)
+    result = CliRunner().invoke(cli, ["bundle", "list", "--workspace", "demo", "--json"])
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.stdout)["result"]["bundles"][0]["kind"] == "root"
+
+
+def test_bundle_list_json_outside_a_workspace_is_one_envelope(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["bundle", "list", "--json"])
+    assert result.exit_code == 1
+    [diagnostic] = json.loads(result.stdout)["diagnostics"]
+    assert diagnostic["code"] == "WORKSPACE_NOT_FOUND"
+
+
+def test_bundle_list_available_json(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["bundle", "list", "--available", "--json"])
+    assert result.exit_code == 0, result.output
+    available = json.loads(result.stdout)["result"]["available"]
+    assert "security" in available["sdlc"] and "governance" in available["mca"]
+
+
+def test_bundle_info_json_returns_the_bundle(healthcare_project: Path, monkeypatch):
+    monkeypatch.chdir(healthcare_project)
+    result = CliRunner().invoke(cli, ["bundle", "info", "security", "--json"])
+    assert result.exit_code == 0, result.output
+    data = json.loads(result.stdout)["result"]
+    assert data["source"] == "workspace"
+    assert data["path"] == "projects/demo/bundles/concepts/security.yaml"
+    assert data["bundle"]["id"] == "bundle:security" and data["bundle"]["scds"]
+    assert isinstance(data["bundle"]["provenance"]["created_at"], str)
+
+
+def test_bundle_info_json_template_and_not_found(tmp_path: Path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(cli, ["bundle", "info", "security", "--json"])
+    assert result.exit_code == 0, result.output
+    data = json.loads(result.stdout)["result"]
+    assert data["source"] == "template" and "path" not in data
+
+    result = CliRunner().invoke(cli, ["bundle", "info", "no-such-bundle", "--json"])
+    assert result.exit_code == 1
+    [diagnostic] = json.loads(result.stdout)["diagnostics"]
+    assert diagnostic["code"] == "BUNDLE_NOT_FOUND"
 
 
 def test_add_scd_adds_a_template_scd_that_validates(tmp_path: Path, monkeypatch):

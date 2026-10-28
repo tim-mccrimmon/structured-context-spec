@@ -8,6 +8,9 @@ codes:
   BUNDLE_META_VERSION_INVALID:
     severity: warning
     meaning: A meta bundle's version does not match the expected SCS version pattern.
+  BUNDLE_NOT_FOUND:
+    severity: error
+    meaning: scs bundle info names a bundle that is neither in the workspace nor a concept bundle template.
   BUNDLE_REQUIRED_FIELD_EMPTY:
     severity: error
     meaning: A bundle's imports or scds list is empty but its type requires at least one entry.
