@@ -27,7 +27,6 @@ xor_constraint:
 id_pattern:
   pattern: "^bundle:[a-zA-Z0-9._-]+$"
   description: "Bundle IDs must follow pattern bundle:<name>"
-  severity: "error"
   examples:
     valid:
       - "bundle:medication-adherence"
@@ -42,13 +41,11 @@ id_pattern:
 version_pattern:
   pattern: "^(\\d+\\.\\d+\\.\\d+|DRAFT)$"
   description: "Version must be DRAFT or semantic version X.Y.Z"
-  severity: "error"
 
 # Import Pattern Rules
 import_pattern:
   pattern: "^bundle:[a-zA-Z0-9._-]+(:\\d+\\.\\d+\\.\\d+)?$"
   description: "Import references must be bundle:<name> or bundle:<name>:<version>"
-  severity: "error"
   examples:
     valid:
       - "bundle:meta:0.3.0"
@@ -64,7 +61,6 @@ import_pattern:
 scd_reference_pattern:
   pattern: "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
   description: "SCD references in bundle must match SCD ID pattern"
-  severity: "error"
 
 # Bundle Type-Specific Rules (SCS 0.6.0 - four bundle types, standards deprecated)
 #
@@ -212,12 +208,6 @@ required_fields:
       - updated_at
       - rationale
 
-# SCD Uniqueness Rules
-scd_uniqueness:
-  scope: "global"  # Across entire loaded bundle set
-  description: "SCD IDs must be unique across all loaded bundles"
-  severity: "error"
-  check_within: "root_bundle_and_all_imports"
 
 # Cross-Bundle Relationship Rules
 cross_bundle_relationships:
@@ -226,11 +216,9 @@ cross_bundle_relationships:
 
   validation_context:
     standalone_bundle:
-      severity: "warning"
       message: "Relationship target not found in this bundle (may be in another bundle)"
 
     complete_project:
-      severity: "error"
       message: "Relationship target not found in any loaded bundle"
 
 # Meta Bundle Special Rules
@@ -239,14 +227,12 @@ meta_bundle_requirements:
     enabled: true
     description: "Meta bundle version should align with SCS spec version"
     pattern: "^\\d+\\.\\d+\\.\\d+$"  # No DRAFT for meta bundle
-    severity: "warning"
 
   version_pinning:
     enabled: true
     description: "Domain bundles must pin a specific meta bundle version"
     require_version_in_import: true
     pattern: "^bundle:meta:\\d+\\.\\d+\\.\\d+$"
-    severity: "error"
     message: "Meta bundle import must include specific version (e.g., bundle:meta:0.6.0)"
 
 # Validation Level 5: Bundle Completeness
@@ -262,17 +248,14 @@ bundle_validation:
   import_resolution:
     enabled: true
     description: "All imported bundles must be resolvable"
-    severity: "error"
 
   scd_resolution:
     enabled: true
     description: "All referenced SCDs must exist in loaded bundles"
-    severity: "error"
 
   scd_tier_matching:
     enabled: true
     description: "SCDs in bundle must match tier constraints"
-    severity: "error"
 
 # Error Messages
 error_messages:

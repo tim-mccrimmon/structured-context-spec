@@ -1,0 +1,7 @@
+# Diagnostic codes added outside a work package (housekeeping on 0.7-dev).
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  WORKSPACE_FILE_UNREADABLE:
+    severity: warning
+    meaning: A YAML file in the workspace could not be read or parsed and was skipped, so any SCD or bundle in it is not seen; fix it or delete it.

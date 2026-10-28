@@ -288,8 +288,8 @@ def _remind_about_ontology(base_path: Path, concept: str, out: Output):
 
 
 def _read_project_type(config_file: Path) -> Optional[str]:
-    """Project type recorded in .scs/config by `scs init --type` (0.6), or None. 0.7 workspaces
-    have none: their templates depend on the ontology only (D-64)."""
+    """Project type recorded in .scs/config by the removed `scs init --type` (0.6), or None.
+    0.7 workspaces have none: their templates depend on the ontology only (D-64)."""
     from scs_tools.utils.project_types import PROJECT_TYPES
 
     if config_file.exists():

@@ -23,6 +23,7 @@ class CompileResult:
     artifact: Optional[Dict[str, Any]] = None
     errors: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
+    unreadable: List[str] = field(default_factory=list)  # YAML files the resolver skipped
 
 
 def _canonical_json(data: Any) -> str:
@@ -50,6 +51,14 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
     """Compile a resolved bundle tree (`scs_validator.resolver.BundleTree`)."""
     result = CompileResult()
     root = tree.root
+    for path, reason in tree.index.unreadable if tree.index is not None else []:
+        try:
+            shown = path.relative_to(tree.project_root).as_posix()
+        except ValueError:
+            shown = str(path)
+        result.unreadable.append(
+            f"{shown} could not be read as YAML ({reason}) and was skipped; fix it or delete it"
+        )
 
     if root.type not in COMPILABLE_TYPES:
         result.errors.append(

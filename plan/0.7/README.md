@@ -50,17 +50,16 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-14 | Done: tag-based versioning, D-39 checks, `--verify-version`, `compile --version`, D-17 resolution, D-70 `SCD_EMPTY`, D-71 `PROVENANCE_PLACEHOLDER` | `2bb34c0` |
 | WP-06 | Done: author and approver rules (D-13, D-71), D-74 ontology inheritance, `--dry-run` on `new`, `bundle pin`/`add-import`/`add-scd`/`remove-scd`, `add bundle --new` (D-68, D-75, D-76), full rollback | `0e16628` |
 | WP-07 | Done, M-07 approved 2026-10-26: `schema/intake/intake-schema.json`, `scs intake set`/`record-finding` (D-77, D-78), `derived_from` in SCD items, `DERIVED_FROM_UNRESOLVED`, intake checks per workspace | `e5da021` |
+| Housekeeping | Done 2026-10-28: `scs init` removed; `WORKSPACE_FILE_UNREADABLE` from validate and compile; unread rule-YAML severities removed; old dog-food and llm-portability bundles deleted; CLI README rewritten (`docs/migration.d/housekeeping.md`) | |
 | WP-02a, WP-08, WP-09, WP-11a, WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
 
-- An unreadable SCD YAML file is skipped by the index without a diagnostic. (Bundle mode now
-  schema-validates the SCDs it resolves, WP-07.)
-- Rule-severity housekeeping item from WP-04 is still open.
+- Open: should `BUNDLE_SCD_UNRESOLVED` be an error? It is a warning so that ontology templates
+  and reference domains (`examples/medical-device-cdmo/`) can list SCD slots not yet written;
+  `scs compile` already refuses them. Making it an error fails those examples.
 - The generated CI workflow installs `scs-validator>=0.7.0,<0.8` from PyPI; that works once
   0.7.0 is published (D-27, WP-11rc). The packages still report version 0.6.0.
-- `scs init` still makes a standalone 0.6-style workspace with `--type`; it is not
-  repository-aware.
 - The 0.5 presentation docs still show `scs new project --type`.
 - The exit-2 (`--strict` warnings) machine-mode test fakes the validator report. A placeholder
   `created_by` (`PROVENANCE_PLACEHOLDER`) is now a real warning-only input in bundle and

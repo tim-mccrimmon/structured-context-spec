@@ -187,33 +187,6 @@ class RulesLoader:
         """
         return re.compile(pattern)
 
-    @staticmethod
-    def get_severity(rules: Dict[str, Any], rule_key: str, default: str = "error") -> str:
-        """Get severity level for a rule.
-
-        Args:
-            rules: Rules dictionary
-            rule_key: Key for the rule
-            default: Default severity if not found
-
-        Returns:
-            Severity level ("error", "warning", "info", "skip")
-        """
-        # Navigate nested dictionaries to find severity
-        keys = rule_key.split(".")
-        current: Any = rules
-
-        for key in keys:
-            if isinstance(current, dict):
-                current = current.get(key)
-            else:
-                return default
-
-        if isinstance(current, dict):
-            severity: str = current.get("severity", default)
-            return severity
-        return default
-
 
 class RelationshipTypeValidator:
     """Helper class for validating relationship types and tier constraints."""

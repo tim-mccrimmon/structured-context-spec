@@ -10,7 +10,6 @@ description: "SCD structure validation rules for SCS v0.1"
 id_pattern:
   pattern: "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
   description: "SCD IDs must follow pattern scd:<tier>:<name>"
-  severity: "error"
   examples:
     valid:
       - "scd:meta:scd-meta"
@@ -26,14 +25,12 @@ id_pattern:
 type_tier_matching:
   enabled: true
   description: "SCD type field must match tier in ID"
-  severity: "error"
   rule: "Extract tier from ID (scd:<TIER>:<name>), must equal type field"
 
 # Version Pattern Rules
 version_pattern:
   pattern: "^(\\d+\\.\\d+\\.\\d+|DRAFT)$"
   description: "Version must be DRAFT or semantic version X.Y.Z"
-  severity: "error"
   examples:
     valid:
       - "DRAFT"
@@ -125,40 +122,17 @@ field_constraints:
         type: "string"
         min_length: 1
 
-# Validation Mode Rules
-validation_modes:
-  DRAFT:
-    description: "Permissive mode for active development"
-    level_1_syntax: "error"  # Always strict
-    level_2_schema: "error"  # Always strict
-    level_3_semantic: "error"  # Always strict
-    level_4_relationships: "warning"  # Permissive
-    level_5_bundle: "warning"  # Permissive
-    level_6_completeness: "skip"  # Skip by default
-
-  VERSIONED:
-    description: "Strict mode for locked SCDs"
-    level_1_syntax: "error"
-    level_2_schema: "error"
-    level_3_semantic: "error"
-    level_4_relationships: "error"
-    level_5_bundle: "error"
-    level_6_completeness: "error"
-
 # Additional Semantic Rules
 semantic_rules:
   - rule: "unique_id_in_scope"
     description: "SCD ID must be unique across loaded bundle set"
-    severity: "error"
 
   - rule: "valid_tier_for_relationships"
     description: "Relationship types must respect tier constraints"
-    severity: "error"
     reference: "relationship-rules.yaml"
 
   - rule: "self_reference_forbidden"
     description: "SCD cannot have relationship to itself"
-    severity: "error"
 
 # Error Messages
 error_messages:
@@ -175,7 +149,6 @@ error_messages:
 # not contain words that make it conditional or advisory. Matched case-insensitively as whole
 # words or phrases.
 prohibition_qualifiers:
-  severity: "error"
   words:
     - "unless"
     - "except"

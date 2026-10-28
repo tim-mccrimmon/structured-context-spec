@@ -139,7 +139,9 @@ def compile(
             )
         if report.exit_code() == 1:
             envelope.diagnostics.extend(
-                d for d in diagnostics_from_results(report.all_results()) if d.severity == "error"
+                d
+                for d in diagnostics_from_results(report.all_results())
+                if d.severity == "error" or d.code == "WORKSPACE_FILE_UNREADABLE"
             )
             envelope.result = {"compiled": False}
             out.echo("Validation failed; nothing compiled.", err=True)
@@ -209,6 +211,8 @@ def _compile_version(
 def _write(
     envelope, out, result, bundle_file, root, workspace_root, output, to_stdout, fmt, dry_run
 ):
+    for message in result.unreadable:
+        envelope.warning("WORKSPACE_FILE_UNREADABLE", message)
     for warning in result.warnings:
         envelope.warning("COMPILE_WARNING", warning)
     if result.errors or result.artifact is None:

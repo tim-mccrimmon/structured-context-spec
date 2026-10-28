@@ -270,7 +270,7 @@ def project(
         scs new project my-funder --ontology mca  # Merchant Cash Advance ontology
         scs new project my-app --author "Jane Doe" --email "jane@acme-health.org" --no-interactive
 
-    See also: scs new domain, scs init (for adding SCS to existing projects)
+    See also: scs new domain
     """
     start = (Path(directory) if directory else Path.cwd()).resolve()
     repo = find_domain_repository(start)

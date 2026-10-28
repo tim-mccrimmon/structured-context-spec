@@ -202,11 +202,6 @@ written to `dist/<bundle-name>-<version>.yaml`. It has no timestamps, so the sam
 gives the same bytes. With `--version`, the released content is compiled from its tag and the
 artifact carries its `source_digest`. See `spec/0.7/runtime-artifact.md`.
 
-### `scs init`
-
-`scs init` still creates a standalone 0.6-style workspace and is not repository-aware. Use
-`scs new domain` and `scs new project` instead.
-
 ## Machine mode
 
 `--json` writes one JSON result envelope to stdout: `ok`, the files and git effects in

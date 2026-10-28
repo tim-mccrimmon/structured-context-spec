@@ -29,32 +29,31 @@ def cli(ctx, show_version, json_mode):
     """
     SCS Tools - CLI for Structured Context Specification
 
-    Scaffold and manage SCS-compliant projects with proper bundle structure,
-    domain organization, and compliance templates.
-
-    SCS (Structured Context Documents) are YAML files that capture essential
-    project context, organized into domain bundles for validation and versioning.
+    Create, version, and compile an organization's or a person's context in a
+    Domain repository: one Domain workspace (governance for all work) and one
+    workspace per Project.
 
     \b
     Quick Start:
-        scs new project my-app              # Create a new project interactively
-        cd my-app
-        scs bundle validate                 # Validate the project bundle
-        scs validate context/project/*.yaml # Validate SCDs
-        scs bundle version --version 1.0.0  # Create versioned snapshot
+        scs new domain acme                 # Create the Domain repository acme-context/
+        cd acme-context
+        scs new project portal              # Add a Project workspace
+        scs-validate --strict               # Validate every workspace
+        cd domain
+        scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme.com>"
+        scs compile bundles/domain-bundle.yaml --version 1.0.0
 
     \b
     Common Workflow:
-        1. Create or initialize project     → scs new project / scs init
-        2. Add domains as needed            → scs add bundle [domain]
-        3. Edit SCDs in context/project/    → (manual editing)
-        4. Validate before versioning       → scs bundle validate / scs validate
-           (also: scs validate --domain <manifest>, --checkpoint <record>)
-        5. Create immutable version         → scs bundle version
-        6. Compile for runtime delivery     → scs compile <bundle> -o <artifact>
+        1. Create the repository and Projects → scs new domain / scs new project
+        2. Add concepts as needed             → scs add bundle <concept> [--new]
+        3. Write SCDs and the intake record   → scs scd write / scs intake set
+        4. Validate                           → scs-validate / scs bundle validate
+        5. Release a version                  → scs bundle version
+        6. Compile for runtime delivery       → scs compile <bundle> --version <v>
 
+    Commands that change files take --dry-run and --json (machine mode).
     For detailed help on any command, use: scs [command] --help
-    Documentation: https://github.com/SCS-Labs/scs-cli
     """
     if show_version:
         from scs_validator.envelope import SCS_VERSION

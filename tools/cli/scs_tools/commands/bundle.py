@@ -79,7 +79,7 @@ def list(available):
     if not bundles_dir.exists():
         click.echo(
             "Error: No bundles directory found. Not an SCS project?\n"
-            "Run 'scs init' to initialize or 'scs bundle list --available' to see templates.",
+            "Run 'scs new domain' to create one or 'scs bundle list --available' to see templates.",
             err=True,
         )
         raise click.Abort()

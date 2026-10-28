@@ -94,5 +94,6 @@ def select_workspace(name: Optional[str], cwd: Optional[Path] = None) -> Path:
         )
     raise CommandError(
         "WORKSPACE_NOT_FOUND",
-        "Not in an SCS workspace (no .scs/config here or above). Run 'scs init' first.",
+        "Not in an SCS workspace (no .scs/config here or above). "
+        "Create one with 'scs new domain' or 'scs new project'.",
     )

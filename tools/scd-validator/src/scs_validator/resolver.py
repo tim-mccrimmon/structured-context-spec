@@ -98,12 +98,24 @@ def _yaml_files(root: Path) -> Iterable[Path]:
         yield path
 
 
+def unreadable_reason(error: Exception) -> str:
+    """A one-line reason a YAML file could not be read, with the line for a parse error."""
+    if isinstance(error, yaml.MarkedYAMLError):
+        mark = error.problem_mark or error.context_mark
+        problem = error.problem or error.context or "invalid YAML"
+        return f"line {mark.line + 1}: {problem}" if mark else problem
+    if isinstance(error, UnicodeDecodeError):
+        return "not UTF-8 text"
+    return getattr(error, "strerror", None) or str(error)
+
+
 class Index:
     """Bundles and SCDs under one or more directories, keyed by `id`."""
 
     def __init__(self, roots: Iterable[Path]):
         self.bundles: Dict[str, List[ResolvedBundle]] = {}
         self.scds: Dict[str, List[Tuple[Path, Dict[str, Any]]]] = {}
+        self.unreadable: List[Tuple[Path, str]] = []  # YAML files skipped, with the reason
         for root in roots:
             if root.is_dir():
                 self._scan(root)
@@ -112,7 +124,8 @@ class Index:
         for path in _yaml_files(root):
             try:
                 data = yaml.safe_load(path.read_text(encoding="utf-8"))
-            except (yaml.YAMLError, OSError, UnicodeDecodeError):
+            except (yaml.YAMLError, OSError, UnicodeDecodeError) as e:
+                self.unreadable.append((path, unreadable_reason(e)))
                 continue
             if not isinstance(data, dict) or not isinstance(data.get("id"), str):
                 continue

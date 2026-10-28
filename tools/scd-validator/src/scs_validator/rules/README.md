@@ -260,10 +260,13 @@ pattern: "auth|authn|authz"  # Matches SCDs with these keywords
 
 ### Severity Levels
 
+Each diagnostic code's severity is declared once, in `schema/diagnostics/codes.yaml`. The rule
+files name a severity only where a check can be set to warn instead of fail, and each of those
+has a registered `_WARNING` code: completeness rules (`severity`, and per recommended SCD), the
+bundle `xor_constraint`, and the ontology `concern_residue` and `concept_bundle_agreement`.
+
 - `error` - Validation fails, blocks commit/CI
-- `warning` - Validation passes with warnings
-- `info` - Informational only
-- `skip` - Don't run this check
+- `warning` - Validation passes with warnings (exit 2 under `--strict`)
 
 ## Versioning
 

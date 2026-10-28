@@ -471,7 +471,7 @@ CDMO_DOMAIN_CONCEPT_SCDS: Dict[str, List[str]] = {
 
 # Ontology models a workspace can be scaffolded against. The scaffold's templates are chosen by
 # the ontology and the workspace kind (Domain or Project) only (D-64); "sdlc" is the default.
-# PROJECT_TYPES remain only for 0.6 workspaces made with `scs init --type`.
+# PROJECT_TYPES remain only for 0.6 workspaces made with the removed `scs init --type`.
 ONTOLOGY_MODELS = {
     "sdlc": {
         "description": "Software Development (default)",

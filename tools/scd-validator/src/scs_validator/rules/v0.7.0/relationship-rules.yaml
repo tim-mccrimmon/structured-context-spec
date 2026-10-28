@@ -152,31 +152,24 @@ relationship_schema:
 validation_rules:
   - rule: "target_exists"
     description: "Relationship target SCD must exist in loaded bundles"
-    severity:
-      standalone_bundle: "warning"  # Target may be in another bundle
-      complete_project: "error"  # Target must exist somewhere
     check: "target_scd_id in all_loaded_scd_ids"
 
   - rule: "tier_constraints"
     description: "Relationship must follow tier constraint rules"
-    severity: "error"
     check: "relationship_type_allows_tier_combination(source_tier, target_tier)"
 
   - rule: "no_self_reference"
     description: "SCD cannot have relationship to itself"
-    severity: "error"
     check: "source_scd_id != target_scd_id"
 
   - rule: "acyclic_depends_on"
     description: "Circular depends-on relationships detected"
-    severity: "warning"
     applies_to: ["depends-on"]
     check: "detect_cycles_in_dependency_graph()"
     note: "A → B → C → A creates circular dependency"
 
   - rule: "valid_relationship_type"
     description: "Relationship type must be one of the 7 defined types"
-    severity: "error"
     check: "relationship.type in allowed_types"
 
 # Tier Constraint Validation
@@ -234,7 +227,6 @@ circular_dependency_detection:
   applies_to: ["depends-on"]
   description: "Detect cycles in dependency graph"
   algorithm: "depth_first_search"
-  severity: "warning"  # Warning, not error (may be intentional in some cases)
   max_cycle_length: 10  # Report cycles up to length 10
 
   error_message_template: >

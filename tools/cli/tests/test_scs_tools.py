@@ -457,14 +457,21 @@ def test_add_bundle_rejects_a_domain_name_with_a_hint(tmp_path: Path, monkeypatc
 # ------------------------------------ concept bundles in add / list / info (ISS-034)
 
 
-def _init_bare_project(tmp_path: Path, monkeypatch) -> Path:
-    root = tmp_path / "existing"
-    root.mkdir()
-    monkeypatch.chdir(root)
-    result = CliRunner().invoke(
-        cli, ["init", "--type", "minimal", "--author", "T", "--email", "t@e.com"]
+def _bare_0_6_workspace(root: Path, project_type: str = "minimal") -> Path:
+    """An empty workspace as the removed 0.6 `scs init --type` left it."""
+    for sub in ("bundles/concepts", "context/project", "docs"):
+        (root / sub).mkdir(parents=True, exist_ok=True)
+    (root / ".scs").mkdir(exist_ok=True)
+    (root / ".scs" / "config").write_text(
+        f"project_name: {root.name}\nproject_type: {project_type}\nscs_version: 0.6.0\n"
+        "author: T\nemail: t@e.com\n"
     )
-    assert result.exit_code == 0, result.output
+    return root
+
+
+def _init_bare_project(tmp_path: Path, monkeypatch) -> Path:
+    root = _bare_0_6_workspace(tmp_path / "existing")
+    monkeypatch.chdir(root)
     return root
 
 
@@ -635,7 +642,7 @@ def test_add_bundle_lists_the_full_set_unless_a_0_6_project_type_applies(
     tmp_path: Path, monkeypatch
 ):
     """A 0.7 workspace gets the full compliance bundle (D-64); a 0.6 workspace made with
-    `scs init --type standard` still leaves the HIPAA SCDs out."""
+    the removed `scs init --type standard` still leaves the HIPAA SCDs out."""
     root = scaffold(tmp_path)
     (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
     monkeypatch.chdir(root)
@@ -646,11 +653,8 @@ def test_add_bundle_lists_the_full_set_unless_a_0_6_project_type_applies(
     text = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
     assert "hipaa-compliance" in text
 
-    legacy = tmp_path / "legacy"
-    legacy.mkdir()
+    legacy = _bare_0_6_workspace(tmp_path / "legacy", "standard")
     monkeypatch.chdir(legacy)
-    args = ["init", "--type", "standard", "--author", "T", "--email", "t@e.com"]
-    assert CliRunner().invoke(cli, args).exit_code == 0
     assert (
         CliRunner().invoke(cli, ["add", "bundle", "compliance-governance", *ADD_AUTHOR]).exit_code
         == 0
@@ -1057,3 +1061,10 @@ def test_cdmo_example_directive_compiles_once_uncommented(tmp_path: Path):
     assert result.exit_code == 0, result.output
     ids = [r["id"] for r in yaml.safe_load(result.stdout)["rules"]]
     assert "demo/agent-autonomy-rules/AAR-001" in ids
+
+
+def test_scs_init_is_removed():
+    result = CliRunner().invoke(cli, ["init"])
+    assert result.exit_code == 3  # usage error
+    assert "No such command 'init'" in result.output
+    assert "init" not in CliRunner().invoke(cli, ["--help"]).output.split("Commands:")[1]

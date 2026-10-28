@@ -19,6 +19,7 @@ from jsonschema import Draft202012Validator
 from scs_validator import checks
 from scs_validator.checks import CheckContext
 from scs_validator.commands.validate import validate
+from scs_validator.resolver import unreadable_reason
 from scs_validator.utils import ValidationInfo, ValidationResult
 
 REPO = Path(__file__).resolve().parents[3]
@@ -327,3 +328,73 @@ def test_a_check_registered_elsewhere_runs_and_info_keeps_exit_0(repo: Path):
         assert data["summary"]["status"] == "valid"
     finally:
         checks.unregister("test-only")
+
+
+# ------------------------------------------------------------------- unreadable files
+
+BROKEN = "id: scd:project:broken\ntitle: [unclosed\n"
+
+
+def unreadable(data: dict) -> list:
+    sections = [data] + data.get("workspaces", [])
+    return [
+        f
+        for s in sections
+        for kind in ("errors", "warnings", "infos")
+        for f in s[kind]
+        if f["code"] == "WORKSPACE_FILE_UNREADABLE"
+    ]
+
+
+def test_an_unlisted_unparseable_file_is_a_warning_naming_it(repo: Path):
+    write(repo / "domain" / "context" / "project" / "broken.yaml", BROKEN)
+    assert run("--repo", str(repo)).exit_code == 0
+    assert run("--repo", str(repo), "--strict").exit_code == 2
+    [found] = unreadable(report("--repo", str(repo)))
+    assert found["severity"] == "warning"
+    assert found["file_path"].endswith("domain/context/project/broken.yaml")
+    assert "line 3" in found["message"] and "delete it" in found["message"]
+
+
+def test_a_listed_scd_that_does_not_parse_is_unresolved_and_unreadable(repo: Path):
+    write(repo / "domain" / "context" / "project" / "company.yaml", "id: [\n")
+    data = report("--repo", str(repo))
+    assert "BUNDLE_SCD_UNRESOLVED" in codes(data)
+    [found] = unreadable(data)
+    assert found["file_path"].endswith("domain/context/project/company.yaml")
+
+
+def test_a_file_that_is_not_utf8_is_unreadable(repo: Path):
+    path = repo / "projects" / "app" / "context" / "project" / "latin1.yaml"
+    path.write_bytes("title: caf\xe9\n".encode("latin-1"))
+    [found] = unreadable(report("--repo", str(repo)))
+    assert "not UTF-8 text" in found["message"]
+
+
+def test_bundle_mode_reports_unreadable_files(tmp_path: Path):
+    root = workspace(tmp_path / "ws", "app", "project", "release")
+    write(root / "context" / "project" / "broken.yaml", BROKEN)
+    data = report("--bundle", str(root / "bundles" / "project-bundle.yaml"))
+    assert len(unreadable(data)) == 1
+
+
+def test_files_other_checks_report_are_not_reported_twice(repo: Path):
+    write(repo / "domain" / "intake.yaml", "owner: [\n")
+    write(repo / "domain" / "ontology" / "domain-manifest.yaml", "id: [\n")
+    write(repo / "projects" / "app" / "bundles" / "project-bundle.yaml", "id: [\n")
+    assert unreadable(report("--repo", str(repo))) == []
+
+
+def test_unreadable_files_in_reserved_and_skipped_directories_are_ignored(repo: Path):
+    write(repo / "domain" / "plan" / "broken.yaml", BROKEN)
+    write(repo / "domain" / "dist" / "broken.yaml", BROKEN)
+    assert run("--repo", str(repo), "--strict").exit_code == 0
+
+
+def test_the_reason_gives_the_line_of_a_parse_error():
+    try:
+        yaml.safe_load(BROKEN)
+    except yaml.YAMLError as e:
+        reason = unreadable_reason(e)
+    assert reason.startswith("line 3: ")
+    assert unreadable_reason(UnicodeDecodeError("utf-8", b"\xe9", 0, 1, "bad")) == "not UTF-8 text"

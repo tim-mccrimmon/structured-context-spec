@@ -533,3 +533,57 @@ def test_a_06_repository_passes_after_versioning_once_under_07(repo: Path):
     release(repo, "1.0.1", "1.1.0")
     code, diagnostics = validate(repo, "--strict")
     assert code == 0, diagnostics
+
+
+# ------------------------------------------------------------------- unreadable files
+
+
+BROKEN = "id: scd:project:broken\ntitle: [unclosed\n"
+
+
+def unreadable(data: Dict) -> List[Dict]:
+    return [d for d in data["diagnostics"] if d["code"] == "WORKSPACE_FILE_UNREADABLE"]
+
+
+def test_compile_names_an_unreadable_file_and_still_compiles(repo: Path):
+    (ws(repo) / "context" / "project" / "broken.yaml").write_text(BROKEN)
+    result = compile_(ROOT, "--allow-draft", "--dry-run", "--json")
+    data = json.loads(result.stdout)
+    assert result.exit_code == 0, data
+    [found] = unreadable(data)
+    assert found["severity"] == "warning"
+    assert "context/project/broken.yaml" in found["message"]
+    assert "line 3" in found["message"] and "delete it" in found["message"]
+
+
+def test_compile_explains_an_unresolved_scd_by_its_unreadable_file(repo: Path):
+    (ws(repo) / SCD).write_text("id: [\n")
+    result = compile_(ROOT, "--allow-draft", "--dry-run", "--json")
+    data = json.loads(result.stdout)
+    assert result.exit_code == 1, data
+    [found] = unreadable(data)
+    assert SCD in found["message"]
+
+
+def test_compile_without_validation_still_names_an_unreadable_file(repo: Path):
+    (ws(repo) / "context" / "project" / "broken.yaml").write_text(BROKEN)
+    result = compile_(ROOT, "--allow-draft", "--no-validate", "--dry-run", "--json")
+    data = json.loads(result.stdout)
+    assert result.exit_code == 0, data
+    assert len(unreadable(data)) == 1
+
+
+def test_compile_of_a_version_names_an_unreadable_file_in_its_tag(repo: Path):
+    (ws(repo) / "context" / "project" / "broken.yaml").write_text(BROKEN)
+    release(repo)
+    result = compile_(ROOT, "--version", "1.0.0", "--dry-run", "--json")
+    data = json.loads(result.stdout)
+    assert result.exit_code == 0, data
+    assert len(unreadable(data)) == 1
+
+
+def test_a_readable_workspace_compiles_with_no_unreadable_diagnostic(repo: Path):
+    result = compile_(ROOT, "--allow-draft", "--dry-run", "--json")
+    data = json.loads(result.stdout)
+    assert result.exit_code == 0, data
+    assert unreadable(data) == []

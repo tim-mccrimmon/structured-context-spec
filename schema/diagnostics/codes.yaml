@@ -413,6 +413,10 @@ codes:
   WORKSPACE_EXISTS:
     severity: error
     meaning: The Domain repository or Project workspace scs new would create already exists.
+  WORKSPACE_FILE_UNREADABLE:
+    severity: warning
+    meaning: A YAML file in the workspace could not be read or parsed and was skipped, so any SCD or bundle
+      in it is not seen; fix it or delete it.
   WORKSPACE_NAME_INVALID:
     severity: error
     meaning: A Domain or Project name cannot be a directory, bundle id, and tag prefix (bad characters),
