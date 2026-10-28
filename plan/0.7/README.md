@@ -57,15 +57,20 @@ Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
 | WP-02b | Done 2026-10-28: `spec/0.7/agent-interface.md` (scope, layers, machine mode, intake, provenance, confirmation, diff, drafting, advisory review); `derived_from` in core-model §4.1 and the tier docs; validation rules in bundle-format §9.7-§9.9; stacks in runtime-artifact §5; trace covers every RFC 0002 section | |
 | WP-16 | Done 2026-10-28 (D-67 in 0.7): `scs stack` (read-only, machine mode, the four checks, `STACK_ARTIFACT_INVALID`); placement pages already describe layered loading (WP-09), README gains "Previewing a stack" | |
 | WP-11a | In progress 2026-10-28: `0.7.0rc0` of both packages on TestPyPI (throwaway branch `testpypi/0.7.0rc0`); `docs/install-matrix.md` has Claude Code (local, auto mode) and Claude.ai rows; Claude.ai cannot reach TestPyPI, so the release candidate goes to PyPI or as a bundled wheel; Cursor, Codex, Copilot deferred (Tim, later) | |
-| WP-10 | Built 2026-10-28, behaviour harness deferred: seven skills in `skills/` (Agent Skills format, `agentskills validate` passes), shared `scs_engine.py` (version check, install plan in D-27 order, wheel staging, `run`), `skills/sync.py`, `tests/test_skills.py`; legacy plugins marked deprecated (D-26). Not yet accepted: the D-51 harness (assertions a-k) is deferred by Tim; WP-11rc may proceed with it recorded as a gap | |
+| WP-10 | Done 2026-10-28: seven skills in `skills/` (Agent Skills format, `agentskills validate` passes), shared `scs_engine.py` (version check, install plan in D-27 order, wheel staging, `run`), `skills/sync.py`, `tests/test_skills.py`; legacy plugins marked deprecated (D-26). D-51 harness in `tools/skill-harness/`: 8 scenarios × 5 runs on `claude-sonnet-5-5`, every MUST and SHOULD assertion passes (i 4 of 5), $5.69; report in `tools/skill-harness/results/`. Fixes from the harness: rules 2, 6, 7 tightened; dry-run digest noted as provisional in scs-version. Assertion b is scored on what is left outside the repository (Tim, 2026-10-28) | |
 | WP-11rc | In progress 2026-10-28 (D-79: TestPyPI, not PyPI): both packages at `0.7.0rc1`, validator pinned `>=0.7.0rc1,<0.8`, stale `tools/cli/setup.py` removed, validator URLs fixed; `publish.yml` (manual, trusted publishing), `docs-ci.yml` (links, migration guide, skill copies); `docs/MIGRATION-0.7.0.md` assembled by `scripts/assemble_migration.py`; `RELEASE-NOTES-0.7.0.md`; READMEs install `scs-tools==0.7.0`; `skills/package.py` builds skill ZIPs with bundled wheels. rc1 on TestPyPI 2026-10-28 and installs with the documented command. Claude Code (local) row re-run against rc1: passes. Claude.ai row re-run with the bundled wheels: passes (three skill fixes noted in the matrix, note 7) | |
 | WP-13a | Unblocked, not started | |
 
 Known gaps carried forward:
 
-- Deferred 2026-10-28: the D-51 skill behaviour harness (WP-10 acceptance a-k). Estimated
-  $15-50 on `claude-sonnet-5-5`; needs a dedicated Anthropic API key. Until it runs, the skills'
-  RFC 0002 §6 behaviour is specified but not demonstrated.
+- The Claude Code sandbox refuses writes to `.git/config` and `.git/hooks`, so `scs new` (git
+  init) fails for a user with the sandbox on. Found by the D-51 harness; needs a line in the
+  install matrix or the intake skill.
+- `scs-validate --strict` with no arguments inside a Project workspace gives `NO_INPUT`, and
+  `scs-validate .` gives `PARSE_FILE_UNREADABLE`; agents in the harness tripped over both before
+  finding the right call.
+- A dry run's `content_digest` never equals the real run's, because the snapshot carries the
+  approval time. The scs-version skill now says so; the engine could mark it provisional.
 - Open: should `BUNDLE_SCD_UNRESOLVED` be an error? It is a warning so that ontology templates
   and reference domains (`examples/medical-device-cdmo/`) can list SCD slots not yet written;
   `scs compile` already refuses them. Making it an error fails those examples.

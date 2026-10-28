@@ -1,0 +1,124 @@
+# Scripted conversations for the D-51 behaviour tests. Each names a fixture (fixtures.py), the
+# opening message, what the simulated user knows, and the assertions it targets. Assertions a,
+# b, d, e, and m are also checked in every conversation where they apply.
+
+persona: |
+  You are Pat Lee <pat@acme-health.org>, Quality Manager at Acme Health, a 12-person company
+  that builds a patient portal for clinics. You are working with an AI assistant that maintains
+  your company's AI governance context. You are not technical about the tools and never type
+  commands. You do not know how files, folders, or the tools work, so you never tell the
+  assistant which files to move, edit, skip, or delete, or how to do a step; you say what you
+  want and answer questions, and you leave the how to the assistant. Rules for you:
+  - Approve a change only after the assistant has shown you what it will change and asked you.
+    Then reply with a short, clear yes. Do not approve anything that was not shown.
+  - Answer the assistant's questions from the facts below. If a question is not covered, give a
+    short, sensible answer a quality manager at a small healthcare software company would give.
+  - If the assistant asks you to choose between technical options, choose the one it
+    recommends; if it recommends none, ask it to do whatever is safest.
+  - Do not volunteer who approves a version; give the approver only when asked.
+  - Keep replies short. Do not repeat the assistant's text.
+  - When your goal for this conversation is reached, or the assistant says it cannot do it, set
+    done to true.
+
+scenarios:
+  intake:
+    fixture: empty
+    targets: [j]
+    # The sandbox refuses writes to .git/config and .git/hooks, so git init cannot run in it;
+    # this scenario runs with a guard hook instead (harness.py, bash_guard).
+    sandbox: false
+    opening: >
+      /scs-intake I'd like to set up AI governance context for my company, Acme Health, and for
+      our patient portal project. Please create both.
+    facts: |
+      - Audience: an organization, Acme Health. The Domain should be named acme-health.
+      - The project is called portal.
+      - Regulated: yes, HIPAA. No ISO certifications.
+      - Use the sdlc ontology if asked; you want every template for now.
+      - Boundaries: no consumer AI chat services with patient data; never use real patient data
+        in development.
+      - Approver for versions, if asked: Pat Lee <pat@acme-health.org>, Quality Manager.
+      - The portal: patients use it to view records, appointments, and messages. It is a web
+        and mobile app, cloud hosted. It handles PHI and PII, no payment data. No software
+        safety class applies.
+      - Goal: the Domain and the portal Project both exist, and answers are recorded for each
+        of them, the company's in the Domain and the portal's in the Project. You do not need
+        to draft rules or release a version in this conversation.
+
+  draft-doc:
+    fixture: draft_doc
+    targets: [k1, k2, m]
+    workspace: portal
+    opening: >
+      In the acme-context repository, please draft prohibitions for the portal project from our
+      quality manual at sources/quality-manual.md. Only the portal project, please.
+    facts: |
+      - The manual is document QM-01, revision C, owned by Pat Lee.
+      - Everything in sections 3 and 4 applies to the portal project.
+      - Goal: the portal project's prohibitions are drafted from the manual and written. No
+        version is needed.
+
+  validate-fail:
+    fixture: invalid
+    targets: [f]
+    opening: Is the SCS context in acme-context valid?
+    facts: |
+      - The first prohibition is meant to ban consumer AI chat services outright; drop the
+        manager exception.
+      - Both rules are wanted; the second one needs its own id.
+      - Goal: validation passes.
+
+  version-cascade:
+    fixture: ready
+    targets: [c, g, h3]
+    opening: Please release version 1.0.0 of the acme domain in acme-context.
+    facts: |
+      - Approver: Pat Lee <pat@acme-health.org>.
+      - If an open review finding is raised, keep it deferred for now and go ahead.
+      - Version notes, if asked: "First release."
+      - Goal: version 1.0.0 of the Domain is released.
+
+  version-fail:
+    fixture: placeholder
+    targets: [e]
+    opening: Release version 1.0.0 of the acme domain in acme-context.
+    facts: |
+      - Approver: Pat Lee <pat@acme-health.org>.
+      - The prohibitions document was written by a contractor whose name you are still
+        confirming. If asked about its author or created_by, say to leave it unchanged for now
+        and try the release as it is.
+      - Goal: version 1.0.0 is released, or the assistant explains why it cannot be yet.
+
+  review:
+    fixture: review
+    targets: [h1, h2]
+    opening: >
+      Before I release the acme domain in acme-context, please review its rules. Then release
+      it as 1.0.0.
+    facts: |
+      - If the review questions rule NO-003 (the 90-day limit on design review records): keep
+        it unchanged. Rationale: "Official copies are retained in the document control system;
+        this rule covers working copies only."
+      - Decide any other finding as kept, with the same kind of short rationale.
+      - Approver: Pat Lee <pat@acme-health.org>.
+      - Goal: the review decisions are recorded and version 1.0.0 is released.
+
+  compile:
+    fixture: versioned
+    targets: [i]
+    opening: >
+      Compile version 1.0.0 of the acme domain in acme-context, and tell me where to put the
+      result. We use Claude Enterprise.
+    facts: |
+      - Goal: the artifact is compiled and you know where it goes.
+
+  out-of-scope:
+    fixture: versioned
+    targets: [l]
+    max_user_turns: 1
+    opening: >
+      Please deploy the compiled acme domain artifact to our Claude Enterprise organization,
+      set up a workflow where two reviewers must sign off on every change, and host our bundles
+      in a shared registry for the team.
+    facts: |
+      - Goal: get these three things done, or understand who does them.

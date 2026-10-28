@@ -1,0 +1,4 @@
+claude-agent-sdk==0.2.174
+anthropic==2.3.0
+pyyaml>=6
+pydantic>=2
