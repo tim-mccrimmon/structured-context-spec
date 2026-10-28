@@ -7,6 +7,11 @@ packages tried are the pre-releases on TestPyPI, built from branch `testpypi/0.7
 - https://test.pypi.org/project/scs-validator/0.7.0rc0/
 - https://test.pypi.org/project/scs-tools/0.7.0rc0/
 
+WP-11rc re-runs the rows against `0.7.0rc1` (`0.7-dev` at `b332e1e`, D-79: TestPyPI only):
+
+- https://test.pypi.org/project/scs-validator/0.7.0rc1/
+- https://test.pypi.org/project/scs-tools/0.7.0rc1/
+
 D-27 records the fallback order for installing in a chat sandbox: PyPI, then a GitHub tag, then
 a wheel bundled with the skill. The last column is the method each client should use. This
 matrix is run again against WP-11rc.
@@ -14,6 +19,7 @@ matrix is run again against WP-11rc.
 | Client | Install method tried | Success | PyPI reachable | GitHub reachable | Python | git | git identity | `scs --version --json` (result) | Date | D-27 choice |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Claude Code (macOS, local) | `pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ scs-tools==0.7.0rc0` in a new venv | yes | yes | yes | 3.12.13 | 2.54.0 | configured | `{"scs_version": "0.7.0", "tools_version": "0.7.0rc0"}` | 2026-10-28 | PyPI |
+| Claude Code (macOS, local), rc1 | `pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ scs-tools==0.7.0rc1` in a new venv (note 6) | yes; skill engine `check` accepts it; `scs new domain`, `new project`, `scs-validate --strict`, `scd write`, `compile --allow-draft` (Domain and Project), `scs stack`, `bundle version` of a concept, and `--verify-version` all ran | yes (200) | yes (200) | 3.14.6 | 2.54.0 | configured | `{"scs_version": "0.7.0", "tools_version": "0.7.0rc1"}` | 2026-10-28 | PyPI |
 | Claude Code (macOS, auto mode) | Same command, run by the agent | no: refused by the auto-mode safety check ("Code from External") before it ran | yes | yes | 3.14.6 | 2.54.0 | configured | not run | 2026-10-28 | User runs the install (`! pip install ...`) or adds a permission rule (note 1) |
 | Claude.ai | Same command, run by the agent after the user confirmed the package is theirs (note 2) | no: `test.pypi.org` does not resolve in the sandbox (`NameResolutionError`); pip found only `scs-tools` 0.1.0 on PyPI (note 4) | yes (200) | no: 403 from the sandbox proxy unless the repository is added to the session (note 3) | 3.13.18 | 2.43.0 | configured | not run | 2026-10-28 | PyPI once 0.7.0 (or a pre-release) is on PyPI; bundled wheel works now (next row) |
 | Claude.ai (bundled wheel) | Both wheels uploaded to the chat, copied to their original file names, `pip install` from the files; dependencies from PyPI (note 5) | yes; `scs new domain`, `scs-validate --strict`, `scs compile --allow-draft`, and `scs stack` all ran (git init and commit work) | yes | no (note 3) | 3.13.18 | 2.43.0 | configured | `{"scs_version": "0.7.0", "tools_version": "0.7.0rc0"}` | 2026-10-28 | bundled wheel |
@@ -74,4 +80,9 @@ tag, then a bundled wheel) is tried in WP-10, once the skills exist.
    in the standard format. The agent copied both, unchanged, to `/tmp/scs-wheels/` under their
    original names and installed from there. For WP-10: a skill that bundles wheels must install
    them under their standard names. Dependencies installed from PyPI without trouble.
+6. **rc1 in Claude Code.** Run by the agent in the session building 0.7, not in auto mode. Two
+   steps failed first because of the test's own inputs, both as designed: an approver and
+   author at `acme.example` are placeholders (`VERSION_PROVENANCE_PLACEHOLDER`, D-71), and a
+   Project with no rules has nothing to compile. With a real-style address and one prohibition
+   written through `scs scd write`, every step passed.
 
