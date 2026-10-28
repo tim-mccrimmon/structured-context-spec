@@ -11,7 +11,7 @@ context in a Domain repository.
 - **Compile** a Domain or Project bundle into a deterministic runtime artifact
 
 Every command that changes files has `--dry-run` and `--json` (machine mode), and the commands
-that read (`bundle list`, `bundle info`, `bundle diff`, `validate`) have `--json`, so an agent or
+that read (`bundle list`, `bundle info`, `bundle diff`, `validate`, `stack`) have `--json`, so an agent or
 a script can drive the tools and read back exactly what changed.
 
 ## Packages
@@ -209,6 +209,20 @@ The artifact is one self-contained file of the bundle's prohibitions, directives
 written to `dist/<bundle-name>-<version>.yaml`. It has no timestamps, so the same source always
 gives the same bytes. With `--version`, the released content is compiled from its tag and the
 artifact carries its `source_digest`. See `spec/0.7/runtime-artifact.md`.
+
+### `scs stack` - Artifacts loaded together
+
+```bash
+scs stack ~/jdoe-context/domain/dist/jdoe-1.0.0.yaml dist/medtech-cdmo-1.2.0.yaml
+scs stack global.yaml projects/infusion-pump-fw.yaml --json --strict
+```
+
+Previews what a session receives when a client loads several artifacts in layers. Give them
+outermost first. It lists each layer and every rule and fact in stack order with the layer it
+came from, and reports a bundle in two layers (error), a directive that mentions what another
+layer prohibits (warning), identical text in two layers, and `DRAFT` layers (info). Rules are
+never merged, reordered, or dropped, and nothing is written. See `spec/0.7/runtime-artifact.md`
+§5.
 
 ## Machine mode
 

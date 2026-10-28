@@ -51,6 +51,7 @@ def cli(ctx, show_version, json_mode):
         4. Validate                           → scs-validate / scs bundle validate
         5. Release a version                  → scs bundle version
         6. Compile for runtime delivery       → scs compile <bundle> --version <v>
+        7. Preview artifacts loaded together  → scs stack <outer> ... <inner>
 
     Commands that change files take --dry-run and --json (machine mode).
     For detailed help on any command, use: scs [command] --help

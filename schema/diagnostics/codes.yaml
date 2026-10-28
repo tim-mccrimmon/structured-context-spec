@@ -371,6 +371,23 @@ codes:
   SCHEMA_VALIDATION_FAILED:
     severity: error
     meaning: Schema validation itself failed with an unexpected exception, so the document was not checked.
+  STACK_ARTIFACT_INVALID:
+    severity: error
+    meaning: An input to scs stack is not a runtime artifact (not YAML or JSON, or not valid against schema/runtime/runtime-artifact-schema.json).
+  STACK_BUNDLE_REPEATED:
+    severity: error
+    meaning: The same bundle id appears in two layers of a stack, for example two versions of one bundle.
+  STACK_LAYER_DRAFT:
+    severity: info
+    meaning: A layer of a stack is a DRAFT artifact (version DRAFT+<digest>).
+  STACK_PROHIBITION_DIRECTED:
+    severity: warning
+    meaning: A directive in one layer of a stack contains, ignoring case, the subject of a prohibition
+      in another layer; a textual match that the advisory review judges (layer-conflict).
+  STACK_RULE_DUPLICATE:
+    severity: info
+    meaning: Two layers of a stack carry a rule or fact with identical text, for example the meta bundle's
+      rules in two Domain artifacts.
   TEMPLATE_NOT_FOUND:
     severity: error
     meaning: No SCD or concept bundle template has the given name in the workspace's ontology model.

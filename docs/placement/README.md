@@ -78,3 +78,21 @@ trying things out, not for placing where other people rely on it.
   about 3,300 bytes. Each page gives the limits it could confirm.
 - Whether a service loads both layers in a given session is the service's behaviour. SCS does
   not test it. Each page describes what the vendor documents.
+
+## Previewing a stack
+
+Once you know which artifacts a service loads together, and in what order, `scs stack` shows
+what a session receives. Give the artifacts outermost first, in the order the page for your
+service describes:
+
+```bash
+scs stack ~/jdoe-context/domain/dist/jdoe-1.0.0.yaml \
+          dist/medtech-cdmo-1.2.0.yaml \
+          projects/infusion-pump-fw/dist/infusion-pump-fw-1.0.0.yaml
+```
+
+It lists every rule and fact with the layer it came from, and reports a bundle in two layers,
+a directive that mentions what another layer prohibits, identical text in two layers, and
+`DRAFT` layers ([runtime-artifact.md](../../spec/0.7/runtime-artifact.md) §5). It reads only
+and changes nothing. It checks the artifacts, not the service: a rendering placed in a settings
+field is not read back.
