@@ -168,6 +168,27 @@ def test_install_plan_installs_nothing_and_pins_the_version(capsys):
     assert "scs-tools==" in plans[0]["command"] or "scs-tools==" in plans[1]["command"]
 
 
+def test_install_plan_recommends_bundled_wheels(tmp_path: Path, monkeypatch, capsys):
+    module = engine()
+    wheel = tmp_path / "scs_tools-0.7.0rc1-py3-none-any.whl"
+    monkeypatch.setattr(module, "bundled_wheels", lambda: [wheel])
+    assert module.install_plan([]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["recommended"] == "bundled or uploaded wheels"
+    assert [p["recommended"] for p in out["plans"]] == [True, False, False]
+    assert str(wheel) in out["plans"][0]["command"]
+    assert all("may be a pre-release" in p["note"] for p in out["plans"][1:])
+
+
+def test_install_plan_recommends_pypi_without_wheels(monkeypatch, capsys):
+    module = engine()
+    monkeypatch.setattr(module, "bundled_wheels", lambda: [])
+    assert module.install_plan([]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["recommended"] == "PyPI"
+    assert out["plans"][0]["recommended"] is True
+
+
 def test_run_refuses_anything_but_the_engine(capsys):
     assert engine().run(["rm", "-rf", "/"]) == 3
     assert json.loads(capsys.readouterr().out)["ok"] is False

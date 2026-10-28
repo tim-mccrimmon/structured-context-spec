@@ -87,7 +87,8 @@ tag, then a bundled wheel) is tried in WP-10, once the skills exist.
    Project with no rules has nothing to compile. With a real-style address and one prohibition
    written through `scs scd write`, every step passed.
 7. **rc1 in Claude.ai, through the skill.** The install flow worked as designed: check, plan,
-   confirmation, install, check. Three things to fix:
+   confirmation, install, check. Three things it showed, since fixed in the skills (the
+   engine's `install-plan` marks a `recommended` plan, and two rules added to every skill):
    - The agent labelled PyPI (`scs-tools==0.7.0`) "recommended", although 0.7.0 is not yet on
      PyPI and the `v0.7.0` GitHub tag does not exist; only the bundled wheels could work.
      `install-plan` should say which plan to use when wheels are bundled.

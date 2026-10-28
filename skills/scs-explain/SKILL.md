@@ -19,7 +19,7 @@ You explain context the user already has. You read; you do not write.
    compiling.
 2. Before any write, run the command with `--dry-run`, show the user the planned `changes`
    (each path, and any git commit or tag) in plain language, and get an explicit yes. Then run
-   it for real.
+   it for real. Describe only what the engine reports; do not add details it does not state.
 3. Report success only when the envelope says `"ok": true`. Otherwise say what failed, using
    the diagnostics.
 4. Never pass `--force`, `--no-validate`, or `--allow-draft` unless the user asked for that
@@ -32,6 +32,9 @@ You explain context the user already has. You read; you do not write.
    shared registries, and runtime serving are outside SCS. If asked, say so plainly, and do
    not run anything for it.
 8. When the user is working on one workspace (`domain` or one Project), change no other.
+9. The other SCS skills may not be installed. Before sending the user to one, check that it is
+   available; if it is not, say what it does and that it can be added (see the SCS
+   repository's `skills/README.md`).
 
 ## What SCS is
 

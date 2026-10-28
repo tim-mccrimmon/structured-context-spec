@@ -21,7 +21,7 @@ facts for the AI tools they use. You gather what is needed in conversation, and 
    compiling.
 2. Before any write, run the command with `--dry-run`, show the user the planned `changes`
    (each path, and any git commit or tag) in plain language, and get an explicit yes. Then run
-   it for real.
+   it for real. Describe only what the engine reports; do not add details it does not state.
 3. Report success only when the envelope says `"ok": true`. Otherwise say what failed, using
    the diagnostics.
 4. Never pass `--force`, `--no-validate`, or `--allow-draft` unless the user asked for that
@@ -34,12 +34,16 @@ facts for the AI tools they use. You gather what is needed in conversation, and 
    shared registries, and runtime serving are outside SCS. If asked, say so plainly, and do
    not run anything for it.
 8. When the user is working on one workspace (`domain` or one Project), change no other.
+9. The other SCS skills may not be installed. Before sending the user to one, check that it is
+   available; if it is not, say what it does and that it can be added (see the SCS
+   repository's `skills/README.md`).
 
 ## 0. Check the engine
 
 Run `scripts/scs_engine.py check`. If `ok` is false, run `scripts/scs_engine.py install-plan`
-and show the user the command and where the package comes from. Install only once the user
-agrees, or let them run it. If the user uploaded wheel files, run `stage-wheels` on them first
+and show the user the command and where the package comes from. Recommend the plan the result
+marks `recommended`; when wheels are bundled, that is the wheels, since the matching release
+may not be on PyPI yet. Install only once the user agrees, or let them run it. If the user uploaded wheel files, run `stage-wheels` on them first
 and pass the staged paths to `install-plan`.
 
 ## 1. Establish the Domain repository first
@@ -49,8 +53,9 @@ or a new one. A Domain is one owner's governance: an organization, or one person
 
 - **Existing:** confirm the path, then work inside it. A repository holds `domain/` and
   `projects/<name>/`, each with `.scs/config`.
-- **New:** propose the name `<domain-name>-context` (for example `acme-cdmo-context`,
-  `jdoe-context`). Build the Domain workspace before any Project.
+- **New:** propose a Domain name (for example `acme-cdmo`, `jdoe`). `scs new domain <name>`
+  creates the repository `<name>-context/`, so pass the name without `-context`. Build the
+  Domain workspace before any Project.
 
 ## 2. Routing questions (always)
 
@@ -78,7 +83,9 @@ scripts/scs_engine.py run scs new domain <name> --ontology <ontology> \
 ```
 
 Show the planned changes (the repository, `AGENTS.md`, CI workflow, templates, the initial
-commit), get a yes, then run it without `--dry-run`. For a Project, run
+commit), get a yes, then run it without `--dry-run`. The engine makes the initial commit as
+`scs-tools <noreply@scs.invalid>`; the author you were given goes into `created_by` in the
+files, not into the commit. For a Project, run
 `scs new project <name> --dir <repository> ...` the same way, only after the Domain exists.
 
 The scaffold supplies every template for the ontology. Go through them with the user and remove

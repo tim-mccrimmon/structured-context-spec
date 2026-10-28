@@ -101,6 +101,11 @@ def install_plan(wheels: list[str]) -> int:
         },
     ]
     if staged:
+        for plan in plans:
+            plan["note"] += (
+                f" Use only if {PACKAGE} {RELEASE} has been released; the wheels here may be"
+                " a pre-release that is not published there."
+            )
         plans.insert(
             0,
             {
@@ -111,12 +116,16 @@ def install_plan(wheels: list[str]) -> int:
                 "their standard names (stage-wheels).",
             },
         )
+    for plan in plans:
+        plan["recommended"] = plan is plans[0]
     emit(
         {
             "ok": True,
+            "recommended": plans[0]["source"],
             "plans": plans,
             "after": f"Put {venv}/bin on PATH, then run `scs_engine.py check` again.",
-            "rule": "Show the user the command and where the package comes from "
+            "rule": "Recommend the plan marked recommended. "
+            "Show the user the command and where the package comes from "
             "(pypi.org/project/scs-tools, github.com/tim-mccrimmon/structured-context-spec). "
             "Install only after the user agrees, or let the user run it.",
         }
