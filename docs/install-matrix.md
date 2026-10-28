@@ -23,6 +23,7 @@ matrix is run again against WP-11rc.
 | Claude Code (macOS, auto mode) | Same command, run by the agent | no: refused by the auto-mode safety check ("Code from External") before it ran | yes | yes | 3.14.6 | 2.54.0 | configured | not run | 2026-10-28 | User runs the install (`! pip install ...`) or adds a permission rule (note 1) |
 | Claude.ai | Same command, run by the agent after the user confirmed the package is theirs (note 2) | no: `test.pypi.org` does not resolve in the sandbox (`NameResolutionError`); pip found only `scs-tools` 0.1.0 on PyPI (note 4) | yes (200) | no: 403 from the sandbox proxy unless the repository is added to the session (note 3) | 3.13.18 | 2.43.0 | configured | not run | 2026-10-28 | PyPI once 0.7.0 (or a pre-release) is on PyPI; bundled wheel works now (next row) |
 | Claude.ai (bundled wheel) | Both wheels uploaded to the chat, copied to their original file names, `pip install` from the files; dependencies from PyPI (note 5) | yes; `scs new domain`, `scs-validate --strict`, `scs compile --allow-draft`, and `scs stack` all ran (git init and commit work) | yes | no (note 3) | 3.13.18 | 2.43.0 | configured | `{"scs_version": "0.7.0", "tools_version": "0.7.0rc0"}` | 2026-10-28 | bundled wheel |
+| Claude.ai (bundled wheel in the skill), rc1 | `scs-intake.zip` built by `skills/package.py --wheels`, uploaded under Customize > Skills; `/scs-intake` ran `scs_engine.py check`, showed the install plan, and installed the bundled wheels after the user confirmed; dependencies from PyPI (note 7) | yes; engine `check` accepts 0.7.0rc1; `scs new domain --ontology personal` (dry run shown and confirmed first) and `scs-validate --strict` at the root passed, 0 errors, 0 warnings, one `SCD_EMPTY` info | yes | not tried | 3.13.18 | 2.43.0 | configured | 0.7.0rc1 (per engine `check`) | 2026-10-28 | bundled wheel until 0.7.0 is on PyPI |
 | Cursor | deferred: not yet run (Tim, later; Claude clients first) | | | | | | | | | |
 | Codex | deferred: not yet run (Tim, later; Claude clients first) | | | | | | | | | |
 | GitHub Copilot | deferred: not yet run (Tim, later; Claude clients first) | | | | | | | | | |
@@ -85,4 +86,14 @@ tag, then a bundled wheel) is tried in WP-10, once the skills exist.
    author at `acme.example` are placeholders (`VERSION_PROVENANCE_PLACEHOLDER`, D-71), and a
    Project with no rules has nothing to compile. With a real-style address and one prohibition
    written through `scs scd write`, every step passed.
+7. **rc1 in Claude.ai, through the skill.** The install flow worked as designed: check, plan,
+   confirmation, install, check. Three things to fix:
+   - The agent labelled PyPI (`scs-tools==0.7.0`) "recommended", although 0.7.0 is not yet on
+     PyPI and the `v0.7.0` GitHub tag does not exist; only the bundled wheels could work.
+     `install-plan` should say which plan to use when wheels are bundled.
+   - Describing the dry run of `scs new domain`, the agent said the initial commit is authored
+     by the user; it is authored by `scs-tools <noreply@scs.invalid>`. The `git-commit` change
+     does not name an author, so the agent filled one in.
+   - It pointed to scs-draft, which was not installed (only `scs-intake` was uploaded).
+     Skills should not assume the others are present.
 
