@@ -127,7 +127,7 @@ explicit null.)
 | `relationship_types[]` | no | domain may restrict the allowed set |
 
 `concerns` is not a valid domain manifest field (retired in 0.5.0) — see §9, Migration.
-`scd:standards:` ids remain accepted as `satisfies` targets in 0.6.0 and are deprecated;
+`scd:standards:` ids remain accepted as `satisfies` targets and have been deprecated since 0.6.0;
 `schemas.standards` is no longer required.
 
 ### 3.2 Relationship Semantics
@@ -212,7 +212,7 @@ unchanged from 0.3's concern bundles:
 - MUST NOT import other bundles (`imports: []`)
 - MUST contain ≥ 1 SCD
 - Domain bundles import concept bundles (MUST import ≥1, MUST contain no direct SCDs), and
-  in 0.6.0 also pin the meta bundle. Project bundles MAY import concept bundles too
+  since 0.6.0 also pin the meta bundle. Project bundles MAY import concept bundles too
   (`bundle-format.md` §3.1).
 
 A concept's `bundle` field (§3.1) is what connects the ontology entry to the concept bundle
@@ -223,7 +223,7 @@ realizing it — matched by bundle name, ignoring the version suffix.
 ## 6. Bundle Validity Properties
 
 Beyond the structural rules above, a concept bundle is expected to have four properties.
-Only the first is validator-enforced as of 0.6.0; the rest are stated intent for future
+Only the first is validator-enforced as of 0.7.0; the rest are stated intent for future
 validator work:
 
 1. **Reflects the ontology** — every SCD's `concept` resolves to a real concept in the
@@ -324,7 +324,7 @@ where noted, to SCDs and bundles from the same domain):
    This alone is a valid (flat) Domain Ontology.
 3. **Add depth incrementally**: set `parent` where a taxonomy exists; add `depends-on` /
    `relates-to`; add `satisfies` citations (`std:...`) for the standards each concept
-   addresses (0.6.0; see `citations.md` §6 for converting `scd:standards:` targets).
+   addresses (since 0.6.0; see `citations.md` §6 for converting `scd:standards:` targets).
 4. **SCDs**: add `concept: concept:<id>` to each SCD in a concept bundle (optional but
    recommended).
 5. **Provenance**: add `version_approved_by` / `version_approved_at` to any bundle that

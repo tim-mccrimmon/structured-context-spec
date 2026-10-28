@@ -23,7 +23,7 @@ Meta-Tier SCDs are intended to be:
 - referenceable by Project-Tier SCDs  
 - interpretable by AI agents and tools  
 
-**Ownership (0.6.0):** the **Meta bundle** and its Meta-Tier SCDs are published and
+**Ownership (since 0.6.0):** the **Meta bundle** and its Meta-Tier SCDs are published and
 versioned with the SCS specification (for example, `bundle:meta:0.6.0`). Adopters do not
 author or edit them. An organization's Domain bundle imports one pinned Meta bundle version;
 Project bundles MUST NOT import it (`bundle-format.md`). Organization-specific vocabulary,
@@ -273,14 +273,14 @@ AI agents SHOULD:
 
 ## 9. Validation Requirements
 
-In SCS 0.6.0:
+In SCS 0.7.0:
 
 - Meta-Tier SCDs MUST conform to the meta SCD schema (defined in /schema/scd.meta.schema.json).
 - type MUST be meta.
 - id MUST be unique within the bundle.
 - content MUST follow the structure defined in the corresponding schema.
 
-Additional semantic validation (e.g., cross-SCD consistency) is out of scope for 0.6.0 but may be performed by tools.
+Additional semantic validation (e.g., cross-SCD consistency) is out of scope for 0.7.0 but may be performed by tools.
 
 ⸻
 
@@ -294,7 +294,7 @@ Future versions of SCS may add:
 - cross-bundle meta libraries
 - domain-specific meta taxonomies
 
-The Meta-Tier defined in 0.6.0 is intentionally minimal but designed for evolution.
+The Meta-Tier, as defined since 0.6.0, is intentionally minimal but designed for evolution.
 
 ---
 

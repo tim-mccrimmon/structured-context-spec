@@ -1,7 +1,7 @@
 # SCS 0.7.0 — Core Model  
 **Version:** 0.7.0 (Draft)  
 **Status:** Work in Progress  
-**Last Updated:** 2026-10-25  
+**Last Updated:** 2026-10-28  
 
 ---
 
@@ -10,7 +10,7 @@
 The Core Model defines the foundational structures and semantics of the Structured Context Specification (SCS).  
 It establishes the conceptual architecture upon which SCDs, tiers, bundles, schemas, and tools are built.
 
-This model is **normative** for SCS 0.6.0 and is intended to remain stable across future versions.
+This model is **normative** for SCS 0.7.0 and is intended to remain stable across future versions.
 
 This document describes the model as it applies to any single AI actor reasoning over a
 bundle. For how context is *selected* for a given actor, how tool permissions become
@@ -72,7 +72,7 @@ These properties provide minimal requirements for:
 
 ## 4. SCD Structure
 
-While SCD structures may evolve, the 0.6.0 version establishes the following top-level pattern:
+While SCD structures may evolve, the 0.7.0 version establishes the following top-level pattern:
 
 ```yaml
 id: scd:<unique-id>
@@ -111,7 +111,7 @@ This structure ensures:
 
 ## 5. SCD Tiers (Type Model)
 
-Each SCD must belong to exactly one tier. SCS 0.6.0 has two active tiers, Meta and
+Each SCD must belong to exactly one tier. SCS 0.7.0 has two active tiers, Meta and
 Project. The Standards tier is deprecated (§5.2).
 
 ### 5.1 Meta-Tier
@@ -155,17 +155,18 @@ Includes:
 ### 5.4 Terminology Note: Corporate / Project / Personal
 
 `ROADMAP.md` and engagement-facing material sometimes describe SCS coverage as
-**Corporate** and **Project** context, with a **Personal** layer deferred (ISS-012). This is
-audience-facing shorthand, not a schema tier — it maps onto bundles as follows:
+**Corporate**, **Project**, and **Personal** context. This is audience-facing shorthand, not
+a schema tier. It maps onto bundles as follows:
 
-- **"Corporate"** is the organization's **Domain bundle**: the pinned Meta bundle plus the
+- **"Corporate"** is an organization's **Domain bundle**: the pinned Meta bundle plus the
   organization's own rules, applied to every project. Deployments often call this tier
   "Global".
 - **"Project"** is a **Project bundle**: one project's governance, independent of the
   Domain bundle and not repeating it.
-- **"Personal"** — individual-level context, such as a user's own uploads — has no schema
-  tier or bundle type. It is out of scope for 0.6.0 (ROADMAP.md workstream 5); it names a
-  scope SCS does not yet model, not a tier waiting to be renamed.
+- **"Personal"** is a **personal Domain**: one person's Domain bundle, covering all of that
+  person's work, usually built on the `personal` Ontology Model (`terminology.md` §2.11). It
+  is a Domain like any other, kept in its own Domain repository, and not a separate tier.
+  Context that an application's own repository carries for its users is outside SCS.
 
 A **"departmental"** layer appears in some engagement narratives (policy that applies to
 one department rather than the whole org). This is a description of a bundle's audience and
@@ -196,7 +197,7 @@ Common relationship types include:
 - conflicts-with
 - implements
 
-Tools may introduce additional semantics, but 0.6.0 defines the minimal set.
+Tools may introduce additional semantics, but 0.7.0 defines the minimal set.
 
 **Note:** these are SCD-to-SCD relationships. A domain's **Domain Ontology**
 (`domain-ontology.md`, RFC-0001) defines a separate, smaller relationship set
@@ -225,7 +226,7 @@ Relationships support:
 
 ## 7. SCD Bundles
 
-An SCD Bundle is a versioned set of SCDs. SCS 0.6.0 defines two independent governance
+An SCD Bundle is a versioned set of SCDs. SCS 0.7.0 defines two independent governance
 bundles (`bundle-format.md`):
 
 | Bundle | Holds | Includes Meta? |
@@ -288,13 +289,13 @@ Bundle versions represent:
 
 ### 8.3 SCS Version (Spec Version)
 
-SCS 0.6.0 defines:
+SCS 0.7.0 defines:
 
 - schema templates
 - required fields
 - allowed SCD structure
 
-Future SCS versions may introduce changes, but SCDs written for 0.6.0 must remain readable by compatible tools.
+Future SCS versions may introduce changes, but SCDs written for 0.6.0 and 0.7.0 must remain readable by compatible tools.
 
 ---
 
@@ -332,13 +333,13 @@ The Core Model enables future tools such as:
 - Architecture Graph Viewers
 - Change Impact Analyzers
 
-While tooling is out of scope for 0.6.0, the Core Model is designed to support it from the beginning.
+While tooling is out of scope for the Core Model, the Core Model is designed to support it from the beginning.
 
 ---
 
 ## 11. Extensibility
 
-SCS 0.6.0 defines the minimal Core Model.
+SCS 0.7.0 defines the minimal Core Model.
 
 Future versions may extend:
 	•	relationship types

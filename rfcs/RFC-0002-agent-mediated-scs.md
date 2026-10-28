@@ -305,7 +305,7 @@ The agent interface MUST be limited to these operations on a local Domain reposi
 | Maintain | Add, edit, retire, and re-scope SCDs; add concept bundles; explain existing context in plain language. Each write is an engine command: `scs scd write` (content on stdin), `scs bundle add-scd`, `remove-scd`, `add-import`, `pin`. Retiring an SCD is removing it from its bundle. |
 | Validate | Run the validator; explain results; propose fixes |
 | Version | Pin imports; version bundles; record approver and notes |
-| Compile | Produce the runtime artifact defined in [runtime-artifact.md](../spec/0.6/runtime-artifact.md); preview and check a stack of compiled artifacts (section 13) |
+| Compile | Produce the runtime artifact defined in [runtime-artifact.md](../spec/0.7/runtime-artifact.md); preview and check a stack of compiled artifacts (section 13) |
 
 SCS's output ends at a validated, versioned bundle and its compiled artifact. Placing
 artifacts where AI services read them (section 10), multi-user review, approval workflows,
@@ -589,7 +589,7 @@ added. A `--from` version with no tag is an error (`DIFF_VERSION_NOT_FOUND`).
 When the user provides source documents, the agent MAY draft SCD items from them. Each item
 drafted from a document MUST carry a `derived_from` entry naming the document, and SHOULD carry
 a locator. The agent MUST NOT copy standard text into SCDs; citations remain `std:`
-references (see [citations.md](../spec/0.6/citations.md)). Source documents stay in the
+references (see [citations.md](../spec/0.7/citations.md)). Source documents stay in the
 user's workspace; the interface MUST NOT send them anywhere other than the user's own AI
 client.
 
@@ -737,7 +737,7 @@ current documentation when written or updated, since these conventions change. S
 use it to advise the user after compiling.
 
 Every compiled artifact already identifies its bundle and version, and carries a
-self-identification rule (see [runtime-artifact.md](../spec/0.6/runtime-artifact.md) §3), so
+self-identification rule (see [runtime-artifact.md](../spec/0.7/runtime-artifact.md) §3), so
 a user or an agent can always tell which version is in place. With section 11 it also carries
 the source digest, so a rendering can be checked against the exact content it came from. The
 placement guide SHOULD recommend that renderings keep the bundle id, version, and digest.
@@ -762,7 +762,7 @@ full resolved content and record it in the version manifest:
 
 Each file is parsed and serialized canonically before hashing: JSON with sorted keys, no
 insignificant whitespace, and non-ASCII characters unescaped, as
-[runtime-artifact.md](../spec/0.6/runtime-artifact.md) §3.6 does for artifacts. Inputs are
+[runtime-artifact.md](../spec/0.7/runtime-artifact.md) §3.6 does for artifacts. Inputs are
 hashed in a fixed order (the manifest, then SCDs by id, then imports by id). The digest is
 SHA-256, written `sha256:<hex>`. Because files are parsed first, edits to comments or
 formatting do not change the digest; edits to content do.
@@ -866,7 +866,7 @@ The command:
 - MUST only read. It MUST NOT write, compile, or place anything, and it MAY read artifacts from
   any path, since the layers of a stack usually come from different Domain repositories.
 - MUST accept only runtime artifacts as defined in
-  [runtime-artifact.md](../spec/0.6/runtime-artifact.md); any other input is an error
+  [runtime-artifact.md](../spec/0.7/runtime-artifact.md); any other input is an error
   (`STACK_ARTIFACT_INVALID`).
 - MUST NOT merge, reorder, or drop rules. SCS defines no precedence between layers: a rule in an
   inner layer does not override one in an outer layer. How a client weighs layers is the
@@ -1175,5 +1175,5 @@ optional.
 - RFC 0003: Review Profiles (stub). Declarative, citable checks that structure the advisory
   review in section 12.
 - Related issues: ISS-014, ISS-027, ISS-042, ISS-043, ISS-044, ISS-045.
-- Related spec: [bundle-format.md](../spec/0.6/bundle-format.md) (Domain and Project
-  independence; §7.3 immutability), [runtime-artifact.md](../spec/0.6/runtime-artifact.md).
+- Related spec: [bundle-format.md](../spec/0.7/bundle-format.md) (Domain and Project
+  independence; §7.3 immutability), [runtime-artifact.md](../spec/0.7/runtime-artifact.md).

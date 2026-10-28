@@ -10,7 +10,7 @@
 Through 0.5.0, SCS represented external standards (HIPAA, SOC 2, ISO 13485 and others) as
 **Standards-Tier SCDs**, grouped into **Standards bundles** and imported into projects.
 
-In 0.6.0:
+Since 0.6.0:
 
 - The **Standards tier** (`type: standards`, `scd:standards:` ids) is deprecated.
 - The **Standards bundle** type (`type: standards`) is deprecated (`bundle-format.md` §3.3).
@@ -19,7 +19,7 @@ In 0.6.0:
   (`citations.md`).
 
 Validators continue to accept Standards-Tier SCDs, Standards bundles and `scd:standards:`
-relationship targets in 0.6.0, with deprecation warnings. They will be removed in a later
+relationship targets, with deprecation warnings. They will be removed in a later
 release.
 
 ---

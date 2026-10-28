@@ -231,7 +231,7 @@ semver version whose `provenance.version_approved_by` / `version_approved_at` ar
 A `DRAFT` bundle is never "in effect" for a governed call; it is a working version only.
 
 **Pinning.** A deployment may override this default by pinning an older approved version
-for a given bundle. SCS 0.6.0 does not define the pin's storage mechanism (a candidate for a
+for a given bundle. SCS 0.7.0 does not define the pin's storage mechanism (a candidate for a
 future meta-tier field, deployment config, or runtime-specific setting) — only that if a pin
 exists, it takes precedence over "latest approved" when resolving what's in effect.
 

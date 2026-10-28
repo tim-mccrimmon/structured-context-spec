@@ -1,13 +1,15 @@
 # Structured Context Specification (SCS) — Overview
 **Version:** 0.7.0 (Draft)
 **Status:** Work in Progress
-**Last Updated:** 2026-10-25
+**Last Updated:** 2026-10-28
 
 ---
 
 ## 1. Introduction
 
-**If you are using AI and not using Structured Context - you are doing it wrong.**
+SCS is versioned context for generative AI: the guidance, guardrails, and supporting facts an
+organization stands behind, authored deliberately and changed only by a new version. That
+distinguishes it from retrieved context, which changes with every query.
 
 AI is transforming professional work across all domains:
 - **Legal aids** draft contracts and analyze case law
@@ -38,6 +40,33 @@ The **Structured Context Specification (SCS)** provides a unified, domain-agnost
 
 SCS is not a programming framework or industry-specific tool.
 It is a **universal context framework** — a platform for representing the truth of professional work across all domains.
+
+### 1.1 Scope
+
+SCS covers context from intake to a validated, versioned bundle and its compiled artifact, kept
+in a local Domain repository ([bundle-format.md](bundle-format.md) §8):
+
+| Area | What SCS defines |
+|---|---|
+| Create | The Domain repository and its Domain and Project workspaces; SCDs, drafted from conversation or source documents; the intake record |
+| Maintain | Adding, editing, retiring, and re-scoping SCDs; adding concept bundles |
+| Validate | Schemas, rules, and integrity checks, with registered diagnostic codes |
+| Version | Pinned imports; versions recorded as git tags with an approver and a content digest |
+| Compile | The runtime artifact ([runtime-artifact.md](runtime-artifact.md)) |
+
+SCS's output ends at a validated, versioned bundle and its compiled artifact. The versioned
+bundle is the source of truth; the compiled artifact, and anything derived from it for a
+particular vendor or runtime, is a rendering. The following are out of scope for SCS:
+
+- placing artifacts where AI services read them, or transforming them for a service. That is
+  the owner's decision, and SCS tools MUST NOT do it. The non-normative placement guide
+  (`docs/placement/`) describes common services;
+- multi-user review and approval workflows;
+- shared or hosted registries;
+- runtime serving: selecting or streaming context to agents at request time.
+
+Agents that operate SCS on a user's behalf work within this scope
+([agent-interface.md](agent-interface.md)).
 
 ---
 
@@ -149,7 +178,7 @@ Every SCD is:
 
 ### 4.2 SCD Tiers
 
-SCS organizes SCDs into tiers. Two are active in 0.6.0, Meta and Project; the Standards
+SCS organizes SCDs into tiers. Two are active, Meta and Project; the Standards
 tier is deprecated.
 
 #### **1. Meta-Tier SCDs**  
@@ -192,7 +221,7 @@ See `standards-tier.md` and `citations.md`.
 
 A **bundle** is a manifest document that organizes and references SCDs and other bundles. Bundles are NOT SCDs themselves - they are container documents similar to Docker manifests.
 
-SCS 0.6.0 defines **five bundle types**, one of them deprecated:
+SCS 0.7.0 defines **five bundle types**, one of them deprecated:
 
 1. **Domain Bundle** - An organization's governance, applied to every project (deployments
    often call it "Global"). It pins the Meta bundle and imports concept bundles holding the
@@ -265,9 +294,20 @@ Tools built on SCS (e.g., Viewer/Editor, Evaluator, Validator) are domain-aware 
 
 ---
 
-## 6. Scope of the 0.6.0 Specification
+## 6. Scope of the 0.7.0 Specification
 
-0.6.0 separates governance into two independent bundles and retires standards-as-SCDs:
+0.7.0 keeps the 0.6.0 bundle model and adds how context is kept and versioned:
+
+- **One Domain repository per Domain.** A Domain's context lives in its own git repository: one
+  Domain workspace and its Project workspaces (`bundle-format.md` §8). A Domain can belong to an
+  organization or to one person.
+- **The git tag is the record of a version**, and a versioned bundle is verifiably unchanged:
+  versioning records a content digest, and validators and compilers check it against the tag
+  (`bundle-format.md` §7).
+- **Agents may operate SCS on a user's behalf** through the tools, within the scope of §1.1
+  (`agent-interface.md`).
+
+0.6.0 separated governance into two independent bundles and retired standards-as-SCDs:
 
 - **Domain and Project bundles are independent.** A Domain bundle is the organization's
   governance and imports the pinned Meta bundle plus concept bundles. A Project bundle holds
@@ -300,7 +340,9 @@ architecture.
 
 ---
 
-## 7. Out of Scope (For 0.6.0)
+## 7. Out of Scope (For 0.7.0)
+
+See also §1.1 for what lies outside SCS altogether.
 
 The following will be addressed in later versions:
 
@@ -389,7 +431,7 @@ With SCS, it becomes structured, predictable, and governable across all domains.
 
 ## 11. Specification Documents
 
-The SCS 0.6.0 specification includes:
+The SCS 0.7.0 specification includes:
 
 - **terminology.md** - Definitions of core concepts, domains, and bundle types
 - **core-model.md** - The foundational SCD/tier/bundle/relationship model
@@ -405,7 +447,7 @@ The SCS 0.6.0 specification includes:
 - **../../examples/** - Complete working examples, including the Software Development and
   Medical-Device CDMO domains
 
-These documents together form the complete SCS 0.6.0 specification.
+These documents together form the complete SCS 0.7.0 specification.
 
 **For Domain Experts:**
 If you want to create a domain for your professional field (Legal, Clinical, Financial, etc.), start with `domain-ontology.md` and an existing Ontology Model (Software Development, Medical-Device CDMO, or Merchant Cash Advance) as a reference.

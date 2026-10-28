@@ -114,7 +114,7 @@ Project-Tier SCDs follow the general SCD structure described in the Core Model.
 
 ## 5. Common Project-Tier SCD Types
 
-SCS 0.6.0 does not prescribe specific SCDs but recommends common patterns.
+SCS 0.7.0 does not prescribe specific SCDs but recommends common patterns.
 
 ### 5.1 Architecture SCD
 
@@ -268,7 +268,7 @@ relationships:
     target: std:soc2:2017#CC2.1
 ```
 
-`scd:standards:` targets still validate in 0.6.0 but are deprecated.
+`scd:standards:` targets still validate but have been deprecated since 0.6.0.
 
 ### 6.3 With Other Project-Tier SCDs
 
@@ -320,7 +320,7 @@ SCDs, then the Project bundle's SCDs.
 
 ## 9. Validation Requirements
 
-In SCS 0.6.0:
+In SCS 0.7.0:
 
 - Project-Tier SCDs MUST conform to scd.project.schema.json.
 - The type MUST be project.
@@ -328,7 +328,7 @@ In SCS 0.6.0:
 - Relationships MUST reference valid SCD identifiers, or for `satisfies`, well-formed
   citation references.
 
-Semantic validation (e.g., architectural coherence) is tool-dependent and out of scope for 0.6.0.
+Semantic validation (e.g., architectural coherence) is tool-dependent and out of scope for 0.7.0.
 
 ---
 

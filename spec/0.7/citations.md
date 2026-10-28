@@ -9,7 +9,7 @@
 ## 1. Purpose
 
 This document defines how SCS refers to external standards (ISO 13485, IEC 62304, HIPAA,
-SOC 2, and so on). In 0.6.0 a standard appears in SCS only as a **citation reference**: an
+SOC 2, and so on). Since 0.6.0 a standard appears in SCS only as a **citation reference**: an
 identifier for a standard, an edition, and optionally a clause. A citation carries no text
 from the standard.
 
@@ -138,7 +138,7 @@ them. They MUST NOT be expanded into standard text.
 
 ## 6. Migration From Standards-Tier SCDs
 
-`scd:standards:` identifiers remain valid in 0.6.0 and produce a deprecation warning.
+`scd:standards:` identifiers remain valid and produce a deprecation warning (deprecated since 0.6.0).
 
 1. For each standards-tier SCD, find the rules that implement it and add the corresponding
    citation to those SCDs (`cites`), or to the concept that addresses it (`satisfies`).

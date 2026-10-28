@@ -2,7 +2,7 @@
 
 **Version:** 0.7.0 (Draft)
 **Status:** Work in Progress
-**Last Updated:** 2026-10-25
+**Last Updated:** 2026-10-28
 
 ---
 
@@ -19,8 +19,8 @@ The Bundle Format defines:
 - how a bundle version gets approved, once it leaves `DRAFT`
 - how tools load, validate, and reason over bundles
 
-In SCS 0.6.0, a real (non-`DRAFT`) bundle version serves as an **immutable, approved
-contract** for structured context.
+A real (non-`DRAFT`) bundle version serves as an **immutable, approved contract** for
+structured context. It is recorded as a git tag in the owner's Domain repository (§7.3, §8).
 
 ### What changed in 0.6.0
 
@@ -40,6 +40,12 @@ See `docs/MIGRATION-0.6.0.md`.
 - **Versioned bundles are verifiably immutable.** Versioning records a content digest over
   the bundle's full resolved content; validators and compilers verify it, and a mismatch is
   an error (§7.3, §7.6, §9.6).
+- **The git tag is the record of a version.** A version is the tag
+  `<workspace>/<bundle-name>-v<version>` on a commit holding the whole workspace. Verification
+  reads the tagged content, not only the working tree (§7.3, §7.7).
+- **One Domain repository per Domain.** A Domain's context lives in its own git repository,
+  holding one Domain workspace and its Project workspaces (§8). A Domain can belong to an
+  organization or to one person.
 
 See `docs/MIGRATION-0.7.0.md`.
 
@@ -76,7 +82,7 @@ Just as Docker manifests organize layers without being layers themselves, SCS bu
 
 ## 3. Bundle Types
 
-SCS 0.6.0 defines **four bundle types**, plus one deprecated type:
+SCS 0.7.0 defines **four bundle types**, plus one deprecated type:
 
 | Type | Holds | Authored by |
 |---|---|---|
@@ -188,7 +194,7 @@ provenance:
 **Status**: Deprecated in 0.6.0; scheduled for removal in a later release
 
 Standards bundles are no longer part of the bundle model. Tools MUST continue to accept
-`type: standards` in 0.6.0 and SHOULD warn when they encounter one. Domain and Project
+`type: standards` in 0.7.0 and SHOULD warn when they encounter one. Domain and Project
 bundles SHOULD NOT import them.
 
 Standards are referenced by **citation** instead: an SCD's `cites` list, or a `satisfies`
@@ -408,7 +414,7 @@ Examples:
 - `scd:meta:roles` - Meta-tier SCD
 - `scd:project:system-context` - Project-tier SCD
 
-`scd:standards:` references remain valid in 0.6.0 and are deprecated (`citations.md` §6).
+`scd:standards:` references remain valid and have been deprecated since 0.6.0 (`citations.md` §6).
 
 ---
 
@@ -517,8 +523,18 @@ Once versioned (e.g., `1.0.0`), a bundle MUST remain immutable. Changes require 
 
 Immutability covers the bundle's full resolved content: its manifest, every SCD it lists, and
 every bundle it imports. Editing an SCD after `1.0.0` changes what `1.0.0` means, so it is a
-change to the bundle. Tools make this checkable with a content digest (§7.6). Git tags locate
-versions; they are not the guarantee, since a tag can be moved.
+change to the bundle. A versioned bundle MUST be verifiably unchanged after it is versioned.
+
+**The tag is the record.** A version of a bundle is the git tag
+`<workspace>/<bundle-name>-v<version>` (§8.5) on a commit that holds the whole workspace
+directory except `dist/`. The version manifest at that tag records the approver, the
+validation result, and the content digest (§7.6). Verification reads the tagged content and the
+tagged manifest, never only the working tree, so editing a manifest in place cannot vouch for
+changed content (§7.7). Because the tagged commit holds every compiler input, any version can be
+rebuilt from its tag.
+
+The working bundle file stays `DRAFT` after versioning; the released copy is the snapshot
+beside it, and the record is the tag.
 
 ### 7.4 Independent Versioning
 
@@ -581,7 +597,7 @@ The versioned bundle's `provenance` records `validation_passed` and `approval_st
 what happened: a bundle versioned without validation records `validation_passed: false` and
 `approval_status: approved` rather than `validated`.
 
-**Verification.** A validator or compiler given a versioned bundle recomputes its content
+**Digest checks.** A validator or compiler given a versioned bundle recomputes its content
 digest and compares it with its version manifest's `content_digest`:
 
 - A mismatch is an error in every mode. The diagnostic SHOULD name the bundles and SCDs whose
@@ -593,44 +609,200 @@ digest and compares it with its version manifest's `content_digest`:
   specification, such as the meta bundle) has nothing to verify against and is not reported.
 
 Every versioned bundle in a tree that has a version manifest is verified, not only the root.
+In a Domain repository these checks read the tags (§7.7).
+
 A compiled artifact carries the root's content digest as `source_digest`
 ([runtime-artifact.md](runtime-artifact.md) §3.1), so a rendering can be checked against the
-exact content it came from.
+exact content it came from. Compiling at a checkout of a version's tag, with the
+`tools_version` its manifest records, gives an artifact with the same `source_digest` and the
+same content as the original, apart from the fields
+[runtime-artifact.md](runtime-artifact.md) §3.5 declares variable.
+
+### 7.7 Verification of Versions
+
+Run at the root of a Domain repository, a validator MUST make three checks, each an error in
+every mode:
+
+1. **Every version tag.** The digest recomputed from the tagged content equals the tagged
+   manifest's `content_digest`, and each pinned import's manifest at that commit equals the
+   import's own tagged manifest. A workspace-qualified tag with no manifest at the tag
+   (`VERSION_MANIFEST_MISSING`), and a manifest carrying `content_digest` with no qualified tag
+   (`VERSION_TAG_MISSING`), are errors.
+2. **Working copies of versions in use.** For each version pinned by a working bundle, and the
+   latest version of each bundle whose working file exists, the working manifest and snapshot
+   equal their tagged copies, compared by git blob id (`MANIFEST_ALTERED`). Versions of a
+   removed bundle are history, still covered by check 1.
+3. **Drift.** Each pinned import of a working bundle matches its tagged content
+   (`CONTENT_DIGEST_MISMATCH`). The diagnostic SHOULD name the files whose content changed and
+   the bundles to version again.
+
+All three read tags, so validating a Domain repository from a shallow clone is an error
+(`GIT_HISTORY_INCOMPLETE`). A single version can be checked on request
+(`scs-validate --verify-version <tag>`). Versions recorded without a workspace-qualified tag
+(before 0.7) are history: they are not verified and not reported. Migrating a bundle means
+versioning it once under 0.7.
+
+A compiler MUST run these checks for the tree it compiles, including when the root is `DRAFT`,
+and MUST refuse on a failure. There is no override; a changed bundle needs a new version.
+
+A tool that versions a bundle MUST record `validation_passed` and `approval_status` in the
+version from what actually happened. Skipping content validation (schemas and rules) does not
+skip these integrity checks, and the version records `validation_passed: false`.
+
+### 7.8 Boundary of the Integrity Model
+
+Git allows anyone with write access to delete and recreate a tag. The checks in §7.6 and §7.7
+detect change that was not recorded as a new version. They do not defend against someone who
+rewrites both the content and the tag. Signed tags are out of scope for 0.7. Protecting version
+tags on a shared remote, for example with tag protection rules, is the adopter's
+responsibility.
 
 ---
 
-## 8. Directory Structure
+## 8. Domain Repositories
 
-Domain and Project bundles normally live in separate repositories, owned by the teams that
-approve them.
+### 8.1 One Repository per Domain
+
+Every Domain MUST have its own git repository, called a **Domain repository**. A Domain
+repository holds exactly one Domain workspace, under `domain/`, and zero or more Project
+workspaces, each under `projects/<name>/`. A Project belongs to the Domain whose repository it
+is in. No field records the relationship, because the layout does.
+
+A Domain can belong to an organization or to one person (`terminology.md` §2.11). A person can
+have several Domains, for example one for personal work and one for work done for an employer;
+each has its own repository.
+
+The Domain and Project bundles keep the model of §7.1: a Project bundle does not import the
+Domain bundle, and each is validated, versioned, and compiled on its own. They sit in separate
+directories because their artifacts are placed separately, not because either depends on the
+other.
+
+Application repositories that consume the context are separate and MUST NOT be used to author
+it. Domain repository names SHOULD follow `<domain-name>-context` (for example
+`medtech-cdmo-context`, `jdoe-context`).
+
+### 8.2 Layout
 
 ```
-org-governance/                      # Domain bundle repository
-├── bundles/
-│   ├── domain-bundle.yaml           # The Domain bundle
-│   └── concepts/
-│       ├── design-controls.yaml
-│       └── ...
-├── context/
-│   └── project/                     # Project-tier SCDs holding the org's rules
-│       ├── design-change-control.yaml
-│       └── ...
-├── domain.yaml                      # Domain manifest (ontology)
-└── .scs/
-    └── config.yaml
-
-project-name/                        # Project bundle repository
-├── bundles/
-│   └── project-bundle.yaml
-├── context/
-│   └── project/
-│       ├── pump-release-gates.yaml
-│       └── ...
-└── .scs/
-    └── config.yaml
+medtech-cdmo-context/
+├── AGENTS.md                      # agent instructions: purpose and boundaries of this repo
+├── CLAUDE.md                      # pointer to AGENTS.md
+├── .gitignore                     # ignores sources/ by default
+├── .gitattributes                 # * text eol=lf
+├── .github/workflows/scs-validate.yml
+├── domain/                        # the Domain workspace
+│   ├── .scs/config                # workspace marker: bundle_type, name, ontology, scs_version, tools_version
+│   ├── intake.yaml                # intake record (§8.4)
+│   ├── ontology/
+│   │   └── domain-manifest.yaml   # ontology manifest (domain-ontology.md)
+│   ├── bundles/
+│   │   ├── domain-bundle.yaml
+│   │   └── concepts/
+│   ├── context/
+│   │   └── project/               # SCDs
+│   ├── sources/                   # optional source documents (§8.6)
+│   └── dist/                      # compiled artifacts (§8.7)
+└── projects/
+    └── infusion-pump-fw/          # a Project workspace
+        ├── .scs/config
+        ├── intake.yaml
+        ├── ontology/
+        ├── bundles/
+        │   ├── project-bundle.yaml
+        │   └── concepts/
+        ├── context/
+        │   └── project/
+        ├── sources/
+        └── dist/
 ```
 
-The meta bundle is not copied into either repository; tools supply the published version.
+The meta bundle is not copied into the repository; tools supply the published version.
+
+### 8.3 Workspaces
+
+A **workspace** is a directory with a `.scs/config` file: the Domain workspace or one Project
+workspace. A workspace's name is `domain` for the Domain workspace and the directory name under
+`projects/` for a Project. The `name` in its `.scs/config` MUST match.
+
+The ontology manifest lives at `ontology/domain-manifest.yaml` in each workspace. SCS 0.6
+placed it at `domain/domain-manifest.yaml`, which would become `domain/domain/` in a Domain
+workspace; tools still read the 0.6 location and report it as information.
+
+A workspace's starting set of concept bundles and SCD templates depends on two things only: its
+ontology (`sdlc`, `cdmo`, `mca`, `personal`, and others added later) and its kind (Domain or
+Project). Each ontology provides one set for a Domain workspace and one for a Project workspace.
+The `personal` ontology provides one fixed concept, boundaries (the `prohibited` concept
+bundle); a person's other concepts are defined with them. What does not apply is removed.
+
+### 8.4 Intake Record
+
+A workspace MAY hold an **intake record**, `intake.yaml` at the workspace root
+(`domain/intake.yaml`, `projects/<name>/intake.yaml`). It records the answers that scaffolding
+and drafting were based on, the approvers, source documents, and review findings, so an intake
+can be resumed, revisited, and audited. It is not an SCD and is never compiled. It is validated
+against `schema/intake/intake-schema.json`.
+
+People in the record are identified as `Name <email>`. For a repository that will be shared
+publicly, the record MAY use role-only attribution instead, written `role:<name>` (for example
+`role:quality-manager`). Role-only attribution is allowed in the intake record only; a version
+manifest's approver is always a person.
+
+### 8.5 Versions in the Repository
+
+Each bundle is versioned on its own. Bundle versions MUST be recorded as git tags in the Domain
+repository. Because several workspaces, and their concept bundles, are versioned in one
+repository, tags MUST be qualified by workspace and bundle name:
+`<workspace>/<bundle-name>-v<version>`, where `<workspace>` is `domain` or the Project name (for
+example `domain/company-v1.0.0`, `infusion-pump-fw/design-controls-v1.0.0`).
+
+Version manifests MUST be named `<bundle-name>-v<version>-MANIFEST.yaml`, and snapshots
+`<bundle-name>-v<version>.yaml`, in the bundle's directory. The location supplies the
+workspace, so no two bundles share a manifest file. The bundle names `plan`, `test-plan`, and
+`qa` are reserved for a later release, so its tags cannot collide with a bundle's.
+
+A tool that versions a bundle:
+
+- commits everything under the workspace directory except `dist/`, including deletions, and
+  nothing outside it, then creates an annotated tag on that commit;
+- refuses if a file the digest or the compiler reads is ignored or untracked, or if git is not
+  available. An existing version is never rewritten;
+- refuses if an import is unpinned or `DRAFT`;
+- records the approver as the commit's author. The committer and the tagger are the fixed
+  identity `scs-tools <noreply@scs.invalid>`. Neither identity is read from the environment;
+- on failure at any step, undoes what that run wrote, leaving the working tree, index, and refs
+  as they were.
+
+### 8.6 Source Documents and Reserved Directories
+
+`sources/` holds documents that SCDs were drafted from. The generated `.gitignore` ignores it,
+so source documents stay local unless the owner chooses to track them. An SCD item's
+`derived_from` still names the document. Compilers never read `sources/`, so ignoring it does
+not affect rebuilding a version.
+
+`plan/`, `test-plan/`, and `qa/` are reserved in every workspace for a later release. SCS 0.7
+defines no content for them, and validators and compilers do not read them.
+
+### 8.7 Compiled Output
+
+A compiler SHOULD write to the workspace's `dist/` directory, named
+`<bundle-name>-<version>.yaml`. Compiling a released version reads it from its tag; compiling the
+working `DRAFT` is an explicit choice. Whether `dist/` is committed is the owner's choice; every
+artifact can be rebuilt from its tag. Placing an artifact where an AI service reads it is the
+owner's decision, outside SCS (`overview.md` §1.1).
+
+### 8.8 Agent Instructions and CI
+
+A tool that creates a Domain repository MUST generate an agent instructions file stating that
+the repository manages SCS context for one named Domain and its Projects, that work in it is
+limited to creating, maintaining, validating, versioning, and compiling that context, and that
+application work belongs elsewhere. `AGENTS.md` is the default; the tool SHOULD also generate a
+client-specific file (for example `CLAUDE.md`) that points to it, for clients that read only
+their own file.
+
+The tool SHOULD also generate a CI workflow that validates the Domain workspace and every
+Project workspace with `scs-validate --strict` on every push. Validation reads tags (§7.7), so
+the workflow MUST fetch full history and tags (for GitHub Actions, `fetch-depth: 0`). The
+workflow is a convenience, not a requirement of conformance.
 
 ---
 
@@ -676,6 +848,7 @@ Tools MUST validate that:
 - The recomputed content digest matches the version manifest's `content_digest` (§7.6); a
   mismatch is an error in every mode
 - A version manifest with no `content_digest` is a warning
+- In a Domain repository, the three checks of §7.7 pass
 
 Tools MAY also perform:
 - Compliance completeness checks
@@ -712,8 +885,9 @@ Domain and Project bundles follow the same workflow, independently:
 3. Owners validate the bundle tree
 4. Owners lock concept bundles with versions (e.g., `bundle:design-controls:1.0.0`)
 5. The Domain or Project bundle imports the versioned concept bundles (or lists its SCDs)
-6. The Domain or Project bundle is approved and locked (e.g., `1.0.0`)
-7. The locked bundle is compiled and published for runtime use
+6. The Domain or Project bundle is approved and locked (e.g., `1.0.0`), recorded as its tag
+   (§8.5)
+7. The locked bundle is compiled; where its artifact is placed is the owner's decision (§8.7)
 
 ---
 
@@ -760,9 +934,7 @@ block — see `domain-ontology.md`)
 ## 14. Future Extensions
 
 Future versions may introduce:
-- Bundle signatures for attestation
-- Registry-based bundle resolution
-- Scoping a Project bundle to a named Domain bundle
+- Bundle signatures for attestation (signed tags, §7.8)
 - Bundle dependency graph visualization
 
 ---
@@ -774,6 +946,7 @@ Future versions may introduce:
 - [Domain Ontology](domain-ontology.md) - Concepts and Ontology Models
 - [Bundle Lifecycle](../../docs/bundle-lifecycle.md) - How bundles evolve through development
 - [Migration to 0.6.0](../../docs/MIGRATION-0.6.0.md)
+- [Migration to 0.7.0](../../docs/MIGRATION-0.7.0.md)
 
 ---
 

@@ -1,7 +1,7 @@
 # SCS 0.7.0 — Governance & Compliance  
 **Version:** 0.7.0 (Draft)  
 **Status:** Work in Progress  
-**Last Updated:** 2026-10-25  
+**Last Updated:** 2026-10-28  
 
 ---
 
@@ -219,64 +219,58 @@ evidence:
 
 ## 8. Governance Workflow
 
-A standard governance workflow includes:
+Context is managed in the owner's Domain repository ([bundle-format.md](bundle-format.md) §8),
+like code. A change follows the same path whether a person makes it directly or an agent makes
+it on their behalf:
 
-Step 1 — Add/Modify SCD
+1. **Intake.** The answers and source documents the context is drafted from are recorded in the
+   workspace's intake record.
+2. **Draft or change.** SCDs are added, edited, or retired. Each rule traces to an intake answer
+   or a source document (`derived_from`), and to the person who gave it.
+3. **Validate.** The validator checks schemas, rules, and integrity. Every finding has a
+   registered code.
+4. **Review.** Findings about the content, such as a rule that conflicts with a cited framework,
+   are raised with the owner, and the owner's decision is recorded in the intake record. Review
+   is advisory: declining a finding leaves the content as it is.
+5. **Summarize.** A deterministic diff shows what the new version changes against the last.
+6. **Version.** A named person approves the version. It is recorded as a git tag with the
+   approver and a content digest, and it cannot be changed without detection
+   ([bundle-format.md](bundle-format.md) §7).
+7. **Compile and place.** The version is compiled into a runtime artifact. Where the owner
+   places it is their decision, outside SCS ([overview.md](overview.md) §1.1).
 
-Developers update SCDs as part of feature work.
-
-Step 2 — Issue Discussion
-
-Teams discuss changes in GitHub Issues.
-
-Step 3 — PR Creation
-
-A small, single-purpose branch proposes the change.
-
-Step 4 — Governance Evaluation
-
-AI agents evaluate the bundle for:
-
-- violations
-- missing mappings
-- inconsistent definitions
-- unclear rationale
-
-Step 5 — Human Review
-
-Maintainers confirm or challenge AI findings.
-
-Step 6 — Merge + Version Increment
-
-SCD versions are updated if meaningful changes were made.
-
-Step 7 — status-context.yaml Updated
-
-AI agents summarize the new state.
+Teams that want multi-person review can use pull requests on their own infrastructure. SCS
+does not define a review or approval workflow beyond recording the approver.
 
 ---
 
 ## 9. Role of AI Agents
 
-AI agents in SCS must:
+AI agents relate to SCS in two ways.
 
-- interpret the Domain and Project bundles that apply
-- understand each tier and bundle type
-- trace relationships
-- map obligations to implementations
-- detect inconsistencies
-- answer questions
-- generate missing context
-- propose improvements
-- keep status-context.yaml up to date
+**Agents that consume context** read the compiled Domain and Project artifacts that apply to
+their work. Such agents:
 
-AI agents must NOT autonomously merge changes; governance is still human-led.
+- interpret the Domain and Project rules that apply
+- trace rules to their citations and sources
+- detect conflicts between layers and raise them
+- answer questions about the context in plain language
+
+**Agents that operate SCS** create and maintain context on a user's behalf, through the SCS
+tools, in the user's Domain repository. They work within the scope of
+[overview.md](overview.md) §1.1, and every change they make goes through the tools, is shown to
+the user, and is confirmed by the user before it is written. The rules for such agents are in
+[agent-interface.md](agent-interface.md).
+
+In both roles governance stays human-led. An agent does not approve a version: the approver is
+always a person the user names. An agent does not place artifacts, and does not present itself
+as providing review workflows, registries, or runtime serving.
 
 ---
 
 ## 10. Validation Requirements
 
-SCS 0.6.0 requires tools to validate:
+SCS 0.7.0 requires tools to validate:
 
 ### 10.1 Syntactic Validity
 
@@ -294,7 +288,7 @@ SCS 0.6.0 requires tools to validate:
 ### 10.4 Bundle Integrity
 - all SCDs in the bundle exist and load correctly
 
-### 10.5 Compliance Completeness (Optional in 0.6.0)
+### 10.5 Compliance Completeness (Optional in 0.7.0)
 
 Tools MAY check for:
 
@@ -318,7 +312,7 @@ Future versions of SCS may introduce:
 - provenance lineage graphs
 - organizational policy libraries
 
-The 0.6.0 model defines the minimum surface required for explainable, automatable governance.
+The 0.7.0 model defines the minimum surface required for explainable, automatable governance.
 
 ---
 

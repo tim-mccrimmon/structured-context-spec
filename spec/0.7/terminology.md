@@ -1,7 +1,7 @@
 # SCS 0.7.0 — Terminology
 **Version:** 0.7.0 (Draft)
 **Status:** Work in Progress
-**Last Updated:** 2026-10-25  
+**Last Updated:** 2026-10-28  
 
 ---
 
@@ -162,10 +162,17 @@ Capabilities are often organized in Meta- or Project-Tier SCDs.
 ---
 
 ### **2.11 Domain**
-An **organization** (or an organizational unit with its own governance authority) and the
-governance context that applies across it, carried in a **Domain bundle**. Deployments often
-call this the **Global** context; "organization", "domain", and "global" name the same thing
-for different audiences.
+The **owner of a body of work** and the governance context that applies across all of it,
+carried in a **Domain bundle**. The owner is an **organization** (or an organizational unit
+with its own governance authority) or **one person**. Deployments often call this the
+**Global** context; "organization", "domain", and "global" name the same thing for different
+audiences.
+
+A **personal Domain** belongs to one person and covers all of that person's work. It is
+usually built on the `personal` Ontology Model, whose only fixed concept is boundaries (the
+`prohibited` concept); the person's other concepts are defined with them. A person may have
+several Domains, for example one for personal work and one for work done for an employer.
+Each Domain has its own Domain repository (2.18).
 
 An industry and an organization are the same kind of domain at different levels of detail.
 An industry is described by an **Ontology Model** (2.14): concepts, skeleton SCDs, and open
@@ -255,7 +262,7 @@ specified (RFC-0001, Unresolved Questions).
 ---
 
 ### **2.15 Bundle Types**
-SCS 0.6.0 defines four bundle types, plus one deprecated type. Domain and Project bundles are
+SCS 0.7.0 defines four bundle types, plus one deprecated type. Domain and Project bundles are
 the two **governance bundles**; they are independent, and either may exist without the other.
 
 #### **Domain Bundle**
@@ -315,6 +322,23 @@ are not resolved against any document. Full definition: `citations.md`.
 
 ---
 
+### **2.18 Domain Repository and Workspace**
+A **Domain repository** is the git repository that holds one Domain's context: exactly one
+**Domain workspace** (`domain/`) and zero or more **Project workspaces** (`projects/<name>/`).
+A Project belongs to the Domain whose repository it is in. A **workspace** is a directory with
+a `.scs/config` file; its name is `domain` or the Project's directory name. Versions of a
+workspace's bundles are git tags, `<workspace>/<bundle-name>-v<version>`. See
+[Bundle Format §8](bundle-format.md).
+
+---
+
+### **2.19 Intake Record**
+A workspace's **intake record**, `intake.yaml`, holds the answers its context was drafted from,
+the approvers, source documents, and review findings. It is not an SCD and is never compiled
+([Bundle Format §8.4](bundle-format.md)).
+
+---
+
 ## 3. Tiers
 
 ### **3.1 Meta-Tier**
@@ -358,13 +382,13 @@ Project-tier SCDs include:
 
 ### **3.4 "Corporate / Project / Personal" is Shorthand, Not a Fourth Tier**
 
-Some material (`ROADMAP.md`, engagement-facing docs) describes coverage as Corporate and
-Project context, with Personal deferred. "Corporate" means the Domain bundle (the pinned
-meta bundle plus the organization's rules); "Project" means a Project bundle; "Personal"
-(individual-level context, such as a user's own documents) is not governance and is out of
-scope for SCS. See `core-model.md` §5.4 for the full mapping,
-including why a "departmental" layer some engagements describe is a scope/audience
-distinction, not a tier.
+Some material (`ROADMAP.md`, engagement-facing docs) describes coverage as Corporate, Project,
+and Personal context. "Corporate" means an organization's Domain bundle (the pinned meta bundle
+plus the organization's rules); "Project" means a Project bundle; "Personal" means a **personal
+Domain** (2.11), one person's Domain bundle. None of these is a tier. Context that an
+application's own repository carries for its users is outside SCS. See `core-model.md` §5.4 for
+the full mapping, including why a "departmental" layer some engagements describe is a
+scope/audience distinction, not a tier.
 
 ---
 
