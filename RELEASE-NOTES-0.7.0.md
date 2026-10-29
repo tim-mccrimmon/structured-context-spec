@@ -95,7 +95,8 @@ outside SCS, and this guidance is expected to change in 0.8.
 - **Removed.** `scs init`, `scs new --type`, and `scs bundle version --force` / `--no-git`.
 - **Exit codes.** 0 success, 1 errors, 2 warnings under `--strict`, 3 usage error, 4 file
   error, 5 internal error.
-- **Deprecated.** The `scs-vibe` and `scs-team` plugins, removed in 0.8.
+- **Removed.** The `scs-vibe` and `scs-team` plugins; the Agent Skills in `skills/` replace
+  them.
 
 ## Testing the release candidate
 

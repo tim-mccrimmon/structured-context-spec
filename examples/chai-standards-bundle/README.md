@@ -41,22 +41,9 @@ chai-standards-bundle/
 
 ## Using This Today
 
-### Option 1: With the SCS Team Plugin (Recommended)
+### Option 1: Direct Context
 
-If you have the [SCS Team plugin](https://github.com/tim-mccrimmon/structured-context-spec/tree/main/plugins/scs-team) installed:
-
-1. Clone or download this repository
-2. Copy the four SCD files into your project's `.scs/scds/` directory:
-   ```bash
-   cp scds/*.yaml /your-project/.scs/scds/
-   ```
-3. Run `/scs-team:status` — the plugin picks up the new SCDs automatically and compiles them to `.claude/rules/`
-
-Claude will now operate within CHAI governance boundaries for prior authorization criteria matching.
-
-### Option 2: Direct Context (No Plugin Required)
-
-If you are not using the SCS Team plugin, load the YAML files directly as context for your Claude session:
+Load the YAML files directly as context for your Claude session:
 
 1. Clone or download this repository
 2. Add the contents of the `scds/` directory to your project
@@ -64,7 +51,7 @@ If you are not using the SCS Team plugin, load the YAML files directly as contex
 
 The YAML files are human-readable and can be included in any Claude context — no special tooling required.
 
-### Option 3: Bundle Import (With SCS Control Plane)
+### Option 2: Bundle Import (With SCS Control Plane)
 
 For teams running the SCS Control Plane, compose your project bundle to import this standards bundle:
 
@@ -84,8 +71,6 @@ scds:
 The agent subscribes to a tag (e.g., `prior-auth-agent:latest`) and receives the full resolved bundle graph — including CHAI governance requirements alongside company-specific policies.
 
 ---
-
-**Note:** The SCS Team plugin also includes a general CHAI standards bundle (`/scs-team:use chai`) based on the CHAI Blueprint for Trustworthy AI (2023). This prior authorization bundle is different — it is based on the CHAI T&E Framework v1.0 (December 2025) and is specific to prior authorization criteria matching. Use this bundle if your use case involves AI-supported prior authorization.
 
 ## Why This Matters
 

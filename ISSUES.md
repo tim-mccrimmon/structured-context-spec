@@ -968,8 +968,8 @@ ids; `compile` never emits either. Run `scripts/sync_schemas.py`.
 **Status:** open
 RFC 0002 sections 2, 4, 6, 8, and 12. Skills for intake, draft, review, validate, version,
 compile, and explain, calling the engine in machine mode, with placement advice from the guide
-(ISS-053). Skills live in `skills/` in this repository; `scs-vibe` and `scs-team` are
-deprecated in 0.7 and removed in 0.8. Still open: whether hosted chat sandboxes can install
+(ISS-053). Skills live in `skills/` in this repository; `scs-vibe` and `scs-team` were
+removed in 0.7 (D-26, amended 2026-10-29). Still open: whether hosted chat sandboxes can install
 `scs-tools` (fallback order PyPI, GitHub tag, bundled wheel; settled by WP-11a).
 
 ### ISS-052 - `scs bundle diff`

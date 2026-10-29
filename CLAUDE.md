@@ -45,9 +45,7 @@ structured-context-spec/
 │   ├── bundles/            # Bundle manifest templates
 │   └── scd/                # SCD templates by tier
 ├── examples/               # Reference implementations
-├── plugins/                # Editor/tool integrations
-│   ├── scs-vibe/           # Cursor/Windsurf plugin
-│   └── scs-team/           # Claude Code multi-agent plugin
+├── skills/                 # Agent Skills (scs-intake, scs-draft, ...) for operating SCS
 ├── tools/                  # CLI and validator tools
 │   ├── cli/                # scs CLI
 │   └── scd-validator/      # YAML structure validator
@@ -161,10 +159,10 @@ See `rfcs/README.md` for full process details.
 
 ---
 
-## Plugins
+## Agent Skills
 
-- **scs-vibe** (`plugins/scs-vibe/`) — Cursor and Windsurf integration for design-time context
-- **scs-team** (`plugins/scs-team/`) — Claude Code multi-agent team coordination
+- **`skills/`** — seven `scs-*` skills that operate SCS through the engine in machine mode
+  (see `skills/README.md`). They replace the `scs-vibe` and `scs-team` plugins, removed in 0.7.
 
 ---
 

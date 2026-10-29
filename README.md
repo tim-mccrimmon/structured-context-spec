@@ -141,8 +141,7 @@ structured-context-spec/
 ├── examples/          # Example bundles
 ├── docs/              # Guides
 ├── rfcs/              # Proposals for spec changes
-├── skills/            # Agent Skills for operating SCS (0.7)
-└── plugins/           # Claude Code plugins (deprecated; see below)
+└── skills/            # Agent Skills for operating SCS (0.7)
 ```
 
 ---
@@ -151,8 +150,8 @@ structured-context-spec/
 
 The [SCS Agent Skills](skills/README.md) let an AI assistant build, validate, version, and
 compile a Domain repository for you, confirming each change with you first. They replace the
-`scs-vibe` and `scs-team` plugins in [`plugins/`](plugins/), which are built on the model SCS
-used before 0.6.0, are deprecated in 0.7, and are removed in 0.8.
+`scs-vibe` and `scs-team` plugins, which were built on the model SCS used before 0.6.0 and are
+removed in 0.7.
 
 ---
 

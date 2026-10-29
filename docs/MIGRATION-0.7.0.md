@@ -41,7 +41,7 @@ list every change.
    `scs init` is removed. Scripts should use `--json`, which prints one result envelope.
 6. **CI.** Validate at the repository root with `scs-validate --strict`, and check out with full
    history and tags (`fetch-depth: 0`). `scs new domain` writes a workflow that does this.
-7. **Legacy plugins.** `plugins/scs-vibe` and `plugins/scs-team` are deprecated; use the Agent
+7. **Legacy plugins.** `plugins/scs-vibe` and `plugins/scs-team` are removed; use the Agent
    Skills in `skills/`.
 
 ---
@@ -306,9 +306,9 @@ These edit the files' text, so comments and layout survive.
   operate SCS through the tools in machine mode, confirming every change with the user
   (`spec/0.7/agent-interface.md`). Install steps for Claude Code and Claude are in
   `skills/README.md`.
-- **Deprecated: `plugins/scs-vibe` and `plugins/scs-team`.** They predate the 0.6 model and
-  write context into application repositories. They still load in 0.7 and are removed in 0.8
-  (D-26). Move to the skills; there is no automatic conversion.
+- **Removed: `plugins/scs-vibe` and `plugins/scs-team`.** They predated the 0.6 model and
+  wrote context into application repositories. They are removed in 0.7 (D-26). Move to the
+  skills; there is no automatic conversion.
 
 ## Housekeeping
 

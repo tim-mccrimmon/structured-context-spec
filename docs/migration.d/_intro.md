@@ -41,7 +41,7 @@ list every change.
    `scs init` is removed. Scripts should use `--json`, which prints one result envelope.
 6. **CI.** Validate at the repository root with `scs-validate --strict`, and check out with full
    history and tags (`fetch-depth: 0`). `scs new domain` writes a workflow that does this.
-7. **Legacy plugins.** `plugins/scs-vibe` and `plugins/scs-team` are deprecated; use the Agent
+7. **Legacy plugins.** `plugins/scs-vibe` and `plugins/scs-team` are removed; use the Agent
    Skills in `skills/`.
 
 ---

@@ -91,7 +91,7 @@ copies must match them. Section 5 states the model in full.
 | D-23 | Personal profile and ontologies | Personal ignores ontology unless one is given; `ontology: none` supported. | WP-03 || **Decided** 2026-10-25: as recommended. **Superseded** 2026-10-26 by D-61 and D-62: Personal is an ontology; no `--profile personal`, no `ontology: none`. |
 | D-24 | Placement guide | `docs/placement/<service>.md` with `checked:` dates and sources, for Claude Enterprise, Claude Code, Cursor, GitHub Copilot, ChatGPT Enterprise. Skills ship a copy and state its `checked:` date when advising. | WP-09 || **Decided** 2026-10-25: as recommended. |
 | D-25 | UQ1: where skills live | `skills/` in this repo, versioned with the spec. | WP-10 || **Decided** 2026-10-25: as recommended. |
-| D-26 | UQ2: legacy plugins | Deprecated in 0.7, removed in 0.8. | WP-10 || **Decided** 2026-10-25: as recommended. |
+| D-26 | UQ2: legacy plugins | Removed in 0.7 (`plugins/` deleted); the Agent Skills replace them. | WP-10 || **Decided** 2026-10-25: deprecated in 0.7, removed in 0.8. **Amended** 2026-10-29 by Tim: 0.7 replaces them entirely, so removed in 0.7. |
 | D-27 | UQ3: installing in chat sandboxes | Fallback order recorded now: PyPI; GitHub tag; a wheel bundled with the skill. The choice per client is an output of WP-11a, not part of WP-01b. | WP-10 (via WP-11a) | |
 | D-31 | UQ8: agent instructions file | `AGENTS.md` plus a `CLAUDE.md` pointer. | WP-03 || **Decided** 2026-10-25: as recommended. |
 | D-50 | Target chat clients | WP-11a: Claude.ai, Claude Code, Cursor, Codex, GitHub Copilot. WP-13 runs in Claude.ai. | WP-11a, WP-13 || **Decided** 2026-10-25: as recommended. |

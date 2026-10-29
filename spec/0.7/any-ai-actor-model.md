@@ -135,7 +135,7 @@ restricting or extending the default relationship set (RFC-0001).
 
 A policy SCD is a declaration, not an enforcement mechanism. Something specific to the
 runtime — a compiler, the same kind of function that turns SCDs into `.claude/rules/*.md`
-(`scs-team`'s recompile step) — reads the policy SCD and produces whatever the actual tool
+(the step that compiles SCDs into rule files) — reads the policy SCD and produces whatever the actual tool
 registry needs: a LangChain tool allow-list, an MCP gateway's permission gate, an OPA
 policy. The registry, once populated, enforces the permission the moment an agent tries to
 call a tool. **SCS defines what is permitted. It never enforces it directly, and it does
