@@ -18,8 +18,9 @@ examples/med-adherence/
 - **Project bundle** (`project-bundle.yaml`) imports 11 concept bundles. A project bundle
   may instead list its project-tier SCDs directly; it does one or the other, not both.
 - **No meta, standards, or domain imports.** Organization-wide rules live in the
-  organization's Domain bundle, which is authored and versioned separately. A runtime
-  applies the Domain bundle and this Project bundle side by side.
+  organization's Domain bundle, which is authored and versioned separately. They still
+  apply to this project: a runtime applies the Domain bundle and this Project bundle
+  together.
 - **Standards are cited, not bundled.** `hipaa-compliance.yaml` and `soc2-controls.yaml`
   carry `cites:` entries such as `std:hipaa#164.312`. See `spec/0.6/citations.md`.
 

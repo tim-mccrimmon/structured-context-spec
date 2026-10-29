@@ -263,7 +263,8 @@ specified (RFC-0001, Unresolved Questions).
 
 ### **2.15 Bundle Types**
 SCS 0.7.0 defines four bundle types, plus one deprecated type. Domain and Project bundles are
-the two **governance bundles**; they are independent, and either may exist without the other.
+the two **governance bundles**. A Project inherits its Domain's rules at runtime; the two are
+versioned and compiled separately, and either may exist without the other.
 
 #### **Domain Bundle**
 - **Purpose**: An organization's governance context (often called Global)

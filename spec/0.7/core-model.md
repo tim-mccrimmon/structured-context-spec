@@ -245,8 +245,9 @@ Relationships support:
 
 ## 7. SCD Bundles
 
-An SCD Bundle is a versioned set of SCDs. SCS 0.7.0 defines two independent governance
-bundles (`bundle-format.md`):
+An SCD Bundle is a versioned set of SCDs. SCS 0.7.0 defines two governance bundles
+(`bundle-format.md`). The Domain bundle's rules apply to every project; a Project bundle
+adds one project's rules, and at runtime both apply:
 
 | Bundle | Holds | Includes Meta? |
 | ---- | ---- | ---- |

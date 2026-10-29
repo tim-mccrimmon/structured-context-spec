@@ -154,7 +154,8 @@ See `rfcs/README.md` for full process details.
   - Concept bundles are leaf nodes (no imports)
   - Domain bundle = organization / Global: imports `bundle:meta:<version>` + concepts, no direct SCDs
   - Project bundle: concepts (or SCDs) directly; never imports meta, domain, or standards
-  - Domain and Project bundles are independent trees, compiled separately
+  - Domain and Project bundles are compiled separately; at runtime a Project inherits its
+    Domain's rules
 - **Relationships** — Explicit edges between SCDs for graph traversal (`references`, `applies_to`, `governed_by`)
 - **Validation**: Loose (structure only) in Phase 1 / DRAFT; strict in Phase 2 / versioned
 

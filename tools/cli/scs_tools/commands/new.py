@@ -254,8 +254,9 @@ def project(
 
     Adds `projects/NAME/` to the Domain repository containing the current directory (or the
     one given with --dir). The Project bundle holds the governance for one project. It imports
-    its concept bundles directly and does not import the Domain bundle; a runtime applies the
-    two side by side. Create the repository first with `scs new domain`.
+    its concept bundles directly. The Project inherits its Domain's rules at runtime; the
+    Project bundle does not import the Domain bundle. Create the repository first with
+    `scs new domain`.
 
     By default, prompts for missing required information interactively.
     Use --no-interactive to disable prompts and require all flags.

@@ -25,7 +25,8 @@ There are two kinds of artifact:
   person.
 - A **Project** artifact governs one project.
 
-A runtime applies them side by side, and neither includes the other. They usually go in
+Both apply to work on a project: the Project inherits the Domain's rules at runtime. Each
+artifact is compiled on its own, so neither includes the other, and they usually go in
 different places. The Domain artifact goes at the broadest level that covers all of that
 owner's work and nothing else. The Project artifact goes at the level that covers only that
 project. If you work in several Domains, such as a client organization and your own work, place

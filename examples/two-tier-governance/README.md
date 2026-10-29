@@ -73,8 +73,8 @@ same source always produces the same bytes. The artifacts carry no timestamps or
 each begins with a self-identification rule, so asking an agent "which governance bundles
 are active?" reports both bundles and their versions.
 
-The two bundles are compiled separately and never import each other. A runtime applies them
-side by side: Domain first, then Project.
+The project inherits the Domain bundle's rules: at runtime both apply, Domain first, then
+Project. The two bundles are compiled separately and neither imports the other.
 
 The Domain bundle imports `bundle:meta:0.6.0`, the meta bundle published with the spec
 (`meta/` at the repo root). The tools ship a copy of it, so the import resolves without the

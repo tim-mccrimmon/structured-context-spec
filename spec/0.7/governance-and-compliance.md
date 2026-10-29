@@ -76,7 +76,8 @@ Governance in SCS is **context-driven**—SCDs define the “rules of the system
 Governance agents rely on:
 
 ### 4.1 Governance Bundles  
-Two independent bundles, either of which may be absent:
+Two governance bundles, either of which may be absent. Where both exist, both apply: a
+project is governed by the Domain bundle and its own Project bundle together.
 - **Domain bundle** → the organization's governance: the pinned Meta bundle (semantic
   foundation) plus the organization's own rules, applied to every project  
 - **Project bundle** → one project's governance: system design, constraints, flows,

@@ -78,8 +78,9 @@ scs compile bundles/domain-bundle.yaml --version 1.0.0
 
 SCS 0.7 keeps an owner's context in one git repository, `<name>-context/`. It holds one Domain
 workspace (governance that applies to all of the owner's work) and one workspace per Project
-(governance for one project). The two kinds of bundle are independent: a Project bundle does not
-import the Domain bundle, and a runtime applies the two side by side.
+(governance for one project). A Project inherits its Domain's rules at runtime, so work on a
+Project is governed by both; the two are compiled separately, and a Project bundle does not
+import the Domain bundle.
 
 ```
 acme-health-context/

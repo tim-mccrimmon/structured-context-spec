@@ -69,7 +69,7 @@ scd_reference_pattern:
 # expected_import_types produces a warning when a type is missing.
 bundle_types:
   project:
-    description: "Project bundle - one project's governance, independent of the Domain bundle"
+    description: "Project bundle - one project's governance; the Domain bundle's rules also apply"
     type_name: "project"
 
     imports:

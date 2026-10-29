@@ -83,8 +83,8 @@ SCS defines:
 - semantics that enable tools and AI agents to reason over professional work
 - a governance-friendly model, with **citation references** that trace rules to external
   standards without reproducing their text
-- two independent governance bundles: an organization's **Domain** bundle and each
-  project's **Project** bundle
+- two governance bundles: an organization's **Domain** bundle, whose rules apply to every
+  project, and each project's **Project** bundle, which adds that project's rules
 
 In short:
 **SCS makes professional context a first-class, version-controlled, domain-aware artifact.**
@@ -228,8 +228,9 @@ SCS 0.7.0 defines **five bundle types**, one of them deprecated:
    organization's rules. An industry Ontology Model (Software Development, Medical-Device
    CDMO, Merchant Cash Advance) is its template; the organization's Domain bundle is that
    ontology filled in and approved.
-2. **Project Bundle** - One project's governance only. Independent of the Domain bundle and
-   does not repeat it.
+2. **Project Bundle** - One project's governance. A Project inherits its Domain's rules at
+   runtime, so its bundle holds only what is specific to the project and does not repeat the
+   Domain. It is versioned and compiled separately and does not import the Domain bundle.
 3. **Meta Bundle** - Universal vocabulary, published and versioned with the SCS
    specification; read-only to adopters
 4. **Concept Bundle** - A Domain Ontology concept, realized as SCDs (Architecture, Security, etc.)
@@ -245,8 +246,9 @@ Bundles enable:
 - AI-based reasoning within domain context
 - governance and compliance checks
 
-**Structure**: two independent trees — Domain → Meta + Concept → SCD, and
-Project → SCD (or Project → Concept → SCD). Neither requires the other.
+**Structure**: two trees, built separately and applied together — Domain → Meta + Concept →
+SCD, and Project → SCD (or Project → Concept → SCD). At runtime a project is governed by
+both.
 
 ### 5.2 Domains
 

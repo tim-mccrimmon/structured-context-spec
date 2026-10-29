@@ -104,9 +104,9 @@ expected to observe and follow. Meta and Concept bundles are building blocks for
 **SCDs**: Project-tier SCDs, directly or through imported concept bundles (XOR rule, §9.3)
 
 A Project bundle contains only what is specific to its project: its constraints, decisions,
-and conventions. It does not import or repeat the organization's Domain bundle. Where both
-exist, a consuming tool applies the Domain bundle and the Project bundle side by side
-(§4.2); the Project bundle never needs to restate organization-wide rules.
+and conventions. The project inherits the organization's Domain rules at runtime, so the
+Project bundle does not restate them, and it does not import the Domain bundle. Where both
+exist, a consuming tool applies the two together (§4.2).
 
 **Example (SCDs directly):**
 ```yaml
@@ -334,9 +334,11 @@ When deciding scope:
 
 ## 4. Bundle Structure
 
-### 4.1 Two Independent Trees
+### 4.1 Two Trees, Applied Together
 
-Governance context is organized as two independent bundle trees:
+Governance context is organized as two bundle trees, versioned and compiled separately. At
+runtime both apply to a project: the Domain bundle's rules govern every project, and the
+Project bundle adds that project's rules (§4.2).
 
 ```
 Domain Bundle (organization governance, "Global")

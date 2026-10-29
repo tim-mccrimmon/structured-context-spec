@@ -26,7 +26,7 @@ application's own repository. If you are asked for it here, say so and stop.
 ```
 {{ repo_name }}/
 ├── domain/              # the Domain workspace: governance for all of {{ domain_name }}'s work
-└── projects/<name>/     # one workspace per Project, independent of the Domain bundle
+└── projects/<name>/     # one workspace per Project; the Domain's rules apply to it too
 ```
 
 Each workspace has `.scs/config`, `bundles/` (the root bundle and `concepts/`), `context/project/`

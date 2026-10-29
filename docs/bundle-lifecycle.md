@@ -296,9 +296,10 @@ Once versioned:
 
 ## Bundle Hierarchy
 
-### Two Independent Trees
+### Domain and Project Bundles
 
-SCS 0.6.0 has two governance bundles, each the root of its own tree:
+SCS has two governance bundles, each the root of its own tree. A project is governed by
+both: it inherits the Domain bundle's rules and adds its own.
 
 ```
 Domain bundle (type: domain)            organization-wide; applies to all work
@@ -324,8 +325,8 @@ Project bundle (type: project)          one project
 - Neither tree contains standards text. SCDs and concepts cite standards with `std:`
   references (`spec/0.6/citations.md`).
 
-A runtime applies the two side by side. The rules in the Domain bundle apply to every
-project; the Project bundle adds the rules for one project.
+At runtime both apply. The rules in the Domain bundle apply to every project; the Project
+bundle adds the rules for one project.
 
 ### Teams Own Concept Bundles
 
