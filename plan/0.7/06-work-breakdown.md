@@ -51,7 +51,6 @@ graph TD
   WP11a[WP-11a Install matrix + D-27] --> WP10
   WP10[WP-10 Skills] --> WP11rc[WP-11rc Release candidate]
   WP11rc --> WP13[WP-13 Acceptance]
-  WP13a[WP-13a 0.6 baseline] --> WP13
   WP13 --> WP11[WP-11 Release 0.7.0]
   WP11 --> WP15[WP-15 Docs site]
 ```
@@ -63,7 +62,7 @@ WP-11rc, WP-13, WP-11. Near-critical: WP-07 to M-07 to WP-02b to WP-10.
 
 | Group | Packages | Waits for |
 |---|---|---|
-| 1 | WP-00, WP-01a, WP-01b, WP-13a | nothing |
+| 1 | WP-00, WP-01a, WP-01b | nothing |
 | 2 | WP-09, WP-11a, WP-02a | WP-01b (WP-02a also WP-01a) |
 | 3 | WP-04 (lead) | WP-00, WP-01a |
 | 4 | WP-05, WP-03 | WP-04 (WP-03 also WP-01b) |
@@ -397,22 +396,25 @@ listed in order, and each starts after the previous one merges.
 - Deferred until demand. When activated: stdio only, every operation through machine mode, no
   behavior of its own (RFC §2).
 
-### WP-13a Baseline run with 0.6 tools
-- **Depends**: none. Onboard Omarchy with 0.6 tools.
-- **Accept**: friction log at `plan/0.7/acceptance/baseline-0.6.md`, each entry with step, time,
-  and blocker.
+### WP-13a Baseline run with 0.6 tools (dropped, D-80)
+Dropped 2026-10-29 by Tim. WP-13 is judged on its own friction log.
 
 ### WP-13 Acceptance (ISS-055)
-- **Depends**: WP-11rc, WP-13a, WP-01b (D-50). Omarchy through Claude.ai with skills only.
-- **Accept**: transcript archived; repo archived as a `git bundle` including tags. Pass if:
+- **Depends**: WP-11rc, WP-01b (D-50). Two tests on the Omarchy box, through Claude Code with
+  the skills only (D-80): a personal Domain, `boat-context` with Project `docs-server`
+  (`personal` ontology), and an organization Domain, `nextern-context` with Project
+  `timekeeping` (`cdmo` ontology). Tim approves the versions in both. Runbook:
+  `scs-0.7-runbook.md` on the Omarchy share.
+- **Accept**: transcripts archived; each repo archived as a `git bundle` including tags. Pass
+  if, for each test:
   - the transcript has no user-typed `scs` command and no spec link opened;
   - `scs-validate --strict` at the repo root exits 0;
-  - the Domain and two Projects each have a tag, a manifest at the tag with a user-named
+  - the Domain and the Project each have a tag, a manifest at the tag with a user-named
     `approved_by`, and a `dist/` artifact whose `source_digest` equals the manifest's
     `content_digest`;
   - each workspace has a valid `intake.yaml`;
   - placement advice was given for each artifact;
-  - the friction log has no unresolved blocker that is absent from the WP-13a log.
+  - the friction log has no unresolved blocker.
 
 ### WP-11 Release 0.7.0
 - **Depends**: WP-13 pass. Publish `0.7.0` to PyPI, tag `v0.7.0`, GitHub releases from `v0.6.0`
