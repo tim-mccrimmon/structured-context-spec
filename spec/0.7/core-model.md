@@ -165,14 +165,11 @@ or for a specific project or system (in a Project bundle). The tier identifies t
 MUST NOT infer it from the tier (`project-tier.md` §1).
 
 Includes:
-	•	architecture
-	•	modules
-	•	features
-	•	quality attributes
-	•	security requirements
-	•	performance targets
-	•	compliance mappings
-	•	operational constraints
+	•	prohibitions
+	•	directives
+	•	facts
+	•	citations of the standards they implement
+	•	reviewer context (summaries, rationale, decisions), which is not compiled
 
 ### 5.4 Terminology Note: Corporate / Project / Personal
 

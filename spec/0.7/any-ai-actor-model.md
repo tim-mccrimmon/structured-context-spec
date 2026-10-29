@@ -84,8 +84,8 @@ A concept's `relationships[]` (RFC-0001) carries only a type and a target — en
 `depends-on`/`relates-to`/`satisfies`, not enough for a real permission, which needs *who*
 (a role), *what scope* (which resource), and often a condition (read-only, requires
 approval). That is exactly the shape an SCD already carries. Policy-as-context is therefore
-a **project-tier SCD content pattern** — a new named pattern alongside Architecture,
-Security, and the others in `project-tier.md` §5 — not a new relationship type.
+a **project-tier SCD content pattern** — a named pattern alongside the others in
+`project-tier.md` §5 — not a new relationship type.
 
 ```yaml
 id: scd:project:policy-risk-management-readonly
