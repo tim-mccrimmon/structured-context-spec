@@ -59,11 +59,17 @@ report.
 List advisory review findings still `deferred` in `intake.yaml` and raise each again (see
 scs-review). They never block the version.
 
-## 3. Get the approver
+## 3. Get the approver and the version
 
 Ask the user who approves this version, as `Name <email>`. The approver is recorded as the
 commit's author. If the engine's diagnostics suggest a value (`suggestion.approved_by`), you may
 offer it, but only the user's answer counts. Ask for optional version notes.
+
+Ask which version to release; never choose it. Show the latest version (none yet, if the diff
+shows everything as added) and suggest the next one: patch for wording fixes, minor for added
+rules, major for removed or changed rules. For a first release, offer `0.1.0` (still being
+shaped) or `1.0.0` (ready to rely on). Explain that the working copy stays `DRAFT` and is
+not a release; it can be compiled for testing only with `--allow-draft`.
 
 ## 4. Plan the order
 
@@ -73,8 +79,7 @@ changed concept bundle first, pin it in the root, then version the root.
 
 Before asking for confirmation, show the cascade plan. For each step, list:
 
-- the bundle and its new version (semver: patch for wording fixes, minor for added rules, major
-  for removed or changed rules);
+- the bundle and the new version the user chose;
 - the snapshot `<bundle-name>-v<version>.yaml` and manifest
   `<bundle-name>-v<version>-MANIFEST.yaml` it writes;
 - the pin it changes in the root (`scs bundle pin <name> --version <v>`);

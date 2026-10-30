@@ -30,6 +30,7 @@ All of these are covered in *Memory*:
 - **Conflicts.** When instructions contradict each other, "Claude may pick one arbitrarily". A
   user rule and a project rule do not override each other.
 - **Seeing what loaded.** `/context` shows which `CLAUDE.md` and rules files loaded at launch.
+  On its own that does not prove an import loaded; see [Check the placement](#check-the-placement).
 
 A Domain layer and a Project layer can therefore both be active in one session.
 
@@ -50,19 +51,47 @@ A Domain layer and a Project layer can therefore both be active in one session.
 and the docs' own examples import non-Markdown files such as `@package.json` (*Memory*, "Import
 additional files"). For example, the line `@~/governance/dist/medtech-cdmo-1.0.0.yaml` pulls the
 YAML in unchanged. Imports outside the working directory need a one-time approval in project
-files, but not in user-scope files (*Memory*). Files in `.claude/rules/` must be `.md`. To use a
+files, but not in user-scope files (*Memory*). Until approved, the import does not load and
+nothing reports it: the session starts normally and exits 0 (observed in Claude Code 2.1.301,
+2026-10-30). The workspace trust prompt comes first, and `claude -p` cannot show the approval
+prompt, so a scripted or CI session never loads an unapproved import. Approval appears to be
+per project.
+
+This matters for the several-Domains layout above. If the artifact lives in the Domain's
+context repository and that repository is a sibling of the code repositories, the parent
+`CLAUDE.md` import is external from every one of them, and each needs its own approval. Start
+one interactive session in each repository and approve the import before relying on it, then
+[check the placement](#check-the-placement).
+
+Files in `.claude/rules/` must be `.md`. To use a
 rule file, put the YAML in a fenced block, or render it and keep the identity header
 ([README](README.md#keep-the-identity-in-any-rendering)).
 
 ## Project placement
 
 - **Committed with the repository:** `.claude/rules/scs-<bundle-name>.md` with no `paths`
-  frontmatter, so it loads at launch. RFC 0002 section 3 uses this example. Alternatively, add
-  `@dist/<bundle-name>-<version>.yaml` to the project's `CLAUDE.md`.
+  frontmatter, so it loads at launch. RFC 0002 section 3 uses this example. Alternatively,
+  import the artifact from the project's `CLAUDE.md`. `scs compile` writes it to the context
+  repository, at `<name>-context/projects/<project>/dist/<bundle-name>-<version>.yaml`, not to
+  the code repository. Import it from there (an external import, which needs approval), or
+  copy it into the code repository and import the copy.
 - **Personal, not committed:** `CLAUDE.local.md` in the project root.
 
 Avoid `paths:` frontmatter for governance rules. A path-scoped rule loads only when Claude works
 with matching files (*Memory*, "Path-specific rules").
+
+## Check the placement
+
+`/context` lists the `CLAUDE.md` and rules files that loaded, but a file can be listed while an
+import inside it did not load. A placement passes when both hold in a new session started in
+the code repository:
+
+1. `/context` lists the artifact itself: the `.yaml` path for an import, or the rule file.
+2. Asked which governance bundles are active, the session returns the exact text of each
+   self-identification rule (`<bundle-name>/identity`) without using tools.
+
+The second check matters because a session can name the bundles and versions just by reading
+the import paths in `CLAUDE.md`. Only the exact rule text shows the content was loaded.
 
 ## AGENTS.md
 

@@ -54,11 +54,21 @@ and pass the staged paths to `install-plan`.
 The first step of every intake decides the Domain repository: an existing one the user names,
 or a new one. A Domain is one owner's governance: an organization, or one person.
 
+Before creating anything, make sure the user knows there are three separate things:
+
+- the **context repository** this intake creates, which holds only governance context;
+- the repositories or tools the context is **for**, such as a code repository, which SCS does
+  not change;
+- **placement**, a later step that puts the compiled context where an AI tool reads it.
+
+A Project here is the context for one piece of work, not the work itself.
+
 - **Existing:** confirm the path, then work inside it. A repository holds `domain/` and
   `projects/<name>/`, each with `.scs/config`.
 - **New:** propose a Domain name (for example `acme-cdmo`, `jdoe`). `scs new domain <name>`
-  creates the repository `<name>-context/`, so pass the name without `-context`. Build the
-  Domain workspace before any Project.
+  creates the repository `<name>-context/`, so pass the name without `-context`. Ask the user
+  which directory it goes in; do not assume the current directory. Build the Domain workspace
+  before any Project.
 
 ## 2. Routing questions (always)
 
@@ -82,10 +92,11 @@ Ask for the author's name and email; never take them from git config without con
 
 ```
 scripts/scs_engine.py run scs new domain <name> --ontology <ontology> \
-    --author "<Name>" --email "<email>" --no-interactive --dry-run
+    --dir <directory> --author "<Name>" --email "<email>" --no-interactive --dry-run
 ```
 
-Show the planned changes (the repository, `AGENTS.md`, CI workflow, templates, the initial
+`<directory>` is the one the user chose in step 1. Show the planned changes (the full path of
+the repository, `AGENTS.md`, CI workflow, templates, the initial
 commit), get a yes, then run it without `--dry-run`. The engine makes the initial commit as
 `scs-tools <noreply@scs.invalid>`; the author you were given goes into `created_by` in the
 files, not into the commit. For a Project, run
