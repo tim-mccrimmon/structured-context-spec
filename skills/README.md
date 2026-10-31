@@ -16,7 +16,8 @@ tools (`scs`, `scs-validate`) in machine mode; the skills carry the conversation
 | [`scs-compile`](scs-compile/SKILL.md) | Compiles a version, previews stacks, and advises on placement |
 | [`scs-explain`](scs-explain/SKILL.md) | Explains a workspace, a rule's origin, an artifact, or a message |
 
-Status: draft for 0.7. The behaviour tests (scripted conversations, D-51) are not yet run.
+Status: 0.7 release candidate. The behaviour tests (scripted conversations, D-51) pass: 40 runs
+on `claude-sonnet-5-5`, report in [`tools/skill-harness/results/`](../tools/skill-harness/results/).
 
 ## Installing the skills
 
