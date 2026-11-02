@@ -409,7 +409,7 @@ listed in order, and each starts after the previous one merges.
   |---|---|---|
   | n | The first assistant turn of each init is the welcome: stages, what to have ready, how to stop and resume | MUST |
   | o | Before any profile question, the assistant asks for documents and names the exact `sources/` path | MUST |
-  | p | No turn asks more than three intake questions; the Project's ontology comes from a user turn | MUST |
+  | p | No turn asks more than three intake questions; the Project's ontology comes from a user turn | SHOULD (MUST until 2026-11-02: the model's phrasing varies run to run; pacing is judged on the box in WP-13) |
   | q | `scs-project` init on a repository whose Domain has no tag stops before any write | MUST |
   | r | In a Project session, no file under `domain/` changes | MUST |
   | s | Every commit is made by `scs commit` after a confirmed dry run; no `git commit` in the transcript | MUST |

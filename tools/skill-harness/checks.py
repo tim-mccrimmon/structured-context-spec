@@ -18,7 +18,7 @@ LEVELS = {
     "a": "MUST", "b": "MUST", "c": "MUST", "d": "MUST", "e": "MUST", "f": "MUST",
     "g": "SHOULD", "h1": "MUST", "h2": "MUST", "h3": "SHOULD", "i": "SHOULD", "j": "MUST",
     "k1": "MUST", "k2": "SHOULD", "l": "MUST", "m": "SHOULD",
-    "n": "MUST", "o": "MUST", "p": "MUST", "q": "MUST", "r": "MUST", "s": "MUST", "t": "SHOULD",
+    "n": "MUST", "o": "MUST", "p": "SHOULD", "q": "MUST", "r": "MUST", "s": "MUST", "t": "SHOULD",
 }
 CROSS_CUTTING = ["a", "b", "d", "e", "m", "r", "s"]
 FORBIDDEN_FLAGS = {

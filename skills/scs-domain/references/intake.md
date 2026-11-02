@@ -10,7 +10,11 @@ How to ask the intake questions and record the answers. The engine is the only w
   and role together count as one. Ask only for what this stage needs: a detail needed
   later, such as a person's email for the people answer, waits for that stage.
 - Propose answers you can infer, from the source documents or the conversation, and ask the
-  user to confirm them. A proposal is not an answer until the user confirms it.
+  user to confirm them. A proposal is not an answer until the user confirms it. Put a value
+  the documents do not give into the same confirmation as an invitation ("confirm or correct
+  these, and add any products or sites"), not as a question of its own.
+- Ask the people questions only once the profile answers are recorded, in a message of their
+  own.
 - Ask the ontology; never assume it, even when the Domain's ontology seems to fit.
 - After each group of answers, record them, then say what comes next.
 
