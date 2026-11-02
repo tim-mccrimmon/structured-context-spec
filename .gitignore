@@ -62,3 +62,6 @@ temp-docs/
 
 # direnv (per-directory GITHUB_TOKEN scoping, matching other Ohana repos - never commit; ISS-019)
 .envrc
+
+# WP-13 acceptance evidence: holds client material, never committed (2026-11-02)
+plan/0.7/acceptance/

@@ -392,6 +392,31 @@ listed in order, and each starts after the previous one merges.
   `scs-validate`, each reporting the rc version; skills with a `0.7.0` minimum accept it (D-56);
   WP-11a re-run against the rc.
 
+### WP-10b Skills by workspace and stage (rc2)
+- **Sections**: 2, 4, 5. **Depends**: section 7 H (D-81 to D-89, D-91). Found by
+  the first run of WP-13 Test 2 (2026-11-02).
+- Engine: `scs status` (D-83), `scs commit` (D-84), `sources/` with a README in `new domain` and
+  `new project` (D-86), and the D-91 fixes.
+- Skills: `scs-domain` and `scs-project` with the welcome (D-85), documents (D-86), people
+  (D-87), pacing (D-88), and the Domain dependency (D-89); `scs-validate` gains the Domain plus
+  Project scope; `scs-explain` unchanged. The intake, draft, review, version, and compile
+  procedures move to shared references (D-82); `sync.py`, `package.py`, `test_skills.py`, the
+  skills README, and the runbook follow.
+- **Accept**: `skills-ref validate` passes; the D-51 assertions a to k still pass, rewritten for
+  the new skills, plus these, scripted the same way:
+
+  | # | Assertion | Level |
+  |---|---|---|
+  | l | The first assistant turn of each init is the welcome: stages, what to have ready, how to stop and resume | MUST |
+  | m | Before any profile question, the assistant asks for documents and names the exact `sources/` path | MUST |
+  | n | No turn asks more than three intake questions; the Project's ontology comes from a user turn | MUST |
+  | o | `scs-project` init on a repository whose Domain has no tag stops before any write | MUST |
+  | p | In a Project session, no file under `domain/` changes | MUST |
+  | q | Every commit is made by `scs commit` after a confirmed dry run; no `git commit` in the transcript | MUST |
+  | r | A resumed session runs `scs status` first and states what is done and what is open | SHOULD |
+
+  Then `0.7.0rc2` on TestPyPI with the skill ZIPs, and WP-13 runs again on rc2.
+
 ### WP-12 MCP server (ISS-054)
 - Deferred until demand. When activated: stdio only, every operation through machine mode, no
   behavior of its own (RFC §2).
@@ -400,7 +425,7 @@ listed in order, and each starts after the previous one merges.
 Dropped 2026-10-29 by Tim. WP-13 is judged on its own friction log.
 
 ### WP-13 Acceptance (ISS-055)
-- **Depends**: WP-11rc, WP-01b (D-50). Two tests on the Omarchy box, through Claude Code with
+- **Depends**: WP-11rc, WP-10b (rc2), WP-01b (D-50). Two tests on the Omarchy box, through Claude Code with
   the skills only (D-80): a personal Domain, `boat-context` with Project `docs-server`
   (`personal` ontology), and an organization Domain, `nextern-context` with Project
   `timekeeping` (`cdmo` ontology). Tim approves the versions in both. Runbook:

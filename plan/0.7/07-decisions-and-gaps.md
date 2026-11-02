@@ -140,6 +140,36 @@ decisions depended on, all decided the same day.
 | D-79 | Where does the release candidate go? | TestPyPI, plus skill ZIPs with the wheels bundled for Claude (claude.ai), which cannot reach TestPyPI. Nothing goes to PyPI until 0.7.0 itself; WP-11rc's install check runs against TestPyPI. `.github/workflows/publish.yml` uploads to either index by trusted publishing. | WP-11rc | **Decided** 2026-10-28 by Tim: keep 0.7 off PyPI for now. |
 | D-80 | How is 0.7 accepted (WP-13)? | Two real scenarios on the Omarchy box through Claude Code with the skills only: a personal Domain (`boat-context`, Project `docs-server`, `personal` ontology, built up from conversation) and an organization Domain (`nextern-context`, Project `timekeeping`, `cdmo` ontology, trimmed down). Tim approves the versions. No 0.6 baseline (WP-13a dropped); WP-13 passes with no unresolved blocker in its own friction log. | WP-13 | **Decided** 2026-10-29 by Tim. |
 
+## H. Skills by workspace and stage (rc2, 2026-11-02)
+
+From the first run of WP-13 Test 2 (CDMO), stopped after review. Evidence: the friction log and
+transcript of that run, kept out of this repository because they contain NexTern material. The
+run's one blocker: no step told the user to provide documents or where to put them. The
+intake also asked every question in one message, assumed the Project's ontology, never asked
+who the people were, and set up the Domain and the Project in one session. Project work started
+on an unreleased Domain without a warning, and the agent kept the process status in Claude Code
+memory and committed with plain `git`. Drafting and review went well, and they become the
+procedures underneath the new skills.
+
+| ID | Question | Rec. | Blocks | RFC | Decision |
+|---|---|---|---|---|---|
+| D-81 | How are the skills organized? | Four skills, by workspace and stage: `scs-domain` (init or update, chosen from `scs status`), `scs-project` (init or update), `scs-validate` (a Domain, or a Domain plus one Project), `scs-explain`. Each runs as its own session with a clear start and end: an init ends with a released version; an update starts from what changed and ends with a new version. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-82 | What happens to `scs-intake`, `scs-draft`, `scs-review`, `scs-version`, `scs-compile`? | Their procedures become shared reference files, synced by `skills/sync.py` into `scs-domain` and `scs-project` like `scs_engine.py`; they stop being installable on their own. Users get one way in per workspace. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-83 | Where does process state live? | In the repository, derived on demand by a new read-only command, `scs status [--workspace]` (machine mode): intake fields filled per profile, documents in `sources/` and whether recorded, template placeholders left, open and deferred findings, version (`DRAFT` or last tag, changes since), whether `dist/` matches the version, and for a Project the Domain's latest released version. No stored progress field. Client memory is a convenience only; when it disagrees with the repository, the repository wins. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-84 | How are intake and draft changes committed? | A new engine command, `scs commit --workspace <ws> --message <m> --author "Name <email>"`, with `--dry-run` listing the files and message. It commits only that workspace's paths, with the author the user names (rule 5 applies). Skills never run `git` directly. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-85 | How does a session start? | With a welcome: the stages ahead and roughly how long each takes; what to have ready (documents, the people who hold the answers); that rough answers are fine; and how to stop and pick up again (everything is in the repository; run the same skill again). A resumed or update session reads `scs status` first and says what is done and what is open. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-86 | How do source documents get in? (Test 2 blocker) | `scs new domain` and `scs new project` create `sources/` with a short README in each workspace (still gitignored, D-59). Before any profile question, the skill asks what documents the user already has, gives the exact `sources/` path, and waits until they are there; it records each with `scs intake set source_documents`, reads it, and proposes answers from it. A document shared by the Domain and a Project lives once in `domain/sources/` and the Project records it by a path relative to its workspace. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-87 | Who are the people? | The Domain asks for leadership and key roles (CEO, CTO, CISO, Head of Quality, or "nobody"); the Project asks for the team (project manager, product manager, lead architect, security, QA, test). The agent proposes people from the documents and asks the user to confirm and fill gaps before drafting. In 0.7 they are recorded as intake answers; roles as fields wait for the 0.8 roles RFC. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-88 | How are questions paced? | One at a time, or in small related groups, after proposing answers from the documents. The Project's ontology is always asked, with the reason (QMS software or not), never assumed. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-89 | How does a Project depend on its Domain? | One way only. `scs-domain` reads only `domain/`. `scs-project` init stops when the repository has a Domain with no released version. Project review and validation load the Domain's latest released version and judge the two together; a finding against a Domain rule is recorded in the Project as a question for the Domain owner, never as a Domain change in a Project session. Project update and validate report when the Domain has a newer version than the one last reviewed. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-90 | Does a Project record the Domain version it was reviewed against? | Yes, as a reference (`bundle:<domain>@<version>`) in the Project manifest, not an import. A schema change, so RFC: in the 0.8 roles RFC, or fast-tracked. Until then `scs status` compares against the Domain's latest tag, and the review records the version it used in the finding. | | RFC | Open. |
+| D-91 | Smaller fixes from Test 2 | `scs new project` makes its commit like `scs new domain`; the `sdlc` scaffold drops healthcare templates (`hipaa-compliance`, `tefca-participation`, `chai-adherence`) to an industry layer; the drafting procedure writes a scope limit ("not in the first release") as a fact or directive, never a prohibition. | WP-10b | | **Decided** 2026-11-02 by Tim: all three. |
+
+Observations from the same run, not decided: review checks only whether rules are too loose,
+never whether they block the work (an `over-restriction` finding, and how to measure it); a
+strict check that every compiled item has `derived_from`; rendering a bundle as a docs site for
+reviewers who do not read YAML.
+
 ## RFC amendments implied
 
 Applied to RFC 0002 on 2026-10-25 as one amendment covering WP-01a and WP-01b: §1 (D-08), §3
