@@ -333,7 +333,7 @@ def test_removing_the_last_scd_removes_the_concept_its_import_and_ontology_entry
     assert root["imports"] == []
     manifest = (app(repo) / "ontology/domain-manifest.yaml").read_text()
     assert "concept:prohibited" not in manifest
-    assert real["result"]["bundle_removed"] == "bundle:prohibited"
+    assert real["result"]["removed"][0]["bundle_removed"] == "bundle:prohibited"
 
 
 def test_an_scd_another_bundle_lists_is_kept(repo: Path):
@@ -355,7 +355,30 @@ def test_an_scd_another_bundle_lists_is_kept(repo: Path):
         {"action": "modify", "path": "projects/app/bundles/concepts/groceries.yaml"}
     ]
     assert (app(repo) / "context/project/prohibited.yaml").is_file()
-    assert real["result"]["scd_file_deleted"] is False
+    assert real["result"]["removed"][0]["scd_file_deleted"] is False
+
+
+def test_several_scds_are_retired_as_one_change(repo: Path):
+    assert run("add", "bundle", "groceries", "--new", *AUTHOR).exit_code == 0
+    real = conforms(
+        repo, "bundle", "remove-scd", "scd:project:prohibited", "scd:project:groceries"
+    )  # fmt: skip
+    assert {(c["action"], c["path"]) for c in real["changes"]} == {
+        ("delete", "projects/app/bundles/concepts/prohibited.yaml"),
+        ("delete", "projects/app/context/project/prohibited.yaml"),
+        ("delete", "projects/app/bundles/concepts/groceries.yaml"),
+        ("delete", "projects/app/context/project/groceries.yaml"),
+        ("modify", "projects/app/bundles/project-bundle.yaml"),
+        ("modify", "projects/app/ontology/domain-manifest.yaml"),
+    }
+    assert [r["bundle_removed"] for r in real["result"]["removed"]] == [
+        "bundle:prohibited",
+        "bundle:groceries",
+    ]
+    root = yaml.safe_load((app(repo) / "bundles/project-bundle.yaml").read_text())
+    assert root["imports"] == []
+    manifest = (app(repo) / "ontology/domain-manifest.yaml").read_text()
+    assert "concept:prohibited" not in manifest and "concept:groceries" not in manifest
 
 
 def test_remove_scd_keeps_the_comments_of_the_files_it_edits(repo: Path):

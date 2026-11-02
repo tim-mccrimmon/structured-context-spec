@@ -381,63 +381,83 @@ def add_scd(
 
 
 def remove_scd(
-    envelope: Envelope, ws: Workspace, bundle: Optional[Path], scd_id: str, dry_run: bool
+    envelope: Envelope, ws: Workspace, bundle: Optional[Path], scd_ids: List[str], dry_run: bool
 ) -> None:
-    working = ws.working_bundles()
-    listing = [b for b in working if scd_id in [str(s) for s in b[2].get("scds") or []]]
-    if bundle is not None:
-        path, data = _target(ws, bundle)
-        if path not in [b[1].resolve() for b in listing]:
-            raise CommandError(
-                "SCD_NOT_LISTED", f"{data.get('id')} does not list {scd_id}", path=ws.shown(path)
-            )
-    elif len(listing) == 1:
-        path, data = listing[0][1].resolve(), listing[0][2]
-    elif not listing:
-        raise CommandError("SCD_NOT_LISTED", f"No bundle in this workspace lists {scd_id}")
-    else:
-        names = ", ".join(b[0] for b in listing)
-        raise CommandError(
-            "USAGE_ERROR",
-            f"{scd_id} is listed by {names}; name the bundle with --bundle",
-            exit_code=EXIT_USAGE,
-        )
-
+    """Retire one or more SCDs as one change: each later removal sees the earlier ones, so the
+    dry run shows every concept bundle that goes."""
     edit = Edit(ws.root)
-    edit.writes[path] = remove_item(path.read_text(encoding="utf-8"), "scds", scd_id)
-    removed: Dict[str, object] = {
-        "bundle": data.get("id"),
-        "scd": scd_id,
-        "scd_file_deleted": False,
-    }
+    initial = [(i, p.resolve(), d) for i, p, d in ws.working_bundles()]
 
-    # The SCD file goes when nothing else lists it (D-75)
-    others = [b for b in listing if b[1].resolve() != path]
-    if not others:
-        for scd_path, _ in ws.index.scds.get(scd_id, []):
-            if _inside(scd_path, ws.path):
-                edit.writes[scd_path.resolve()] = None
-                removed["scd_file_deleted"] = True
+    def working() -> List[Tuple[str, Path, dict]]:
+        current = []
+        for bundle_id, path, data in initial:
+            if path in edit.writes:
+                if edit.writes[path] is None:
+                    continue
+                data = yaml.safe_load(edit.text(path)) or {}
+            current.append((bundle_id, path, data))
+        return current
 
-    # A concept bundle left with no SCDs goes, with its imports and ontology entry (D-69)
-    remaining = list_items(edit.text(path), "scds")
-    if data.get("type") == "concept" and not remaining:
-        concept_id = str(data.get("id"))
-        edit.writes[path] = None
-        for other_id, other_path, other in working:
-            for ref in [str(i) for i in other.get("imports") or []]:
-                if (parse_bundle_ref(ref) or ("",))[0] == concept_id:
-                    other_path = other_path.resolve()
-                    edit.writes[other_path] = remove_item(edit.text(other_path), "imports", ref)
-        manifest = load_workspace(ws.path.name, ws.path).ontology_manifest()
-        if manifest is not None:
-            manifest = manifest.resolve()
-            concept = f"concept:{bundle_name(concept_id)}"
-            text = manifest.read_text(encoding="utf-8")
-            edit.writes[manifest] = remove_concept(text, concept)
-        removed["bundle_removed"] = concept_id
+    manifest = load_workspace(ws.path.name, ws.path).ontology_manifest()
+    removed: List[Dict[str, object]] = []
+    for scd_id in scd_ids:
+        bundles = working()
+        listing = [b for b in bundles if scd_id in [str(s) for s in b[2].get("scds") or []]]
+        if bundle is not None:
+            path, data = _target(ws, bundle)
+            if path not in [b[1] for b in listing]:
+                raise CommandError(
+                    "SCD_NOT_LISTED",
+                    f"{data.get('id')} does not list {scd_id}",
+                    path=ws.shown(path),
+                )
+        elif len(listing) == 1:
+            path, data = listing[0][1], listing[0][2]
+        elif not listing:
+            raise CommandError("SCD_NOT_LISTED", f"No bundle in this workspace lists {scd_id}")
+        else:
+            names = ", ".join(b[0] for b in listing)
+            raise CommandError(
+                "USAGE_ERROR",
+                f"{scd_id} is listed by {names}; name the bundle with --bundle",
+                exit_code=EXIT_USAGE,
+            )
+
+        edit.writes[path] = remove_item(edit.text(path), "scds", scd_id)
+        item: Dict[str, object] = {
+            "bundle": data.get("id"),
+            "scd": scd_id,
+            "scd_file_deleted": False,
+        }
+
+        # The SCD file goes when nothing else lists it (D-75)
+        others = [b for b in listing if b[1] != path]
+        if not others:
+            for scd_path, _ in ws.index.scds.get(scd_id, []):
+                if _inside(scd_path, ws.path):
+                    edit.writes[scd_path.resolve()] = None
+                    item["scd_file_deleted"] = True
+
+        # A concept bundle left with no SCDs goes, with its imports and ontology entry (D-69)
+        remaining = list_items(edit.text(path), "scds")
+        if data.get("type") == "concept" and not remaining:
+            concept_id = str(data.get("id"))
+            edit.writes[path] = None
+            for _, other_path, other in working():
+                for ref in [str(i) for i in other.get("imports") or []]:
+                    if (parse_bundle_ref(ref) or ("",))[0] == concept_id:
+                        edit.writes[other_path] = remove_item(
+                            edit.text(other_path), "imports", ref
+                        )
+            if manifest is not None:
+                concept = f"concept:{bundle_name(concept_id)}"
+                edit.writes[manifest.resolve()] = remove_concept(
+                    edit.text(manifest.resolve()), concept
+                )
+            item["bundle_removed"] = concept_id
+        removed.append(item)
     edit.apply(envelope, dry_run)
-    envelope.result = removed
+    envelope.result = {"removed": removed}
 
 
 def new_concept(

@@ -467,22 +467,23 @@ def add_scd(envelope, out, scd_id, bundle_file, workspace, dry_run):
 
 
 @bundle.command("remove-scd")
-@click.argument("scd_id")
-@_edit_options("the bundle that lists it")
+@click.argument("scd_ids", nargs=-1, required=True)
+@_edit_options("the bundle that lists them")
 @machine_command("bundle remove-scd")
-def remove_scd(envelope, out, scd_id, bundle_file, workspace, dry_run):
+def remove_scd(envelope, out, scd_ids, bundle_file, workspace, dry_run):
     """
-    Retire an SCD: remove it from its bundle
+    Retire SCDs: remove them from their bundles
 
     The SCD file is deleted when no other bundle lists it; released versions keep it at their
     tags. A concept bundle left with no SCDs is removed too, with the imports of it and its
-    ontology manifest entry.
+    ontology manifest entry. Several SCDs are retired as one change, so one dry run shows
+    everything that goes.
 
     \b
     Examples:
         scs bundle remove-scd scd:project:tefca-participation
-        scs bundle remove-scd scd:project:threat-model --dry-run
+        scs bundle remove-scd scd:project:threat-model scd:project:pen-testing --dry-run
     """
     ws = maintain.open_workspace(workspace, bundle_file)
-    maintain.remove_scd(envelope, ws, bundle_file, scd_id, dry_run)
+    maintain.remove_scd(envelope, ws, bundle_file, [*scd_ids], dry_run)
     _done(out, envelope, dry_run)

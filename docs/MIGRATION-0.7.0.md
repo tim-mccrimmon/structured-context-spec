@@ -330,6 +330,9 @@ These edit the files' text, so comments and layout survive.
   `scs-validate` and `scs-explain` are unchanged in purpose. The rc1 skills `scs-intake`,
   `scs-draft`, `scs-review`, `scs-version`, and `scs-compile` are removed: their procedures are
   references inside the two new skills. Remove the old skills and install the four (D-81, D-82).
+- **`scs bundle remove-scd` takes several SCD IDs** and retires them as one change, so one dry
+  run shows every concept bundle that goes with them. `result` is now
+  `{removed: [{bundle, scd, scd_file_deleted, bundle_removed?}, ...]}`, one entry per SCD.
 - **The sdlc scaffold leaves out the healthcare templates** (`hipaa-compliance`,
   `chai-adherence`, `tefca-participation`); add one with `scs add scd <name>` (D-91).
 

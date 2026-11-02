@@ -12,11 +12,12 @@ through the templates with the user: fill the ones that apply, and retire the re
 `scs bundle remove-scd`. A `personal` Domain gets only boundaries; define the person's other
 concepts with them using `scs add bundle <name> --new`.
 
-Removing the last SCD of a concept bundle also removes the bundle, its import in the Domain
-bundle, and its entry in the ontology manifest. When retiring several SCDs, a dry run of each
-against the current files does not show this. In the plan you show, name every concept that
-will go and the three files each one changes, and get the yes for that. Afterwards, report
-what the real runs' `changes` and `result.bundle_removed` say, not what you expected.
+Removing the last SCD of a concept bundle also removes the bundle, its import in the root
+bundle, and its entry in the ontology manifest. Retire several SCDs in one call
+(`scs bundle remove-scd <id> <id> ... --dry-run`), so one dry run shows everything that goes;
+dry runs made one at a time against the same files miss it. Show that dry run's `changes` and
+name each concept bundle in `result.removed[].bundle_removed`, then get the yes. Afterwards,
+report what the real run's envelope says, not what you expected.
 
 ## Choosing the kind
 
@@ -58,7 +59,7 @@ organization's rules from yours.
 | Create a concept with no template | `scs add bundle <name> --new --title "..." --author ... --email ...` |
 | Add a template SCD | `scs add scd <name>` |
 | List an existing SCD in a bundle (re-scope) | `scs bundle add-scd <scd-id> --bundle <file>` |
-| Retire an SCD | `scs bundle remove-scd <scd-id>` |
+| Retire SCDs | `scs bundle remove-scd <scd-id> [<scd-id> ...]` |
 | Import a concept bundle | `scs bundle add-import <ref>` |
 | See what is there | `scs bundle list`, `scs bundle info <name>` |
 
