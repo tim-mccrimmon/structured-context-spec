@@ -97,9 +97,10 @@ Make sure the user knows there are three separate things:
 
 Propose a Domain name (for example `acme-cdmo`, `jdoe`); `scs new domain <name>` creates the
 repository `<name>-context/`, so pass the name without `-context`. Ask which directory it goes
-in; do not assume the current directory. Ask the routing questions (audience, regulated, and
-the ontology) from [references/intake.md](references/intake.md), no more than three at once.
-Ask for the author's name and email; never take them from git config without confirming.
+in; do not assume the current directory. Ask for the author's name and email; never take them
+from git config without confirming. These three are the first message. Once they are answered,
+ask the routing questions (audience, regulated, and the ontology) from
+[references/intake.md](references/intake.md) in a message of their own.
 
 ```
 scripts/scs_engine.py run scs new domain <name> --ontology <ontology> \

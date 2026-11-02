@@ -54,9 +54,14 @@ If the user has no documents, say that is fine and go on with the questions.
 ## People
 
 Ask who is involved, and record them as an answer, `q-people-1`, so drafted items can cite
-it. Propose names and roles you find in the documents, and ask the user to confirm or correct
+it. Record each person by name and role; ask for an email only for someone who approves
+versions, unless the user offers it. Propose names and roles you find in the documents, and ask the user to confirm or correct
 them. Take the people in two messages: first who is involved and in which role; then, once
 that is settled, who owns which concept (for a Domain) and who approves versions.
+
+For concept owners, propose an owner for every concept yourself, from the people and their
+roles, as one table, and ask the user to confirm or correct it: that is one question. Never
+list the concepts with blanks for the user to fill in.
 
 - **Domain:** leadership roles that set or own the rules: for example CEO, CTO, CISO, quality,
   regulatory, legal. Ask who owns each concept the ontology covers.
@@ -127,6 +132,7 @@ EOF
 ```
 
 Pass the YAML on stdin with a heredoc, as above, so no file is written. `answered_at` is filled in when
-omitted. Giving an existing `id` replaces that answer. Ask who is answering; do not assume.
+omitted. Giving an existing `id` replaces that answer. The person answering is the author
+named when the workspace was created, unless the user says otherwise; do not ask again.
 A record for a public repository may name roles (`role:quality-manager`) instead of people,
 but a version's approver is always a person.

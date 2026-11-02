@@ -12,6 +12,12 @@ through the templates with the user: fill the ones that apply, and retire the re
 `scs bundle remove-scd`. A `personal` Domain gets only boundaries; define the person's other
 concepts with them using `scs add bundle <name> --new`.
 
+Removing the last SCD of a concept bundle also removes the bundle, its import in the Domain
+bundle, and its entry in the ontology manifest. When retiring several SCDs, a dry run of each
+against the current files does not show this. In the plan you show, name every concept that
+will go and the three files each one changes, and get the yes for that. Afterwards, report
+what the real runs' `changes` and `result.bundle_removed` say, not what you expected.
+
 ## Choosing the kind
 
 - A **prohibition** is binary: a `subject` noun phrase, a `kind` (`tool` or `practice`), and

@@ -123,7 +123,7 @@ def engine_calls(turn: dict) -> list[dict]:
     return calls
 
 
-FUNCTION_RE = re.compile(r"^\s*(\w+)\s*\(\)\s*\{(.*)\}\s*;?\s*$")
+FUNCTION_RE = re.compile(r"(?:^|;)\s*(\w+)\s*\(\)\s*\{(.*)\}\s*;?\s*$")
 
 
 def expand_functions(command: str) -> list[str]:
@@ -131,10 +131,10 @@ def expand_functions(command: str) -> list[str]:
     replaced by its body up to "$@", so calls made through it are seen, at the start of a line
     or after `;`, `&&`, `||`, or `|`."""
     lines = command.splitlines()
-    bodies = {m.group(1): m.group(2) for m in map(FUNCTION_RE.match, lines) if m}
+    bodies = {m.group(1): m.group(2) for m in map(FUNCTION_RE.search, lines) if m}
     out = []
     for line in lines:
-        if not FUNCTION_RE.match(line):
+        if not FUNCTION_RE.search(line):
             for name, body in bodies.items():
                 prefix = body.split('"$@"')[0].strip()
                 line = re.sub(rf"(^|[;&|]\s*){re.escape(name)}(?=\s)",

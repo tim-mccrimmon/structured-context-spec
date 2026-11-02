@@ -454,7 +454,9 @@ async def score_p(run: dict, scenario: dict, api, config: dict, meter: Meter) ->
         "answer? Count each question the user must answer as one, including each item in a "
         "numbered or bulleted list of questions. Details about one person (name, email, role) "
         "are one question, and so is a request to confirm or correct a set of proposed "
-        "answers. Do not count a request to approve a shown change (such as 'shall I go "
+        "answers, even a long one such as a table proposing an owner for every concept. A "
+        "list of items the user must each fill in (for example concepts with no proposed "
+        "owner) counts one per item. Do not count a request to approve a shown change (such as 'shall I go "
         "ahead?'), nor optional offers. Answer true if any message asks more than three, and "
         "name it.",
         evidence[:60000],
