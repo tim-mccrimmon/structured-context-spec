@@ -48,10 +48,11 @@ def cli(ctx, show_version, json_mode):
         1. Create the repository and Projects → scs new domain / scs new project
         2. Add concepts as needed             → scs add bundle <concept> [--new]
         3. Write SCDs and the intake record   → scs scd write / scs intake set
-        4. Validate                           → scs-validate / scs bundle validate
-        5. Release a version                  → scs bundle version
-        6. Compile for runtime delivery       → scs compile <bundle> --version <v>
-        7. Preview artifacts loaded together  → scs stack <outer> ... <inner>
+        4. Commit, and check where things are → scs commit / scs status
+        5. Validate                           → scs-validate / scs bundle validate
+        6. Release a version                  → scs bundle version
+        7. Compile for runtime delivery       → scs compile <bundle> --version <v>
+        8. Preview artifacts loaded together  → scs stack <outer> ... <inner>
 
     Commands that change files take --dry-run and --json (machine mode).
     For detailed help on any command, use: scs [command] --help

@@ -20,7 +20,7 @@ REPO = Path(__file__).resolve().parents[3]
 SCHEMA = REPO / "schema"
 ENVELOPE_SCHEMA = json.loads((SCHEMA / "cli" / "envelope-schema.json").read_text())
 AUTHOR = ["--author", "Test Author", "--email", "test@structuredcontext.dev"]
-OPERATIONS = ["Create", "Maintain", "Validate", "Version", "Compile"]
+OPERATIONS = ["Create", "Maintain", "Validate", "Version", "Compile", "Commit"]
 
 
 def run(*args: str) -> Result:
@@ -259,10 +259,14 @@ def test_new_domain_json_lists_files_init_and_commit(tmp_path: Path):
 def test_new_project_json_lists_files_relative_to_the_repository(tmp_path: Path, monkeypatch):
     repo = new_domain(tmp_path)
     data = envelope(new_project(repo, "a", monkeypatch, "--json"))
-    paths = [c["path"] for c in data["changes"]]
-    assert all(c["action"] == "create" for c in data["changes"])
-    assert "projects/a/bundles/project-bundle.yaml" in paths
-    assert all(p.startswith("projects/a/") for p in paths)
+    created = [c["path"] for c in data["changes"] if c["action"] == "create"]
+    assert "projects/a/bundles/project-bundle.yaml" in created
+    assert all(p.startswith("projects/a/") for p in created)
+    # D-91: the Project is committed on its own, like the Domain
+    commit = data["changes"][-1]
+    assert commit["action"] == "git-commit" and commit["ref"] == "HEAD"
+    assert sorted(p["path"] for p in commit["paths"]) == sorted(created)
+    assert git_out(repo, "log", "-1", "--format=%s").strip() == "Create Project a (scs new project)"
 
 
 def test_an_existing_repository_or_project_is_not_overwritten(tmp_path: Path, monkeypatch):

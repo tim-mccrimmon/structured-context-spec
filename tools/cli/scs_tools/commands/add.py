@@ -15,7 +15,7 @@ from scs_validator.workspace import load_workspace
 from scs_tools import identity, maintain
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import get_template_path, render_template, write_file
-from scs_tools.utils.project_types import get_project_type_config
+from scs_tools.utils.project_types import SDLC_INDUSTRY_SCDS, get_project_type_config
 from scs_tools.workspace import repository_root, select_workspace
 
 
@@ -234,12 +234,14 @@ def bundle(
         )
 
     variables = _variables(base_path, author, email, out)
-    # Which SCDs a concept bundle lists: the full set (D-64), except in a 0.6 workspace made
-    # with `scs init --type`, whose project type still applies
+    # Which SCDs a concept bundle lists: the full set (D-64) less the sdlc industry layer
+    # (D-91), except in a 0.6 workspace made with `scs init --type`, whose project type applies
     project_type = _read_project_type(config_file) if ontology == "sdlc" else None
-    variables["config"] = (
-        get_project_type_config(project_type) if project_type else {"exclude_scds": []}
-    )
+    if project_type:
+        variables["config"] = get_project_type_config(project_type)
+    else:
+        excluded = SDLC_INDUSTRY_SCDS if ontology == "sdlc" else []
+        variables["config"] = {"exclude_scds": list(excluded)}
     bundle_file = base_path / "bundles" / "concepts" / f"{bundle_name}.yaml"
     _write(envelope, out, template_path, bundle_file, variables, force, dry_run)
     if not dry_run:

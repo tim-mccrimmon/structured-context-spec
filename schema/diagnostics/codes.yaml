@@ -41,6 +41,13 @@ codes:
   BUNDLE_XOR_VIOLATION_WARNING:
     severity: warning
     meaning: A bundle has both imports and scds, or neither, and the rules set this check to warn.
+  COMMIT_AUTHOR_INVALID:
+    severity: error
+    meaning: The --author given to scs commit is not a person identifier (Name <email>).
+  COMMIT_AUTHOR_REQUIRED:
+    severity: error
+    meaning: scs commit was run without --author; a commit's author is a person the user names, never
+      taken from git configuration.
   COMPILE_ERROR:
     severity: error
     meaning: The bundle tree cannot be compiled (unresolved import or SCD, import cycle, DRAFT without

@@ -242,17 +242,19 @@ def test_an_ignored_digest_input_is_refused_and_sources_are_not_committed(repo: 
     gitignore = repo / ".gitignore"
     kept = gitignore.read_text()
     gitignore.write_text(kept + "projects/app/context/project/prohibited.yaml\n")
+    git(repo, "rm", "-q", "--cached", "projects/app/" + SCD)  # new project committed it
     code, data = version(CONCEPT, "1.0.0")
     assert code == 1
     assert codes(data) == ["VERSION_INPUT_UNTRACKED"]
     assert data["diagnostics"][0]["path"] == "projects/app/" + SCD
 
     gitignore.write_text(kept)
-    (ws(repo) / "sources").mkdir()
+    git(repo, "add", "projects/app/" + SCD)
+    (ws(repo) / "sources").mkdir(exist_ok=True)
     (ws(repo) / "sources" / "policy.txt").write_text("source document\n")
     code, data = version(CONCEPT, "1.0.0")
     assert code == 0, data
-    assert "sources/" not in git(repo, "ls-tree", "-r", "--name-only", "HEAD")
+    assert "policy.txt" not in git(repo, "ls-tree", "-r", "--name-only", "HEAD")
 
 
 def test_author_committer_and_annotated_tag_under_a_hostile_git_config(repo: Path):

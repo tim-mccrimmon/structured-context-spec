@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as pkg_version
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import click
 from scs_validator.envelope import SCS_VERSION, Change, relative
@@ -27,6 +27,7 @@ from scs_tools.utils.files import (
 )
 from scs_tools.utils.project_types import (
     ONTOLOGY_MODELS,
+    SDLC_INDUSTRY_SCDS,
     get_concept_info,
     get_ontology_model_config,
 )
@@ -296,6 +297,10 @@ def project(
             _scaffold(Output(True), target, staged, "project", name, ontology, author, email)
             files = [relative(p, target) for p in _files(staged)]
         envelope.changes.extend(Change("create", path=p) for p in files)
+        if git.available() and git.head(repo):
+            tracked = sorted(set(files) - set(git.ignored(repo, files)))
+            paths = [{"path": p, "status": "A"} for p in tracked]
+            envelope.changes.append(Change("git-commit", ref="HEAD", paths=paths))
         out.echo(f"Would create Project {relative(workspace, repo)} ({len(files)} files)")
         return
 
@@ -303,11 +308,21 @@ def project(
     out.echo(f"Location: {workspace}\n")
     try:
         _scaffold(out, repo, workspace, "project", name, ontology, author, email)
+        written = _files(workspace)
+        commit = _commit_project(repo, workspace, name)
+    except git.GitError as e:
+        shutil.rmtree(workspace, ignore_errors=True)
+        raise CommandError("GIT_COMMAND_FAILED", f"{e}; the Project was not created")
     except BaseException:
         shutil.rmtree(workspace, ignore_errors=True)
         raise
 
-    envelope.changes.extend(Change("create", path=relative(p, repo)) for p in _files(workspace))
+    envelope.changes.extend(Change("create", path=relative(p, repo)) for p in written)
+    if commit:
+        # ref HEAD, like the Domain's initial commit, so a dry run and a real run report alike
+        envelope.changes.append(
+            Change("git-commit", ref="HEAD", paths=git.committed_paths(repo, commit))
+        )
 
     out.echo(f"\n✓ Project '{name}' created in {relative(workspace, repo)}.")
     out.echo("\nNext steps:")
@@ -317,6 +332,21 @@ def project(
     )
     out.echo("  scs-validate --strict           # at the repository root")
     out.echo(f"  scs compile {relative(workspace, repo)}/bundles/project-bundle.yaml --allow-draft")
+
+
+def _commit_project(repo: Path, workspace: Path, name: str) -> Optional[str]:
+    """Commit the new Project workspace, and nothing else, as the engine (D-91), like the
+    Domain's initial commit. None when the repository has no git history to commit onto."""
+    if not git.available() or not git.head(repo):
+        return None
+    pathspec = [relative(workspace, repo)]
+    old = git.head(repo)
+    message = f"Create Project {name} (scs new project)"
+    with tempfile.TemporaryDirectory(prefix="scs-new-") as work:
+        commit = git.commit_paths(repo, pathspec, message, git.ENGINE_IDENTITY, Path(work))
+    git.move_head(repo, commit, old, f"scs new project {name}")
+    git.sync_index(repo, pathspec)
+    return commit
 
 
 def _domain_ontology(repo: Path) -> str:
@@ -421,8 +451,9 @@ def _scaffold(out, repo, base_path, kind, name, ontology, author, email):
     out.echo(f"Ontology model: {ontology}")
 
     model_config = get_ontology_model_config(ontology)
-    # No SCD is left out: the user (or the agent with the user) removes what does not apply.
-    config: dict = {"exclude_scds": []}
+    # The user (or the agent with the user) removes what does not apply; only the sdlc
+    # industry layer is left out up front (D-91).
+    config: dict = {"exclude_scds": list(SDLC_INDUSTRY_SCDS) if ontology == "sdlc" else []}
     concepts = list(model_config["concepts"])
     if kind == "domain" and ontology == "sdlc":
         # The Global profile: only concepts with organization-wide SCDs
@@ -754,11 +785,17 @@ def _create_concept_docs(base_path: Path, concepts: list, variables: dict, out: 
 
 
 def _create_supporting_files(base_path: Path, variables: dict):
-    """Create README, docs/GETTING_STARTED.md, and .scs/config. Repository-wide files
-    (.gitignore, .gitattributes) are created once, at the Domain repository root."""
+    """Create README, docs/GETTING_STARTED.md, sources/README.md, and .scs/config.
+    Repository-wide files (.gitignore, .gitattributes) are created once, at the Domain
+    repository root."""
     template_path = get_template_path()
 
     copy_template(template_path / "project-README.md", base_path / "README.md", variables)
+    # Where the user puts the documents the context is drafted from (D-86); only this README
+    # is tracked (D-59)
+    copy_template(
+        template_path / "sources-README.md", base_path / "sources" / "README.md", variables
+    )
     copy_template(
         template_path / "GETTING_STARTED.md",
         base_path / "docs" / "GETTING_STARTED.md",

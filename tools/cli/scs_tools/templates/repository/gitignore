@@ -1,6 +1,8 @@
 # Source documents stay local unless you choose to track them (SCS 0.7, D-59). An SCD's
-# derived_from still names the document; the compiler never reads sources/.
-sources/
+# derived_from still names the document; the compiler never reads sources/. Each sources/
+# README says what goes there, so it is tracked (D-86).
+**/sources/*
+!**/sources/README.md
 
 # dist/ holds compiled artifacts. Version commits leave it out either way; ignore it here too if
 # you do not want artifacts in the repository.

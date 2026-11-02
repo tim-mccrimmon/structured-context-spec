@@ -18,6 +18,8 @@ Every code the SCS tools emit, with its severity. Generated from
 | `BUNDLE_TYPE_UNKNOWN` | warning | A bundle's type has no validation rules, so type-specific checks were skipped. |
 | `BUNDLE_XOR_VIOLATION` | error | A bundle has both imports and scds, or neither. |
 | `BUNDLE_XOR_VIOLATION_WARNING` | warning | A bundle has both imports and scds, or neither, and the rules set this check to warn. |
+| `COMMIT_AUTHOR_INVALID` | error | The --author given to scs commit is not a person identifier (Name <email>). |
+| `COMMIT_AUTHOR_REQUIRED` | error | scs commit was run without --author; a commit's author is a person the user names, never taken from git configuration. |
 | `COMPILE_ERROR` | error | The bundle tree cannot be compiled (unresolved import or SCD, import cycle, DRAFT without --allow-draft, digest mismatch, or a non-compilable bundle type). |
 | `COMPILE_WARNING` | warning | The compiler compiled the bundle but noted a problem with its content. |
 | `COMPLETENESS_DOMAIN_MISSING` | error | A domain the completeness rules require is not imported. |

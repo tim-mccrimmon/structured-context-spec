@@ -2,6 +2,10 @@
 
 from typing import Any, Dict, List
 
+# Healthcare templates in the sdlc ontology. They are an industry layer, not part of every
+# software workspace, so the scaffold leaves them out (D-91); `scs add scd <name>` adds one.
+SDLC_INDUSTRY_SCDS = ["hipaa-compliance", "chai-adherence", "tefca-participation"]
+
 PROJECT_TYPES: Dict[str, Dict[str, Any]] = {
     "healthcare": {
         "description": "Healthcare application (HIPAA, CHAI, TEFCA)",

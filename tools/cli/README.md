@@ -121,12 +121,14 @@ scs new project my-funder --ontology mca     # default: the Domain's ontology
 
 `scs new domain` creates the repository, AGENTS.md, the CI workflow, and an initial commit.
 `scs new project` adds `projects/<name>/` to the repository that contains the current directory
-(or `--dir`).
+(or `--dir`) and commits it. Each workspace gets a `sources/` folder for the documents its context
+is drafted from; git ignores everything there except its README.
 
 Each ontology supplies one template set for a Domain and one for a Project; remove what does not
 apply. A Domain gets organization-wide policy and standards (for sdlc: tech stack, security,
 compliance, retention, engineering practices, operations, AI use), plus `company` and
-`prohibited`. SCDs that describe one system, such as system context, threat model, and the risk
+`prohibited`. The sdlc healthcare templates (`hipaa-compliance`, `chai-adherence`,
+`tefca-participation`) are left out; add one with `scs add scd <name>`. SCDs that describe one system, such as system context, threat model, and the risk
 register, are scaffolded only for a Project. A personal Domain gets only boundaries (the
 `prohibited` concept); its other concepts are defined with the user.
 
@@ -165,6 +167,22 @@ scs intake record-finding --help
 
 `intake.yaml` holds a workspace's intake answers, approvers, source documents, and review
 findings. It is not an SCD and is never compiled.
+
+### `scs status` and `scs commit` - Where the work stands, and committing it
+
+```bash
+scs status                                   # at the repository root: every workspace
+scs status --workspace patient-portal --json
+scs commit --workspace domain -m "Draft data handling rules" \
+    --author "Jane Doe <jane@acme-health.org>" --dry-run
+```
+
+`scs status` reads only. It works out each workspace's state from the repository: the intake
+record, documents in `sources/` and whether they are recorded, SCDs with template placeholders
+left, review findings by decision, versions and changes since the latest, uncommitted files,
+compiled artifacts, and, for a Project, the Domain's latest released version. `scs commit`
+commits one workspace's changes and nothing else, with the author you name and `scs-tools` as
+committer. Versions are committed by `scs bundle version`.
 
 ### `scs bundle` - Inspect, edit, and version bundles
 

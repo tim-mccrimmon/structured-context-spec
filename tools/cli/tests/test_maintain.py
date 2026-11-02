@@ -136,7 +136,10 @@ def test_new_domain_conforms(tmp_path: Path, monkeypatch):
 def test_new_project_conforms(repo: Path, monkeypatch):
     monkeypatch.chdir(repo)
     real = conforms(repo, "new", "project", "web", *AUTHOR, "--no-interactive")
-    assert all(c["path"].startswith("projects/web/") for c in real["changes"])
+    *created, commit = real["changes"]
+    assert all(c["path"].startswith("projects/web/") for c in created)
+    assert commit["action"] == "git-commit"
+    assert all(p["path"].startswith("projects/web/") for p in commit["paths"])
 
 
 def test_bundle_version_conforms(repo: Path):

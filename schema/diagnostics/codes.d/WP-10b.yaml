@@ -1,0 +1,10 @@
+# Diagnostic codes added by WP-10b (scs commit, D-84; scs status, D-83).
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  COMMIT_AUTHOR_REQUIRED:
+    severity: error
+    meaning: scs commit was run without --author; a commit's author is a person the user names, never taken from git configuration.
+  COMMIT_AUTHOR_INVALID:
+    severity: error
+    meaning: The --author given to scs commit is not a person identifier (Name <email>).

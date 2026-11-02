@@ -88,13 +88,17 @@ def test_scaffold_creates_the_expected_structure(tmp_path: Path):
         ".scs/config",
         "README.md",
         "docs/GETTING_STARTED.md",
+        "sources/README.md",
     ]:
         assert (root / rel).is_file(), rel
     generated = {p.stem for p in (root / "bundles" / "concepts").glob("*.yaml")}
     assert generated == CONCEPTS
-    # The full template set (D-64): nothing is left out by project type
+    # The full template set (D-64) less the sdlc healthcare layer (D-91)
     scds = {p.stem for p in (root / "context" / "project").glob("*.yaml")}
-    assert {"hipaa-compliance", "chai-adherence", "tefca-participation"} <= scds
+    assert {"soc2-controls", "threat-model", "test-coverage"} <= scds
+    assert not {"hipaa-compliance", "chai-adherence", "tefca-participation"} & scds
+    bundle = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
+    assert "soc2-controls" in bundle and "hipaa-compliance" not in bundle
     # 0.6.0: no meta, standards, or domain bundles in a Project workspace
     assert sorted(p.name for p in (root / "bundles").iterdir()) == [
         "concepts",
@@ -705,8 +709,9 @@ def test_add_bundle_works_for_every_concept(tmp_path: Path, monkeypatch, concept
 def test_add_bundle_lists_the_full_set_unless_a_0_6_project_type_applies(
     tmp_path: Path, monkeypatch
 ):
-    """A 0.7 workspace gets the full compliance bundle (D-64); a 0.6 workspace made with
-    the removed `scs init --type standard` still leaves the HIPAA SCDs out."""
+    """A 0.7 workspace gets the compliance bundle without the healthcare layer (D-91), and
+    `scs add scd` adds a healthcare SCD on request; a 0.6 workspace made with the removed
+    `scs init --type healthcare` still gets them."""
     root = scaffold(tmp_path)
     (root / "bundles" / "concepts" / "compliance-governance.yaml").unlink()
     monkeypatch.chdir(root)
@@ -715,16 +720,18 @@ def test_add_bundle_lists_the_full_set_unless_a_0_6_project_type_applies(
         == 0
     )
     text = (root / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
-    assert "hipaa-compliance" in text
+    assert "soc2-controls" in text and "hipaa-compliance" not in text
+    assert CliRunner().invoke(cli, ["add", "scd", "hipaa-compliance", *ADD_AUTHOR]).exit_code == 0
+    assert (root / "context" / "project" / "hipaa-compliance.yaml").is_file()
 
-    legacy = _bare_0_6_workspace(tmp_path / "legacy", "standard")
+    legacy = _bare_0_6_workspace(tmp_path / "legacy", "healthcare")
     monkeypatch.chdir(legacy)
     assert (
         CliRunner().invoke(cli, ["add", "bundle", "compliance-governance", *ADD_AUTHOR]).exit_code
         == 0
     )
     text = (legacy / "bundles" / "concepts" / "compliance-governance.yaml").read_text()
-    assert "hipaa-compliance" not in text
+    assert "hipaa-compliance" in text
 
 
 # ------------------------------------------------------ --ontology mca (ISS-029)
