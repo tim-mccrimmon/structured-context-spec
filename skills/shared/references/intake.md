@@ -55,7 +55,8 @@ If the user has no documents, say that is fine and go on with the questions.
 
 Ask who is involved, and record them as an answer, `q-people-1`, so drafted items can cite
 it. Propose names and roles you find in the documents, and ask the user to confirm or correct
-them.
+them. Take the people in two messages: first who is involved and in which role; then, once
+that is settled, who owns which concept (for a Domain) and who approves versions.
 
 - **Domain:** leadership roles that set or own the rules: for example CEO, CTO, CISO, quality,
   regulatory, legal. Ask who owns each concept the ontology covers.

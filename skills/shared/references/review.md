@@ -47,7 +47,9 @@ scripts/scs_engine.py run scs intake record-finding --workspace <ws> \
     --decided-by "<Name <email> of the user deciding>" --dry-run
 ```
 
-Show the change, confirm, then run it. `kept` needs a rationale. Ask who is deciding; do not
+Show the change, confirm, then run it. `kept` needs a rationale. When the decisions are
+recorded, commit them with `scs commit`: show its dry run, get a yes, then commit. Do this
+before any version is planned, not as a step inside the version plan. Ask who is deciding; do not
 assume. To decide a `deferred` finding later, pass its `--id` (`rf-3`) to replace it.
 `scs status` counts findings by decision and lists the deferred ones.
 
