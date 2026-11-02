@@ -1,6 +1,6 @@
 # SCS 0.7.0 Release Notes
 
-**Status:** release candidate `0.7.0rc1`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
+**Status:** release candidate `0.7.0rc2`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
 
 ---
 
@@ -66,11 +66,13 @@ it never merges or drops a rule. See
 
 ### Agent Skills
 
-Seven skills in the open Agent Skills format, in [`skills/`](skills/README.md), operate SCS
-through the tools: intake, drafting, advisory review, validation, versioning, compiling, and
-explaining. They share one set of rules: write only through the engine, show a dry run and get
-an explicit yes before every change, never choose an approver, and stay inside the Domain
-repository. They install in Claude Code and in Claude (claude.ai).
+Four skills in the open Agent Skills format, in [`skills/`](skills/README.md), operate SCS
+through the tools. `scs-domain` and `scs-project` each take one workspace from setup through
+source documents, intake, drafting, advisory review, and versioning to a compiled artifact,
+and resume or update it from `scs status`; `scs-validate` checks and fixes, and `scs-explain`
+answers questions. They share one set of rules: write only through the engine, show a dry run
+and get an explicit yes before every change and commit, never choose an approver, and stay
+inside the Domain repository. They install in Claude Code and in Claude (claude.ai).
 
 ### The agent interface, specified
 
@@ -100,11 +102,11 @@ outside SCS, and this guidance is expected to change in 0.8.
 
 ## Testing the release candidate
 
-`0.7.0rc1` is published to TestPyPI only:
+`0.7.0rc2` is published to TestPyPI only:
 
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc1"
+  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc2"
 ```
 
 The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI. Claude
@@ -115,8 +117,8 @@ The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI
 ## Known Gaps
 
 - **Skill behaviour tests.** The scripted-conversation tests of the skills (plan decision
-  D-51) have not run. The skills' structure is tested; their behaviour with a model is
-  specified but not yet demonstrated.
+  D-51) run against a simulated user; pacing (at most three questions per message) is held to
+  4 of 5 runs, not 5 of 5. Acceptance with a real user (WP-13) is in progress.
 - **Install matrix.** Claude Code and Claude are recorded; Cursor, Codex, and GitHub Copilot
   are not yet tried.
 - **Generated CI.** The workflow `scs new domain` writes installs `scs-validator` 0.7.x from
