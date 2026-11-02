@@ -408,9 +408,9 @@ async def score_n(run: dict, scenario: dict, api, config: dict, meter: Meter) ->
         api, config["models"]["judge"], meter,
         "Before asking any setup question (names, folders, the organization, the project), does "
         "the message tell the user all three of: (1) the stages the work will go through, "
-        "(2) what information or documents to have ready, and (3) that they can stop and "
-        "resume later and how? A message that also checks the tools or reports status still "
-        "counts; one that only asks questions does not.",
+        "where a list of the main steps in order counts, (2) what information or documents to "
+        "have ready, and (3) that they can stop and resume later? A message that also checks "
+        "the tools or reports status still counts; one that only asks questions does not.",
         f"The assistant's first message in a new setup session:\n{run['turns'][0]['assistant']}",
     )
     return verdict_result(verdict)
@@ -447,10 +447,12 @@ async def score_p(run: dict, scenario: dict, api, config: dict, meter: Meter) ->
     verdict = await judge(
         api, config["models"]["judge"], meter,
         "Does any single message ask the user more than three separate questions that they must "
-        "answer? Count each distinct piece of information requested as one question, including "
-        "items in a numbered or bulleted list. Do not count a request to confirm a shown change "
-        "(such as 'shall I go ahead?'), nor optional offers. Answer true if any message asks "
-        "more than three, and name it.",
+        "answer? Count each question the user must answer as one, including each item in a "
+        "numbered or bulleted list of questions. Details about one person (name, email, role) "
+        "are one question, and so is a request to confirm or correct a set of proposed "
+        "answers. Do not count a request to approve a shown change (such as 'shall I go "
+        "ahead?'), nor optional offers. Answer true if any message asks more than three, and "
+        "name it.",
         evidence[:60000],
     )
     return verdict_result(verdict, expected=False)

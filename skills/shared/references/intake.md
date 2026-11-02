@@ -5,7 +5,10 @@ How to ask the intake questions and record the answers. The engine is the only w
 
 ## Pacing
 
-- Ask at most three questions in one message, and wait for the answers before going on.
+- Ask at most three questions in one message, and wait for the answers before going on. A
+  request to confirm proposed answers counts as one of the three; a person's name, email,
+  and role together count as one. Ask only for what this stage needs: a detail needed
+  later, such as a person's email for the people answer, waits for that stage.
 - Propose answers you can infer, from the source documents or the conversation, and ask the
   user to confirm them. A proposal is not an answer until the user confirms it.
 - Ask the ontology; never assume it, even when the Domain's ontology seems to fit.
@@ -16,7 +19,7 @@ How to ask the intake questions and record the answers. The engine is the only w
 | Field | Values |
 |---|---|
 | `audience` | `individual` or `organization` |
-| `regulated` | yes or no; if yes, which frameworks |
+| `regulated` | `true` or `false`. The frameworks are recorded later, with the profile, as `certifications` |
 | `ontology` | `sdlc`, `cdmo`, `mca`, or `personal` |
 
 | Ontology | For |
@@ -79,12 +82,12 @@ A personal Domain is small. A few prohibitions are enough to start.
 
 ## Organization Domain
 
-When `audience: organization`, or `regulated: yes`.
+When `audience: organization`, or `regulated: true`.
 
 | Field | Ask | Notes |
 |---|---|---|
 | `organization` | Name, products or services, sites | |
-| `certifications` | Standards and editions in scope | Citation references such as `std:iso-13485:2016`; they drive `cites`. Never the standard's text |
+| `certifications` | Standards, regulations, and editions in scope | Citation references such as `std:iso-13485:2016` or `std:hipaa`; they drive `cites`. Never the standard's text |
 | `boundaries` | What is explicitly out of bounds for AI tools | The main source of prohibitions |
 
 ## Project
@@ -95,6 +98,19 @@ When `audience: organization`, or `regulated: yes`.
 | `risk` | A risk or safety classification, where one applies | For example IEC 62304 software safety class |
 | `data` | Categories of data handled | PHI, PCI, PII |
 | `boundaries` | Project-specific prohibitions | Narrower than the Domain's; never a lift of one |
+
+## Value shapes
+
+The engine validates each value against the intake schema. Pass YAML in these shapes:
+
+| Field | Shape |
+|---|---|
+| `organization` | `{name: ..., products: [...], services: [...], sites: [...]}` |
+| `project` | `{name: ..., purpose: ..., technology: [...]}` |
+| `risk` | `{classification: ..., cites: [std:...], rationale: ...}` |
+| `certifications`, `data`, `boundaries`, `practices` | lists of strings; a new list replaces the old one |
+| `approvers`, `source_documents`, `answers` | one entry per call: added, or replacing the entry with the same `person` or `id` |
+| `owner` | `Name <email>` |
 
 ## Answers
 

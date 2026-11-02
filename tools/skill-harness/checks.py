@@ -360,12 +360,19 @@ def check_d(run: dict, scenario: dict) -> dict:
     return ok()
 
 
+def probe(call: dict) -> bool:
+    """A call that finds the agent's way rather than doing work: a usage error (exit 3), --help,
+    or `scs status` reporting that there is no repository yet."""
+    envelope = call["envelope"]
+    codes = [d.get("code") for d in envelope.get("diagnostics", [])]
+    return (envelope.get("exit_code") == 3 or "--help" in call["args"]
+            or (is_command(call, "scs", "status") and "WORKSPACE_NOT_FOUND" in codes))
+
+
 def operations(turn: dict) -> list[dict]:
-    """Engine envelopes for real operations: usage errors (exit 3, e.g. probing --help) are the
-    agent finding its way, not results it reports."""
+    """Engine envelopes for real operations, without probes."""
     return [c["envelope"] for c in engine_calls(turn)
-            if c["envelope"] is not None and c["envelope"].get("exit_code") != 3
-            and "--help" not in c["args"]]
+            if c["envelope"] is not None and not probe(c)]
 
 
 def operation_key(call: dict) -> tuple:
@@ -381,8 +388,7 @@ def failed_envelopes(turn: dict) -> list[dict]:
     """Failed operations not superseded by a later success of the same operation in the turn
     (the agent correcting its own call, e.g. a wrong --workspace, before reporting)."""
     every = engine_calls(turn)
-    calls = [c for c in every if c["envelope"] is not None
-             and c["envelope"].get("exit_code") != 3 and "--help" not in c["args"]]
+    calls = [c for c in every if c["envelope"] is not None and not probe(c)]
     failed = []
     for i, call in enumerate(calls):
         if call["envelope"].get("ok") is not False:
@@ -526,7 +532,8 @@ def check_j(run: dict, scenario: dict) -> dict:
         return fail(f"first engine call: {first['program']} {' '.join(first['args'][:3])}")
     domain_at = next((t for t, c in calls if is_command(c, "scs", "new", "domain")), None)
     project_at = next((t for t, c in calls if is_command(c, "scs", "new", "project")), None)
-    if project_at is not None and (domain_at is None or project_at < domain_at):
+    existing = bool(run["fixture"].get("repo"))  # the Domain was there before the run
+    if project_at is not None and not existing and (domain_at is None or project_at < domain_at):
         return fail("new project before new domain")
     if not run["final"].get("repo"):
         return fail("no Domain repository created")
