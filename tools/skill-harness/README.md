@@ -81,7 +81,7 @@ Choices worth knowing when reading a report:
 | Date | Runs | Result | Report |
 |---|---|---|---|
 | 2026-10-28 | 40 on `claude-sonnet-5-5` | All MUST and SHOULD assertions pass; i 4 of 5 | `results/2026-10-28-sonnet-5-5.md` |
-| | rc2 skills (WP-10b) | Not yet run | |
+| 2026-11-02 | rc2 skills (WP-10b): 60 runs, then targeted reruns | Every MUST passes 5 of 5; p (pacing, now SHOULD) 4 of 5 | `results/2026-11-02-rc2.md` |
 
 ## Model changes
 
