@@ -1,4 +1,9 @@
-"""Fixture Domain repositories for the scenarios, built with the SCS engine itself."""
+"""Fixture Domain repositories for the scenarios, built with the SCS engine itself.
+
+A builder returns what the checks need to know about its fixture. `documents` lists files the
+simulated user holds outside the work folder; the harness copies them into the `sources/`
+folder the user is told to use (assertion o), as the user would.
+"""
 
 import subprocess
 from pathlib import Path
@@ -48,6 +53,48 @@ instead.
 """
 
 
+POLICY = """# Acme Health AI Usage Policy
+
+Policy POL-07, version 2. Owner: Sam Ortiz, CTO. Approved by Morgan Chen, CEO.
+
+## 1. Scope
+
+This policy covers every use of AI tools for Acme Health work, by every employee and contractor.
+
+## 2. Roles
+
+- Morgan Chen, CEO: approves this policy.
+- Sam Ortiz, CTO: owns this policy and the list of approved AI tools.
+- Pat Lee, Quality Manager: approves changes to the rules AI tools follow.
+
+## 3. Rules
+
+3.1 Use only the AI assistant the company has approved. Consumer AI chat services and personal
+AI accounts are not used for company or patient information.
+
+3.2 Patient data (PHI) is never entered into an AI tool, approved or not.
+
+3.3 Code an AI tool writes is reviewed by a developer before it is merged.
+
+3.4 Real patient data is never used in development or test environments.
+"""
+
+BRIEF = """# Patient portal: project brief
+
+Owner: Riley Park, product lead.
+
+Patients use the portal to view their records, appointments, and messages from their clinic.
+It is a web and mobile app, cloud hosted. It handles PHI and PII; no payment data. No software
+safety class applies.
+
+Team: Riley Park (product lead), Jordan Kim (developer), Avery Shah (developer), Pat Lee
+(quality reviewer). Morgan Chen is the business owner.
+
+The first release covers viewing records and appointments. Messaging comes in the second
+release. Developers use the company's approved AI assistant to draft code and tests.
+"""
+
+
 def run(env: dict, cwd: Path, *args: str, stdin: str | None = None) -> str:
     result = subprocess.run(
         list(args), cwd=cwd, env=env, input=stdin, capture_output=True, text=True
@@ -63,6 +110,24 @@ def commit(env: dict, repo: Path) -> None:
     if run(env, repo, "git", "status", "--porcelain").strip():
         run(env, repo, "git", "-c", "user.name=Pat Lee", "-c", "user.email=pat@acme-health.org",
             "commit", "-q", "-m", "Prepare the scenario")
+
+
+def _documents(work: Path, files: dict[str, str]) -> list[str]:
+    """Files the simulated user holds, outside the work folder."""
+    folder = work.parent / "documents"
+    folder.mkdir(exist_ok=True)
+    for name, text in files.items():
+        (folder / name).write_text(text)
+    return [str(folder / name) for name in files]
+
+
+def _release(env: dict, repo: Path, workspace: str = "domain") -> None:
+    """Version the workspace's concept bundle and its root as 1.0.0."""
+    folder = repo / workspace
+    run(env, folder, "scs", "bundle", "version", "--bundle", "bundles/concepts/prohibited.yaml",
+        "--version", "1.0.0", "--approved-by", APPROVER)
+    run(env, folder, "scs", "bundle", "pin", "prohibited", "--version", "1.0.0")
+    run(env, folder, "scs", "bundle", "version", "--version", "1.0.0", "--approved-by", APPROVER)
 
 
 def _domain(work: Path, env: dict) -> Path:
@@ -90,16 +155,93 @@ GOOD = [
 ]
 
 
+def _intake(env: dict, repo: Path, workspace: str, fields: dict[str, str]) -> None:
+    for field, value in fields.items():
+        run(env, repo, "scs", "intake", "set", field, value, "--workspace", workspace)
+
+
+DOMAIN_INTAKE = {"audience": "organization", "regulated": "true",
+                 "organization": "{name: Acme Health, products: [patient portal]}"}
+
+
+def _released(work: Path, env: dict, extra: list[dict] | None = None) -> Path:
+    """A Domain with an intake record and a released version 1.0.0."""
+    repo = _domain(work, env)
+    _prohibitions(repo, GOOD + (extra or []))
+    _intake(env, repo, "domain", DOMAIN_INTAKE)
+    commit(env, repo)
+    _release(env, repo)
+    return repo
+
+
 def empty(work: Path, env: dict) -> dict:
-    return {}
+    """Nothing yet: the user has only their AI usage policy (domain-init)."""
+    docs = _documents(work, {"ai-usage-policy.md": POLICY})
+    return {"documents": docs, "sources": "acme-health-context/domain/sources"}
+
+
+def resume(work: Path, env: dict) -> dict:
+    """A Domain set up yesterday and left partway: routing answers and the policy recorded, no
+    people, no approvers, nothing drafted (domain-resume)."""
+    repo = _domain(work, env)
+    (repo / "domain" / "sources" / "ai-usage-policy.md").write_text(POLICY)
+    _intake(env, repo, "domain", {
+        "audience": "organization", "regulated": "true",
+        "source_documents": "{id: doc-ai-policy, title: AI Usage Policy, "
+                            "path: sources/ai-usage-policy.md}"})
+    return {"repo": repo, "done": ["policy", "audience"],
+            "open": ["people", "approver", "draft"]}
+
+
+def unreleased(work: Path, env: dict) -> dict:
+    """A Domain drafted but never versioned: a Project cannot start yet (project-gate)."""
+    repo = _domain(work, env)
+    _prohibitions(repo, GOOD)
+    _intake(env, repo, "domain", DOMAIN_INTAKE)
+    return {"repo": repo, "unreleased": True}
+
+
+def released(work: Path, env: dict) -> dict:
+    """A released Domain, and the project brief in the user's hands (project-init)."""
+    repo = _released(work, env)
+    docs = _documents(work, {"portal-brief.md": BRIEF})
+    return {"repo": repo, "documents": docs, "sources": "acme-context/projects/portal/sources",
+            "project": "portal"}
 
 
 def draft_doc(work: Path, env: dict) -> dict:
-    repo = _domain(work, env)
+    repo = _released(work, env)
     run(env, repo, "scs", "new", "project", "portal", *AUTHOR, "--no-interactive")
-    (repo / "sources").mkdir()
-    (repo / "sources" / "quality-manual.md").write_text(MANUAL)
+    (repo / "projects" / "portal" / "sources" / "quality-manual.md").write_text(MANUAL)
     return {"repo": repo, "project": "portal", "quoted": QUOTED_STANDARD}
+
+
+BLOCKING = {"id": "NO-003", "kind": "practice",
+            "subject": "AI tools writing code that reads, displays, or stores patient records",
+            "reason": "Keeps PHI away from AI tools."}
+
+
+def project_review(work: Path, env: dict) -> dict:
+    """A released Domain with a rule that blocks the portal's own work, and a drafted portal
+    Project: the review should record the conflict in the Project and leave the Domain alone."""
+    repo = _released(work, env, extra=[BLOCKING])
+    run(env, repo, "scs", "new", "project", "portal", *AUTHOR, "--no-interactive")
+    path = repo / "projects" / "portal" / "context" / "project" / "prohibited.yaml"
+    data = yaml.safe_load(path.read_text())
+    data["content"]["prohibitions"] = [
+        {"id": "PP-001", "kind": "practice",
+         "subject": "real patient data in portal development or test environments",
+         "instead": "synthetic patient data"}]
+    path.write_text(yaml.safe_dump(data, sort_keys=False))
+    _intake(env, repo, "portal", {
+        "project": "{name: portal, purpose: patients view their records and appointments, "
+                   "technology: [web, mobile]}",
+        "data": "[PHI, PII]",
+        "answers": '{id: q-ai-use-1, question: "How will the team use AI tools?", answer: '
+                   '"Developers use the approved AI assistant to draft the portal\'s code and '
+                   'tests.", answered_by: Pat Lee <pat@acme-health.org>}'})
+    return {"repo": repo, "project": "portal", "conflict": "NO-003", "cite": None,
+            "findings_in": "projects/portal"}
 
 
 def invalid(work: Path, env: dict) -> dict:
@@ -132,11 +274,7 @@ def placeholder(work: Path, env: dict) -> dict:
 def versioned(work: Path, env: dict) -> dict:
     repo = _domain(work, env)
     _prohibitions(repo, GOOD)
-    domain = repo / "domain"
-    run(env, domain, "scs", "bundle", "version", "--bundle", "bundles/concepts/prohibited.yaml",
-        "--version", "1.0.0", "--approved-by", APPROVER)
-    run(env, domain, "scs", "bundle", "pin", "prohibited", "--version", "1.0.0")
-    run(env, domain, "scs", "bundle", "version", "--version", "1.0.0", "--approved-by", APPROVER)
+    _release(env, repo)
     return {"repo": repo}
 
 
@@ -154,5 +292,5 @@ def review(work: Path, env: dict) -> dict:
     return {"repo": repo, "conflict": "NO-003", "cite": "std:iso-13485:2016"}
 
 
-BUILDERS = {f.__name__: f for f in (empty, draft_doc, invalid, ready, placeholder, versioned,
-                                     review)}
+BUILDERS = {f.__name__: f for f in (empty, resume, unreleased, released, draft_doc, invalid,
+                                     ready, placeholder, versioned, review, project_review)}

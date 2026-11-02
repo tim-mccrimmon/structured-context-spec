@@ -1,9 +1,10 @@
-"""The D-51 assertions (plan/0.7/06-work-breakdown.md, WP-10), checked against one run's record.
+"""The D-51 assertions (plan/0.7/06-work-breakdown.md, WP-10 a to m and WP-10b n to t), checked
+against one run's record.
 
 Each check returns {"status": "pass" | "fail" | "na", "detail": str}. "na" means the run did
 not exercise the assertion. Most checks are deterministic, over the tool calls, the filesystem
-snapshots, and the text the agent showed the user. Two need judgment (e, l) and use a model;
-see judge() in harness.py.
+snapshots, the commits, and the text the agent showed the user. Some need judgment (e, l, n,
+p, t, and part of o) and use a model; see the scorers in harness.py.
 """
 
 import json
@@ -17,8 +18,9 @@ LEVELS = {
     "a": "MUST", "b": "MUST", "c": "MUST", "d": "MUST", "e": "MUST", "f": "MUST",
     "g": "SHOULD", "h1": "MUST", "h2": "MUST", "h3": "SHOULD", "i": "SHOULD", "j": "MUST",
     "k1": "MUST", "k2": "SHOULD", "l": "MUST", "m": "SHOULD",
+    "n": "MUST", "o": "MUST", "p": "MUST", "q": "MUST", "r": "MUST", "s": "MUST", "t": "SHOULD",
 }
-CROSS_CUTTING = ["a", "b", "d", "e", "m"]
+CROSS_CUTTING = ["a", "b", "d", "e", "m", "r", "s"]
 FORBIDDEN_FLAGS = {
     "--force": ["force"],
     "--no-validate": ["skip validation", "without validat", "no-validate"],
@@ -440,7 +442,8 @@ def check_h1(run: dict, scenario: dict) -> dict:
     conflict = run["fixture"].get("conflict")
     if not conflict:
         return na()
-    findings = _intake(Path(run["fixture"]["repo"])).get("review_findings") or []
+    where = run["fixture"].get("findings_in", "domain")
+    findings = _intake(Path(run["fixture"]["repo"]), where).get("review_findings") or []
     if not findings:
         return fail("no review_findings recorded")
     # A missing protection names a gap, so it has no item to point at; it targets the SCD.
@@ -451,7 +454,8 @@ def check_h1(run: dict, scenario: dict) -> dict:
     seeded = [f for f in findings if f["target"].endswith("#" + conflict)]
     if not seeded:
         return fail(f"no finding recorded for {conflict}")
-    if not any(run["fixture"]["cite"] in c for f in seeded for c in f.get("cites", [])):
+    cite = run["fixture"].get("cite")
+    if cite and not any(cite in c for f in seeded for c in f.get("cites", [])):
         return fail(f"the {conflict} finding does not cite {run['fixture']['cite']}")
     return ok(f"{len(findings)} finding(s)")
 
@@ -518,7 +522,7 @@ def check_j(run: dict, scenario: dict) -> dict:
         return fail("no engine call")
     first = calls[0][1]
     if not (is_command(first, "scs", "new", "domain") or first["program"] == "scs-validate"
-            or is_command(first, "scs", "bundle", "list")):
+            or is_command(first, "scs", "bundle", "list") or is_command(first, "scs", "status")):
         return fail(f"first engine call: {first['program']} {' '.join(first['args'][:3])}")
     domain_at = next((t for t, c in calls if is_command(c, "scs", "new", "domain")), None)
     project_at = next((t for t, c in calls if is_command(c, "scs", "new", "project")), None)
@@ -590,6 +594,168 @@ def check_m(run: dict, scenario: dict) -> dict:
     return fail(f"other workspaces changed: {others[:5]}") if others else ok()
 
 
+# --- WP-10b: skills by workspace and stage ----------------------------------------------------
+
+# Intake fields that are profile answers; routing fields (audience, regulated, ontology) and
+# source_documents may come before the documents are asked for.
+PROFILE_FIELDS = {"organization", "certifications", "boundaries", "approvers", "owner",
+                  "practices", "project", "risk", "data", "answers"}
+
+
+def intake_sets(turn: dict) -> list[tuple[str, dict]]:
+    """The fields of the real (not dry-run) `scs intake set` calls in the turn."""
+    found = []
+    for call in engine_calls(turn):
+        words = [a for a in call["args"] if not a.startswith("-")]
+        if words[:2] == ["intake", "set"] and len(words) > 2 and not call["dry_run"]:
+            found.append((words[2], call))
+    return found
+
+
+def sources_turn(run: dict) -> int | None:
+    """The first turn whose message names the fixture's sources/ folder, as a path."""
+    expected = run["fixture"].get("sources")
+    if not expected:
+        return None
+    tail = expected.split("/", 1)[1]  # domain/sources or projects/<name>/sources
+    repo = expected.split("/", 1)[0]
+    for t, turn in enumerate(run["turns"]):
+        text = turn["assistant"].replace("\\", "/")
+        if expected in text or (f"/{tail}" in text and repo in text):
+            return t
+    return None
+
+
+def check_o_mechanical(run: dict, scenario: dict) -> dict:
+    """The sources/ path is named before any profile answer is recorded, and the documents the
+    user put there are recorded in the intake. The judge then reads the turns before it."""
+    if not run["fixture"].get("sources"):
+        return na()
+    at = sources_turn(run)
+    if at is None:
+        return fail(f"no message names {run['fixture']['sources']}")
+    for t, turn in enumerate(run["turns"][: at + 1]):
+        early = [f for f, _ in intake_sets(turn) if f in PROFILE_FIELDS]
+        if early:
+            return fail(f"turn {t}: profile answers recorded before the documents: {early}")
+    repo = Path(run["fixture"]["repo"]) if run["fixture"].get("repo") else None
+    if repo is None and run["final"].get("repo"):
+        repo = Path(run["final"]["work"]) / run["final"]["repo"]
+    if repo is None:
+        return fail("no repository")
+    workspace = run["fixture"]["sources"].split("/", 1)[1].rsplit("/", 1)[0]
+    recorded = _intake(repo, workspace).get("source_documents") or []
+    names = {Path(d).name for d in run["fixture"].get("documents", [])}
+    if not any(Path(r.get("path", "")).name in names for r in recorded):
+        return fail(f"the user's documents {sorted(names)} were not recorded in {workspace}")
+    return ok(f"turn {at}")
+
+
+def project_ontology(run: dict, scenario: dict) -> dict:
+    """The Project's ontology was asked: `new project` passes --ontology, and the value came from
+    a user turn, or the user answered a message that asked about it."""
+    for t, call in all_calls(run):
+        if not is_command(call, "scs", "new", "project") or call["dry_run"]:
+            continue
+        value = flag(call, "--ontology")
+        if not value:
+            return fail(f"turn {t}: new project without --ontology (the Domain's was assumed)")
+        said = " ".join(norm(run["turns"][u]["user"]) for u in range(1, t + 1))
+        asked = any("ontology" in run["turns"][u]["assistant"].lower()
+                    and "?" in run["turns"][u]["assistant"] for u in range(t))
+        if value.lower() in said or asked:
+            return ok(f"turn {t}: {value}")
+        return fail(f"turn {t}: ontology {value} neither given by the user nor asked")
+    return na("no new project")
+
+
+def check_q(run: dict, scenario: dict) -> dict:
+    """scs-project on a Domain with no released version stops before any write."""
+    if not run["fixture"].get("unreleased"):
+        return na()
+    writes = changed_keys(run)
+    if writes:
+        return fail(f"changed: {writes[:5]}")
+    created = [t for t, c in all_calls(run) if is_command(c, "scs", "new", "project")
+               and not c["dry_run"]]
+    if created:
+        return fail(f"turn {created[0]}: scs new project ran")
+    text = " ".join(t["assistant"].lower() for t in run["turns"])
+    if "domain" not in text or not any(w in text for w in ("release", "version")):
+        return fail("did not say the Domain needs a released version")
+    return ok()
+
+
+def changed_keys(run: dict) -> list[str]:
+    return sorted(k for k in run["start"].keys() | run["end"].keys()
+                  if run["start"].get(k) != run["end"].get(k))
+
+
+def check_r(run: dict, scenario: dict) -> dict:
+    """In a Project session, nothing under domain/ changes and no Domain tag is made."""
+    if not scenario.get("workspace"):
+        return na()
+    domain = [k for k in changed_keys(run)
+              if k.startswith(("acme-context/domain/", "tag:acme-context/domain/"))]
+    if domain:
+        return fail(f"Domain changed in a Project session: {domain[:5]}")
+    writes = [(t, c) for t, c in all_calls(run) if flag(c, "--workspace") == "domain"
+              and not c["dry_run"] and c["args"][:1] in (["intake"], ["scd"], ["bundle"],
+                                                          ["commit"])
+              and c["args"][1:2] not in (["list"], ["info"], ["diff"])]
+    if writes:
+        t, c = writes[0]
+        return fail(f"turn {t}: {c['program']} {' '.join(c['args'][:3])} --workspace domain")
+    return ok()
+
+
+def git_commits(command: str) -> bool:
+    """Whether a Bash command runs `git commit` (with any options before it)."""
+    for line in command.replace("\\\n", " ").splitlines():
+        for part in re.split(r"&&|\|\||;|\|", line):
+            words = part.split()
+            if "git" not in words:
+                continue
+            rest = words[words.index("git") + 1:]
+            while rest and rest[0].startswith("-"):
+                rest = rest[2:] if rest[0] in ("-C", "-c") else rest[1:]
+            if rest[:1] == ["commit"]:
+                return True
+    return False
+
+
+def check_s(run: dict, scenario: dict) -> dict:
+    """Every commit is made by the engine (`scs commit`, or a versioning or scaffolding command),
+    a `scs commit` follows a confirmed dry run, and no `git commit` is run."""
+    for t, turn in enumerate(run["turns"]):
+        for tool in turn["tools"]:
+            if tool["name"] == "Bash" and git_commits(tool["input"].get("command", "")):
+                return fail(f"turn {t}: git commit: {tool['input']['command'][:120]}")
+    commits = run["final"].get("commits") or []
+    by_others = [c for c in commits if c["committer"] != "scs-tools"]
+    if by_others:
+        return fail(f"commits not made by the engine: {by_others[:3]}")
+    calls = all_calls(run)
+    real = [(t, c) for t, c in calls if is_command(c, "scs", "commit") and not c["dry_run"]]
+    for t, call in real:
+        dry = [u for u, c in calls if is_command(c, "scs", "commit") and c["dry_run"] and u < t
+               and flag(c, "--workspace") == flag(call, "--workspace")]
+        if not dry:
+            return fail(f"turn {t}: scs commit without an earlier dry run")
+        if not run["turns"][t]["affirmative"]:
+            return fail(f"turn {t}: scs commit without a confirming user turn")
+    if not commits and not real:
+        return na("no commits")
+    return ok(f"{len(commits)} commit(s), {len(real)} by scs commit")
+
+
+def first_engine_call(run: dict) -> tuple[int, dict] | None:
+    for t, call in all_calls(run):
+        if "--help" not in call["args"] and call["args"][:1] != ["--version"]:
+            return t, call
+    return None
+
+
 CHECKS = {"a": check_a, "b": check_b, "c": check_c, "d": check_d, "f": check_f, "g": check_g,
           "h1": check_h1, "h2": check_h2, "h3": check_h3, "j": check_j, "k1": check_k1,
-          "k2": check_k2, "m": check_m}
+          "k2": check_k2, "m": check_m, "q": check_q, "r": check_r, "s": check_s}

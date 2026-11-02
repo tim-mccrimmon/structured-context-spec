@@ -60,6 +60,7 @@ class Reply(BaseModel):
     message: str
     approves_change: bool
     done: bool
+    documents_path: str  # the folder the user was told to put documents in, once they do
 
 
 class Verdict(BaseModel):
@@ -159,7 +160,10 @@ async def simulate(client, model: str, meter: Meter, persona: str, facts: str,
             "The conversation so far:\n\n" + transcript(turns) + "\n\nWrite your next reply. "
             "Set approves_change to true only if your reply approves a change the assistant "
             "showed you and asked about. Set done to true if your goal is reached or the "
-            "assistant cannot do it; then message may be empty."
+            "assistant cannot do it; then message may be empty. If the assistant has just told "
+            "you a folder to put your documents in, and you have documents, set documents_path "
+            "to that folder exactly as the assistant wrote it and say you have put them there; "
+            "otherwise leave documents_path empty."
         )}],
         output_format=Reply,
     )
@@ -183,10 +187,25 @@ async def judge(client, model: str, meter: Meter, question: str, evidence: str) 
 # --- one run --------------------------------------------------------------------------------
 
 
+def put_documents(work: Path, folder: str, documents: list[str]) -> str:
+    """Do what the user says they did: copy their documents into the folder the assistant named,
+    if it is a sources/ folder inside the work folder. Returns what happened, for the record."""
+    target = Path(folder.strip().strip("`'\"")).expanduser()
+    if not target.is_absolute():
+        target = work / target
+    target = target.resolve()
+    if not target.is_relative_to(work.resolve()) or target.name != "sources" \
+            or not target.is_dir():
+        return f"not copied: {folder!r} is not an existing sources/ folder in the work folder"
+    for document in documents:
+        shutil.copy(document, target / Path(document).name)
+    return f"copied {len(documents)} document(s) to {target.relative_to(work.resolve())}"
+
+
 async def converse(work: Path, env: dict, scenario: dict, config: dict, persona: str,
-                   api, meter: Meter, log) -> dict:
+                   api, meter: Meter, log, info: dict) -> dict:
     turns: list[dict] = []
-    record = {"agent_cost_usd": 0.0, "skills_loaded": None, "stopped": None}
+    record = {"agent_cost_usd": 0.0, "skills_loaded": None, "stopped": None, "documents": None}
     limits = config["limits"]
 
     async def guard(input_data, tool_use_id, context):
@@ -225,7 +244,7 @@ async def converse(work: Path, env: dict, scenario: dict, config: dict, persona:
         allowed_tools=["Bash", "Read", "Glob", "Grep", "Skill", "Write", "Edit"],
         disallowed_tools=["WebFetch", "WebSearch"],
         max_turns=limits["agent_turns"],
-        max_budget_usd=limits["budget_usd"],
+        max_budget_usd=scenario.get("budget_usd", limits["budget_usd"]),
         env=env,
         sandbox={"enabled": sandboxed, "autoAllowBashIfSandboxed": True,
                  "allowUnsandboxedCommands": False, "failIfUnavailable": True},
@@ -281,6 +300,9 @@ async def converse(work: Path, env: dict, scenario: dict, config: dict, persona:
                 break
             reply = await simulate(api, config["models"]["user"], meter, persona,
                                    scenario["facts"], turns)
+            if reply.documents_path.strip() and info.get("documents") and not record["documents"]:
+                record["documents"] = put_documents(work, reply.documents_path, info["documents"])
+                log(record["documents"])
             if reply.done or not reply.message.strip():
                 break
             message, affirmative = reply.message, reply.approves_change
@@ -288,28 +310,39 @@ async def converse(work: Path, env: dict, scenario: dict, config: dict, persona:
     return record
 
 
-def finish(work: Path, env: dict) -> dict:
+def commits(repo: Path, since: str | None) -> list[dict]:
+    """The commits made during the run, with their committer."""
+    span = f"{since}..HEAD" if since else "HEAD"
+    out = subprocess.run(["git", "log", "--format=%h%x09%cn%x09%s", span], cwd=repo,
+                         capture_output=True, text=True).stdout
+    return [dict(zip(("commit", "committer", "subject"), line.split("\t", 2)))
+            for line in out.splitlines()]
+
+
+def finish(work: Path, env: dict, start: dict) -> dict:
     found = repos(work)
     if not found:
-        return {"repo": None, "intake": False, "missing_intake": [], "validate_exit": None}
+        return {"repo": None, "work": str(work), "intake": False, "missing_intake": [],
+                "validate_exit": None, "commits": []}
     repo = found[0]
     workspaces = [repo / "domain"] + sorted((repo / "projects").glob("*/"))
     workspaces = [w for w in workspaces if (w / ".scs" / "config").exists()]
     missing = [w.name for w in workspaces if not (w / "intake.yaml").exists()]
     exit_code = subprocess.run(["scs-validate", "--strict"], cwd=repo, env=env,
                                capture_output=True).returncode
-    return {"repo": repo.name, "intake": bool(workspaces) and not missing,
-            "missing_intake": missing, "validate_exit": exit_code}
+    return {"repo": repo.name, "work": str(work), "intake": bool(workspaces) and not missing,
+            "missing_intake": missing, "validate_exit": exit_code,
+            "commits": commits(repo, start.get(f"head:{repo.name}"))}
 
 
 async def score(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
     names = sorted(set(scenario["targets"]) | set(checks.CROSS_CUTTING))
     results = {}
+    judged = {"e": score_e, "l": score_l, "n": score_n, "o": score_o, "p": score_p,
+              "t": score_t}
     for name in names:
-        if name == "e":
-            results[name] = await score_e(run, api, config, meter)
-        elif name == "l":
-            results[name] = await score_l(run, api, config, meter)
+        if name in judged:
+            results[name] = await judged[name](run, scenario, api, config, meter)
         elif name == "i":
             results[name] = checks.check_i(run, scenario, ROOT)
         else:
@@ -317,7 +350,12 @@ async def score(run: dict, scenario: dict, api, config: dict, meter: Meter) -> d
     return results
 
 
-async def score_e(run: dict, api, config: dict, meter: Meter) -> dict:
+def verdict_result(verdict: Verdict, expected: bool = True) -> dict:
+    good = verdict.verdict is expected
+    return checks.ok(verdict.reason) if good else checks.fail(verdict.reason)
+
+
+async def score_e(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
     exercised = False
     for t, turn in enumerate(run["turns"]):
         failures = checks.failed_envelopes(turn)
@@ -343,7 +381,7 @@ async def score_e(run: dict, api, config: dict, meter: Meter) -> dict:
     return checks.ok() if exercised else checks.na("no ok:false envelope")
 
 
-async def score_l(run: dict, api, config: dict, meter: Meter) -> dict:
+async def score_l(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
     # Only the reply to the out-of-scope request is scored: a later step the user asks for on
     # its own, such as a compile, is in scope.
     calls = checks.engine_calls(run["turns"][0])
@@ -362,6 +400,80 @@ async def score_l(run: dict, api, config: dict, meter: Meter) -> dict:
     return checks.ok(verdict.reason) if verdict.verdict else checks.fail(verdict.reason)
 
 
+async def score_n(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
+    """The first reply of a set-up session is the welcome (D-85)."""
+    if not scenario.get("init"):
+        return checks.na("not a set-up session")
+    verdict = await judge(
+        api, config["models"]["judge"], meter,
+        "Before asking any setup question (names, folders, the organization, the project), does "
+        "the message tell the user all three of: (1) the stages the work will go through, "
+        "(2) what information or documents to have ready, and (3) that they can stop and "
+        "resume later and how? A message that also checks the tools or reports status still "
+        "counts; one that only asks questions does not.",
+        f"The assistant's first message in a new setup session:\n{run['turns'][0]['assistant']}",
+    )
+    return verdict_result(verdict)
+
+
+async def score_o(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
+    """Documents, with the exact sources/ path, come before any profile question (D-86)."""
+    result = checks.check_o_mechanical(run, scenario)
+    if result["status"] != "pass":
+        return result
+    at = checks.sources_turn(run)
+    evidence = "\n\n".join(f"MESSAGE {t}:\n{run['turns'][t]['assistant']}" for t in range(at + 1))
+    verdict = await judge(
+        api, config["models"]["judge"], meter,
+        f"Message {at} asks the user for documents. In messages 0 to {at}, does the assistant ask "
+        "any profile question before that request for documents? Profile questions are about "
+        "the organization, its certifications, its boundaries or rules, the people and their "
+        "roles, who approves versions, or the project's purpose, technology, data, or risk. "
+        "Questions about the name, the folder, the author, whether the user is an individual or "
+        "an organization, whether they are regulated, or the ontology are not profile "
+        "questions. Answer true if a profile question comes first.",
+        evidence[:30000],
+    )
+    return verdict_result(verdict, expected=False)
+
+
+async def score_p(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
+    """No message asks more than three intake questions; the Project's ontology is asked (D-88)."""
+    ontology = checks.project_ontology(run, scenario)
+    if ontology["status"] == "fail":
+        return ontology
+    evidence = "\n\n".join(f"MESSAGE {t}:\n{turn['assistant']}"
+                            for t, turn in enumerate(run["turns"]))
+    verdict = await judge(
+        api, config["models"]["judge"], meter,
+        "Does any single message ask the user more than three separate questions that they must "
+        "answer? Count each distinct piece of information requested as one question, including "
+        "items in a numbered or bulleted list. Do not count a request to confirm a shown change "
+        "(such as 'shall I go ahead?'), nor optional offers. Answer true if any message asks "
+        "more than three, and name it.",
+        evidence[:60000],
+    )
+    return verdict_result(verdict, expected=False)
+
+
+async def score_t(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
+    """A resumed session runs scs status first and says what is done and what is open (D-83)."""
+    if not scenario.get("resume"):
+        return checks.na("not a resumed session")
+    first = checks.first_engine_call(run)
+    if first is None or not checks.is_command(first[1], "scs", "status"):
+        named = f"{first[1]['program']} {' '.join(first[1]['args'][:2])}" if first else "none"
+        return checks.fail(f"first engine call: {named}")
+    done, open_ = run["fixture"]["done"], run["fixture"]["open"]
+    verdict = await judge(
+        api, config["models"]["judge"], meter,
+        f"Does the message tell the user what is already done (for example: {', '.join(done)}) "
+        f"and what is still open (for example: {', '.join(open_)}), before going on?",
+        f"The assistant's first message in a resumed session:\n{run['turns'][first[0]]['assistant']}",
+    )
+    return verdict_result(verdict)
+
+
 async def one_run(name: str, n: int, scenario: dict, config: dict, persona: str, out: Path,
                   key: str, sem: asyncio.Semaphore) -> dict:
     async with sem:
@@ -373,12 +485,13 @@ async def one_run(name: str, n: int, scenario: dict, config: dict, persona: str,
         work, env, info = prepare(sandbox, scenario["fixture"], key)
         start = snapshot(work)
         try:
-            record = await converse(work, env, scenario, config, persona, api, meter, log)
+            record = await converse(work, env, scenario, config, persona, api, meter, log,
+                                    info)
         except Exception as error:  # a crashed run is a failed run, recorded as such
             record = {"turns": [], "error": repr(error), "agent_cost_usd": 0.0}
             log(f"error: {error!r}")
         run = {"scenario": name, "run": n, "fixture": info, "start": start,
-               "end": snapshot(work), "final": finish(work, env), **record}
+               "end": snapshot(work), "final": finish(work, env, start), **record}
         run["outside_changes"] = [
             k for k in changed(start, run["end"])
             if not k.startswith(("tag:", "head:"))

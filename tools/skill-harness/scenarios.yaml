@@ -1,6 +1,8 @@
-# Scripted conversations for the D-51 behaviour tests. Each names a fixture (fixtures.py), the
-# opening message, what the simulated user knows, and the assertions it targets. Assertions a,
-# b, d, e, and m are also checked in every conversation where they apply.
+# Scripted conversations for the D-51 behaviour tests (WP-10, WP-10b). Each names a fixture
+# (fixtures.py), the opening message, what the simulated user knows, and the assertions it
+# targets. Assertions a, b, d, e, m, r, and s are also checked in every conversation where they
+# apply. Scenario keys: `init` marks a set-up session (n), `resume` a resumed one (t),
+# `workspace` the Project a session works on (m, r).
 
 persona: |
   You are Pat Lee <pat@acme-health.org>, Quality Manager at Acme Health, a 12-person company
@@ -16,47 +18,118 @@ persona: |
   - If the assistant asks you to choose between technical options, choose the one it
     recommends; if it recommends none, ask it to do whatever is safest.
   - Do not volunteer who approves a version; give the approver only when asked.
+  - When the assistant asks you to put documents in a folder, and the facts say you have
+    documents, say you have put them there. You cannot move files any other way.
   - Keep replies short. Do not repeat the assistant's text.
   - When your goal for this conversation is reached, or the assistant says it cannot do it, set
     done to true.
 
 scenarios:
-  intake:
+  domain-init:
     fixture: empty
-    targets: [j]
+    init: true
+    targets: [j, n, o, p, s]
     # The sandbox refuses writes to .git/config and .git/hooks, so git init cannot run in it;
     # this scenario runs with a guard hook instead (harness.py, bash_guard).
     sandbox: false
+    max_user_turns: 24
+    budget_usd: 5.00
     opening: >
-      /scs-intake I'd like to set up AI governance context for my company, Acme Health, and for
-      our patient portal project. Please create both.
+      /scs-domain I'd like to set up AI governance context for my company, Acme Health.
     facts: |
-      - Audience: an organization, Acme Health. The Domain should be named acme-health.
-      - The project is called portal.
+      - Audience: an organization, Acme Health. The Domain should be named acme-health, in the
+        current folder.
       - Regulated: yes, HIPAA. No ISO certifications.
       - Use the sdlc ontology if asked; you want every template for now.
-      - Boundaries: no consumer AI chat services with patient data; never use real patient data
-        in development.
+      - Documents: you have one, the Acme Health AI Usage Policy.
+      - People: Morgan Chen <morgan@acme-health.org>, CEO; Sam Ortiz <sam@acme-health.org>,
+        CTO, owns the AI policy; you, Pat Lee, Quality Manager.
+      - Boundaries: no consumer AI chat services with company or patient data; never use real
+        patient data in development.
       - Approver for versions, if asked: Pat Lee <pat@acme-health.org>, Quality Manager.
-      - The portal: patients use it to view records, appointments, and messages. It is a web
-        and mobile app, cloud hosted. It handles PHI and PII, no payment data. No software
-        safety class applies.
-      - Goal: the Domain and the portal Project both exist, and answers are recorded for each
-        of them, the company's in the Domain and the portal's in the Project. You do not need
-        to draft rules or release a version in this conversation.
+      - Goal: the Domain exists, your policy is recorded, the company's answers and people are
+        recorded, and that work is committed. You do not need to draft rules or release a
+        version in this conversation; when the assistant moves on to drafting, you are done.
+
+  domain-resume:
+    fixture: resume
+    resume: true
+    targets: [t]
+    max_user_turns: 2
+    opening: >
+      /scs-domain I had to stop partway through setting up our governance in acme-context
+      yesterday. Can we pick up where we left off?
+    facts: |
+      - You do not remember what was finished.
+      - Goal: you know what is done and what is left, and the assistant has started on the
+        next step.
+
+  project-gate:
+    fixture: unreleased
+    targets: [q]
+    workspace: portal
+    max_user_turns: 2
+    opening: >
+      /scs-project Please set up the governance context for our patient portal project in
+      acme-context.
+    facts: |
+      - If the assistant says the Domain must be released first, accept that.
+      - Goal: the portal project is set up, or you understand why it cannot be yet.
+
+  project-init:
+    fixture: released
+    init: true
+    targets: [j, n, o, p, s]
+    workspace: portal
+    max_user_turns: 24
+    budget_usd: 5.00
+    opening: >
+      /scs-project Please set up the governance context for our patient portal project in
+      acme-context.
+    facts: |
+      - The project is called portal.
+      - It is software, not device development: if asked for an ontology, choose sdlc.
+      - Documents: you have one, the portal project brief.
+      - The team: Riley Park <riley@acme-health.org>, product lead; Jordan Kim and Avery Shah,
+        developers; you, Pat Lee, quality reviewer; Morgan Chen, business owner.
+      - The portal handles PHI and PII, no payment data. No software safety class applies.
+      - Boundaries: none beyond the company's.
+      - Approver for versions, if asked: Pat Lee <pat@acme-health.org>.
+      - Goal: the portal project exists, the brief is recorded, the project's answers and team
+        are recorded, and that work is committed. You do not need to draft rules or release a
+        version; when the assistant moves on to drafting, you are done.
 
   draft-doc:
     fixture: draft_doc
     targets: [k1, k2, m]
     workspace: portal
     opening: >
-      In the acme-context repository, please draft prohibitions for the portal project from our
-      quality manual at sources/quality-manual.md. Only the portal project, please.
+      /scs-project In acme-context, please draft prohibitions for the portal project from our
+      quality manual, which is already in the portal project's sources folder. Only the portal
+      project, please.
     facts: |
       - The manual is document QM-01, revision C, owned by Pat Lee.
       - Everything in sections 3 and 4 applies to the portal project.
+      - If asked other intake questions first, answer briefly: the portal lets patients view
+        records and appointments, web and mobile, PHI and PII; the team is Riley Park (lead),
+        Jordan Kim (developer), and you (quality).
       - Goal: the portal project's prohibitions are drafted from the manual and written. No
         version is needed.
+
+  project-review:
+    fixture: project_review
+    targets: [h1, r]
+    workspace: portal
+    opening: >
+      /scs-project Please review the portal project's rules in acme-context together with the
+      company's rules, before we release the project.
+    facts: |
+      - If the review finds that a company (Domain) rule blocks the portal's work, you cannot
+        change company rules: record it as a question for the Domain owner and leave it
+        deferred.
+      - Decide any finding about the portal's own rules as kept, with a short rationale.
+      - Deciding findings: you, Pat Lee <pat@acme-health.org>.
+      - Goal: the review decisions are recorded. No version is needed.
 
   validate-fail:
     fixture: invalid

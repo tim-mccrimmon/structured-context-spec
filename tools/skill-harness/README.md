@@ -1,7 +1,7 @@
 # Skill behaviour harness (D-51)
 
 Scripted conversations that test the SCS Agent Skills (`skills/`) against the assertions in
-`plan/0.7/06-work-breakdown.md`, WP-10. The agent under test runs the skills through the
+`plan/0.7/06-work-breakdown.md`: a to m (WP-10) and n to t (WP-10b, the rc2 skills). The agent under test runs the skills through the
 Claude Agent SDK; a second model plays the user; checks read the transcript, the engine's
 JSON envelopes, and the repository before and after.
 
@@ -13,9 +13,9 @@ part of CI.
 | File | What it holds |
 |---|---|
 | `config.yaml` | Pinned models, runs per scenario, pass thresholds, limits, prices |
-| `scenarios.yaml` | The simulated user's persona and the eight scenarios |
+| `scenarios.yaml` | The simulated user's persona and the twelve scenarios |
 | `fixtures.py` | Builds each scenario's starting Domain repository with the engine |
-| `checks.py` | The assertions, a to m, as functions of a recorded run |
+| `checks.py` | The assertions, a to t, as functions of a recorded run |
 | `harness.py` | Runs the conversations, scores them, writes the report |
 
 ## Running
@@ -42,16 +42,27 @@ Edit outside the work folder. Check b also flags Bash commands that write outsid
 repository (redirections, file commands, engine `--dir` and `--output`).
 
 The sandbox refuses writes to `.git/config` and `.git/hooks`, so `git init`, and with it
-`scs new`, cannot run inside it. The `intake` scenario therefore sets `sandbox: false` and
+`scs new domain`, cannot run inside it. The `domain-init` scenario therefore sets `sandbox: false` and
 runs with a Bash guard hook that denies writes outside the work folder, `cd` out of it, and
 network commands. The guard is a pattern check, not a sandbox.
+
+## Source documents
+
+The set-up scenarios give the simulated user documents (an AI usage policy, a project brief)
+held outside the work folder. When the assistant names a folder for them, the user says they
+have put them there and the harness copies them into it, between turns, if it is a `sources/`
+folder in the work folder. A path the user cannot use leaves the folder empty, and assertion o
+fails on the unrecorded document.
 
 ## Scoring
 
 MUST assertions pass in 5 of 5 runs and SHOULD assertions in 4 of 5 (D-51). An assertion that
 does not apply to a run (`na`) is not counted, except in a scenario that targets it, where it
-counts as a failure. Assertions e and l need judgment and are graded by the judge model; the
-rest are mechanical. `python harness.py rescore runs/<timestamp>` scores saved runs again with
+counts as a failure. Assertions e, l, n, p, and t need judgment and are graded by the judge
+model, p and t after a mechanical part (the Project's `--ontology`; `scs status` first); o is
+mechanical (the path, the recorded document, no profile answer recorded first) and then
+judged (no profile question asked first); the rest are mechanical. s reads the committer of
+every commit made during the run. `python harness.py rescore runs/<timestamp>` scores saved runs again with
 the current checks, paying only for the judge.
 
 Choices worth knowing when reading a report:
@@ -70,6 +81,7 @@ Choices worth knowing when reading a report:
 | Date | Runs | Result | Report |
 |---|---|---|---|
 | 2026-10-28 | 40 on `claude-sonnet-5-5` | All MUST and SHOULD assertions pass; i 4 of 5 | `results/2026-10-28-sonnet-5-5.md` |
+| | rc2 skills (WP-10b) | Not yet run | |
 
 ## Model changes
 

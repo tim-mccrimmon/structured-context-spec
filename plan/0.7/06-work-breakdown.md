@@ -402,18 +402,18 @@ listed in order, and each starts after the previous one merges.
   Project scope; `scs-explain` unchanged. The intake, draft, review, version, and compile
   procedures move to shared references (D-82); `sync.py`, `package.py`, `test_skills.py`, the
   skills README, and the runbook follow.
-- **Accept**: `skills-ref validate` passes; the D-51 assertions a to k still pass, rewritten for
+- **Accept**: `skills-ref validate` passes; the D-51 assertions a to m still pass, rewritten for
   the new skills, plus these, scripted the same way:
 
   | # | Assertion | Level |
   |---|---|---|
-  | l | The first assistant turn of each init is the welcome: stages, what to have ready, how to stop and resume | MUST |
-  | m | Before any profile question, the assistant asks for documents and names the exact `sources/` path | MUST |
-  | n | No turn asks more than three intake questions; the Project's ontology comes from a user turn | MUST |
-  | o | `scs-project` init on a repository whose Domain has no tag stops before any write | MUST |
-  | p | In a Project session, no file under `domain/` changes | MUST |
-  | q | Every commit is made by `scs commit` after a confirmed dry run; no `git commit` in the transcript | MUST |
-  | r | A resumed session runs `scs status` first and states what is done and what is open | SHOULD |
+  | n | The first assistant turn of each init is the welcome: stages, what to have ready, how to stop and resume | MUST |
+  | o | Before any profile question, the assistant asks for documents and names the exact `sources/` path | MUST |
+  | p | No turn asks more than three intake questions; the Project's ontology comes from a user turn | MUST |
+  | q | `scs-project` init on a repository whose Domain has no tag stops before any write | MUST |
+  | r | In a Project session, no file under `domain/` changes | MUST |
+  | s | Every commit is made by `scs commit` after a confirmed dry run; no `git commit` in the transcript | MUST |
+  | t | A resumed session runs `scs status` first and states what is done and what is open | SHOULD |
 
   Then `0.7.0rc2` on TestPyPI with the skill ZIPs, and WP-13 runs again on rc2.
 
