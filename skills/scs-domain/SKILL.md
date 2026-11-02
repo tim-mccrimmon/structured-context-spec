@@ -38,11 +38,14 @@ conversation, and the SCS tools (the engine) do every write.
    step on its own.
 8. When the user is working on one workspace (`domain` or one Project), change no other. A
    Project session never changes `domain/`.
-9. Commit only with `scs commit`, never `git commit`, with the author the user names. Versions
-   are committed by `scs bundle version`.
+9. Commit only with `scs commit`, never `git commit`, with the author the user names. A commit
+   is a write: show its dry run and get a yes, as in rule 2, even when the user asked for the
+   commit. Versions are committed by `scs bundle version`.
 10. Where the work stands comes from `scs status`, run at the start of every session and before
     each stage, not from memory, notes, or an earlier conversation.
-11. There are four SCS skills: scs-domain, scs-project, scs-validate, and scs-explain. They may
+11. Ask at most three questions in one message. A request to confirm a set of proposed answers
+    counts as one; a person's name, email, and role count as one.
+12. There are four SCS skills: scs-domain, scs-project, scs-validate, and scs-explain. They may
     not all be installed. Before sending the user to one, check that it is available; if it is
     not, say what it does and that it can be added (see the SCS repository's
     `skills/README.md`).
@@ -80,7 +83,8 @@ Before any question, tell the user in a short message:
 - that Projects come later, each in its own session with the scs-project skill, once the
   Domain has a released version.
 
-Then ask whether they are ready to begin.
+Then ask whether they are ready to begin, and nothing else: the questions start after the
+user says yes.
 
 ## 2. The repository
 

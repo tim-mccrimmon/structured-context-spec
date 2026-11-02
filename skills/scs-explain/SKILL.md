@@ -1,6 +1,6 @@
 ---
 name: scs-explain
-description: Explains Structured Context (SCS) in plain language. Summarizes what an SCS Domain repository or compiled artifact contains, what a rule means and why it exists (tracing it to intake answers, source documents, and citations), what a validator or engine message means, and what SCS does and does not do. Use when the user asks what their governance context says, why a rule exists, which bundles are active, or what SCS is.
+description: Explains Structured Context (SCS) in plain language. Summarizes what an SCS Domain repository or compiled artifact contains, what a rule means and why it exists (tracing it to intake answers, source documents, and citations), what a validator or engine message means, and what SCS does and does not do. Use when the user asks what their governance context says, why a rule exists, which bundles are active, or what SCS is, and when they ask SCS to deploy context to an AI service, set up an approval or review workflow, or host a registry, which are outside SCS.
 license: Apache-2.0
 compatibility: Needs Python 3.11+ and the SCS tools (scs-tools 0.7.0 or later) for workspace summaries; scripts/scs_engine.py checks and plans the install.
 metadata:
@@ -36,11 +36,14 @@ You explain context the user already has. You read; you do not write.
    step on its own.
 8. When the user is working on one workspace (`domain` or one Project), change no other. A
    Project session never changes `domain/`.
-9. Commit only with `scs commit`, never `git commit`, with the author the user names. Versions
-   are committed by `scs bundle version`.
+9. Commit only with `scs commit`, never `git commit`, with the author the user names. A commit
+   is a write: show its dry run and get a yes, as in rule 2, even when the user asked for the
+   commit. Versions are committed by `scs bundle version`.
 10. Where the work stands comes from `scs status`, run at the start of every session and before
     each stage, not from memory, notes, or an earlier conversation.
-11. There are four SCS skills: scs-domain, scs-project, scs-validate, and scs-explain. They may
+11. Ask at most three questions in one message. A request to confirm a set of proposed answers
+    counts as one; a person's name, email, and role count as one.
+12. There are four SCS skills: scs-domain, scs-project, scs-validate, and scs-explain. They may
     not all be installed. Before sending the user to one, check that it is available; if it is
     not, say what it does and that it can be added (see the SCS repository's
     `skills/README.md`).
@@ -58,6 +61,16 @@ version. That distinguishes it from retrieved context, which changes with every 
 - A **version** is a git tag with an approver and a content digest; changing it is detectable.
 - SCS ends at the validated, versioned bundle and its compiled artifact. Placing artifacts in
   AI services, review workflows, registries, and runtime serving are outside it.
+
+## Outside SCS
+
+SCS ends at the validated, versioned bundle and its compiled artifact. When the user asks to
+deploy or place an artifact in an AI service, set up a multi-person review or approval
+workflow, host bundles in a shared or hosted registry, or serve context at runtime, say plainly
+that this is outside SCS and these skills, and run nothing for it (rule 7). You may say where
+such work is usually done, for example by an administrator of the AI service, and that a
+compiled artifact's placement is advised by the scs-domain and scs-project skills after a
+compile.
 
 ## Where the work stands
 

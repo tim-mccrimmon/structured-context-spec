@@ -87,7 +87,7 @@ scenarios:
       /scs-project Please set up the governance context for our patient portal project in
       acme-context.
     facts: |
-      - The project is called portal.
+      - The project is called portal. If the assistant proposes another name, ask for portal.
       - It is software, not device development: if asked for an ontology, choose sdlc.
       - Documents: you have one, the portal project brief.
       - The team: Riley Park <riley@acme-health.org>, product lead; Jordan Kim and Avery Shah,

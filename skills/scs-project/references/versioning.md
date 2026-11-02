@@ -39,7 +39,11 @@ Every import must be pinned to a released version before the root can be version
 (`VERSION_IMPORT_NOT_PINNED`). So versioning a root usually means a **cascade**: version each
 changed concept bundle first, pin it in the root, then version the root.
 
-Before asking for confirmation, show the cascade plan. For each step, list:
+Commit any other pending changes first, such as recorded review decisions, with `scs commit`
+as a step of its own, shown and confirmed before the plan.
+
+Before asking for confirmation, show the cascade plan. For each step, list, by name and for the
+root as well as each concept bundle:
 
 - the bundle and the new version the user chose;
 - the snapshot `<bundle-name>-v<version>.yaml` and manifest
@@ -47,8 +51,10 @@ Before asking for confirmation, show the cascade plan. For each step, list:
 - the pin it changes in the root (`scs bundle pin <name> --version <v>`);
 - the commit and the tag `<workspace>/<bundle-name>-v<version>`.
 
-One confirmation, naming the approver, may cover the whole plan. Then run each step's
-`--dry-run` first; if its `changes` differ from the plan, stop and show the user.
+One confirmation, naming the approver, may cover the whole plan. It covers versioning and
+pinning only: compiling comes after the versions are reported, with its own dry run and yes.
+Then run each step's `--dry-run` first; if its `changes` differ from the plan, stop and show
+the user.
 
 ```
 scripts/scs_engine.py run scs bundle version --bundle bundles/concepts/security.yaml \

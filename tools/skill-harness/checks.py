@@ -102,6 +102,7 @@ def engine_calls(turn: dict) -> list[dict]:
                 calls.append({
                     "program": match.group(1),
                     "args": args,
+                    "command": command,
                     "dry_run": "--dry-run" in args,
                     "piped": piped(line[match.end() :]),
                 })
@@ -235,13 +236,23 @@ def is_command(call: dict, program: str, *words: str) -> bool:
 
 
 def flag(call: dict, name: str) -> str | None:
+    """The flag's value; a shell variable ($A, "$A") is resolved from an assignment in the same
+    Bash command, if there is one."""
     args = call["args"]
     for i, arg in enumerate(args):
         if arg == name and i + 1 < len(args):
-            return args[i + 1]
+            return resolve(args[i + 1], call.get("command", ""))
         if arg.startswith(name + "="):
-            return arg.split("=", 1)[1]
+            return resolve(arg.split("=", 1)[1], call.get("command", ""))
     return None
+
+
+def resolve(value: str, command: str) -> str:
+    match = re.fullmatch(r"\$\{?(\w+)\}?", value)
+    if not match:
+        return value
+    found = re.findall(rf"(?:^|[\s;&]){match.group(1)}=(\"[^\"]*\"|'[^']*'|\S+)", command)
+    return found[-1].strip("\"'") if found else value
 
 
 def all_calls(run: dict) -> list[tuple[int, dict]]:
@@ -512,7 +523,8 @@ def check_i(run: dict, scenario: dict, root: Path) -> dict:
         if not calls:
             continue
         compiled = True
-        text = " ".join(u["assistant"] for u in run["turns"][t:]).lower()
+        # The advice may come with the compile's dry run, in the turn just before.
+        text = " ".join(u["assistant"] for u in run["turns"][max(t - 1, 0):]).lower()
         if not any(s in text.replace("-", " ") for s in SERVICES):
             return fail(f"turn {t}: no placement named")
         if not any(d in text for d in dates):

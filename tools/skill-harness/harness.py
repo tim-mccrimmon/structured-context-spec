@@ -107,6 +107,8 @@ def engine_env(sandbox: Path, key: str) -> dict:
         "HOME": str(sandbox / "home"),
         "CLAUDE_CONFIG_DIR": str(sandbox / "claude-config"),
         "LANG": "en_US.UTF-8",
+        # The sandboxes sit inside this repository; keep git from finding it from the work folder.
+        "GIT_CEILING_DIRECTORIES": str(sandbox),
     }
 
 
@@ -192,7 +194,9 @@ def put_documents(work: Path, folder: str, documents: list[str]) -> str:
     if it is a sources/ folder inside the work folder. Returns what happened, for the record."""
     target = Path(folder.strip().strip("`'\"")).expanduser()
     if not target.is_absolute():
-        target = work / target
+        # Relative to the work folder, or to a repository in it (`projects/portal/sources/`).
+        bases = [work] + repos(work)
+        target = next((b / target for b in bases if (b / target).is_dir()), work / target)
     target = target.resolve()
     if not target.is_relative_to(work.resolve()) or target.name != "sources" \
             or not target.is_dir():
