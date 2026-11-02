@@ -1,6 +1,6 @@
 # SCS Agent Skills
 
-Seven skills in the open [Agent Skills](https://agentskills.io/specification) format that let an
+Four skills in the open [Agent Skills](https://agentskills.io/specification) format that let an
 AI assistant operate SCS for a user: build and maintain a Domain repository, validate it, version
 it, and compile it, with the user confirming every change. They follow
 [`spec/0.7/agent-interface.md`](../spec/0.7/agent-interface.md). Every write goes through the SCS
@@ -8,16 +8,18 @@ tools (`scs`, `scs-validate`) in machine mode; the skills carry the conversation
 
 | Skill | Does |
 |---|---|
-| [`scs-intake`](scs-intake/SKILL.md) | The intake conversation; creates the Domain repository and its workspaces; records `intake.yaml` |
-| [`scs-draft`](scs-draft/SKILL.md) | Writes and maintains prohibitions, directives, and facts, from conversation or source documents |
-| [`scs-review`](scs-review/SKILL.md) | Advisory review; records the user's decision on each finding |
+| [`scs-domain`](scs-domain/SKILL.md) | The Domain, from setup to a compiled version: welcome, source documents, intake, people, drafting, review, versioning, compiling; resumes or updates from `scs status` |
+| [`scs-project`](scs-project/SKILL.md) | One Project, the same way, once the Domain has a released version; reviews the Project with the Domain and records Domain conflicts as questions for the Domain owner |
 | [`scs-validate`](scs-validate/SKILL.md) | Runs the validator and explains the results before proposing fixes |
-| [`scs-version`](scs-version/SKILL.md) | Change summary, approver, and bottom-up versioning |
-| [`scs-compile`](scs-compile/SKILL.md) | Compiles a version, previews stacks, and advises on placement |
-| [`scs-explain`](scs-explain/SKILL.md) | Explains a workspace, a rule's origin, an artifact, or a message |
+| [`scs-explain`](scs-explain/SKILL.md) | Explains where the work stands, a workspace, a rule's origin, an artifact, or a message |
 
-Status: 0.7 release candidate. The behaviour tests (scripted conversations, D-51) pass: 40 runs
-on `claude-sonnet-5-5`, report in [`tools/skill-harness/results/`](../tools/skill-harness/results/).
+Run the Domain and each Project in separate sessions. Each session starts from `scs status`, so
+work can stop at any point and resume later.
+
+Status: 0.7 release candidate 2. The rc1 skills (`scs-intake`, `scs-draft`, `scs-review`,
+`scs-version`, `scs-compile`) passed the behaviour tests (D-51); rc2 reorganizes them by workspace
+(D-81), and its behaviour tests (WP-10b) are not yet run. Earlier reports are in
+[`tools/skill-harness/results/`](../tools/skill-harness/results/).
 
 ## Installing the skills
 
@@ -44,8 +46,10 @@ without the user's agreement. What works in each client is recorded in
 ## Maintaining the skills
 
 Some files are copies, so each skill stays self-contained: `scripts/scs_engine.py` (from
-`scs-intake`), `scs-validate/references/diagnostics.md` (from `schema/diagnostics/codes.yaml`),
-and `scs-compile/references/placement/` (from `docs/placement/`). After changing a source, run:
+`shared/scs_engine.py`), the stage procedures in `scs-domain/references/` and
+`scs-project/references/` (from `shared/references/`, edited there only),
+`references/placement/` in the same two skills (from `docs/placement/`), and
+`scs-validate/references/diagnostics.md` (from `schema/diagnostics/codes.yaml`). After changing a source, run:
 
 ```bash
 python skills/sync.py          # requires PyYAML

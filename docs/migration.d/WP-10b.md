@@ -13,5 +13,10 @@
   generated `.gitignore` now ignores `**/sources/*` except that README (D-86). An existing
   repository keeps its `.gitignore`; to track the README there too, change `sources/` to the
   two new lines.
+- **The skills are organized by workspace (rc2).** `scs-domain` and `scs-project` each run a
+  workspace from setup to a compiled version, and resume or update it from `scs status`;
+  `scs-validate` and `scs-explain` are unchanged in purpose. The rc1 skills `scs-intake`,
+  `scs-draft`, `scs-review`, `scs-version`, and `scs-compile` are removed: their procedures are
+  references inside the two new skills. Remove the old skills and install the four (D-81, D-82).
 - **The sdlc scaffold leaves out the healthcare templates** (`hipaa-compliance`,
   `chai-adherence`, `tefca-participation`); add one with `scs add scd <name>` (D-91).

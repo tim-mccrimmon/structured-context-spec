@@ -1,4 +1,4 @@
-"""The Agent Skills under `skills/` (WP-10): format, shared rules, and the engine calls they name.
+"""The Agent Skills under `skills/` (WP-10, WP-10b): format, shared rules, and the engine calls they name.
 
 These are structural checks. The behaviour tests (scripted conversations, D-51) need a model
 and run separately.
@@ -21,15 +21,7 @@ from scs_tools.cli import cli
 
 ROOT = Path(__file__).resolve().parents[3]
 SKILLS = ROOT / "skills"
-NAMES = [
-    "scs-compile",
-    "scs-draft",
-    "scs-explain",
-    "scs-intake",
-    "scs-review",
-    "scs-validate",
-    "scs-version",
-]
+NAMES = ["scs-domain", "scs-explain", "scs-project", "scs-validate"]
 RULES_RE = re.compile(r"## Rules for every SCS skill\n(.*?)\n## ", re.DOTALL)
 
 
@@ -41,14 +33,14 @@ def frontmatter(skill: str):
 
 def engine():
     spec = importlib.util.spec_from_file_location(
-        "scs_engine", SKILLS / "scs-intake" / "scripts" / "scs_engine.py"
+        "scs_engine", SKILLS / "shared" / "scs_engine.py"
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
-def test_the_seven_skills_exist():
+def test_the_four_skills_exist():
     assert sorted(p.parent.name for p in SKILLS.glob("*/SKILL.md")) == NAMES
 
 
@@ -207,11 +199,12 @@ def test_package_builds_one_zip_per_skill_with_bundled_wheels(tmp_path: Path):
     )
     assert result.returncode == 0, result.stderr
     assert sorted(p.stem for p in out.glob("*.zip")) == NAMES
-    with zipfile.ZipFile(out / "scs-intake.zip") as archive:
+    with zipfile.ZipFile(out / "scs-domain.zip") as archive:
         names = set(archive.namelist())
-    assert "scs-intake/SKILL.md" in names
-    assert "scs-intake/assets/wheels/scs_tools-0.7.0rc1-py3-none-any.whl" in names
-    assert all(n.startswith("scs-intake/") for n in names)
+    assert "scs-domain/SKILL.md" in names
+    assert "scs-domain/references/review.md" in names
+    assert "scs-domain/assets/wheels/scs_tools-0.7.0rc1-py3-none-any.whl" in names
+    assert all(n.startswith("scs-domain/") for n in names)
 
 
 def test_package_refuses_an_incomplete_wheel_set(tmp_path: Path):

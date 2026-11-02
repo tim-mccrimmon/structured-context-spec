@@ -301,9 +301,9 @@ These edit the files' text, so comments and layout survive.
 
 ## Agent Skills
 
-- **New: `skills/`.** Seven skills in the Agent Skills format (`scs-intake`, `scs-draft`,
-  `scs-review`, `scs-validate`, `scs-version`, `scs-compile`, `scs-explain`) let an AI assistant
-  operate SCS through the tools in machine mode, confirming every change with the user
+- **New: `skills/`.** Four skills in the Agent Skills format (`scs-domain`, `scs-project`,
+  `scs-validate`, `scs-explain`) let an AI assistant operate SCS through the tools in machine
+  mode, confirming every change with the user
   (`spec/0.7/agent-interface.md`). Install steps for Claude Code and Claude are in
   `skills/README.md`.
 - **Removed: `plugins/scs-vibe` and `plugins/scs-team`.** They predated the 0.6 model and
@@ -325,6 +325,11 @@ These edit the files' text, so comments and layout survive.
   generated `.gitignore` now ignores `**/sources/*` except that README (D-86). An existing
   repository keeps its `.gitignore`; to track the README there too, change `sources/` to the
   two new lines.
+- **The skills are organized by workspace (rc2).** `scs-domain` and `scs-project` each run a
+  workspace from setup to a compiled version, and resume or update it from `scs status`;
+  `scs-validate` and `scs-explain` are unchanged in purpose. The rc1 skills `scs-intake`,
+  `scs-draft`, `scs-review`, `scs-version`, and `scs-compile` are removed: their procedures are
+  references inside the two new skills. Remove the old skills and install the four (D-81, D-82).
 - **The sdlc scaffold leaves out the healthcare templates** (`hipaa-compliance`,
   `chai-adherence`, `tefca-participation`); add one with `scs add scd <name>` (D-91).
 

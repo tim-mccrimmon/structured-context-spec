@@ -3,9 +3,11 @@
 
 A skill must be self-contained, so some files are copied into it:
 
-- `scripts/scs_engine.py` into every skill, from `scs-intake/scripts/scs_engine.py`;
-- `scs-validate/references/diagnostics.md`, generated from `schema/diagnostics/codes.yaml`;
-- `scs-compile/references/placement/*.md`, from `docs/placement/`.
+- `scripts/scs_engine.py` into every skill, from `shared/scs_engine.py`;
+- `shared/references/*.md` (intake, drafting, review, versioning, compiling) into the skills
+  that run those stages, scs-domain and scs-project (D-82);
+- `references/placement/*.md` into the same skills, from `docs/placement/`;
+- `scs-validate/references/diagnostics.md`, generated from `schema/diagnostics/codes.yaml`.
 
     python skills/sync.py          # write the copies
     python skills/sync.py --check  # exit 1 if any copy differs (CI)
@@ -21,7 +23,9 @@ import yaml
 
 SKILLS = Path(__file__).resolve().parent
 ROOT = SKILLS.parent
-ENGINE_SOURCE = SKILLS / "scs-intake" / "scripts" / "scs_engine.py"
+SHARED = SKILLS / "shared"
+ENGINE_SOURCE = SHARED / "scs_engine.py"
+STAGE_SKILLS = ("scs-domain", "scs-project")
 CODES = ROOT / "schema" / "diagnostics" / "codes.yaml"
 PLACEMENT = ROOT / "docs" / "placement"
 SPEC_LINK = re.compile(r"\]\(\.\./\.\./spec/0\.7/([a-z-]+\.md)\)")
@@ -60,9 +64,14 @@ def expected() -> Dict[Path, str]:
     for skill in skills():
         files[skill / "scripts" / "scs_engine.py"] = engine
     files[SKILLS / "scs-validate" / "references" / "diagnostics.md"] = diagnostics()
-    for page in sorted(PLACEMENT.glob("*.md")):
-        target = SKILLS / "scs-compile" / "references" / "placement" / page.name
-        files[target] = placement_page(page.read_text(encoding="utf-8"))
+    for name in STAGE_SKILLS:
+        references = SKILLS / name / "references"
+        for page in sorted((SHARED / "references").glob("*.md")):
+            files[references / page.name] = page.read_text(encoding="utf-8")
+        for page in sorted(PLACEMENT.glob("*.md")):
+            files[references / "placement" / page.name] = placement_page(
+                page.read_text(encoding="utf-8")
+            )
     return files
 
 

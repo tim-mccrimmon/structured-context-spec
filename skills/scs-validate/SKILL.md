@@ -35,17 +35,26 @@ judge of validity; never decide it yourself.
    shared registries, and runtime serving are outside SCS. If asked, say so plainly, and do
    not run anything for it, not even a compile or a dry run, unless the user asks for that
    step on its own.
-8. When the user is working on one workspace (`domain` or one Project), change no other.
-9. The other SCS skills may not be installed. Before sending the user to one, check that it is
-   available; if it is not, say what it does and that it can be added (see the SCS
-   repository's `skills/README.md`).
+8. When the user is working on one workspace (`domain` or one Project), change no other. A
+   Project session never changes `domain/`.
+9. Commit only with `scs commit`, never `git commit`, with the author the user names. Versions
+   are committed by `scs bundle version`.
+10. Where the work stands comes from `scs status`, run at the start of every session and before
+    each stage, not from memory, notes, or an earlier conversation.
+11. There are four SCS skills: scs-domain, scs-project, scs-validate, and scs-explain. They may
+    not all be installed. Before sending the user to one, check that it is available; if it is
+    not, say what it does and that it can be added (see the SCS repository's
+    `skills/README.md`).
 
 ## Run it
 
-At the repository root, so every workspace and every version tag is checked:
+At the repository root, so every workspace and every version tag is checked: the Domain and
+each Project. Run `scs status` there too, so you can tell the user which workspace each finding
+belongs to and where that workspace stands:
 
 ```
 scripts/scs_engine.py check
+scripts/scs_engine.py run scs status
 scripts/scs_engine.py run scs-validate --strict
 ```
 
@@ -65,8 +74,8 @@ briefly.
 Common findings, by code (see [references/diagnostics.md](references/diagnostics.md)):
 
 - `CONTENT_DIGEST_MISMATCH`, `MANIFEST_ALTERED`: a versioned bundle changed after it was
-  versioned. The fix is a new version, bottom-up, re-pinning each in the next (scs-version);
-  never edit the manifest or tag.
+  versioned. The fix is a new version, bottom-up, re-pinning each in the next, made in a
+  session with scs-domain or scs-project; never edit the manifest or tag.
 - `GIT_HISTORY_INCOMPLETE`: a shallow clone. Fetch full history and tags.
 - `PROVENANCE_PLACEHOLDER`: a placeholder `created_by`. Correct it with the user.
 - `DERIVED_FROM_UNRESOLVED`: an item names an intake answer or document that is not recorded.
@@ -75,5 +84,7 @@ Common findings, by code (see [references/diagnostics.md](references/diagnostics
 
 ## Fixing
 
-Each fix is a write: use the scs-draft commands with `--dry-run`, show the change, and confirm.
-Validate again afterwards and report the new result, not the expected one.
+Each fix is a write: run the engine command with `--dry-run`, show the change, and confirm.
+Fix only the workspace the user is working on; a finding in the Domain, found from a Project
+session, goes to the Domain owner (scs-domain). Validate again afterwards and report the new
+result, not the expected one. Commit the fix with `scs commit`.

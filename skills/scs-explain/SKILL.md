@@ -34,10 +34,16 @@ You explain context the user already has. You read; you do not write.
    shared registries, and runtime serving are outside SCS. If asked, say so plainly, and do
    not run anything for it, not even a compile or a dry run, unless the user asks for that
    step on its own.
-8. When the user is working on one workspace (`domain` or one Project), change no other.
-9. The other SCS skills may not be installed. Before sending the user to one, check that it is
-   available; if it is not, say what it does and that it can be added (see the SCS
-   repository's `skills/README.md`).
+8. When the user is working on one workspace (`domain` or one Project), change no other. A
+   Project session never changes `domain/`.
+9. Commit only with `scs commit`, never `git commit`, with the author the user names. Versions
+   are committed by `scs bundle version`.
+10. Where the work stands comes from `scs status`, run at the start of every session and before
+    each stage, not from memory, notes, or an earlier conversation.
+11. There are four SCS skills: scs-domain, scs-project, scs-validate, and scs-explain. They may
+    not all be installed. Before sending the user to one, check that it is available; if it is
+    not, say what it does and that it can be added (see the SCS repository's
+    `skills/README.md`).
 
 ## What SCS is
 
@@ -52,6 +58,18 @@ version. That distinguishes it from retrieved context, which changes with every 
 - A **version** is a git tag with an approver and a content digest; changing it is detectable.
 - SCS ends at the validated, versioned bundle and its compiled artifact. Placing artifacts in
   AI services, review workflows, registries, and runtime serving are outside it.
+
+## Where the work stands
+
+```
+scripts/scs_engine.py run scs status
+```
+
+At the repository root it reports every workspace: the intake, source documents, SCDs with
+placeholders left, review findings, versions and changes since the latest, uncommitted files,
+and compiled artifacts; for a Project, the Domain's latest version. Explain it in plain language
+and suggest the next step, with the skill that does it: scs-domain for the Domain, scs-project
+for a Project.
 
 ## Summarize a workspace
 

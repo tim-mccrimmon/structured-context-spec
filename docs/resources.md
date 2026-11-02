@@ -34,9 +34,9 @@ replaces with Agent Skills.
 
 ## Agent Skills
 
-SCS 0.7 ships seven Agent Skills in [`skills/`](../skills/README.md): `scs-intake`, `scs-draft`,
-`scs-review`, `scs-validate`, `scs-version`, `scs-compile`, and `scs-explain`. They let an AI
-assistant set up, maintain, version, and compile your context through the SCS engine,
+SCS 0.7 ships four Agent Skills in [`skills/`](../skills/README.md): `scs-domain`,
+`scs-project`, `scs-validate`, and `scs-explain`. They let an AI assistant set up, maintain,
+version, and compile your context through the SCS engine,
 confirming each change with you first. They replace the earlier SCS Vibe and SCS Team plugins,
 which were removed in 0.7.
 

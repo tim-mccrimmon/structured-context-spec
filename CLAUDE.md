@@ -45,7 +45,7 @@ structured-context-spec/
 │   ├── bundles/            # Bundle manifest templates
 │   └── scd/                # SCD templates by tier
 ├── examples/               # Reference implementations
-├── skills/                 # Agent Skills (scs-intake, scs-draft, ...) for operating SCS
+├── skills/                 # Agent Skills (scs-domain, scs-project, ...) for operating SCS
 ├── tools/                  # CLI and validator tools
 │   ├── cli/                # scs CLI
 │   └── scd-validator/      # YAML structure validator
@@ -161,7 +161,7 @@ See `rfcs/README.md` for full process details.
 
 ## Agent Skills
 
-- **`skills/`** — seven `scs-*` skills that operate SCS through the engine in machine mode
+- **`skills/`** — four `scs-*` skills that operate SCS through the engine in machine mode
   (see `skills/README.md`). They replace the `scs-vibe` and `scs-team` plugins, removed in 0.7.
 
 ---
