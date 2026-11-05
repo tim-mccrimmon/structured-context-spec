@@ -123,9 +123,9 @@ initial commit itself. Record the routing answers with `scs intake set` (see the
 
 ## 3. Documents
 
-Before the profile questions, ask for the source documents, as
-[references/intake.md](references/intake.md) describes: give the exact `domain/sources/` path,
-wait for the user, then record each document and read it. Propose the answers the documents
+Before the profile questions, ask for the source documents, and whether there is a website to
+read, as [references/intake.md](references/intake.md) describes: give the exact
+`domain/sources/` path, wait for the user, then record each document and read it. Propose the answers the documents
 support.
 
 ## 4. Profile and people

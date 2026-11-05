@@ -116,8 +116,9 @@ Show the planned changes, get a yes, then run it. The engine commits the new Pro
 ## 3. Documents
 
 Before the profile questions, ask for the Project's documents (the brief, requirements, design
-notes), as [references/intake.md](references/intake.md) describes: give the exact
-`projects/<name>/sources/` path, wait for the user, then record each document and read it.
+notes), and whether there is a website to read, as [references/intake.md](references/intake.md)
+describes: give the exact `projects/<name>/sources/` path, wait for the user, then record each
+document and read it.
 Domain documents are already in the Domain; do not record them again.
 
 ## 4. Profile and team

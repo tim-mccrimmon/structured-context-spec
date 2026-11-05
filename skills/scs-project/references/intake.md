@@ -53,7 +53,16 @@ Read each document in the conversation, then propose the profile answers it supp
 copy a document anywhere else. The documents stay local: `sources/` is ignored by git, except
 its README.
 
-If the user has no documents, say that is fine and go on with the questions.
+In the same message, ask one optional question: is there a website whose pages should inform the
+answers (the organization's site for a Domain, the product's or client's for a Project)? If the
+user gives one, read the pages they name; the home page and an About page are usually enough.
+Save the text of each page as a dated Markdown copy in `sources/`, named
+`website-<host>-<page>-<YYYY-MM-DD>.md`, starting with the URL and the date it was read; show
+the file names and get a yes first, as for any write. Record each copy like a document, with its
+`path` only: the copy, not the live page, is what the answers came from. If you cannot read web
+pages here, say so and ask the user to save the pages into `sources/` themselves.
+
+If the user has no documents and no website, say that is fine and go on with the questions.
 
 ## People
 
