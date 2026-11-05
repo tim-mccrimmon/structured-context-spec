@@ -106,9 +106,11 @@ Propose a Domain name (for example `acme-cdmo`, `jdoe`); `scs new domain <name>`
 repository `<name>-context/`, so pass the name without `-context`. Propose a display name too,
 the name as people write it (for example `NexTern` for `nextern`): it goes in the titles and
 descriptions, and changing it later takes a new version. Ask which directory it goes in; do not
-assume the current directory. Ask for the author's name and email; never take them from git
-config without confirming. These are the first message. Once they are answered,
-ask the routing questions (audience, regulated, and the ontology) from
+assume the current directory. Ask for the author's name and email, and say what they are for:
+they are recorded as `created_by` in the provenance of what is created, and as the author of
+each checkpoint commit (the committer is `scs-tools`). They are not taken from git config, and
+git config is not changed. These are the first message. Once they are answered, ask the routing
+questions (audience, regulated, and the ontology) from
 [references/intake.md](references/intake.md) in a message of their own.
 
 ```

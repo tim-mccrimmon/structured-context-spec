@@ -101,7 +101,10 @@ Propose a Project name from the conversation, and a display name, the name as pe
 changing it later takes a new version. A Project here is the context for one piece of work, not
 the work itself; the work's own repository is not changed. Ask the Project's
 ontology, explaining the choice, as [references/intake.md](references/intake.md) describes;
-never assume the Domain's. Ask for the author's name and email.
+never assume the Domain's. Ask for the author's name and email, and say what they are for:
+they are recorded as `created_by` in the provenance of what is created, and as the author of
+each checkpoint commit (the committer is `scs-tools`). They are not taken from git config, and
+git config is not changed.
 
 ```
 scripts/scs_engine.py run scs new project <name> --title "<Display name>" --dir <repository> \
