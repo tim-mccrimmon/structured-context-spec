@@ -1,6 +1,6 @@
 # SCS 0.7.0 Release Notes
 
-**Status:** release candidate `0.7.0rc2`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
+**Status:** release candidate `0.7.0rc3`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
 
 ---
 
@@ -25,7 +25,7 @@ Context now lives in its own git repository, `<name>-context/`, rather than insi
 application's codebase. The Domain workspace (`domain/`) holds organization-wide context, and
 each Project has a workspace under `projects/<name>/`. `scs new domain` creates the repository
 with a CI workflow, `AGENTS.md`, and an initial commit; `scs new project` adds a Project inside
-it. `scs-validate` at the repository root checks every workspace. See
+it. Both take `--title`, the display name used in titles and descriptions. `scs-validate` at the repository root checks every workspace. See
 [`spec/0.7/bundle-format.md`](spec/0.7/bundle-format.md) §8.
 
 ### Versions you can verify
@@ -102,11 +102,11 @@ outside SCS, and this guidance is expected to change in 0.8.
 
 ## Testing the release candidate
 
-`0.7.0rc2` is published to TestPyPI only:
+`0.7.0rc3` is published to TestPyPI only:
 
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc2"
+  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc3"
 ```
 
 The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI. Claude
@@ -118,7 +118,9 @@ The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI
 
 - **Skill behaviour tests.** The scripted-conversation tests of the skills (plan decision
   D-51) run against a simulated user; pacing (at most three questions per message) is held to
-  4 of 5 runs, not 5 of 5. Acceptance with a real user (WP-13) is in progress.
+  4 of 5 runs, not 5 of 5. The harness was last run on rc2; rc3's skill changes (display name,
+  git check, website question, new-session advice) are tested only by the WP-13 rerun.
+  Acceptance with a real user (WP-13) passed on rc2 and is rerun on rc3.
 - **Install matrix.** Claude Code and Claude are recorded; Cursor, Codex, and GitHub Copilot
   are not yet tried.
 - **Generated CI.** The workflow `scs new domain` writes installs `scs-validator` 0.7.x from
