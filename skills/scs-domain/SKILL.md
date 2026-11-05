@@ -52,6 +52,12 @@ conversation, and the SCS tools (the engine) do every write.
 
 ## 0. Where things stand
 
+If this session has already run the scs-project skill, say first, before the check, that
+the Domain is best done in a new session, and why: the Project conversation is still in
+context, so its answers can carry over into the Domain's rules, and a long session gets
+compacted, which loses detail. A new session picks up from `scs status`. Offer to stop here;
+go on in this session only if the user asks to.
+
 Run `scripts/scs_engine.py check`. If `ok` is false, run `scripts/scs_engine.py install-plan`
 and handle what `missing` names; install nothing the user has not agreed to, or let them run it.
 
