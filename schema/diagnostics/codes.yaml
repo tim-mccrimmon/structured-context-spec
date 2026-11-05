@@ -463,3 +463,7 @@ codes:
     severity: error
     meaning: At the root of a Domain repository a workspace-scoped command needs --workspace (D-42); exit
       code 3.
+  WORKSPACE_TITLE_INVALID:
+    severity: error
+    meaning: The display name given to scs new --title is empty, or contains a double quote or a backslash;
+      exit code 3.

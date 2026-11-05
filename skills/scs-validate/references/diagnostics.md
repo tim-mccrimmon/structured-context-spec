@@ -148,3 +148,4 @@ Every code the SCS tools emit, with its severity. Generated from
 | `WORKSPACE_NAME_INVALID` | error | A Domain or Project name cannot be a directory, bundle id, and tag prefix (bad characters), names a concept bundle, or is a Project named domain; exit code 3. |
 | `WORKSPACE_NOT_FOUND` | error | No workspace was found (no .scs/config above the current directory, or no workspace by the --workspace name). |
 | `WORKSPACE_REQUIRED` | error | At the root of a Domain repository a workspace-scoped command needs --workspace (D-42); exit code 3. |
+| `WORKSPACE_TITLE_INVALID` | error | The display name given to scs new --title is empty, or contains a double quote or a backslash; exit code 3. |
