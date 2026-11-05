@@ -15,6 +15,10 @@ TREES = ["spec", "docs", "rfcs", "skills"]
 FILES = ["README.md", "CONTRIBUTING.md", "RELEASE-NOTES-0.7.0.md"]
 # Released history, kept as published.
 FROZEN = ["spec/0.3", "spec/0.5", "docs/MIGRATION-0.3.md"]
+# The shared skill references link to `placement/`, which skills/sync.py copies into each skill
+# from docs/placement/; resolve those links against the source.
+SHARED_REFERENCES = ROOT / "skills" / "shared" / "references"
+PLACEMENT = ROOT / "docs" / "placement"
 LINK_RE = re.compile(r"\]\(<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\)")
 FENCE_RE = re.compile(r"^(```|~~~).*?^\1", re.DOTALL | re.MULTILINE)
 INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
@@ -50,6 +54,8 @@ def broken(page: Path):
             continue
         path = target.split("#", 1)[0]
         resolved = (ROOT / path.lstrip("/")) if path.startswith("/") else (page.parent / path)
+        if page.parent == SHARED_REFERENCES and path.startswith("placement/"):
+            resolved = PLACEMENT / path.removeprefix("placement/")
         if not exists(resolved):
             yield target
 
