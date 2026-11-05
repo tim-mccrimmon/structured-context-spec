@@ -1,4 +1,4 @@
-"""The Agent Skills under `skills/` (WP-10, WP-10b): format, shared rules, and the engine calls they name.
+"""The Agent Skills under `skills/` (WP-10, WP-10b): format, shared rules, and engine calls.
 
 These are structural checks. The behaviour tests (scripted conversations, D-51) need a model
 and run separately.
@@ -32,9 +32,7 @@ def frontmatter(skill: str):
 
 
 def engine():
-    spec = importlib.util.spec_from_file_location(
-        "scs_engine", SKILLS / "shared" / "scs_engine.py"
-    )
+    spec = importlib.util.spec_from_file_location("scs_engine", SKILLS / "shared" / "scs_engine.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module

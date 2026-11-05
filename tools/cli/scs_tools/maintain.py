@@ -446,9 +446,7 @@ def remove_scd(
             for _, other_path, other in working():
                 for ref in [str(i) for i in other.get("imports") or []]:
                     if (parse_bundle_ref(ref) or ("",))[0] == concept_id:
-                        edit.writes[other_path] = remove_item(
-                            edit.text(other_path), "imports", ref
-                        )
+                        edit.writes[other_path] = remove_item(edit.text(other_path), "imports", ref)
             if manifest is not None:
                 concept = f"concept:{bundle_name(concept_id)}"
                 edit.writes[manifest.resolve()] = remove_concept(
