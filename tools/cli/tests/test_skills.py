@@ -181,6 +181,37 @@ def test_install_plan_recommends_pypi_without_wheels(monkeypatch, capsys):
     assert out["plans"][0]["recommended"] is True
 
 
+def test_check_is_not_ok_without_git(monkeypatch, capsys):
+    module = engine()
+    monkeypatch.setattr(module, "engine_version", lambda: "0.7.0")
+    monkeypatch.setattr(module, "has_git", lambda: False)
+    assert module.check() == 1
+    out = json.loads(capsys.readouterr().out)
+    assert out["ok"] is False and out["missing"] == ["git"]
+
+
+def test_install_plan_offers_git_only_when_missing(monkeypatch, capsys):
+    module = engine()
+    monkeypatch.setattr(module, "has_git", lambda: True)
+    module.install_plan([])
+    assert "git" not in json.loads(capsys.readouterr().out)
+    monkeypatch.setattr(module, "has_git", lambda: False)
+    module.install_plan([])
+    git = json.loads(capsys.readouterr().out)["git"]
+    assert "No GitHub account" in git["why"] and "before running it" in git["rule"]
+
+
+def test_git_install_command_follows_the_linux_distribution(monkeypatch):
+    module = engine()
+    monkeypatch.setattr(module.platform, "system", lambda: "Linux")
+    monkeypatch.setattr(module, "os_release", lambda: {"ID": "arch", "PRETTY_NAME": "Arch"})
+    assert module.git_install()["command"] == "sudo pacman -S --needed git"
+    monkeypatch.setattr(module, "os_release", lambda: {"ID": "pop", "ID_LIKE": "ubuntu debian"})
+    assert module.git_install()["command"] == "sudo apt-get install -y git"
+    monkeypatch.setattr(module, "os_release", lambda: {"ID": "unknown"})
+    assert module.git_install()["command"] is None
+
+
 def test_run_refuses_anything_but_the_engine(capsys):
     assert engine().run(["rm", "-rf", "/"]) == 3
     assert json.loads(capsys.readouterr().out)["ok"] is False

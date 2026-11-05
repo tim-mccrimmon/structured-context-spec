@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Call the SCS engine (`scs`, `scs-validate`) in machine mode for an SCS skill.
 
-    scs_engine.py check                 Is the engine installed and new enough? (D-45, D-56)
+    scs_engine.py check                 Is the engine installed and new enough, and git there?
     scs_engine.py install-plan [WHEEL...]
                                         The install command to show the user. Installs nothing.
     scs_engine.py stage-wheels WHEEL... Copy uploaded wheels to their standard file names.
@@ -13,6 +13,7 @@ identical in every SCS skill.
 """
 
 import json
+import platform
 import re
 import shutil
 import subprocess
@@ -61,18 +62,73 @@ def bundled_wheels() -> list[Path]:
     return sorted((HERE.parent / "assets" / "wheels").glob("*.whl"))
 
 
+def has_git() -> bool:
+    return shutil.which("git") is not None
+
+
+def os_release() -> dict[str, str]:
+    try:
+        text = Path("/etc/os-release").read_text(encoding="utf-8")
+    except OSError:
+        return {}
+    pairs = (line.split("=", 1) for line in text.splitlines() if "=" in line)
+    return {k: v.strip().strip('"') for k, v in pairs}
+
+
+def git_install() -> dict:
+    """The command that installs git on this platform, for the user to approve."""
+    system = platform.system()
+    if system == "Darwin":
+        if shutil.which("brew"):
+            return {"platform": "macOS (Homebrew)", "command": "brew install git"}
+        return {
+            "platform": "macOS",
+            "command": "xcode-select --install",
+            "note": "Opens a dialog that installs Apple's command line tools, which include git.",
+        }
+    if system == "Windows":
+        return {"platform": "Windows", "command": "winget install --id Git.Git -e"}
+    release = os_release()
+    ids = {release.get("ID", ""), *release.get("ID_LIKE", "").split()}
+    for family, command in [
+        ("arch", "sudo pacman -S --needed git"),
+        ("debian", "sudo apt-get install -y git"),
+        ("ubuntu", "sudo apt-get install -y git"),
+        ("fedora", "sudo dnf install -y git"),
+        ("rhel", "sudo dnf install -y git"),
+        ("suse", "sudo zypper install -y git"),
+        ("alpine", "sudo apk add git"),
+    ]:
+        if family in ids:
+            return {"platform": release.get("PRETTY_NAME", system), "command": command}
+    return {
+        "platform": release.get("PRETTY_NAME", system),
+        "command": None,
+        "note": "Install git with this system's package manager.",
+    }
+
+
 def check() -> int:
     version = engine_version()
-    ok = version is not None and meets(version, MINIMUM_TOOLS_VERSION)
+    engine_ok = version is not None and meets(version, MINIMUM_TOOLS_VERSION)
+    git = has_git()
+    ok = engine_ok and git
     result = {
         "ok": ok,
         "installed": version,
         "minimum": MINIMUM_TOOLS_VERSION,
         "python": sys.version.split()[0],
-        "git": shutil.which("git") is not None,
+        "git": git,
     }
     if not ok:
-        result["next"] = "Run `scs_engine.py install-plan` and show the user the command."
+        missing = [
+            name for name, present in (("the SCS tools", engine_ok), ("git", git)) if not present
+        ]
+        result["missing"] = missing
+        result["next"] = (
+            f"Missing: {' and '.join(missing)}. Run `scs_engine.py install-plan` and show the "
+            "user the commands."
+        )
     emit(result)
     return 0 if ok else 1
 
@@ -118,18 +174,25 @@ def install_plan(wheels: list[str]) -> int:
         )
     for plan in plans:
         plan["recommended"] = plan is plans[0]
-    emit(
-        {
-            "ok": True,
-            "recommended": plans[0]["source"],
-            "plans": plans,
-            "after": f"Put {venv}/bin on PATH, then run `scs_engine.py check` again.",
-            "rule": "Recommend the plan marked recommended. "
-            "Show the user the command and where the package comes from "
-            "(pypi.org/project/scs-tools, github.com/tim-mccrimmon/structured-context-spec). "
-            "Install only after the user agrees, or let the user run it.",
+    result = {
+        "ok": True,
+        "recommended": plans[0]["source"],
+        "plans": plans,
+        "after": f"Put {venv}/bin on PATH, then run `scs_engine.py check` again.",
+        "rule": "Recommend the plan marked recommended. "
+        "Show the user the command and where the package comes from "
+        "(pypi.org/project/scs-tools, github.com/tim-mccrimmon/structured-context-spec). "
+        "Install only after the user agrees, or let the user run it.",
+    }
+    if not has_git():
+        result["git"] = {
+            **git_install(),
+            "why": "SCS keeps each change and version in a local git repository. No GitHub "
+            "account or git setup is needed.",
+            "rule": "Show the user this command before running it, and run it only after the "
+            "user agrees, or let the user run it. With no command, say git is needed and stop.",
         }
-    )
+    emit(result)
     return 0
 
 

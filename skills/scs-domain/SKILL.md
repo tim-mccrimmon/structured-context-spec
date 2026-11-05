@@ -53,10 +53,15 @@ conversation, and the SCS tools (the engine) do every write.
 ## 0. Where things stand
 
 Run `scripts/scs_engine.py check`. If `ok` is false, run `scripts/scs_engine.py install-plan`
-and show the user the command and where the package comes from. Recommend the plan the result
-marks `recommended`; when wheels are bundled, that is the wheels. Install only once the user
-agrees, or let them run it. If the user uploaded wheel files, run `stage-wheels` on them first
-and pass the staged paths to `install-plan`.
+and handle what `missing` names; install nothing the user has not agreed to, or let them run it.
+
+- **The SCS tools**: show the user the command and where the package comes from. Recommend the
+  plan the result marks `recommended`; when wheels are bundled, that is the wheels. If the user
+  uploaded wheel files, run `stage-wheels` on them first and pass the staged paths to
+  `install-plan`.
+- **git**: show the `git` command from the same result, before running it, with its reason: SCS
+  keeps each change and version in a local git repository; no GitHub account or git setup is
+  needed. If the result has no command, say git is needed and stop.
 
 Then find the Domain repository. If the user names one, or the current directory is inside
 one, run `scs status --workspace domain` there and choose the mode:
@@ -76,6 +81,8 @@ Before any question, tell the user in a short message:
 - what happens: setting up the Domain, gathering documents, a few questions at a time,
   drafting the rules, reviewing them together, then releasing a version that a named person
   approves and compiling it for their AI tools;
+- what is needed on the computer: git, which SCS uses to keep each change and version (no
+  GitHub account or git setup is needed), and the SCS tools; step 0 has already checked both;
 - what helps to have ready: the organization's AI usage policy and any related policies or
   SOPs, the names and roles of the people who own the rules, and who approves a version;
 - that they can stop at any point: the work is saved in the repository as it goes, and a new

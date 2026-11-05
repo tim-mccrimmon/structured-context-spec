@@ -54,8 +54,13 @@ do every write.
 ## 0. Where things stand
 
 Run `scripts/scs_engine.py check`. If `ok` is false, run `scripts/scs_engine.py install-plan`
-and show the user the command and where the package comes from. Recommend the plan the result
-marks `recommended`; install only once the user agrees, or let them run it.
+and handle what `missing` names; install nothing the user has not agreed to, or let them run it.
+
+- **The SCS tools**: show the user the command and where the package comes from. Recommend the
+  plan the result marks `recommended`.
+- **git**: show the `git` command from the same result, before running it, with its reason: SCS
+  keeps each change and version in a local git repository; no GitHub account or git setup is
+  needed. If the result has no command, say git is needed and stop.
 
 Then find the Domain repository (the user names it, or the current directory is inside it) and
 run `scs status` at its root.
@@ -78,6 +83,8 @@ Before any question, tell the user in a short message:
 - what happens: creating the Project, gathering its documents, a few questions at a time about
   the work and the team, drafting its rules, reviewing them together with the Domain's, then
   releasing a version that a named person approves and compiling it;
+- what is needed on the computer: git, which SCS uses to keep each change and version (no
+  GitHub account or git setup is needed), and the SCS tools; step 0 has already checked both;
 - what helps to have ready: the project brief or requirements, the team's names and roles, and
   who approves a version;
 - that the Domain's rules are fixed in this session: a conflict with one is recorded as a
