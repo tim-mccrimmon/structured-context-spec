@@ -1,8 +1,8 @@
 id: bundle:{{ project_name }}
 type: project
 version: "DRAFT"
-title: "{{ project_name }} Governance"
-description: "Governance for the {{ project_name }} project"
+title: "{{ display_name }} Governance"
+description: "Governance for the {{ display_name }} project"
 
 # A Project bundle imports its concept bundles directly. It does not import the organization's
 # Domain bundle or the meta bundle; a runtime applies the Domain and Project bundles side by
@@ -16,4 +16,4 @@ scds: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Initial Project bundle for {{ project_name }}"
+  rationale: "Initial Project bundle for {{ display_name }}"

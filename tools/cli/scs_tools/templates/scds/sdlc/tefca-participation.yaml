@@ -62,4 +62,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "TEFCA participation for {{ project_name }}"
+  rationale: "TEFCA participation for {{ display_name }}"

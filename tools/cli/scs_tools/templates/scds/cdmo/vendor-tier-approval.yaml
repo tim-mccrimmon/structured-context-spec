@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Which vendors are approved for which AI deployment tiers"
 concept: concept:supplier-qualification
 content:
-  summary: "TODO - in a sentence or two, vendor tier approval at {{ project_name }}"
+  summary: "TODO - in a sentence or two, vendor tier approval at {{ display_name }}"
   facts: []
   # Examples:
   # - id: VTA-001

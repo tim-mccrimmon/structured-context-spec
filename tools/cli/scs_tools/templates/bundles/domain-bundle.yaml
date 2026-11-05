@@ -1,8 +1,8 @@
 id: bundle:{{ project_name }}
 type: domain
 version: "DRAFT"
-title: "{{ project_name }} Governance"
-description: "Governance for all of {{ project_name }}'s work, organized by the {{ domain_name }} ontology"
+title: "{{ display_name }} Governance"
+description: "Governance for all of {{ display_name }}'s work, organized by the {{ domain_name }} ontology"
 
 # A Domain bundle imports the published meta bundle and its concept bundles, and contains no
 # SCDs of its own. Concept bundles are unversioned while DRAFT; pin a version once you've run
@@ -16,4 +16,4 @@ scds: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Initial Domain bundle for {{ project_name }}"
+  rationale: "Initial Domain bundle for {{ display_name }}"

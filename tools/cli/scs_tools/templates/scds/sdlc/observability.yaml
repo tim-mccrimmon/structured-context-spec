@@ -107,4 +107,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Observability strategy for {{ project_name }}"
+  rationale: "Observability strategy for {{ display_name }}"

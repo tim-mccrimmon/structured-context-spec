@@ -83,4 +83,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "HIPAA compliance for {{ project_name }}"
+  rationale: "HIPAA compliance for {{ display_name }}"

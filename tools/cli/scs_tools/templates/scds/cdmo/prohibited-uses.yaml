@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Tools and practices prohibited on this client program, in addition to the organization's prohibitions"
 concept: concept:compliance-governance
 content:
-  summary: "TODO - in a sentence or two, prohibited uses at {{ project_name }}"
+  summary: "TODO - in a sentence or two, prohibited uses at {{ display_name }}"
   prohibitions: []
   # Examples:
   # - id: PU-001

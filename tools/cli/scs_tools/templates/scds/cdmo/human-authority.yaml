@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The human sign-off gates for AI-assisted work"
 concept: concept:ai-accountability
 content:
-  summary: "TODO - in a sentence or two, human authority at {{ project_name }}"
+  summary: "TODO - in a sentence or two, human authority at {{ display_name }}"
   directives: []
   # Examples:
   # - id: HA-001

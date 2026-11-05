@@ -43,4 +43,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Initial audit requirements for {{ project_name }}"
+  rationale: "Initial audit requirements for {{ display_name }}"

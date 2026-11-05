@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Decisions an AI assistant must never make"
 concept: concept:ai-accountability
 content:
-  summary: "TODO - in a sentence or two, non-decision principle at {{ project_name }}"
+  summary: "TODO - in a sentence or two, non-decision principle at {{ display_name }}"
   directives: []
   # Examples:
   # - id: NDP-001

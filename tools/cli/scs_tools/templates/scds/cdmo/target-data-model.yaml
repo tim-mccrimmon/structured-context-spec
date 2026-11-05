@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The target data and object model for the program"
 concept: concept:system-architecture
 content:
-  summary: "TODO - in a sentence or two, target data model at {{ project_name }}"
+  summary: "TODO - in a sentence or two, target data model at {{ display_name }}"
   facts: []
   # Examples:
   # - id: TDM-001

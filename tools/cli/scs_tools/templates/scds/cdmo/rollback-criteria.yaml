@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "When and how the program rolls back a cutover"
 concept: concept:implementation-cutover
 content:
-  summary: "TODO - in a sentence or two, rollback criteria at {{ project_name }}"
+  summary: "TODO - in a sentence or two, rollback criteria at {{ display_name }}"
   facts: []
   # Examples:
   # - id: RC-001

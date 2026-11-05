@@ -13,7 +13,7 @@ topics:
   - dependency-management
 
 content:
-  summary: "Engineering practices every {{ project_name }} project follows"
+  summary: "Engineering practices every {{ display_name }} project follows"
 
   # Each directive is compiled into the rules an AI agent receives. Write one rule per
   # directive, as the agent should read it. Practices that are forbidden outright belong in
@@ -47,4 +47,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Engineering practices for {{ project_name }}"
+  rationale: "Engineering practices for {{ display_name }}"

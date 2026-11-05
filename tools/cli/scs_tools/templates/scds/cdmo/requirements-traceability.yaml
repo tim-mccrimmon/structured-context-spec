@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "How the program's requirements are identified and traced"
 concept: concept:verification-validation
 content:
-  summary: "TODO - in a sentence or two, requirements traceability at {{ project_name }}"
+  summary: "TODO - in a sentence or two, requirements traceability at {{ display_name }}"
   directives: []
   # Examples:
   # - id: RT-001

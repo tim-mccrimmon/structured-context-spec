@@ -78,4 +78,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "AI usage policy for {{ project_name }}"
+  rationale: "AI usage policy for {{ display_name }}"

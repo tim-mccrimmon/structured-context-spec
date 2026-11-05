@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Source-to-target lineage for data this program migrates or transforms"
 concept: concept:data-provenance
 content:
-  summary: "TODO - in a sentence or two, data lineage at {{ project_name }}"
+  summary: "TODO - in a sentence or two, data lineage at {{ display_name }}"
   facts: []
   # Examples:
   # - id: DL-001

@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The program's qualification protocols and evidence"
 concept: concept:verification-validation
 content:
-  summary: "TODO - in a sentence or two, qualification protocols at {{ project_name }}"
+  summary: "TODO - in a sentence or two, qualification protocols at {{ display_name }}"
   directives: []
   # Examples:
   # - id: QP-001

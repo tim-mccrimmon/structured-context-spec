@@ -2,7 +2,7 @@ id: bundle:prohibited
 type: concept
 version: "DRAFT"
 title: "Prohibited Tools and Practices"
-description: "Tools and practices forbidden in all of {{ project_name }}'s work"
+description: "Tools and practices forbidden in all of {{ display_name }}'s work"
 
 imports: []
 
@@ -12,4 +12,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Prohibited Tools and Practices concept bundle for {{ project_name }}"
+  rationale: "Prohibited Tools and Practices concept bundle for {{ display_name }}"

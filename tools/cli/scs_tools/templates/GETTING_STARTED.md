@@ -1,4 +1,4 @@
-# Getting Started with {{ project_name }}
+# Getting Started with {{ display_name }}
 
 This guide explains how to work with the structured context in this {{ bundle_kind | capitalize }} bundle workspace.
 

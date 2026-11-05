@@ -66,4 +66,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Data protection strategy for {{ project_name }}"
+  rationale: "Data protection strategy for {{ display_name }}"

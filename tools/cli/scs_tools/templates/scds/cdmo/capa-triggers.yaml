@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "What triggers corrective and preventive action, and the assistant's part in it"
 concept: concept:qms-records
 content:
-  summary: "TODO - in a sentence or two, capa triggers at {{ project_name }}"
+  summary: "TODO - in a sentence or two, capa triggers at {{ display_name }}"
   directives: []
   # Examples:
   # - id: CT-001

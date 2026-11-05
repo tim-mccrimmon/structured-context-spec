@@ -53,4 +53,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Availability requirements for {{ project_name }}"
+  rationale: "Availability requirements for {{ display_name }}"

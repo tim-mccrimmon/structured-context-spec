@@ -87,4 +87,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Infrastructure definition for {{ project_name }}"
+  rationale: "Infrastructure definition for {{ display_name }}"

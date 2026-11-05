@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The document hierarchy and control rules"
 concept: concept:qms-records
 content:
-  summary: "TODO - in a sentence or two, document control at {{ project_name }}"
+  summary: "TODO - in a sentence or two, document control at {{ display_name }}"
   directives: []
   # Examples:
   # - id: DC-001

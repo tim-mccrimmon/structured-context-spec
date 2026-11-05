@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The target system design and configuration for the program"
 concept: concept:system-architecture
 content:
-  summary: "TODO - in a sentence or two, solution architecture at {{ project_name }}"
+  summary: "TODO - in a sentence or two, solution architecture at {{ display_name }}"
   facts: []
   # Examples:
   # - id: SA-001

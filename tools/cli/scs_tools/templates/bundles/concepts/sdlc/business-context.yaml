@@ -2,7 +2,7 @@ id: bundle:business-context
 type: concept
 version: "DRAFT"
 title: "Business Context Concept Bundle"
-description: "Business problem, opportunity, stakeholders, and objectives for {{ project_name }}"
+description: "Business problem, opportunity, stakeholders, and objectives for {{ display_name }}"
 
 imports: []
 
@@ -17,4 +17,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Business context concept bundle for {{ project_name }}"
+  rationale: "Business context concept bundle for {{ display_name }}"

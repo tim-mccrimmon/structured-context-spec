@@ -2,7 +2,7 @@ id: bundle:architecture
 type: concept
 version: "DRAFT"
 title: "Architecture Concept Bundle"
-description: "System architecture, components, and technical design for {{ project_name }}"
+description: "System architecture, components, and technical design for {{ display_name }}"
 
 imports: []
 
@@ -15,4 +15,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Architecture concept bundle for {{ project_name }}"
+  rationale: "Architecture concept bundle for {{ display_name }}"

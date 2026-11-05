@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "How risks trace to requirements and controlling deliverables"
 concept: concept:risk-management
 content:
-  summary: "TODO - in a sentence or two, risk traceability at {{ project_name }}"
+  summary: "TODO - in a sentence or two, risk traceability at {{ display_name }}"
   directives: []
   # Examples:
   # - id: RT-001

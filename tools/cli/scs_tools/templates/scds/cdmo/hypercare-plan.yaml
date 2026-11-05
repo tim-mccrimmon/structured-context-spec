@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Support and go-live criteria after each rollout wave"
 concept: concept:implementation-cutover
 content:
-  summary: "TODO - in a sentence or two, hypercare plan at {{ project_name }}"
+  summary: "TODO - in a sentence or two, hypercare plan at {{ display_name }}"
   facts: []
   # Examples:
   # - id: HP-001

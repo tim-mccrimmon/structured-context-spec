@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Access that depends on completed training"
 concept: concept:training-competency
 content:
-  summary: "TODO - in a sentence or two, training completion gates at {{ project_name }}"
+  summary: "TODO - in a sentence or two, training completion gates at {{ display_name }}"
   facts: []
   # Examples:
   # - id: TCG-001

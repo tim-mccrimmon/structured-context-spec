@@ -41,4 +41,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Initial policy enforcement for {{ project_name }}"
+  rationale: "Initial policy enforcement for {{ display_name }}"

@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Which regulations and standards bind the organization's work, and the activities each covers"
 concept: concept:compliance-governance
 content:
-  summary: "TODO - in a sentence or two, regulatory applicability at {{ project_name }}"
+  summary: "TODO - in a sentence or two, regulatory applicability at {{ display_name }}"
   facts: []
   # Examples:
   # - id: RA-001

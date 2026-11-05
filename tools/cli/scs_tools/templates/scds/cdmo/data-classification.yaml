@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The data-classification scheme, with examples for each class"
 concept: concept:data-provenance
 content:
-  summary: "TODO - in a sentence or two, data classification at {{ project_name }}"
+  summary: "TODO - in a sentence or two, data classification at {{ display_name }}"
   facts: []
   # Examples:
   # - id: DC-001

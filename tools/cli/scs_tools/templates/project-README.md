@@ -1,4 +1,4 @@
-# {{ project_name }}
+# {{ display_name }}
 
 **Bundle type**: {{ bundle_kind | capitalize }}
 **Ontology model**: {{ ontology }}
@@ -8,13 +8,13 @@
 ## Overview
 
 {% if bundle_kind == 'domain' -%}
-This workspace holds {{ project_name }}'s **Domain bundle**: the governance that applies to all of
+This workspace holds {{ display_name }}'s **Domain bundle**: the governance that applies to all of
 {% if ontology == 'personal' %}your work, whichever project it is part of. It uses the personal ontology: it starts with
 your boundaries (the prohibited concept) only, and you add the concepts your context needs.{% else %}the organization's work, whichever project it is part of. It starts from the {{ domain_name }}
 ontology model; keep what applies, remove what does not, and fill it in with your
 organization's own rules.{% endif %}
 {%- else -%}
-This workspace holds the **Project bundle** for {{ project_name }}: the governance for this
+This workspace holds the **Project bundle** for {{ display_name }}: the governance for this
 project. It is independent of your organization's Domain bundle; a runtime applies the two side
 by side.
 {%- endif %}

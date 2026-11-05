@@ -96,14 +96,16 @@ Make sure the user knows there are three separate things:
 - **placement**, a later step that puts the compiled context where an AI tool reads it.
 
 Propose a Domain name (for example `acme-cdmo`, `jdoe`); `scs new domain <name>` creates the
-repository `<name>-context/`, so pass the name without `-context`. Ask which directory it goes
-in; do not assume the current directory. Ask for the author's name and email; never take them
-from git config without confirming. These three are the first message. Once they are answered,
+repository `<name>-context/`, so pass the name without `-context`. Propose a display name too,
+the name as people write it (for example `NexTern` for `nextern`): it goes in the titles and
+descriptions, and changing it later takes a new version. Ask which directory it goes in; do not
+assume the current directory. Ask for the author's name and email; never take them from git
+config without confirming. These are the first message. Once they are answered,
 ask the routing questions (audience, regulated, and the ontology) from
 [references/intake.md](references/intake.md) in a message of their own.
 
 ```
-scripts/scs_engine.py run scs new domain <name> --ontology <ontology> \
+scripts/scs_engine.py run scs new domain <name> --title "<Display name>" --ontology <ontology> \
     --dir <directory> --author "<Name>" --email "<email>" --no-interactive --dry-run
 ```
 

@@ -54,4 +54,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Stakeholder analysis for {{ project_name }}"
+  rationale: "Stakeholder analysis for {{ display_name }}"

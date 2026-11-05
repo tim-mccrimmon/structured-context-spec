@@ -15,4 +15,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "System Architecture concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"
+  rationale: "System Architecture concept bundle for {{ display_name }}, from the Medical-Device CDMO ontology"

@@ -67,4 +67,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Scalability strategy for {{ project_name }}"
+  rationale: "Scalability strategy for {{ display_name }}"

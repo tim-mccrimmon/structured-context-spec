@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The client, the program's responsibilities split, and client constraints"
 concept: concept:business-context
 content:
-  summary: "TODO - in a sentence or two, client program context at {{ project_name }}"
+  summary: "TODO - in a sentence or two, client program context at {{ display_name }}"
   facts: []
   # Examples:
   # - id: CPC-001

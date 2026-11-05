@@ -75,4 +75,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Data handling policies for {{ project_name }}"
+  rationale: "Data handling policies for {{ display_name }}"

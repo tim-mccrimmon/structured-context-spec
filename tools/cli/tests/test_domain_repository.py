@@ -89,6 +89,35 @@ def test_new_project_works_from_inside_a_workspace(tmp_path: Path, monkeypatch):
     assert (repo / "projects" / "a" / ".scs" / "config").is_file()
 
 
+def test_title_is_the_display_name_and_ids_keep_the_name(tmp_path: Path, monkeypatch):
+    repo = new_domain(tmp_path, "nextern", "--title", "NexTern")
+    assert new_project(repo, "timekeeping", monkeypatch, "--title", "Time Keeping").exit_code == 0
+    for workspace, name, title in [
+        ("domain", "nextern", "NexTern"),
+        ("projects/timekeeping", "timekeeping", "Time Keeping"),
+    ]:
+        root = repo / workspace
+        manifest = next((root / "bundles").glob("*-bundle.yaml"))
+        data = yaml.safe_load(manifest.read_text())
+        assert data["id"] == f"bundle:{name}"
+        assert data["title"] == f"{title} Governance"
+        assert yaml.safe_load((root / ".scs" / "config").read_text())["display_name"] == title
+    concept = (repo / "projects/timekeeping/bundles/concepts/security.yaml").read_text()
+    assert 'rationale: "Security concept bundle for Time Keeping' in concept
+
+
+def test_title_defaults_to_the_name(tmp_path: Path):
+    repo = new_domain(tmp_path, "acme")
+    data = yaml.safe_load((repo / "domain/bundles/domain-bundle.yaml").read_text())
+    assert data["title"] == "acme Governance"
+
+
+def test_title_with_a_double_quote_is_refused(tmp_path: Path):
+    result = run("new", "domain", "x", "--dir", str(tmp_path), *AUTHOR, "--title", 'A "B"')
+    assert result.exit_code == 3
+    assert not (tmp_path / "x-context").exists()
+
+
 def test_agents_md_states_the_domain_operations_and_exclusion(tmp_path: Path):
     repo = new_domain(tmp_path, "acme-health")
     agents = (repo / "AGENTS.md").read_text()

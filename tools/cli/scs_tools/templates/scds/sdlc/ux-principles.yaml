@@ -60,4 +60,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "UX principles for {{ project_name }}"
+  rationale: "UX principles for {{ display_name }}"

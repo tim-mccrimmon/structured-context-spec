@@ -2,7 +2,7 @@ id: bundle:security
 type: concept
 version: "DRAFT"
 title: "Security Concept Bundle"
-description: "Security controls, data protection, and threat management for {{ project_name }}"
+description: "Security controls, data protection, and threat management for {{ display_name }}"
 
 imports: []
 
@@ -15,4 +15,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Security concept bundle for {{ project_name }}"
+  rationale: "Security concept bundle for {{ display_name }}"

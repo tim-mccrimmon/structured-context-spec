@@ -11,7 +11,7 @@ topics:
   - external-integrations
 
 content:
-  system_name: "{{ project_name }}"
+  system_name: "{{ display_name }}"
 
   system_purpose: |
     [Describe the primary purpose and goals of the system]
@@ -59,4 +59,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Initial system context for {{ project_name }}"
+  rationale: "Initial system context for {{ display_name }}"

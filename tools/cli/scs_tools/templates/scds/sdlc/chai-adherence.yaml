@@ -68,4 +68,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "CHAI adherence for {{ project_name }}"
+  rationale: "CHAI adherence for {{ display_name }}"

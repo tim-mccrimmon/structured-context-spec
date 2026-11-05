@@ -61,4 +61,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Fault tolerance strategy for {{ project_name }}"
+  rationale: "Fault tolerance strategy for {{ display_name }}"

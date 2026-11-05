@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Integration topology between the program's systems"
 concept: concept:system-architecture
 content:
-  summary: "TODO - in a sentence or two, integration map at {{ project_name }}"
+  summary: "TODO - in a sentence or two, integration map at {{ display_name }}"
   facts: []
   # Examples:
   # - id: IM-001

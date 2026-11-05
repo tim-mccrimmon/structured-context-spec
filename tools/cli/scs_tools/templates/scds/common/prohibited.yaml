@@ -1,5 +1,5 @@
 # SCD Template: Prohibited Tools and Practices
-# Purpose: Things that are forbidden in all of {% if bundle_kind == 'project' %}the work on {{ project_name }}{% else %}{{ project_name }}'s work{% endif %}, without exception.
+# Purpose: Things that are forbidden in all of {% if bundle_kind == 'project' %}the work on {{ display_name }}{% else %}{{ display_name }}'s work{% endif %}, without exception.
 #
 # A prohibition is binary. Write only what is prohibited (`subject`), as a noun phrase; the
 # compiler writes the rule as "Prohibited: <subject>." Validation rejects a subject that
@@ -19,7 +19,7 @@ id: scd:project:prohibited
 type: project
 title: "Prohibited Tools and Practices"
 version: "DRAFT"
-description: "Tools and practices forbidden, without exception, in all of {{ project_name }}'s work"
+description: "Tools and practices forbidden, without exception, in all of {{ display_name }}'s work"
 
 content:
   summary: "Binary prohibitions that apply to all work"
@@ -37,4 +37,4 @@ content:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Prohibitions for {{ project_name }}"
+  rationale: "Prohibitions for {{ display_name }}"

@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "How each client program's data is kept separate from every other program's"
 concept: concept:data-provenance
 content:
-  summary: "TODO - in a sentence or two, client program segregation at {{ project_name }}"
+  summary: "TODO - in a sentence or two, client program segregation at {{ display_name }}"
   directives: []
   # Examples:
   # - id: CPS-001

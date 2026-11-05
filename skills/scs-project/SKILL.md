@@ -89,14 +89,16 @@ user says yes.
 
 ## 2. Create the Project
 
-Propose a Project name from the conversation. A Project here is the context for one piece of
-work, not the work itself; the work's own repository is not changed. Ask the Project's
+Propose a Project name from the conversation, and a display name, the name as people write it
+(for example `Time Keeping` for `timekeeping`): it goes in the titles and descriptions, and
+changing it later takes a new version. A Project here is the context for one piece of work, not
+the work itself; the work's own repository is not changed. Ask the Project's
 ontology, explaining the choice, as [references/intake.md](references/intake.md) describes;
 never assume the Domain's. Ask for the author's name and email.
 
 ```
-scripts/scs_engine.py run scs new project <name> --dir <repository> --ontology <ontology> \
-    --author "<Name>" --email "<email>" --no-interactive --dry-run
+scripts/scs_engine.py run scs new project <name> --title "<Display name>" --dir <repository> \
+    --ontology <ontology> --author "<Name>" --email "<email>" --no-interactive --dry-run
 ```
 
 Show the planned changes, get a yes, then run it. The engine commits the new Project itself.

@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Data-integrity risks for the program and their controls"
 concept: concept:risk-management
 content:
-  summary: "TODO - in a sentence or two, data integrity risk at {{ project_name }}"
+  summary: "TODO - in a sentence or two, data integrity risk at {{ display_name }}"
   facts: []
   # Examples:
   # - id: DIR-001

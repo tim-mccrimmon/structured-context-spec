@@ -16,4 +16,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Compliance & Governance concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"
+  rationale: "Compliance & Governance concept bundle for {{ display_name }}, from the Medical-Device CDMO ontology"

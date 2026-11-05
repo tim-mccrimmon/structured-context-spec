@@ -66,4 +66,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Integration map for {{ project_name }}"
+  rationale: "Integration map for {{ display_name }}"

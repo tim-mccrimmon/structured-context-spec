@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Quantitative acceptance criteria for the program's validation"
 concept: concept:verification-validation
 content:
-  summary: "TODO - in a sentence or two, acceptance criteria at {{ project_name }}"
+  summary: "TODO - in a sentence or two, acceptance criteria at {{ display_name }}"
   facts: []
   # Examples:
   # - id: AC-001

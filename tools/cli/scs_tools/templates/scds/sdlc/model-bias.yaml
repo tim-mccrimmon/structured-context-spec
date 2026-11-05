@@ -113,4 +113,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Model bias assessment for {{ project_name }}"
+  rationale: "Model bias assessment for {{ display_name }}"

@@ -15,4 +15,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Risk Management concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"
+  rationale: "Risk Management concept bundle for {{ display_name }}, from the Medical-Device CDMO ontology"

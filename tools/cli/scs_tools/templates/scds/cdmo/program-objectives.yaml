@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The program's objectives and business case"
 concept: concept:business-context
 content:
-  summary: "TODO - in a sentence or two, program objectives at {{ project_name }}"
+  summary: "TODO - in a sentence or two, program objectives at {{ display_name }}"
   facts: []
   # Examples:
   # - id: PO-001

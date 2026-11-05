@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "What an AI assistant may and may not do in validated and QMS systems"
 concept: concept:security
 content:
-  summary: "TODO - in a sentence or two, validated system boundaries at {{ project_name }}"
+  summary: "TODO - in a sentence or two, validated system boundaries at {{ display_name }}"
   directives: []
   # Examples:
   # - id: VSB-001

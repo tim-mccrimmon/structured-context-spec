@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The competencies each role needs"
 concept: concept:training-competency
 content:
-  summary: "TODO - in a sentence or two, role competency matrix at {{ project_name }}"
+  summary: "TODO - in a sentence or two, role competency matrix at {{ display_name }}"
   facts: []
   # Examples:
   # - id: RCM-001

@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Data-loss-prevention controls at the AI boundary"
 concept: concept:security
 content:
-  summary: "TODO - in a sentence or two, data loss prevention at {{ project_name }}"
+  summary: "TODO - in a sentence or two, data loss prevention at {{ display_name }}"
   directives: []
   # Examples:
   # - id: DLP-001

@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Criteria for qualifying AI vendors"
 concept: concept:supplier-qualification
 content:
-  summary: "TODO - in a sentence or two, ai vendor qualification at {{ project_name }}"
+  summary: "TODO - in a sentence or two, ai vendor qualification at {{ display_name }}"
   facts: []
   # Examples:
   # - id: AVQ-001

@@ -116,4 +116,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Audit trail requirements for {{ project_name }}"
+  rationale: "Audit trail requirements for {{ display_name }}"

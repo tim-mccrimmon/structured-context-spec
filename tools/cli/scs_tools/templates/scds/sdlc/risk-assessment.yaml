@@ -90,4 +90,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Risk assessment for {{ project_name }}"
+  rationale: "Risk assessment for {{ display_name }}"

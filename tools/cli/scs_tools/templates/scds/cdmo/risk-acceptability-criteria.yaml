@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "When residual risk is acceptable, under the organization's risk management process"
 concept: concept:risk-management
 content:
-  summary: "TODO - in a sentence or two, risk acceptability criteria at {{ project_name }}"
+  summary: "TODO - in a sentence or two, risk acceptability criteria at {{ display_name }}"
   facts: []
   # Examples:
   # - id: RAC-001

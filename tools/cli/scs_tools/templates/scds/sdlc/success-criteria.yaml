@@ -56,4 +56,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Success criteria for {{ project_name }}"
+  rationale: "Success criteria for {{ display_name }}"

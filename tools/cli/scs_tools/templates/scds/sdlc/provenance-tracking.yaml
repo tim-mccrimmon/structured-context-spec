@@ -79,4 +79,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Provenance tracking for {{ project_name }}"
+  rationale: "Provenance tracking for {{ display_name }}"

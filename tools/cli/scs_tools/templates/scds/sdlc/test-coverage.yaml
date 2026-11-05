@@ -76,4 +76,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Test coverage requirements for {{ project_name }}"
+  rationale: "Test coverage requirements for {{ display_name }}"

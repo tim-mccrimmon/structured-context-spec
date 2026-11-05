@@ -76,4 +76,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Threat model for {{ project_name }}"
+  rationale: "Threat model for {{ display_name }}"

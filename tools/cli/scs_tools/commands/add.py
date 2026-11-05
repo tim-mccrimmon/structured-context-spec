@@ -10,7 +10,7 @@ import click
 import yaml
 from scs_validator.envelope import Change, relative
 from scs_validator.names import RESERVED_BUNDLE_NAMES, bundle_name
-from scs_validator.workspace import load_workspace
+from scs_validator.workspace import CONFIG, load_workspace, read_config
 
 from scs_tools import identity, maintain
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
@@ -57,6 +57,7 @@ def _variables(base_path: Path, author, email, out: Output) -> dict:
     project_name = _bundle_owner_name(base_path)
     return {
         "project_name": project_name,
+        "display_name": _display_name(base_path) or project_name,
         "author": author_info,
         "email": email_info,
         # Provenance identifies a person as `Name <email>` (D-28, D-63)
@@ -269,6 +270,15 @@ def _bundle_owner_name(base_path: Path) -> str:
             if line.startswith("project_name:"):
                 return line.split(":", 1)[1].strip()
     return base_path.name
+
+
+def _display_name(base_path: Path) -> Optional[str]:
+    """The display name `scs new --title` recorded in `.scs/config`, if any."""
+    try:
+        value = read_config(base_path / CONFIG).get("display_name")
+    except ValueError:
+        return None
+    return value or None
 
 
 def _remind_about_ontology(base_path: Path, concept: str, out: Output):

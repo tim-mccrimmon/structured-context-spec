@@ -61,4 +61,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Component model for {{ project_name }}"
+  rationale: "Component model for {{ display_name }}"

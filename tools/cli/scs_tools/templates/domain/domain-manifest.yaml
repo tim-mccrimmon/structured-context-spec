@@ -1,4 +1,4 @@
-# Domain Ontology manifest for {{ project_name }} (SCS 0.7.0, RFC-0001).
+# Domain Ontology manifest for {{ display_name }} (SCS 0.7.0, RFC-0001).
 #
 # The ontology is the industry baseline: the concepts (categories) your guardrails are organized
 # around. {% if ontology == 'personal' %}This workspace uses the personal ontology: its only fixed concept is boundaries
@@ -15,7 +15,7 @@ domain:
   id: "domain:{{ domain_id }}"
   name: "{{ domain_name }}"
   version: "0.1.0"
-  description: "Domain Ontology for {{ project_name }}: the {{ domain_name|lower }} concepts its structured context is organized around"
+  description: "Domain Ontology for {{ display_name }}: the {{ domain_name|lower }} concepts its structured context is organized around"
   author: "{{ author }}"
 
   ontology:

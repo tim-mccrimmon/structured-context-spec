@@ -52,4 +52,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Constraints and assumptions for {{ project_name }}"
+  rationale: "Constraints and assumptions for {{ display_name }}"

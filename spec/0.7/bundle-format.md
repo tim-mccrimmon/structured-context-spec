@@ -697,7 +697,7 @@ medtech-cdmo-context/
 ├── .gitattributes                 # * text eol=lf
 ├── .github/workflows/scs-validate.yml
 ├── domain/                        # the Domain workspace
-│   ├── .scs/config                # workspace marker: bundle_type, name, ontology, scs_version, tools_version
+│   ├── .scs/config                # workspace marker: bundle_type, name, display_name, ontology, scs_version, tools_version
 │   ├── intake.yaml                # intake record (§8.4)
 │   ├── ontology/
 │   │   └── domain-manifest.yaml   # ontology manifest (domain-ontology.md)

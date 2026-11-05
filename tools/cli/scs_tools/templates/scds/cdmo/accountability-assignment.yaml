@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Who is accountable for AI-assisted output"
 concept: concept:ai-accountability
 content:
-  summary: "TODO - in a sentence or two, accountability assignment at {{ project_name }}"
+  summary: "TODO - in a sentence or two, accountability assignment at {{ display_name }}"
   facts: []
   # Examples:
   # - id: AA-001

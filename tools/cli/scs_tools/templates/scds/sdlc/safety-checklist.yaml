@@ -102,4 +102,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Safety checklist for {{ project_name }}"
+  rationale: "Safety checklist for {{ display_name }}"

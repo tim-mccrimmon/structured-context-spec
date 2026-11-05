@@ -70,4 +70,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Retention policy for {{ project_name }}"
+  rationale: "Retention policy for {{ display_name }}"

@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The multi-site rollout sequence, including role and licensing differences"
 concept: concept:implementation-cutover
 content:
-  summary: "TODO - in a sentence or two, rollout sequence at {{ project_name }}"
+  summary: "TODO - in a sentence or two, rollout sequence at {{ display_name }}"
   facts: []
   # Examples:
   # - id: RS-001

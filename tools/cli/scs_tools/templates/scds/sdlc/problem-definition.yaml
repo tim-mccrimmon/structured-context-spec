@@ -49,4 +49,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Problem definition for {{ project_name }}"
+  rationale: "Problem definition for {{ display_name }}"

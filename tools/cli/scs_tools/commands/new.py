@@ -3,6 +3,7 @@ New command - scaffolds a Domain repository (`scs new domain`) and the Project w
 (`scs new project`) (RFC 0002 section 9)
 """
 
+import json
 import re
 import shutil
 import tempfile
@@ -107,6 +108,12 @@ _WORKSPACE_OPTIONS = [
         "remove what does not apply. personal supplies only boundaries (the prohibited "
         "concept).",
     ),
+    click.option(
+        "--title",
+        default=None,
+        help="Display name, written as people write it (e.g. 'NexTern' for nextern); used in "
+        "titles and descriptions. Default: the name",
+    ),
     click.option("--author", default=None, help="Author name for provenance"),
     click.option("--email", default=None, help="Author email for provenance"),
     click.option("--interactive", "-i", is_flag=True, help="Interactive mode with prompts"),
@@ -134,6 +141,7 @@ def domain(
     out: Output,
     name,
     ontology,
+    title,
     author,
     email,
     interactive,
@@ -162,7 +170,9 @@ def domain(
 
     See also: scs new project
     """
-    name, author, email = _ask("domain", out, name, author, email, interactive, no_interactive)
+    name, title, author, email = _ask(
+        "domain", out, name, title, author, email, interactive, no_interactive
+    )
     _check_name(name, "domain")
     ontology = ontology or "sdlc"
     parent = Path(directory) if directory else Path.cwd()
@@ -176,7 +186,15 @@ def domain(
         with tempfile.TemporaryDirectory(prefix="scs-new-") as tmp:
             target = Path(tmp) / repo.name
             _scaffold(
-                Output(True), target, target / "domain", "domain", name, ontology, author, email
+                Output(True),
+                target,
+                target / "domain",
+                "domain",
+                name,
+                title,
+                ontology,
+                author,
+                email,
             )
             _create_repository_files(target, name)
             shown = [relative(p, target) for p in _files(target)]
@@ -196,6 +214,7 @@ def domain(
             repo / "domain",
             "domain",
             name,
+            title,
             ontology,
             author,
             email,
@@ -243,6 +262,7 @@ def project(
     out: Output,
     name,
     ontology,
+    title,
     author,
     email,
     interactive,
@@ -282,7 +302,9 @@ def project(
             f"No Domain repository at or above {start}. A Project workspace lives in one: "
             "create it with 'scs new domain NAME', then run 'scs new project' inside it.",
         )
-    name, author, email = _ask("project", out, name, author, email, interactive, no_interactive)
+    name, title, author, email = _ask(
+        "project", out, name, title, author, email, interactive, no_interactive
+    )
     _check_name(name, "project")
     ontology = ontology or _domain_ontology(repo)
     workspace = repo / "projects" / name
@@ -294,7 +316,7 @@ def project(
         with tempfile.TemporaryDirectory(prefix="scs-new-") as tmp:
             target = Path(tmp) / repo.name
             staged = target / "projects" / name
-            _scaffold(Output(True), target, staged, "project", name, ontology, author, email)
+            _scaffold(Output(True), target, staged, "project", name, title, ontology, author, email)
             files = [relative(p, target) for p in _files(staged)]
         envelope.changes.extend(Change("create", path=p) for p in files)
         if git.available() and git.head(repo):
@@ -307,7 +329,7 @@ def project(
     out.echo(f"Creating SCS project: {name}")
     out.echo(f"Location: {workspace}\n")
     try:
-        _scaffold(out, repo, workspace, "project", name, ontology, author, email)
+        _scaffold(out, repo, workspace, "project", name, title, ontology, author, email)
         written = _files(workspace)
         commit = _commit_project(repo, workspace, name)
     except git.GitError as e:
@@ -393,15 +415,17 @@ def _check_name(name: str, kind: str) -> None:
         )
 
 
-def _ask(kind, out, name, author, email, interactive, no_interactive):
+def _ask(kind, out, name, title, author, email, interactive, no_interactive):
     """Fill in missing values by prompting in interactive human mode; otherwise they are
-    required (NO_INPUT). Machine mode never prompts."""
+    required (NO_INPUT). Machine mode never prompts. The display name defaults to the name."""
     label = kind.capitalize()
     should_prompt = (not no_interactive or interactive) and not out.machine
     if should_prompt:
         if not name:
             click.echo(f"=== SCS {label} Setup ===\n")
             name = click.prompt(f"{label} name", type=str)
+            if not title:
+                title = click.prompt("Display name (as people write it)", default=name, type=str)
     elif not name:
         message = f"{label} name is required in non-interactive mode"
         raise CommandError("NO_INPUT", message, exit_code=EXIT_USAGE)
@@ -409,7 +433,20 @@ def _ask(kind, out, name, author, email, interactive, no_interactive):
     author, email = identity.author(author, email, prompt=should_prompt)
     if should_prompt:
         click.echo()
-    return name, author, email
+    return name, _check_title(title or name), author, email
+
+
+def _check_title(title: str) -> str:
+    """A display name goes into double-quoted YAML strings in the templates: one line, no
+    double quote or backslash."""
+    title = " ".join(title.split())
+    if not title or '"' in title or "\\" in title:
+        raise CommandError(
+            "WORKSPACE_TITLE_INVALID",
+            "The display name must be one non-empty line without '\"' or '\\'",
+            exit_code=EXIT_USAGE,
+        )
+    return title
 
 
 def _files(root: Path) -> List[Path]:
@@ -444,7 +481,7 @@ def _create_repository_files(repo: Path, name: str) -> None:
     write_file(repo / "projects" / ".gitkeep", "")
 
 
-def _scaffold(out, repo, base_path, kind, name, ontology, author, email):
+def _scaffold(out, repo, base_path, kind, name, title, ontology, author, email):
     """Create a `kind` ("domain" or "project") workspace at `base_path` in Domain repository
     `repo`. Its bundle is `bundle:<name>`. The templates depend on the ontology and the
     workspace kind only (D-64): the ontology's full set for that kind."""
@@ -473,6 +510,8 @@ def _scaffold(out, repo, base_path, kind, name, ontology, author, email):
         "bundle_kind": kind,
         "meta_bundle_ref": META_BUNDLE_REF,
         "project_name": name,
+        # Prose (titles, descriptions, summaries) uses the display name; ids use the name
+        "display_name": title,
         "ontology": ontology,
         "domain_id": model_config["domain"],
         "domain_name": model_config["domain_name"],
@@ -809,6 +848,7 @@ def _create_supporting_files(base_path: Path, variables: dict):
         "# SCS Workspace Configuration",
         f"bundle_type: {kind}",
         f"name: {'domain' if kind == 'domain' else variables['project_name']}",
+        f"display_name: {json.dumps(variables['display_name'], ensure_ascii=False)}",
         f"ontology: {variables['ontology']}",
     ]
     lines += [f"scs_version: {SCS_VERSION}", f"tools_version: {_scs_tools_version()}"]

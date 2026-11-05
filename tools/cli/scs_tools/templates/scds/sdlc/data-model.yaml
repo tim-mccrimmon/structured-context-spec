@@ -68,4 +68,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Data model for {{ project_name }}"
+  rationale: "Data model for {{ display_name }}"

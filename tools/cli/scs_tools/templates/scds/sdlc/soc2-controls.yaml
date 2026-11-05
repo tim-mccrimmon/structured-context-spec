@@ -72,4 +72,4 @@ relationships:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "SOC 2 compliance controls for {{ project_name }}"
+  rationale: "SOC 2 compliance controls for {{ display_name }}"

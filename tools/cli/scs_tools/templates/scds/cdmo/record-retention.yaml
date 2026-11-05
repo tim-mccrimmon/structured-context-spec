@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Retention periods for quality records, including AI contribution records"
 concept: concept:qms-records
 content:
-  summary: "TODO - in a sentence or two, record retention at {{ project_name }}"
+  summary: "TODO - in a sentence or two, record retention at {{ display_name }}"
   facts: []
   # Examples:
   # - id: RR-001

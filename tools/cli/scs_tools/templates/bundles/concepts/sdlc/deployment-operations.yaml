@@ -2,7 +2,7 @@ id: bundle:deployment-operations
 type: concept
 version: "DRAFT"
 title: "Deployment & Operations Concept Bundle"
-description: "Infrastructure, deployment processes, and operational practices for {{ project_name }}"
+description: "Infrastructure, deployment processes, and operational practices for {{ display_name }}"
 
 imports: []
 
@@ -14,4 +14,4 @@ scds:
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Deployment & Operations concept bundle for {{ project_name }}"
+  rationale: "Deployment & Operations concept bundle for {{ display_name }}"

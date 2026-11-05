@@ -67,4 +67,4 @@ relationships: []
 provenance:
   created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Error handling UX for {{ project_name }}"
+  rationale: "Error handling UX for {{ display_name }}"

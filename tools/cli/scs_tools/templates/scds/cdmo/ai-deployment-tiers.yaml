@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "Which AI tools may handle which classes of data"
 concept: concept:compliance-governance
 content:
-  summary: "TODO - in a sentence or two, ai deployment tiers at {{ project_name }}"
+  summary: "TODO - in a sentence or two, ai deployment tiers at {{ display_name }}"
   directives: []
   # Examples:
   # - id: ADT-001

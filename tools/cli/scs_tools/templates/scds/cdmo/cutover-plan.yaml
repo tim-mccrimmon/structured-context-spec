@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The program's cutover plan"
 concept: concept:implementation-cutover
 content:
-  summary: "TODO - in a sentence or two, cutover plan at {{ project_name }}"
+  summary: "TODO - in a sentence or two, cutover plan at {{ display_name }}"
   facts: []
   # Examples:
   # - id: CP-001

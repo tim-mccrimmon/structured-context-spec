@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "What is in and out of scope for the program"
 concept: concept:business-context
 content:
-  summary: "TODO - in a sentence or two, scope definition at {{ project_name }}"
+  summary: "TODO - in a sentence or two, scope definition at {{ display_name }}"
   facts: []
   # Examples:
   # - id: SD-001

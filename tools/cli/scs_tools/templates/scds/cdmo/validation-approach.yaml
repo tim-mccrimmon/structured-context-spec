@@ -8,7 +8,7 @@ version: "DRAFT"
 description: "The organization's computer-system validation approach"
 concept: concept:verification-validation
 content:
-  summary: "TODO - in a sentence or two, validation approach at {{ project_name }}"
+  summary: "TODO - in a sentence or two, validation approach at {{ display_name }}"
   directives: []
   # Examples:
   # - id: VA-001
