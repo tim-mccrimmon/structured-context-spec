@@ -42,6 +42,13 @@ def validate(repo: Path) -> List[Dict]:
     return json.loads(result.stdout)["diagnostics"]
 
 
+def strict_exit(repo: Path) -> int:
+    result = CliRunner().invoke(
+        validator_cmd, ["--strict", "--json", "--schema-dir", str(SCHEMA), "--repo", str(repo)]
+    )
+    return result.exit_code
+
+
 def new_repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, ontology: str) -> Path:
     monkeypatch.setenv("SCS_SCHEMA_DIR", str(SCHEMA))
     result = run(
@@ -78,13 +85,14 @@ def test_a_personal_domain_has_one_owner_role(tmp_path: Path, monkeypatch: pytes
     assert set(owners_of(repo / "domain").values()) == {"owner"}
 
 
-def test_unmapped_and_missing_owners_are_warnings_until_mapped(
+def test_unmapped_and_missing_owners_are_info_until_mapped(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
     repo = new_repo(tmp_path, monkeypatch, "cdmo")
     diagnostics = validate(repo)
     unmapped = [d for d in diagnostics if d["code"] == "BUNDLE_OWNER_UNMAPPED"]
-    assert unmapped and all(d["severity"] == "warning" for d in unmapped)
+    assert unmapped and all(d["severity"] == "info" for d in unmapped)
+    assert strict_exit(repo) == 0  # a fresh scaffold still passes --strict
 
     code, data = run_json("status")
     roles = data["result"]["workspaces"][0]["owners"]["unmapped_roles"]
@@ -157,7 +165,20 @@ def test_versioning_needs_an_owner_mapped_to_a_person(
 
     # A change of person needs no new version: the intake is outside the content digest.
     run("intake", "set", "owners", "{role: owner, person: Al Roe <al@acme.example>}")
-    assert "CONTENT_DIGEST_MISMATCH" not in [d["code"] for d in validate(repo)]
+    diagnostics = validate(repo)
+    assert "CONTENT_DIGEST_MISMATCH" not in [d["code"] for d in diagnostics]
+    assert not [d for d in diagnostics if d["code"].startswith("RELEASED_OWNER")]
+
+    # A released section whose role no one holds now fails --strict.
+    intake_path = repo / "domain" / "intake.yaml"
+    intake = yaml.safe_load(intake_path.read_text())
+    intake["owners"] = []
+    intake_path.write_text(yaml.safe_dump(intake, sort_keys=False))
+    released = [d for d in validate(repo) if d["code"] == "RELEASED_OWNER_UNMAPPED"]
+    assert [(d["severity"], d["path"]) for d in released] == [
+        ("warning", "domain/bundles/concepts/prohibited-v1.0.0.yaml")
+    ]
+    assert strict_exit(repo) == 2
 
 
 def test_set_owner_replaces_or_inserts_and_refuses_what_does_not_apply(

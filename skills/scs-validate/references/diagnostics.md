@@ -8,8 +8,8 @@ Every code the SCS tools emit, with its severity. Generated from
 | `BUNDLE_LEGACY_CONCERN_TYPE` | error | A bundle uses the removed concern type (RFC-0001). |
 | `BUNDLE_META_VERSION_INVALID` | warning | A meta bundle's version does not match the expected SCS version pattern. |
 | `BUNDLE_NOT_FOUND` | error | scs bundle info names a bundle that is neither in the workspace nor a concept bundle template. |
-| `BUNDLE_OWNER_MISSING` | warning | A concept bundle, or a Project bundle that lists SCDs directly, names no owner role; versioning it is an error (D-92). |
-| `BUNDLE_OWNER_UNMAPPED` | warning | A bundle's owner role is not mapped to a person in the workspace's intake.yaml owners; versioning it is an error (D-92). |
+| `BUNDLE_OWNER_MISSING` | info | A working concept bundle, or a Project bundle that lists SCDs directly, names no owner role; versioning it is an error (D-92). |
+| `BUNDLE_OWNER_UNMAPPED` | info | A working bundle's owner role is not mapped to a person in the workspace's intake.yaml owners; versioning it is an error (D-92). |
 | `BUNDLE_REQUIRED_FIELD_EMPTY` | error | A bundle's imports or scds list is empty but its type requires at least one entry. |
 | `BUNDLE_SCD_UNRESOLVED` | warning | An SCD listed in a bundle could not be found. |
 | `BUNDLE_STANDARDS_DEPRECATED` | warning | A bundle uses the deprecated standards type. |
@@ -99,6 +99,8 @@ Every code the SCS tools emit, with its severity. Generated from
 | `RELATIONSHIP_TIER_CONSTRAINT` | error | A relationship links SCD tiers that its type does not allow. |
 | `RELATIONSHIP_TYPE_INVALID` | error | An SCD relationship uses a type that is not defined in the relationship rules. |
 | `RELATIONSHIP_TYPE_MISSING` | error | An SCD relationship has no type field. |
+| `RELEASED_OWNER_MISSING` | warning | The latest released version of a section names no owner role, so no one is accountable for it (D-92). |
+| `RELEASED_OWNER_UNMAPPED` | warning | The latest released version of a section is owned by a role that no one in the workspace's intake.yaml owners holds now (D-92). |
 | `RESERVED_BUNDLE_NAME` | error | A bundle is named plan, test-plan, or qa, which are reserved for a later release (D-33). |
 | `RULES_DIR_NOT_FOUND` | error | The validation rules directory does not exist. |
 | `RULES_FILE_NOT_FOUND` | error | A validation rules file is missing from the rules directory. |

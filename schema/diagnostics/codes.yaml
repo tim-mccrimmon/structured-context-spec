@@ -12,13 +12,13 @@ codes:
     severity: error
     meaning: scs bundle info names a bundle that is neither in the workspace nor a concept bundle template.
   BUNDLE_OWNER_MISSING:
-    severity: warning
-    meaning: A concept bundle, or a Project bundle that lists SCDs directly, names no owner role; versioning
-      it is an error (D-92).
+    severity: info
+    meaning: A working concept bundle, or a Project bundle that lists SCDs directly, names no owner role;
+      versioning it is an error (D-92).
   BUNDLE_OWNER_UNMAPPED:
-    severity: warning
-    meaning: A bundle's owner role is not mapped to a person in the workspace's intake.yaml owners; versioning
-      it is an error (D-92).
+    severity: info
+    meaning: A working bundle's owner role is not mapped to a person in the workspace's intake.yaml owners;
+      versioning it is an error (D-92).
   BUNDLE_REQUIRED_FIELD_EMPTY:
     severity: error
     meaning: A bundle's imports or scds list is empty but its type requires at least one entry.
@@ -302,6 +302,14 @@ codes:
   RELATIONSHIP_TYPE_MISSING:
     severity: error
     meaning: An SCD relationship has no type field.
+  RELEASED_OWNER_MISSING:
+    severity: warning
+    meaning: The latest released version of a section names no owner role, so no one is accountable for
+      it (D-92).
+  RELEASED_OWNER_UNMAPPED:
+    severity: warning
+    meaning: The latest released version of a section is owned by a role that no one in the workspace's
+      intake.yaml owners holds now (D-92).
   RESERVED_BUNDLE_NAME:
     severity: error
     meaning: A bundle is named plan, test-plan, or qa, which are reserved for a later release (D-33).

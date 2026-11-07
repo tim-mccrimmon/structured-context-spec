@@ -120,11 +120,4 @@ jobs:
           scs new domain smoke-mca --ontology mca --author CI --email ci@structuredcontext.dev --no-interactive
           cd smoke-mca-context
           scs new project app --ontology mca --author CI --email ci@structuredcontext.dev --no-interactive
-          python - <<'PY'
-          import json, subprocess
-          status = json.loads(subprocess.run(["scs", "status", "--json"], capture_output=True, text=True, check=True).stdout)
-          for ws in status["result"]["workspaces"]:
-              for role in ws["owners"]["unmapped_roles"]:
-                  subprocess.run(["scs", "intake", "set", "owners", f"{{role: {role}, person: CI <ci@structuredcontext.dev>}}", "--workspace", ws["workspace"]], check=True)
-          PY
           scs-validate --strict

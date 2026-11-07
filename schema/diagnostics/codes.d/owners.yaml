@@ -3,11 +3,17 @@
 
 codes:
   BUNDLE_OWNER_MISSING:
-    severity: warning
-    meaning: A concept bundle, or a Project bundle that lists SCDs directly, names no owner role; versioning it is an error (D-92).
+    severity: info
+    meaning: A working concept bundle, or a Project bundle that lists SCDs directly, names no owner role; versioning it is an error (D-92).
   BUNDLE_OWNER_UNMAPPED:
+    severity: info
+    meaning: A working bundle's owner role is not mapped to a person in the workspace's intake.yaml owners; versioning it is an error (D-92).
+  RELEASED_OWNER_MISSING:
     severity: warning
-    meaning: A bundle's owner role is not mapped to a person in the workspace's intake.yaml owners; versioning it is an error (D-92).
+    meaning: The latest released version of a section names no owner role, so no one is accountable for it (D-92).
+  RELEASED_OWNER_UNMAPPED:
+    severity: warning
+    meaning: The latest released version of a section is owned by a role that no one in the workspace's intake.yaml owners holds now (D-92).
   VERSION_OWNER_MISSING:
     severity: error
     meaning: The bundle being versioned needs an owner role and names none; set one with scs bundle set-owner (D-92).

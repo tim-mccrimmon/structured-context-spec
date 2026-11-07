@@ -906,10 +906,14 @@ Tools MUST validate that:
 - The 0.6 stub detection (`COMPLETENESS_STUB_SCD`) is removed
 
 ### 9.10 Section Owners
-- A working concept bundle, or Project bundle that lists SCDs directly, with no `owner` is a
-  warning (`BUNDLE_OWNER_MISSING`); one whose role is not in the workspace's intake record
-  `owners` is a warning (`BUNDLE_OWNER_UNMAPPED`). Both fail under `--strict` with exit code 2.
-  Bundles outside a Domain repository with no intake record are not checked
+- A working concept bundle, or Project bundle that lists SCDs directly, with no `owner` is
+  info (`BUNDLE_OWNER_MISSING`), as is one whose role is not in the workspace's intake record
+  `owners` (`BUNDLE_OWNER_UNMAPPED`), so a fresh scaffold still passes `--strict`
+- The latest released version of such a bundle is a warning when it names no owner
+  (`RELEASED_OWNER_MISSING`) or when no one in the intake record holds its role now
+  (`RELEASED_OWNER_UNMAPPED`), so `--strict` fails, with exit code 2, when a released section
+  has no accountable person
+- Bundles outside a Domain repository with no intake record are not checked
 - A tool that versions such a bundle MUST refuse while either holds (`VERSION_OWNER_MISSING`,
   `VERSION_OWNER_UNMAPPED`)
 

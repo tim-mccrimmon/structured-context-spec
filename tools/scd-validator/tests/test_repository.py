@@ -404,3 +404,20 @@ def test_the_reason_gives_the_line_of_a_parse_error():
         reason = unreadable_reason(e)
     assert reason.startswith("line 3: ")
     assert unreadable_reason(UnicodeDecodeError("utf-8", b"\xe9", 0, 1, "bad")) == "not UTF-8 text"
+
+
+def test_only_the_latest_released_section_must_have_an_accountable_owner(repo: Path):
+    """D-92: a released section with no owner, or a role no one holds now, is a warning; an
+    older release it superseded is not reported."""
+    ws = repo / "domain"
+    old = concept(ws, "company", version="1.0.0", stem="company-v1.0.0")
+    old.write_text(old.read_text().replace("owner: lead\n", ""))
+    assert "RELEASED_OWNER_MISSING" in codes(report("--repo", str(repo)))
+
+    concept(ws, "company", version="1.1.0", stem="company-v1.1.0")
+    data = report("--repo", str(repo))
+    assert not [c for c in codes(data) if c.startswith("RELEASED_OWNER")]
+
+    write(ws / "intake.yaml", 'intake_version: "1.0"\nscs_version: 0.7.0\n')
+    found = codes(report("--repo", str(repo)))
+    assert "RELEASED_OWNER_UNMAPPED" in found and "BUNDLE_OWNER_UNMAPPED" in found

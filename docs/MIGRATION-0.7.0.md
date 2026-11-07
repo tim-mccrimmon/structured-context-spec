@@ -347,9 +347,11 @@ These edit the files' text, so comments and layout survive.
   A change of person needs no new version; a change of role does.
 - **New command, `scs bundle set-owner ROLE`,** and `scs add bundle NAME --new --owner ROLE`.
   `scs status` lists each section's owner and the roles no one holds yet.
-- **Checks.** `BUNDLE_OWNER_MISSING` and `BUNDLE_OWNER_UNMAPPED` (warnings; exit 2 under
-  `--strict`), and `VERSION_OWNER_MISSING` and `VERSION_OWNER_UNMAPPED`, which stop
-  `scs bundle version`.
+- **Checks.** On working bundles, `BUNDLE_OWNER_MISSING` and `BUNDLE_OWNER_UNMAPPED` (info, so a
+  fresh scaffold passes `--strict`); `VERSION_OWNER_MISSING` and `VERSION_OWNER_UNMAPPED` stop
+  `scs bundle version`; and on the latest released version of each section,
+  `RELEASED_OWNER_MISSING` and `RELEASED_OWNER_UNMAPPED` (warnings; exit 2 under `--strict`)
+  when no one is accountable for it now.
 - **To migrate,** give each concept bundle an owner with `scs bundle set-owner`, map each role
   with `scs intake set owners`, and version the changed concepts and their root: adding the
   field changes each bundle's content digest.
