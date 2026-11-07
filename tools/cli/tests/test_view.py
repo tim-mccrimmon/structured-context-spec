@@ -24,6 +24,7 @@ PROJECT = EXAMPLE / "infusion-pump-fw" / "bundles" / "project-bundle.yaml"
 AUTHOR = ["--author", "Test Author", "--email", "test@structuredcontext.dev"]
 APPROVER = "Sam Lee <sam@structuredcontext.dev>"
 CONCEPT = "bundles/concepts/prohibited.yaml"
+OWNER = "{role: owner, person: Dana Fox <dana@acme.example>, title: Founder}"
 SCD = "context/project/prohibited.yaml"
 
 
@@ -128,6 +129,8 @@ def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
             f'      subject: "{subject}"',
         )
         monkeypatch.chdir(ws)
+        result = run("intake", "set", "owners", OWNER)
+        assert result.exit_code == 0, result.output
         version(CONCEPT, "1.0.0")
         bundle = next(p for p in (ws / "bundles").glob("*-bundle.yaml"))
         pin(bundle, "prohibited", "1.0.0")
@@ -196,3 +199,28 @@ def test_domain_version_selects_a_release_and_unknown_versions_fail(repo: Path):
     code, data = run_json("view", "bundles/project-bundle.yaml", "--domain-version", "9.9.9")
     assert code != 0
     assert "VERSION_NOT_FOUND" in [d["code"] for d in data["diagnostics"]]
+
+
+def test_each_section_shows_its_owner_as_recorded_with_the_release(repo: Path):
+    code, data = run_json("view", "bundles/project-bundle.yaml", "--version", "1.0.0")
+    assert code == 0, data
+    html = (repo / "projects/app/dist/app-1.0.0-review.html").read_text()
+    assert "<h2>Section owners</h2>" in html
+    assert "Founder, Dana Fox &lt;dana@acme.example&gt;" in html
+    assert "The one section has an accountable owner." in html
+
+    # The release records who held the role then; a later change shows in the next package.
+    run("intake", "set", "owners", "{role: owner, person: Lee Wu <lee@acme.example>}")
+    run_json("view", "bundles/project-bundle.yaml", "--version", "1.0.0")
+    assert "Dana Fox" in (repo / "projects/app/dist/app-1.0.0-review.html").read_text()
+
+
+def test_a_section_no_one_holds_is_flagged(repo: Path, tmp_path: Path):
+    intake = repo / "projects/app/intake.yaml"
+    intake.write_text(intake.read_text().split("owners:")[0])
+    out = tmp_path / "draft.html"
+    code, data = run_json("view", "bundles/project-bundle.yaml", "--allow-draft", "-o", str(out))
+    assert code == 0, data
+    html = out.read_text()
+    assert "No one holds the role owner" in html
+    assert "The one section has no one accountable for it." in html

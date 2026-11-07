@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
+from scs_validator.owners import needs_owner, owner_map
 
 from scs_tools.compiler import compile_tree
 
@@ -56,14 +57,19 @@ def _short(prefixed_id: str) -> str:
     return prefixed_id.rsplit(":", 1)[-1]
 
 
-def _sources_by_id(workspace: Optional[Path]) -> Dict[str, Dict[str, Any]]:
-    """Source documents and intake answers by id, from the workspace's intake record."""
+def _intake(workspace: Optional[Path]) -> Dict[str, Any]:
+    """The workspace's intake record; for a release, the one committed with it."""
     if workspace is None or not (workspace / "intake.yaml").is_file():
         return {}
     try:
-        data = yaml.safe_load((workspace / "intake.yaml").read_text(encoding="utf-8")) or {}
+        data = yaml.safe_load((workspace / "intake.yaml").read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError):
         return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _sources_by_id(data: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Source documents and intake answers by id, from the intake record."""
     found: Dict[str, Dict[str, Any]] = {}
     for doc in data.get("source_documents") or []:
         if isinstance(doc, dict) and doc.get("id"):
@@ -192,6 +198,20 @@ def _counts(items: List[Dict[str, Any]]) -> Dict[str, int]:
     return {kind: sum(1 for i in items if i["kind"] == kind) for _, kind in ITEM_KINDS}
 
 
+def _owner(bundle: Dict[str, Any], holders: Dict[str, Dict[str, Any]]) -> Optional[Dict]:
+    """The section's owner (D-92): its role and who holds it. None when the bundle holds no
+    section of its own (the meta bundle); `role` or `person` None when not set."""
+    if not needs_owner(bundle):
+        return None
+    role = _text(bundle.get("owner")) or None
+    holder = holders.get(role, {}) if role else {}
+    return {
+        "role": role,
+        "person": _text(holder.get("person")) or None,
+        "title": _text(holder.get("title")) or None,
+    }
+
+
 def _layer(source: Source, role: str, include_cites: bool, allow_draft: bool) -> ViewResult:
     result = ViewResult()
     compiled = compile_tree(source.tree, allow_draft=allow_draft, include_cites=include_cites)
@@ -206,7 +226,9 @@ def _layer(source: Source, role: str, include_cites: bool, allow_draft: bool) ->
     tree = source.tree
     root = tree.root
     name = _short(root.id)
-    known = _sources_by_id(source.workspace)
+    intake = _intake(source.workspace)
+    known = _sources_by_id(intake)
+    holders = owner_map(intake)
     groups = []
     meta = []
     for bundle in tree.bundles:
@@ -225,6 +247,7 @@ def _layer(source: Source, role: str, include_cites: bool, allow_draft: bool) ->
                 "version": _text(bundle.version),
                 "title": _text(bundle.data.get("title")) or _short(bundle.id),
                 "description": _text(bundle.data.get("description")),
+                "owner": _owner(bundle.data, holders),
                 "counts": _counts(items),
                 "scds": scds,
             }
@@ -282,6 +305,22 @@ def _summary(layers: List[Dict[str, Any]]) -> List[str]:
             "No released Domain was available, so rules this Project inherits from its Domain "
             "are not shown."
         )
+    owned = [g["owner"] for g in root["groups"] if g["owner"] is not None]
+    unheld = sum(1 for o in owned if not (o["role"] and o["person"]))
+    if owned:
+        if not unheld:
+            lines.append(
+                "The one section has an accountable owner."
+                if len(owned) == 1
+                else f"All {len(owned)} sections have an accountable owner."
+            )
+        else:
+            lines.append(
+                f"{unheld} of {len(owned)} sections "
+                f"{'has' if unheld == 1 else 'have'} no one accountable for it."
+                if len(owned) > 1
+                else "The one section has no one accountable for it."
+            )
     lines.append(
         "Prohibitions are absolute. Rules are instructions the AI follows. Facts are "
         "information it is given. Each item below shows its source text and the exact line "
@@ -339,6 +378,10 @@ table.release{border-collapse:collapse;margin:12px 0;width:100%}
 table.release th{text-align:left;font-weight:600;padding:5px 12px 5px 0;width:180px;
 vertical-align:top;color:var(--muted)}
 table.release td{padding:5px 0;word-break:break-all}
+table.owners{border-collapse:collapse;width:100%;margin:8px 0}
+table.owners th,table.owners td{text-align:left;padding:5px 12px 5px 0;
+border-bottom:1px solid var(--line);vertical-align:top}
+table.owners th{color:var(--muted);font-weight:600}
 .ok{color:var(--fact);font-weight:600}.bad{color:var(--no);font-weight:600}
 ul.tree{list-style:none;padding-left:0}ul.tree ul{list-style:none;padding-left:20px}
 ul.tree li{margin:3px 0}
@@ -415,6 +458,33 @@ def _release_table(layer: Dict[str, Any]) -> str:
     return f"<table class=release>{body}</table>"
 
 
+def _owner_text(owner: Optional[Dict[str, Any]]) -> str:
+    """`VP Quality, Jane Doe <jane@...> (quality)`; flags a missing role or holder."""
+    if owner is None:
+        return ""
+    if not owner["role"]:
+        return "<span class=bad>No owner</span>"
+    if not owner["person"]:
+        return f"<span class=bad>No one holds the role {_e(owner['role'])}</span>"
+    who = f"{owner['title']}, {owner['person']}" if owner["title"] else owner["person"]
+    return f"{_e(who)} <span class=muted>({_e(owner['role'])})</span>"
+
+
+def _owners_table(layer: Dict[str, Any]) -> str:
+    rows = [
+        f"<tr><td>{_e(g['title'])}</td><td>{_owner_text(g['owner'])}</td></tr>"
+        for g in layer["groups"]
+        if g["owner"] is not None
+    ]
+    if not rows:
+        return ""
+    return (
+        "<h2>Section owners</h2><p class='muted small'>The person accountable for each section, "
+        "who reviews and approves it, as recorded with this release.</p>"
+        "<table class=owners><tr><th>Section</th><th>Owner</th></tr>" + "".join(rows) + "</table>"
+    )
+
+
 def _tree(layers: List[Dict[str, Any]]) -> str:
     out = ["<ul class=tree>"]
     for layer in layers:
@@ -425,9 +495,12 @@ def _tree(layers: List[Dict[str, Any]]) -> str:
             f"{_e(layer['release']['version'])}{tag}<ul>"
         )
         for group in layer["groups"]:
+            owner = _owner_text(group["owner"])
             out.append(
                 f"<li>{_e(group['title'])} <span class='muted small'>"
-                f"{_e(_count_hint(group['counts']))}</span><ul>"
+                f"{_e(_count_hint(group['counts']))}</span>"
+                + (f" <span class=small>Owner: {owner}</span>" if owner else "")
+                + "<ul>"
             )
             for scd in group["scds"]:
                 hint = _count_hint(_counts(scd["items"]))
@@ -563,6 +636,7 @@ def render_html(view: Dict[str, Any]) -> str:
     out.append("<h2>Summary</h2>" + "".join(f"<p>{_e(s)}</p>" for s in view["summary"]))
     if len(layers) > 1:
         out.append("<h3>Inherited Domain</h3>" + _release_table(layers[0]))
+    out.append(_owners_table(root))
     out.append("<h2>Contents</h2>" + _tree(layers))
     for layer in reversed(layers):
         inherited = layer["role"] == "inherited"
@@ -573,7 +647,12 @@ def render_html(view: Dict[str, Any]) -> str:
                 f"<p class=small>The AI is also told: <q>{_e(layer['identity_rule'])}" "</q></p>"
             )
         for group in layer["groups"]:
-            out.append(f"<p class='muted small'>{_e(group['title'])}</p>")
+            owner = _owner_text(group["owner"])
+            out.append(
+                f"<p class='muted small'>{_e(group['title'])}"
+                + (f" &middot; Owner: {owner}" if owner else "")
+                + "</p>"
+            )
             out.extend(_scd_html(s, layer, targets) for s in group["scds"])
     out.append(
         "<footer class='muted small'>Generated by <code>scs view</code> from the bundle "
