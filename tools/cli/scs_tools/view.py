@@ -272,6 +272,18 @@ def _layer(source: Source, role: str, include_cites: bool, allow_draft: bool) ->
     return result
 
 
+def _summary_owner_line(total: int, unheld: int) -> str:
+    if total == 1:
+        if unheld:
+            return "The one section has no one accountable for it."
+        return "The one section has an accountable owner."
+    if not unheld:
+        return f"All {total} sections have an accountable owner."
+    if unheld == 1:
+        return f"1 of {total} sections has no one accountable for it."
+    return f"{unheld} of {total} sections have no one accountable for them."
+
+
 def _summary(layers: List[Dict[str, Any]]) -> List[str]:
     """The overview's plain-language summary, built from counts only."""
 
@@ -308,19 +320,7 @@ def _summary(layers: List[Dict[str, Any]]) -> List[str]:
     owned = [g["owner"] for g in root["groups"] if g["owner"] is not None]
     unheld = sum(1 for o in owned if not (o["role"] and o["person"]))
     if owned:
-        if not unheld:
-            lines.append(
-                "The one section has an accountable owner."
-                if len(owned) == 1
-                else f"All {len(owned)} sections have an accountable owner."
-            )
-        else:
-            lines.append(
-                f"{unheld} of {len(owned)} sections "
-                f"{'has' if unheld == 1 else 'have'} no one accountable for it."
-                if len(owned) > 1
-                else "The one section has no one accountable for it."
-            )
+        lines.append(_summary_owner_line(len(owned), unheld))
     lines.append(
         "Prohibitions are absolute. Rules are instructions the AI follows. Facts are "
         "information it is given. Each item below shows its source text and the exact line "

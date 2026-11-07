@@ -224,3 +224,12 @@ def test_a_section_no_one_holds_is_flagged(repo: Path, tmp_path: Path):
     html = out.read_text()
     assert "No one holds the role owner" in html
     assert "The one section has no one accountable for it." in html
+
+
+def test_owner_summary_wording():
+    from scs_tools.view import _summary_owner_line
+
+    assert _summary_owner_line(3, 0) == "All 3 sections have an accountable owner."
+    assert _summary_owner_line(3, 1) == "1 of 3 sections has no one accountable for it."
+    assert _summary_owner_line(3, 2) == "2 of 3 sections have no one accountable for them."
+    assert _summary_owner_line(1, 1) == "The one section has no one accountable for it."
