@@ -1,6 +1,6 @@
 # SCS 0.7.0 Release Notes
 
-**Status:** release candidate `0.7.0rc3`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
+**Status:** release candidate `0.7.0rc4`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
 
 ---
 
@@ -81,6 +81,25 @@ machine mode, intake, provenance, human confirmation, change summaries, drafting
 documents, and advisory review. [`spec/0.7/rfc-0002-trace.md`](spec/0.7/rfc-0002-trace.md)
 traces every requirement in RFC 0002 to the specification text that states it.
 
+### Section owners
+
+Every section, a concept bundle or a Project bundle that lists SCDs directly, names the role
+accountable for it in its `owner` field, and the workspace's `intake.yaml` `owners` list maps
+each role to a person. Scaffolded concepts come with a default role. Validation reports a
+missing or unmapped owner as information while a section is being drafted, versioning refuses
+a section without one, and a released section whose role no one holds now is a warning. The
+person is kept in the intake record, outside the content digest, so a change of person needs no
+new version. `scs bundle set-owner` sets the role. See
+[`spec/0.7/bundle-format.md`](spec/0.7/bundle-format.md) §5.1.
+
+### Review packages (preview)
+
+`scs view` renders one released bundle as a single self-contained HTML file for people who
+review and approve it without using git: every rule verbatim with the exact line the AI
+receives, the section owners, the rules a Project inherits from its Domain, and the content
+digest checked against the release. The same release always produces the same file. The
+package format is a preview and is expected to change in 0.8.
+
 ### Placement guidance (provisional)
 
 [`docs/placement/`](docs/placement/README.md) describes where a compiled artifact can be
@@ -102,11 +121,11 @@ outside SCS, and this guidance is expected to change in 0.8.
 
 ## Testing the release candidate
 
-`0.7.0rc3` is published to TestPyPI only:
+`0.7.0rc4` is published to TestPyPI only:
 
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc3"
+  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc4"
 ```
 
 The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI. Claude
@@ -118,9 +137,10 @@ The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI
 
 - **Skill behaviour tests.** The scripted-conversation tests of the skills (plan decision
   D-51) run against a simulated user; pacing (at most three questions per message) is held to
-  4 of 5 runs, not 5 of 5. The harness was last run on rc2; rc3's skill changes (display name,
-  git check, website question, new-session advice) are tested only by the WP-13 rerun.
-  Acceptance with a real user (WP-13) passed on rc2 and is rerun on rc3.
+  4 of 5 runs, not 5 of 5. The harness was last run on rc2; the skill changes since (display
+  name, git check, website question, new-session advice, section owners, review packages) are
+  tested only by the WP-13 rerun. Acceptance with a real user (WP-13) passed on rc2 and is
+  rerun on rc4.
 - **Install matrix.** Claude Code and Claude are recorded; Cursor, Codex, and GitHub Copilot
   are not yet tried.
 - **Generated CI.** The workflow `scs new domain` writes installs `scs-validator` 0.7.x from
