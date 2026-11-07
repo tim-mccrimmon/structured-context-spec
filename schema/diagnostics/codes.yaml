@@ -472,6 +472,10 @@ codes:
     severity: error
     meaning: A manifest records a content digest but its version tag does not exist, or a pinned import
       has no 0.7 tag (D-39).
+  VIEW_DOMAIN_UNAVAILABLE:
+    severity: warning
+    meaning: scs view found no released Domain version for a Project, so the review package does not show
+      the rules the Project inherits.
   WORKSPACE_CONFIG_INVALID:
     severity: error
     meaning: A workspace's .scs/config cannot be read as key-value pairs.

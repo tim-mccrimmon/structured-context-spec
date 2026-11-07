@@ -1,6 +1,6 @@
 ---
 name: scs-explain
-description: Explains Structured Context (SCS) in plain language. Summarizes what an SCS Domain repository or compiled artifact contains, what a rule means and why it exists (tracing it to intake answers, source documents, and citations), what a validator or engine message means, and what SCS does and does not do. Use when the user asks what their governance context says, why a rule exists, which bundles are active, or what SCS is, and when they ask SCS to deploy context to an AI service, set up an approval or review workflow, or host a registry, which are outside SCS.
+description: Explains Structured Context (SCS) in plain language. Summarizes what an SCS Domain repository or compiled artifact contains, what a rule means and why it exists (tracing it to intake answers, source documents, and citations), what a validator or engine message means, and what SCS does and does not do. Also writes a review package, one readable HTML file of a bundle for the people who review and certify it. Use when the user asks what their governance context says, why a rule exists, which bundles are active, or what SCS is, when they want a review package or a readable view of a bundle, and when they ask SCS to deploy context to an AI service, set up an approval or review workflow, or host a registry, which are outside SCS.
 license: Apache-2.0
 compatibility: Needs Python 3.11+ and the SCS tools (scs-tools 0.7.0 or later) for workspace summaries; scripts/scs_engine.py checks and plans the install.
 metadata:
@@ -10,7 +10,8 @@ metadata:
 
 # SCS Explain
 
-You explain context the user already has. You read; you do not write.
+You explain context the user already has. You read; the one thing you write is a review
+package, into the workspace's `dist/` directory.
 
 ## Rules for every SCS skill
 
@@ -106,6 +107,33 @@ standard's text. If an item has no `derived_from`, say its origin is not recorde
 A compiled artifact names itself: its first rule is the self-identification rule
 (`<bundle-name>/identity`), and its header gives `id`, `version`, and `source_digest`. Rule ids
 are `<bundle-name>/<scd-name>/<id>`, so any rule can be traced to its bundle and SCD.
+
+## Review package
+
+A review package is one self-contained HTML file showing a bundle the way its reviewers need
+it: the release (version, content digest and whether it matches, approver), a summary built
+from counts, a contents tree, and every prohibition, rule, and fact word for word with its id,
+source, citations, and the exact line the AI receives. A Project's package also shows the
+Domain's rules, marked as inherited. Nothing in it is written by AI, and the same release
+always produces the same file, so it can be attached to a review or approval record.
+
+```
+scripts/scs_engine.py run scs view <bundle-file> --version <v> --dry-run
+scripts/scs_engine.py run scs view <bundle-file> --version <v>
+```
+
+- Use a released version (`--version`, from `scs status`). For a Project, the package shows
+  the Domain's latest released version; pass `--domain-version <v>` only when the user names
+  another.
+- A package of unreleased work needs `--allow-draft` (rule 4) and is marked as not for
+  approval. Say so before writing it.
+- It is a write: show the dry run's path and get a yes (rule 2). It goes to the workspace's
+  `dist/`; do not pass `--output` (rule 6).
+- Report the envelope's `path`, `verified`, `source_digest`, and `domain`. If `verified` is
+  false, say the package could not be checked against a released version. A
+  `VIEW_DOMAIN_UNAVAILABLE` warning means the inherited Domain rules are not shown.
+- In Claude Code the user can open the file in a browser, or you can add `--open`. Routing the
+  package for review and recording approvals happen outside SCS (rule 7).
 
 ## Engine messages
 

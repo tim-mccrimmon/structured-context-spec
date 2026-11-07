@@ -150,6 +150,7 @@ Every code the SCS tools emit, with its severity. Generated from
 | `VERSION_OWNER_UNMAPPED` | error | The bundle being versioned names an owner role that intake.yaml owners does not map to a person; add it with scs intake set owners (D-92). |
 | `VERSION_PROVENANCE_PLACEHOLDER` | error | The bundle or one of its SCDs has a placeholder created_by; correct it before versioning (D-71). |
 | `VERSION_TAG_MISSING` | error | A manifest records a content digest but its version tag does not exist, or a pinned import has no 0.7 tag (D-39). |
+| `VIEW_DOMAIN_UNAVAILABLE` | warning | scs view found no released Domain version for a Project, so the review package does not show the rules the Project inherits. |
 | `WORKSPACE_CONFIG_INVALID` | error | A workspace's .scs/config cannot be read as key-value pairs. |
 | `WORKSPACE_EXISTS` | error | The Domain repository or Project workspace scs new would create already exists. |
 | `WORKSPACE_FILE_UNREADABLE` | warning | A YAML file in the workspace could not be read or parsed and was skipped, so any SCD or bundle in it is not seen; fix it or delete it. |

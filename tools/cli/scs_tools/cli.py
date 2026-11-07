@@ -53,6 +53,7 @@ def cli(ctx, show_version, json_mode):
         6. Release a version                  → scs bundle version
         7. Compile for runtime delivery       → scs compile <bundle> --version <v>
         8. Preview artifacts loaded together  → scs stack <outer> ... <inner>
+        9. Write a review package             → scs view <bundle> --version <v>
 
     Commands that change files take --dry-run and --json (machine mode).
     For detailed help on any command, use: scs [command] --help

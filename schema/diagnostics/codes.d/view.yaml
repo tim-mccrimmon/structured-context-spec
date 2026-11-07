@@ -1,0 +1,7 @@
+# Diagnostic codes added by scs view (plan/0.8/bundle-review-process.md, phase 1).
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  VIEW_DOMAIN_UNAVAILABLE:
+    severity: warning
+    meaning: scs view found no released Domain version for a Project, so the review package does not show the rules the Project inherits.

@@ -45,14 +45,15 @@ needs its own record beside the bundle, as the version manifest already is.
 
 - `scs view` in `tools/cli`: one versioned bundle in, one self-contained HTML file out (no
   external assets, so it can be attached to a QMS record).
-  - Cover: bundle name, version, `source_digest`, generation date, reviewer list.
+  - Cover: bundle name, version, `source_digest` and whether it matches, approver, release
+    date. No generation date, so the same release always produces the same file.
   - Overview: summary, then tree Bundle → concepts (owner) → SCDs (counts).
   - SCD sections: prohibitions, directives and facts verbatim with ids; compiled lines;
     `cites`, `derived_from`; relationships as links.
   - Project packages: inherited Domain as a marked branch.
   - The summary is mechanical (counts and structure), not AI-written, so the same digest always
     produces the same package. AI explanation stays in the Claude session.
-- `/scs-view` skill: runs the generator and opens the result.
+- Skill: folded into `scs-explain` (review package section) rather than a fifth skill.
 - **Exit**: the test bundle's package is readable by a non-technical reviewer; two runs from
   the same digest produce identical output.
 

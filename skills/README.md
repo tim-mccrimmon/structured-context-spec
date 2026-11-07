@@ -11,7 +11,7 @@ tools (`scs`, `scs-validate`) in machine mode; the skills carry the conversation
 | [`scs-domain`](scs-domain/SKILL.md) | The Domain, from setup to a compiled version: welcome, source documents, intake, people, drafting, review, versioning, compiling; resumes or updates from `scs status` |
 | [`scs-project`](scs-project/SKILL.md) | One Project, the same way, once the Domain has a released version; reviews the Project with the Domain and records Domain conflicts as questions for the Domain owner |
 | [`scs-validate`](scs-validate/SKILL.md) | Runs the validator and explains the results before proposing fixes |
-| [`scs-explain`](scs-explain/SKILL.md) | Explains where the work stands, a workspace, a rule's origin, an artifact, or a message |
+| [`scs-explain`](scs-explain/SKILL.md) | Explains where the work stands, a workspace, a rule's origin, an artifact, or a message; writes a review package (`scs view`) for reviewers |
 
 Run the Domain and each Project in separate sessions. Each session starts from `scs status`, so
 work can stop at any point and resume later.
