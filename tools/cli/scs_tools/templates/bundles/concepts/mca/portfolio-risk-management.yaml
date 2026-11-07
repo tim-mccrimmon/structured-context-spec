@@ -4,6 +4,7 @@ version: DRAFT
 title: Portfolio Risk Management Concept Bundle
 description: Aggregate credit and default risk across the book (distinct from AI operational risk, which
   lives under ai-accountability).
+owner: risk
 imports: []
 scds:
 - scd:project:portfolio-risk-management

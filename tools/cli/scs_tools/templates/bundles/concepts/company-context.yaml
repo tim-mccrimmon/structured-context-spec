@@ -20,6 +20,7 @@ description: >
   values, stakeholders, and business model. This concept provides business
   and organizational context that doesn't fit in technical concepts
   (Architecture, Security, etc.).
+owner: executive
 
 # SCDs contained in this bundle
 # At minimum, include company-overview

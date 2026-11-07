@@ -8,6 +8,8 @@ Every code the SCS tools emit, with its severity. Generated from
 | `BUNDLE_LEGACY_CONCERN_TYPE` | error | A bundle uses the removed concern type (RFC-0001). |
 | `BUNDLE_META_VERSION_INVALID` | warning | A meta bundle's version does not match the expected SCS version pattern. |
 | `BUNDLE_NOT_FOUND` | error | scs bundle info names a bundle that is neither in the workspace nor a concept bundle template. |
+| `BUNDLE_OWNER_MISSING` | warning | A concept bundle, or a Project bundle that lists SCDs directly, names no owner role; versioning it is an error (D-92). |
+| `BUNDLE_OWNER_UNMAPPED` | warning | A bundle's owner role is not mapped to a person in the workspace's intake.yaml owners; versioning it is an error (D-92). |
 | `BUNDLE_REQUIRED_FIELD_EMPTY` | error | A bundle's imports or scds list is empty but its type requires at least one entry. |
 | `BUNDLE_SCD_UNRESOLVED` | warning | An SCD listed in a bundle could not be found. |
 | `BUNDLE_STANDARDS_DEPRECATED` | warning | A bundle uses the deprecated standards type. |
@@ -78,6 +80,8 @@ Every code the SCS tools emit, with its severity. Generated from
 | `ONTOLOGY_SATISFIES_TARGET_INVALID` | error | A concept's satisfies target is not a well-formed std: citation. |
 | `ONTOLOGY_SCD_CONCEPT_NOT_FOUND` | error | An SCD's concept field names a concept that is not in the domain. |
 | `OUTPUT_OUTSIDE_REPO` | error | An output path is outside the repository root; SCS commands write only inside it. |
+| `OWNER_NOT_APPLICABLE` | error | scs bundle set-owner named a bundle that holds no SCDs of its own (a Domain bundle, or a Project bundle that imports concepts). |
+| `OWNER_ROLE_INVALID` | error | An owner role is not lowercase letters, digits, and hyphens; exit code 3. |
 | `PARSE_FILE_NOT_FOUND` | error | The file to validate does not exist. |
 | `PARSE_FILE_UNREADABLE` | error | The file to validate could not be read. |
 | `PARSE_JSON_SYNTAX` | error | The file is not valid JSON. |
@@ -140,6 +144,8 @@ Every code the SCS tools emit, with its severity. Generated from
 | `VERSION_MANIFEST_INCOMPLETE` | error | A manifest with a workspace-qualified tag lacks content_digest or tools_version, which every 0.7 manifest carries (D-49). |
 | `VERSION_MANIFEST_MISSING` | error | A workspace-qualified version tag points at a commit without that version's manifest (D-39). |
 | `VERSION_NOT_FOUND` | error | No version tag exists for the requested version. |
+| `VERSION_OWNER_MISSING` | error | The bundle being versioned needs an owner role and names none; set one with scs bundle set-owner (D-92). |
+| `VERSION_OWNER_UNMAPPED` | error | The bundle being versioned names an owner role that intake.yaml owners does not map to a person; add it with scs intake set owners (D-92). |
 | `VERSION_PROVENANCE_PLACEHOLDER` | error | The bundle or one of its SCDs has a placeholder created_by; correct it before versioning (D-71). |
 | `VERSION_TAG_MISSING` | error | A manifest records a content digest but its version tag does not exist, or a pinned import has no 0.7 tag (D-39). |
 | `WORKSPACE_CONFIG_INVALID` | error | A workspace's .scs/config cannot be read as key-value pairs. |

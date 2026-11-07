@@ -3,6 +3,7 @@ type: concept
 version: DRAFT
 title: Origination Concept Bundle
 description: ISO/broker intake, lead qualification, and application intake.
+owner: sales
 imports: []
 scds:
 - scd:project:origination

@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Testing & Validation Concept Bundle"
 description: "Testing strategy, coverage requirements, and validation approach for {{ display_name }}"
+owner: quality
 
 imports: []
 

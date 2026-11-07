@@ -46,6 +46,9 @@ See `docs/MIGRATION-0.6.0.md`.
 - **One Domain repository per Domain.** A Domain's context lives in its own git repository,
   holding one Domain workspace and its Project workspaces (§8). A Domain can belong to an
   organization or to one person.
+- **Every section has an owner.** A concept bundle, and a Project bundle that lists SCDs
+  directly, names an owner role, the person accountable for that section, who reviews and
+  approves it; the workspace's intake record maps each role to a person (§5.1, §8.4, §9.10).
 
 See `docs/MIGRATION-0.7.0.md`.
 
@@ -211,6 +214,7 @@ the Domain bundle. See `citations.md` and `standards-tier.md`.
 **Cardinality**: Variable (depends on the ontology)
 **Imports**: MUST NOT import other bundles
 **SCDs**: MUST contain at least 1 project-tier SCD
+**Owner**: MUST name an owner role before versioning (§5.1)
 
 Concept bundles organize context by functional area (architecture, security, risk
 management, etc.). The concept itself — its id, taxonomy position, and relationships to
@@ -227,6 +231,7 @@ type: concept
 version: "DRAFT"
 title: "Architecture Concept Bundle"
 description: "System architecture, components, and technical design."
+owner: engineering
 
 imports: []
 
@@ -385,6 +390,15 @@ the stricter rule.
 | `imports` | array | List of bundle references with versions |
 | `scds` | array | List of SCD references included in this bundle |
 | `provenance` | object | Authorship and change history |
+
+**Owner.** A concept bundle, and a Project bundle that lists SCDs directly, holds a section of
+content and MUST name an `owner` before it is versioned: the role accountable for that section,
+who reviews and approves it, written in lowercase letters, digits, and hyphens (`owner: quality`).
+Other bundle types SHOULD NOT name one. The role is part of the bundle, so it is covered by the
+content digest (§7.6) and changing it needs a new version. Who holds the role is recorded in the
+workspace's intake record (§8.4), outside the digest, so a change of person needs no new
+version. Ontology templates SHOULD give each concept a default role; a personal Domain uses one
+role, `owner`.
 
 ### 5.2 Version Format
 
@@ -754,6 +768,10 @@ publicly, the record MAY use role-only attribution instead, written `role:<name>
 `role:quality-manager`). Role-only attribution is allowed in the intake record only; a version
 manifest's approver is always a person.
 
+The record's `owners` list maps each owner role named by the workspace's bundles (§5.1) to the
+person who holds it: `role`, `person` (`Name <email>`, never role-only), and an optional
+`title`. One person MAY hold several roles.
+
 ### 8.5 Versions in the Repository
 
 Each bundle is versioned on its own. Bundle versions MUST be recorded as git tags in the Domain
@@ -886,6 +904,14 @@ Tools MUST validate that:
 - A tool that versions a bundle MUST list the bundle's empty SCDs in its dry run, so they are
   removed or kept knowingly before a release
 - The 0.6 stub detection (`COMPLETENESS_STUB_SCD`) is removed
+
+### 9.10 Section Owners
+- A working concept bundle, or Project bundle that lists SCDs directly, with no `owner` is a
+  warning (`BUNDLE_OWNER_MISSING`); one whose role is not in the workspace's intake record
+  `owners` is a warning (`BUNDLE_OWNER_UNMAPPED`). Both fail under `--strict` with exit code 2.
+  Bundles outside a Domain repository with no intake record are not checked
+- A tool that versions such a bundle MUST refuse while either holds (`VERSION_OWNER_MISSING`,
+  `VERSION_OWNER_UNMAPPED`)
 
 Tools MAY also perform:
 - Compliance completeness checks

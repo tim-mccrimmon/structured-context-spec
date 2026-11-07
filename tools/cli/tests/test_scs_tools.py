@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 import yaml
 from click.testing import CliRunner
+from owner_roles import map_owners
 from scs_validator.commands.validate import validate as validator_cmd
 
 from scs_tools.cli import cli
@@ -53,6 +54,7 @@ def new_workspace(tmp_path: Path, kind: str = "project", name: str = "demo", *op
         args = ["new", "domain", name, "--dir", str(tmp_path), *options, *NEW_OPTIONS]
         result = CliRunner().invoke(cli, args)
         assert result.exit_code == 0, result.output
+        map_owners(tmp_path / f"{name}-context")
         return tmp_path / f"{name}-context" / "domain"
     repo = tmp_path / "acme-context"
     if not repo.exists():
@@ -60,6 +62,7 @@ def new_workspace(tmp_path: Path, kind: str = "project", name: str = "demo", *op
     args = ["new", "project", name, "--dir", str(repo), *options, *NEW_OPTIONS]
     result = CliRunner().invoke(cli, args)
     assert result.exit_code == 0, result.output
+    map_owners(repo)
     return repo / "projects" / name
 
 

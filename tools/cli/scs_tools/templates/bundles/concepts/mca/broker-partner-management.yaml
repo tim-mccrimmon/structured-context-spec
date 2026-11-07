@@ -3,6 +3,7 @@ type: concept
 version: DRAFT
 title: Broker & Partner Management Concept Bundle
 description: ISO and broker relationships, and oversight of what brokers represent to merchants.
+owner: sales
 imports: []
 scds:
 - scd:project:broker-partner-management

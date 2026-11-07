@@ -186,6 +186,7 @@ concepts with them rather than starting from templates.
 | `certifications` | Standards and editions in scope; drives `cites` |
 | `source_documents` | Quality manual, SOPs, and other documents the agent may draft from |
 | `approvers` | People and roles who approve context versions |
+| `owners` | Who holds each section owner role (`bundle-format.md` §5.1) |
 | `boundaries` | What is explicitly out of bounds; the main source of prohibitions |
 
 **Project** (each Project):
@@ -205,8 +206,9 @@ circumstances change, and audited.
 
 The engine commands `scs intake set` and `scs intake record-finding` (both with `--dry-run`)
 are the record's only writers; the agent MUST NOT edit the file directly. `scs intake set FIELD
-VALUE` sets one field. An object given for `answers`, `source_documents`, or `approvers`
-replaces the entry with the same `id` (`person` for approvers), or is appended.
+VALUE` sets one field. An object given for `answers`, `source_documents`, `approvers`, or
+`owners` replaces the entry with the same `id` (`person` for approvers, `role` for owners), or
+is appended.
 `review_findings` is written only by `scs intake record-finding` (§11).
 
 ---

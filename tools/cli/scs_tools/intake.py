@@ -30,7 +30,12 @@ from scs_tools.machine import EXIT_USAGE, CommandError, Envelope
 from scs_tools.maintain import Edit, _dump
 from scs_tools.workspace import repository_root, select_workspace
 
-KEYED = {"answers": "id", "source_documents": "id", "approvers": "person"}  # D-77
+KEYED = {
+    "answers": "id",
+    "source_documents": "id",
+    "approvers": "person",
+    "owners": "role",
+}  # D-77, D-92
 ENGINE_FIELDS = ("intake_version", "scs_version")
 FINDING_ID_RE = re.compile(r"^rf-(\d+)$")
 

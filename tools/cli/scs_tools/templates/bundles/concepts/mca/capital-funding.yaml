@@ -4,6 +4,7 @@ version: DRAFT
 title: Capital & Funding Concept Bundle
 description: 'Where the funder''s own money comes from to fund merchants: credit facilities, warehouse
   lines, and Treasury.'
+owner: finance
 imports: []
 scds:
 - scd:project:capital-funding

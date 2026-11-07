@@ -50,16 +50,17 @@ def set_field(envelope, out, field, value, workspace, dry_run):
     """
     Set one field of the intake record
 
-    VALUE is YAML; '-' reads it from stdin. For answers and source_documents (keyed by id) and
-    approvers (keyed by person), a single object replaces the entry with the same key or is
-    added. Any other value replaces the field. An answer without answered_at gets the current
-    time (UTC).
+    VALUE is YAML; '-' reads it from stdin. For answers and source_documents (keyed by id),
+    approvers (keyed by person), and owners (keyed by role), a single object replaces the entry
+    with the same key or is added. Any other value replaces the field. An answer without
+    answered_at gets the current time (UTC).
 
     \b
     Examples:
         scs intake set audience organization
         scs intake set certifications '[std:iso-13485:2016, std:iec-62304:2006-a1]'
         scs intake set approvers '{person: Jane Doe <jane@acme-health.org>, role: QA Lead}'
+        scs intake set owners '{role: quality, person: Jane Doe <jane@acme-health.org>}'
         scs intake set answers - < answer.yaml
     """
     stdin = sys.stdin.read() if value == "-" else None

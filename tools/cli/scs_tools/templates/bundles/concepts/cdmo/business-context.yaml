@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Business Context Concept Bundle"
 description: "Business context for a medical-device CDMO program: objectives and business case, explicit scope boundaries, measurable success criteria, and the client-program context the work serves."
+owner: executive
 
 imports: []
 

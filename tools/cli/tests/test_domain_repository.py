@@ -11,6 +11,7 @@ import jsonschema
 import pytest
 import yaml
 from click.testing import CliRunner, Result
+from owner_roles import map_owners
 from scs_validator.commands.validate import validate as validator_cmd
 
 from scs_tools import git
@@ -67,6 +68,7 @@ def test_new_domain_then_project_validates_strictly_at_the_repository_root(
     assert result.exit_code == 0, result.output
     assert (repo / "projects" / "a" / "bundles" / "project-bundle.yaml").is_file()
 
+    map_owners(repo)  # a fresh scaffold's owner roles are not yet mapped to people (D-92)
     monkeypatch.chdir(repo)
     result = CliRunner().invoke(
         validator_cmd, ["--strict", "--no-color", "--schema-dir", str(SCHEMA)]
@@ -198,6 +200,7 @@ def test_personal_ontology_scaffold(tmp_path: Path, monkeypatch):
     assert bundle["imports"] == ["bundle:prohibited"]
     prohibited = (project / "context" / "project" / "prohibited.yaml").read_text()
     assert "Projects cannot override" not in prohibited  # Domain wording only
+    map_owners(repo)  # a fresh scaffold's owner roles are not yet mapped to people (D-92)
     monkeypatch.chdir(repo)
     result = CliRunner().invoke(
         validator_cmd, ["--strict", "--no-color", "--schema-dir", str(SCHEMA)]
@@ -213,6 +216,7 @@ def test_every_ontology_scaffolds_a_domain_and_a_project(tmp_path: Path, monkeyp
     project, _ = _concepts_and_scds(repo / "projects" / "app")
     assert "prohibited" in domain
     assert ("company" in domain) is (ontology != "personal")
+    map_owners(repo)  # a fresh scaffold's owner roles are not yet mapped to people (D-92)
     monkeypatch.chdir(repo)
     result = CliRunner().invoke(
         validator_cmd, ["--strict", "--no-color", "--schema-dir", str(SCHEMA)]

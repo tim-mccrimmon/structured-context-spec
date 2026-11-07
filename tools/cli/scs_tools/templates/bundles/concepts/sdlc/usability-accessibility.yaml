@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Usability & Accessibility Concept Bundle"
 description: "User experience principles and accessibility requirements for {{ display_name }}"
+owner: product
 
 imports: []
 

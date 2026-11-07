@@ -11,6 +11,7 @@ from typing import Any, Dict, List
 import jsonschema
 import pytest
 from click.testing import CliRunner, Result
+from owner_roles import map_owners
 
 from scs_tools.cli import cli
 
@@ -92,6 +93,7 @@ def ws(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     assert result.exit_code == 0, result.output
     app = tmp_path / "acme-context" / "projects" / "app"
     edit(app / SCD, "  prohibitions: []\n", "  prohibitions:\n" + NO_001)
+    map_owners(tmp_path / "acme-context")
     monkeypatch.chdir(app)
     return app
 

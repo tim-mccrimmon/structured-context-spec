@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "AI Accountability Concept Bundle"
 description: "AI accountability for a medical-device CDMO: human decision authority and sign-off gates, the non-decision principle (automated controls do not approve), named accountability for AI-assisted output, and the method for handling AI limitations and bias."
+owner: ai-governance
 
 imports: []
 

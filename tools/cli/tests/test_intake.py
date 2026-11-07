@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from owner_roles import map_owners
 from test_maintain import (
     codes,
     conforms,
@@ -183,6 +184,7 @@ def test_derived_from_resolves_against_the_workspaces_intake(repo: Path):
     ]
 
     run("intake", "set", "source_documents", "{id: doc-sop, title: AI use SOP}")
+    map_owners(repo)
     code, diagnostics = validate(repo, "--strict")
     assert code == 0, diagnostics
 

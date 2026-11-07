@@ -31,6 +31,11 @@
       "minLength": 1,
       "description": "Summary of what this bundle represents"
     },
+    "owner": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "The role accountable for this section, who reviews and approves it (D-92), e.g. quality. Required on concept bundles and on a project bundle that lists SCDs directly before versioning; the workspace's intake.yaml owners maps the role to a person."
+    },
     "imports": {
       "type": "array",
       "description": "List of external bundle references with versions (e.g., bundle:architecture:1.0.0). Domain bundles import a meta bundle and concept bundles. Project bundles MAY import concept bundles and MUST NOT import meta, domain, or project bundles. Concept bundles MUST have empty imports array.",

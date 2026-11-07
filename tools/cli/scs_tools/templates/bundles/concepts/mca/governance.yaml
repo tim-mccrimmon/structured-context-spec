@@ -4,6 +4,7 @@ version: DRAFT
 title: Governance Concept Bundle
 description: Which AI tools are sanctioned, the autonomy default for AI use, and the hard "never" prohibitions
   company-wide.
+owner: executive
 imports: []
 scds:
 - scd:project:governance

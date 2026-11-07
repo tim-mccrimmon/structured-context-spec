@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Verification & Validation Concept Bundle"
 description: "Computer-system validation for a medical-device CDMO program: the validation approach (GAMP category; IQ/OQ/PQ), requirements (URS) traceability, quantitative acceptance criteria, and qualification protocols and evidence."
+owner: engineering
 
 imports: []
 

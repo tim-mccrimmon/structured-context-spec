@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Compliance & Governance Concept Bundle"
 description: "Regulatory requirements and governance processes for {{ display_name }}"
+owner: compliance
 
 imports: []
 

@@ -340,6 +340,14 @@ the approvers, source documents, and review findings. It is not an SCD and is ne
 
 ---
 
+### **2.20 Section Owner**
+The **owner** of a section is the role accountable for it, who reviews and approves it: a
+concept bundle, or a Project bundle that lists SCDs directly, names the role (`owner: quality`),
+and the workspace's intake record names the person who holds it. A section cannot be versioned
+until its role is held ([Bundle Format §5.1, §9.10](bundle-format.md)).
+
+---
+
 ## 3. Tiers
 
 ### **3.1 Meta-Tier**

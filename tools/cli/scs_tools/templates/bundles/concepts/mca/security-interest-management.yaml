@@ -3,6 +3,7 @@ type: concept
 version: DRAFT
 title: Security Interest Management Concept Bundle
 description: 'UCC-1 filings and liens on receivables: perfection, and releases on payoff.'
+owner: legal
 imports: []
 scds:
 - scd:project:security-interest-management

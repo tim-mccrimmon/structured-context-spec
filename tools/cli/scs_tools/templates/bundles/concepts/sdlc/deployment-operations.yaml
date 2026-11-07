@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Deployment & Operations Concept Bundle"
 description: "Infrastructure, deployment processes, and operational practices for {{ display_name }}"
+owner: operations
 
 imports: []
 

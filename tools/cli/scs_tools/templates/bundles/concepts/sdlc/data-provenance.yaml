@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Data & Provenance Concept Bundle"
 description: "Data models, lineage tracking, and retention policies for {{ display_name }}"
+owner: data
 
 imports: []
 

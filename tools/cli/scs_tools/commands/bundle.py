@@ -428,6 +428,29 @@ def pin(envelope, out, name, version_number, bundle_file, workspace, dry_run):
     _done(out, envelope, dry_run)
 
 
+@bundle.command("set-owner")
+@click.argument("role")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle set-owner")
+def set_owner(envelope, out, role, bundle_file, workspace, dry_run):
+    """
+    Name the role accountable for a section (D-92)
+
+    Sets the bundle's owner to ROLE: the role accountable for this section, who reviews and
+    approves it, such as quality or regulatory. Owners go on concept bundles and on a Project
+    bundle that lists SCDs directly. Map the role to a person with 'scs intake set owners'.
+    The owner is part of the bundle, so changing it on a released bundle needs a new version.
+
+    \b
+    Examples:
+        scs bundle set-owner quality --bundle bundles/concepts/qms-records.yaml
+        scs intake set owners '{role: quality, person: Jane Doe <jane@acme.org>, title: VP Quality}'
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.set_owner(envelope, ws, bundle_file, role, dry_run)
+    _done(out, envelope, dry_run)
+
+
 @bundle.command("add-import")
 @click.argument("ref")
 @_edit_options("the workspace's root bundle")

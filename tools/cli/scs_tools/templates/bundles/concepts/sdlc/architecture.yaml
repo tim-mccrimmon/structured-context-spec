@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Architecture Concept Bundle"
 description: "System architecture, components, and technical design for {{ display_name }}"
+owner: engineering
 
 imports: []
 

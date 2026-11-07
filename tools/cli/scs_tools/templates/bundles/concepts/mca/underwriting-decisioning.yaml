@@ -3,6 +3,7 @@ type: concept
 version: DRAFT
 title: Underwriting & Decisioning Concept Bundle
 description: Cash-flow analysis, risk scoring, approve/decline/counter, and pricing and terms.
+owner: underwriting
 imports: []
 scds:
 - scd:project:underwriting-decisioning

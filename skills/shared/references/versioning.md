@@ -78,5 +78,7 @@ fails, the engine has undone that step; say which steps completed and which did 
 
 Refusals you may see: `VERSION_EXISTS` (versions are never overwritten; choose a new number),
 `VERSION_INPUT_UNTRACKED` (a file the digest reads is ignored or untracked),
-`VERSION_PROVENANCE_PLACEHOLDER` (correct `created_by` first), `GIT_REQUIRED`.
+`VERSION_PROVENANCE_PLACEHOLDER` (correct `created_by` first), `VERSION_OWNER_MISSING` or
+`VERSION_OWNER_UNMAPPED` (the section has no owner role, or no one holds it: settle it as the
+people step in [intake.md](intake.md) describes), `GIT_REQUIRED`.
 `--no-validate` skips content validation only, and is used only if the user asks for it.

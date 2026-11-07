@@ -72,6 +72,7 @@ type: concept
 version: "{version}"
 title: {name}
 description: {name}
+owner: lead
 imports: []
 scds:
   - scd:project:{name}
@@ -81,6 +82,11 @@ scds:
 
 def workspace(root: Path, name: str, bundle_type: str, concept_name: str) -> Path:
     write(root / ".scs" / "config", f"bundle_type: {bundle_type}\nname: {name}\n")
+    write(
+        root / "intake.yaml",
+        'intake_version: "1.0"\nscs_version: 0.7.0\n'
+        "owners:\n  - role: lead\n    person: Lee Wu <lee@structuredcontext.dev>\n",
+    )
     scd(root, concept_name)
     concept(root, concept_name)
     imports = f"  - bundle:{concept_name}\n"

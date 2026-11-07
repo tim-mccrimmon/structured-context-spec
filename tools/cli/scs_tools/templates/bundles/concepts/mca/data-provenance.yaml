@@ -4,6 +4,7 @@ version: DRAFT
 title: Data & Provenance Concept Bundle
 description: 'Bank-statement data, credit-bureau pulls, and ISO/broker-submitted application data: where
   it comes from and what AI may do with it.'
+owner: data
 imports: []
 scds:
 - scd:project:data-provenance

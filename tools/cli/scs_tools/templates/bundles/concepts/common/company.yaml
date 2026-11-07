@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Company"
 description: "Facts about {{ display_name }} that every agent should know"
+owner: executive
 
 imports: []
 

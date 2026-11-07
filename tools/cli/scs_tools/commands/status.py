@@ -26,8 +26,9 @@ def status(envelope, out, workspace):
 
     Read-only. Works the status out from the repository each time: the intake record, the
     documents in sources/ and whether they are recorded, SCDs with template placeholders left,
-    review findings by decision, versions and changes since the latest one, uncommitted files,
-    compiled artifacts, and, for a Project, the Domain's latest released version.
+    section owners and who holds each role (D-92), review findings by decision, versions and
+    changes since the latest one, uncommitted files, compiled artifacts, and, for a Project, the
+    Domain's latest released version.
 
     \b
     Examples:
@@ -74,5 +75,15 @@ def _echo(out, ws):
     )
     scds = ws["scds"]
     out.echo(f"  SCDs: {scds['count']}, {len(scds['placeholders'])} with placeholders left")
+    owners = ws["owners"]
+    out.echo(
+        f"  Section owners: {len(owners['sections']) - len(owners['missing'])} of "
+        f"{len(owners['sections'])} set"
+        + (
+            f"; roles with no person: {', '.join(owners['unmapped_roles'])}"
+            if owners["unmapped_roles"]
+            else ""
+        )
+    )
     out.echo(f"  Uncommitted files: {len(ws['uncommitted'])}")
     out.echo(f"  Compiled artifacts: {', '.join(ws['compiled']['artifacts']) or 'none'}")

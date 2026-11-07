@@ -5,6 +5,7 @@ title: "Acme Health - Company Context"
 description: >
   Company-specific context for Acme Health Corp including mission, values,
   and organizational structure
+owner: executive
 
 scds:
   - scd:project:company-overview

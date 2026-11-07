@@ -131,7 +131,8 @@ Domain documents are already in the Domain; do not record them again.
 
 Ask the Project profile questions and the team questions, from
 [references/intake.md](references/intake.md): the lead, the developers, the quality or
-regulatory reviewer, the business owner, and who approves versions. Pace them, record each
+regulatory reviewer, the business owner, the person who holds each section owner role
+(`scs intake set owners`), and who approves versions. Pace them, record each
 group of answers, and confirm proposals before recording them.
 
 **Checkpoint:** commit the intake.

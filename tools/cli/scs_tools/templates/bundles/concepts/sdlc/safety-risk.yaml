@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Safety & Risk Concept Bundle"
 description: "Risk identification and management, safety concerns for {{ display_name }}"
+owner: quality
 
 imports: []
 

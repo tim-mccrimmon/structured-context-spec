@@ -124,6 +124,8 @@ def _documents(work: Path, files: dict[str, str]) -> list[str]:
 def _release(env: dict, repo: Path, workspace: str = "domain") -> None:
     """Version the workspace's concept bundle and its root as 1.0.0."""
     folder = repo / workspace
+    # A personal workspace's one owner role (D-92) must be held before versioning.
+    run(env, folder, "scs", "intake", "set", "owners", f"{{role: owner, person: {APPROVER}}}")
     run(env, folder, "scs", "bundle", "version", "--bundle", "bundles/concepts/prohibited.yaml",
         "--version", "1.0.0", "--approved-by", APPROVER)
     run(env, folder, "scs", "bundle", "pin", "prohibited", "--version", "1.0.0")

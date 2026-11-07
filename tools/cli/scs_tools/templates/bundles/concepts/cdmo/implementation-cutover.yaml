@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Implementation & Cutover Concept Bundle"
 description: "Implementation and cutover for a medical-device CDMO program: the cutover plan and sequence, multi-site rollout (including role/licensing differences), rollback triggers and procedure, and hypercare / go-live criteria."
+owner: it
 
 imports: []
 

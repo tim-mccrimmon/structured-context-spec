@@ -11,6 +11,14 @@ codes:
   BUNDLE_NOT_FOUND:
     severity: error
     meaning: scs bundle info names a bundle that is neither in the workspace nor a concept bundle template.
+  BUNDLE_OWNER_MISSING:
+    severity: warning
+    meaning: A concept bundle, or a Project bundle that lists SCDs directly, names no owner role; versioning
+      it is an error (D-92).
+  BUNDLE_OWNER_UNMAPPED:
+    severity: warning
+    meaning: A bundle's owner role is not mapped to a person in the workspace's intake.yaml owners; versioning
+      it is an error (D-92).
   BUNDLE_REQUIRED_FIELD_EMPTY:
     severity: error
     meaning: A bundle's imports or scds list is empty but its type requires at least one entry.
@@ -235,6 +243,13 @@ codes:
   OUTPUT_OUTSIDE_REPO:
     severity: error
     meaning: An output path is outside the repository root; SCS commands write only inside it.
+  OWNER_NOT_APPLICABLE:
+    severity: error
+    meaning: scs bundle set-owner named a bundle that holds no SCDs of its own (a Domain bundle, or a
+      Project bundle that imports concepts).
+  OWNER_ROLE_INVALID:
+    severity: error
+    meaning: An owner role is not lowercase letters, digits, and hyphens; exit code 3.
   PARSE_FILE_NOT_FOUND:
     severity: error
     meaning: The file to validate does not exist.
@@ -433,6 +448,14 @@ codes:
   VERSION_NOT_FOUND:
     severity: error
     meaning: No version tag exists for the requested version.
+  VERSION_OWNER_MISSING:
+    severity: error
+    meaning: The bundle being versioned needs an owner role and names none; set one with scs bundle set-owner
+      (D-92).
+  VERSION_OWNER_UNMAPPED:
+    severity: error
+    meaning: The bundle being versioned names an owner role that intake.yaml owners does not map to a
+      person; add it with scs intake set owners (D-92).
   VERSION_PROVENANCE_PLACEHOLDER:
     severity: error
     meaning: The bundle or one of its SCDs has a placeholder created_by; correct it before versioning

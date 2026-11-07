@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Compliance & Governance Concept Bundle"
 description: "Regulatory and QMS governance for a medical-device CDMO: which regulations bind the work, the AI deployment-tier and autonomy rules, electronic-records controls, and hard prohibitions on AI use."
+owner: regulatory
 
 imports: []
 

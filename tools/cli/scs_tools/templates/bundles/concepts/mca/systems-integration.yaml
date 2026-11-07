@@ -4,6 +4,7 @@ version: DRAFT
 title: Systems Integration Concept Bundle
 description: How AI plugs into the loan-origination, CRM, and ACH/servicing platforms, including how state
   data is looked up at the moment a prompt is assembled.
+owner: it
 imports: []
 scds:
 - scd:project:systems-integration

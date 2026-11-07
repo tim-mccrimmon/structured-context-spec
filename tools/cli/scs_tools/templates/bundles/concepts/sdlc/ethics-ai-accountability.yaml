@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Ethics & AI Accountability Concept Bundle"
 description: "Responsible AI use, accountability, and ethical guidelines for {{ display_name }}"
+owner: ai-governance
 
 imports: []
 

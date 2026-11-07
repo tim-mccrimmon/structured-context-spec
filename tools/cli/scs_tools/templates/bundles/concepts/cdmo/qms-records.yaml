@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "QMS Records Concept Bundle"
 description: "QMS records management for a medical-device CDMO: document hierarchy and control rules, record-retention rules, CAPA triggers, and which records are authoritative systems of record (AI output is never one)."
+owner: quality
 
 imports: []
 

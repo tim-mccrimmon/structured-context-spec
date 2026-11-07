@@ -12,6 +12,7 @@ import jsonschema
 import pytest
 import yaml
 from click.testing import CliRunner, Result
+from owner_roles import map_owners
 from scs_validator.commands.validate import validate as validator_cmd
 
 from scs_tools import git as engine_git
@@ -65,7 +66,8 @@ def git_state(repo: Path) -> Dict[str, object]:
 
 def conforms(root: Path, *args: str, prefix: str = "") -> Dict:
     """Machine-mode conformance (plan section 4): one valid envelope, the dry run changes nothing
-    and reports exactly the real run's changes, and the real run changes exactly those files."""
+    and reports exactly the real run's changes, and the real run changes exactly those files.
+    """
     before = files(root)
     dry = envelope(run(*args, "--json", "--dry-run"))
     assert dry["ok"], dry
@@ -119,6 +121,7 @@ def fill(path: Path, subject: str = "personal AI accounts") -> None:
             f'  prohibitions:\n    - id: NO-001\n      kind: tool\n      subject: "{subject}"',
         )
     )
+    map_owners(path.parents[2])
 
 
 # ------------------------------------------------------------------ conformance
@@ -230,7 +233,10 @@ def test_a_project_inherits_its_domains_ontology(repo: Path, monkeypatch):
 
 
 def test_add_bundle_new_creates_a_concept_with_its_scd_ontology_entry_and_import(repo: Path):
-    real = conforms(repo, "add", "bundle", "groceries", "--new", "--title", "Groceries", *AUTHOR)
+    real = conforms(
+        repo, "add", "bundle", "groceries", "--new", "--title", "Groceries", "--owner", "owner",
+        *AUTHOR,
+    )  # fmt: skip
     assert {(c["action"], c["path"]) for c in real["changes"]} == {
         ("create", "projects/app/bundles/concepts/groceries.yaml"),
         ("create", "projects/app/context/project/groceries.yaml"),
@@ -243,6 +249,9 @@ def test_add_bundle_new_creates_a_concept_with_its_scd_ontology_entry_and_import
     ids = [c["id"] for c in manifest["domain"]["ontology"]["concepts"]]
     assert ids[-1] == "concept:groceries"
     assert "# Domain Ontology manifest" in (app(repo) / "ontology/domain-manifest.yaml").read_text()
+    concept = yaml.safe_load((app(repo) / "bundles/concepts/groceries.yaml").read_text())
+    assert concept["owner"] == "owner"
+    map_owners(repo)
     code, diagnostics = validate(repo, "--strict")
     assert code == 0, diagnostics
 

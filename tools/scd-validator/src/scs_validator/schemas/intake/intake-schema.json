@@ -62,6 +62,24 @@
       },
       "description": "Who approves context versions (D-78)"
     },
+    "owners": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "person"],
+        "properties": {
+          "role": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "description": "An owner role named by a bundle's owner field"
+          },
+          "person": {"$ref": "#/$defs/person"},
+          "title": {"type": "string", "minLength": 1, "description": "Job title"}
+        },
+        "additionalProperties": false
+      },
+      "description": "Who holds each owner role: the person accountable for the sections with that role, who reviews and approves them (D-92). Outside the content digest, so a change of person needs no new version"
+    },
     "source_documents": {
       "type": "array",
       "items": {

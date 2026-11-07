@@ -23,6 +23,7 @@ ORDER = [
     "WP-16.md",  # Layered context
     "WP-10.md",  # Agent Skills
     "WP-10b.md",  # Status, commits, source documents (rc2)
+    "D-92.md",  # Section owners (rc4)
     "housekeeping.md",
     "ISS-042-045.md",
 ]

@@ -14,7 +14,8 @@ import yaml
 from scs_validator.envelope import relative
 from scs_validator.gitrepo import GitRepo, GitUnavailable, split_version
 from scs_validator.intake import INTAKE_FILE, load
-from scs_validator.names import bundle_name, version_tag
+from scs_validator.names import bundle_name, is_snapshot, version_tag
+from scs_validator.owners import needs_owner, owner_map
 from scs_validator.workspace import CONFIG, read_config
 
 from scs_tools import git
@@ -93,6 +94,42 @@ def _sources(workspace: Path, documents: List[Dict[str, Any]], root: Path) -> Di
     }
 
 
+def _owners(workspace: Path, root: Path) -> Dict[str, Any]:
+    """Each section's owner role and who holds it (D-92), and the sections missing either."""
+    intake_path = workspace / INTAKE_FILE
+    try:
+        intake = load(intake_path) if intake_path.is_file() else None
+    except (OSError, UnicodeDecodeError, yaml.YAMLError):
+        intake = None
+    holders = owner_map(intake)
+    sections = []
+    paths = [workspace / "bundles" / n for n in ROOT_BUNDLE_FILES]
+    paths += sorted((workspace / "bundles" / "concepts").glob("*.yaml"))
+    for path in paths:
+        if not path.is_file() or is_snapshot(path):
+            continue
+        data = _yaml(path)
+        if not needs_owner(data):
+            continue
+        role = data.get("owner")
+        holder = holders.get(str(role)) if role else None
+        sections.append(
+            {
+                "bundle": data.get("id"),
+                "path": relative(path, root),
+                "owner": role,
+                "person": holder.get("person") if holder else None,
+                "title": holder.get("title") if holder else None,
+            }
+        )
+    roles = sorted({str(s["owner"]) for s in sections if s["owner"]})
+    return {
+        "sections": sections,
+        "missing": [s["bundle"] for s in sections if not s["owner"]],
+        "unmapped_roles": [r for r in roles if r not in holders],
+    }
+
+
 def _scds(workspace: Path) -> Dict[str, Any]:
     paths = sorted((workspace / "context" / "project").glob("*.yaml"))
     placeholders = []
@@ -164,6 +201,7 @@ def workspace_status(
         "intake": intake,
         "sources": _sources(path, documents, root),
         "scds": _scds(path),
+        "owners": _owners(path, root),
         "versions": versions,
         "latest_version": latest,
         "changed_since_version": changed,

@@ -4,6 +4,7 @@ version: DRAFT
 title: Servicing & Collections Concept Bundle
 description: Daily or twice-monthly ACH debiting, NSF and returns, delinquency, restructuring, and confession-of-judgment
   posture.
+owner: operations
 imports: []
 scds:
 - scd:project:servicing-collections

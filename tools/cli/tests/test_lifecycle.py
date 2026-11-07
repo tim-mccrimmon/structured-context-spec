@@ -10,6 +10,7 @@ from typing import Dict, List, Set, Tuple
 import pytest
 import yaml
 from click.testing import CliRunner, Result
+from owner_roles import map_owners
 from scs_validator.commands.validate import validate as validator_cmd
 from scs_validator.digest import content_digest
 from scs_validator.resolver import resolve
@@ -85,6 +86,7 @@ def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "  prohibitions:\n    - id: NO-001\n      kind: tool\n"
         '      subject: "personal AI accounts"',
     )
+    map_owners(root)
     monkeypatch.chdir(ws)
     return root
 
@@ -102,6 +104,8 @@ def own_scd(repo: Path) -> None:
     edit(app / ROOT, "  - bundle:prohibited\n", "")
     edit(app / ROOT, "imports:\n", "imports: []\n")
     edit(app / ROOT, "scds: []", "scds:\n  - scd:project:app-rules")
+    edit(app / ROOT, "imports: []\n", "owner: owner\nimports: []\n")
+    map_owners(repo)
 
 
 def version(bundle: str, number: str, *extra: str) -> Tuple[int, Dict]:
@@ -116,7 +120,7 @@ def version(bundle: str, number: str, *extra: str) -> Tuple[int, Dict]:
 def pin(repo: Path, number: str) -> None:
     text = (ws(repo) / ROOT).read_text()
     lines = [
-        f"  - bundle:prohibited:{number}" if line.startswith("  - bundle:prohibited") else line
+        (f"  - bundle:prohibited:{number}" if line.startswith("  - bundle:prohibited") else line)
         for line in text.splitlines()
     ]
     (ws(repo) / ROOT).write_text("\n".join(lines) + "\n")
@@ -207,7 +211,8 @@ def test_the_version_commit_holds_the_whole_workspace_and_nothing_else(repo: Pat
     commit_all(repo, "scaffold")
     app = ws(repo)
     (app / "docs" / "GETTING_STARTED.md").unlink()
-    (app / "intake.yaml").write_text('intake_version: "1.0"\nscs_version: 0.7.0\n')
+    with (app / "intake.yaml").open("a") as f:
+        f.write("audience: individual\n")
     (app / "README.md").write_text("# app\n")
     (app / "dist").mkdir()
     (app / "dist" / "old.yaml").write_text("x: 1\n")
@@ -224,7 +229,7 @@ def test_the_version_commit_holds_the_whole_workspace_and_nothing_else(repo: Pat
     }
     assert committed == {
         "projects/app/docs/GETTING_STARTED.md": "D",
-        "projects/app/intake.yaml": "A",
+        "projects/app/intake.yaml": "M",
         "projects/app/README.md": "M",
         "projects/app/bundles/concepts/prohibited-v1.0.0.yaml": "A",
         "projects/app/bundles/concepts/prohibited-v1.0.0-MANIFEST.yaml": "A",

@@ -3,6 +3,7 @@ type: concept
 version: DRAFT
 title: Disclosure Compliance Concept Bundle
 description: State commercial-financing disclosure requirements.
+owner: compliance
 imports: []
 scds:
 - scd:project:disclosure-compliance

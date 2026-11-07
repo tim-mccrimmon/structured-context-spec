@@ -23,7 +23,10 @@ from scs_validator.checks.empty_scds import is_empty
 from scs_validator.digest import DigestError, content_digest
 from scs_validator.envelope import Change, diagnostics_from_results, relative
 from scs_validator.gitrepo import GitRepo, GitUnavailable
+from scs_validator.intake import INTAKE_FILE
+from scs_validator.intake import load as load_intake
 from scs_validator.names import bundle_name, manifest_name, snapshot_name, version_tag
+from scs_validator.owners import problem as owner_problem
 from scs_validator.provenance import is_placeholder
 from scs_validator.resolver import BundleTree, ResolvedBundle, parse_bundle_ref, resolve
 from scs_validator.workspace import CONFIG, LEGACY_ONTOLOGY_MANIFEST, ONTOLOGY_MANIFEST
@@ -149,6 +152,19 @@ def _check_placeholders(tree: BundleTree, envelope: Envelope, release: Release) 
                 "it before versioning",
                 release.shown(path),
             )
+
+
+def _check_owner(tree: BundleTree, envelope: Envelope, release: Release) -> None:
+    """A section's bundle names an owner role that the intake maps to a person (D-92)."""
+    record = release.workspace_root / INTAKE_FILE
+    try:
+        intake = load_intake(record) if record.is_file() else None
+    except (yaml.YAMLError, OSError, UnicodeDecodeError):
+        intake = None
+    found = owner_problem(tree.root.data, intake)
+    if found:
+        kind, message = found
+        envelope.error(f"VERSION_OWNER_{kind}", message, release.shown(release.bundle_path))
 
 
 def _inputs(tree: BundleTree, release: Release) -> List[Path]:
@@ -399,6 +415,7 @@ def version_bundle(
         pinned = integrity.check_pinned(tree, repo, workspace, workspace_root, require_tags=True)
     envelope.diagnostics.extend(diagnostics_from_results([pinned]))
     _check_placeholders(tree, envelope, release)
+    _check_owner(tree, envelope, release)
     ignored = git.ignored(top, [release.from_top(p) for p in _inputs(tree, release)])
     for path in ignored:
         envelope.error(

@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Security Concept Bundle"
 description: "Security controls, data protection, and threat management for {{ display_name }}"
+owner: security
 
 imports: []
 

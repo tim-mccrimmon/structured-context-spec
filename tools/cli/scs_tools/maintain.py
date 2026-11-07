@@ -16,6 +16,7 @@ from typing import Dict, List, Optional, Tuple
 import yaml
 from scs_validator.envelope import Change, relative
 from scs_validator.names import RESERVED_BUNDLE_NAMES, bundle_name, is_snapshot
+from scs_validator.owners import needs_owner
 from scs_validator.resolver import Index, parse_bundle_ref
 from scs_validator.workspace import ONTOLOGY_MANIFEST, load_workspace
 
@@ -323,6 +324,56 @@ def pin(
     envelope.result = {"bundle": data.get("id"), "import": pinned, "was": current[0]}
 
 
+OWNER_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+
+
+def set_owner_text(text: str, role: str) -> str:
+    """`text` with its top-level `owner:` set to `role`: replaced in place, else inserted after
+    the `description:` block, else before `imports:`."""
+    lines = text.splitlines(keepends=True)
+    line = f"owner: {role}\n"
+    for i, current in enumerate(lines):
+        if re.match(r"^owner:", current):
+            lines[i] = line
+            return "".join(lines)
+    for i, current in enumerate(lines):
+        if re.match(r"^description:", current):
+            end = i + 1
+            while end < len(lines) and lines[end].startswith((" ", "\t")):
+                end += 1
+            lines.insert(end, line)
+            return "".join(lines)
+    for i, current in enumerate(lines):
+        if re.match(r"^imports:", current):
+            lines.insert(i, line)
+            return "".join(lines)
+    return text.rstrip("\n") + "\n" + line
+
+
+def set_owner(
+    envelope: Envelope, ws: Workspace, bundle: Optional[Path], role: str, dry_run: bool
+) -> None:
+    if not OWNER_RE.match(role):
+        raise CommandError(
+            "OWNER_ROLE_INVALID",
+            f"'{role}' is not an owner role: lowercase letters, digits, and hyphens, such as "
+            "quality or regulatory",
+            exit_code=EXIT_USAGE,
+        )
+    path, data = _target(ws, bundle)
+    if not needs_owner(data):
+        raise CommandError(
+            "OWNER_NOT_APPLICABLE",
+            f"{data.get('id')} holds no SCDs of its own; owners go on concept bundles and on a "
+            "Project bundle that lists SCDs directly",
+            path=ws.shown(path),
+        )
+    edit = Edit(ws.root)
+    edit.writes[path] = set_owner_text(path.read_text(encoding="utf-8"), role)
+    edit.apply(envelope, dry_run)
+    envelope.result = {"bundle": data.get("id"), "owner": role, "was": data.get("owner")}
+
+
 def add_import(
     envelope: Envelope, ws: Workspace, bundle: Optional[Path], ref: str, dry_run: bool
 ) -> None:
@@ -466,9 +517,16 @@ def new_concept(
     description: Optional[str],
     created_by: str,
     dry_run: bool,
+    owner: Optional[str] = None,
 ) -> None:
     """A concept with no shipped template: its bundle, its first SCD, its ontology entry, and the
-    root bundle's import of it (D-68, D-76)."""
+    root bundle's import of it (D-68, D-76). `owner` is its owner role (D-92)."""
+    if owner is not None and not OWNER_RE.match(owner):
+        raise CommandError(
+            "OWNER_ROLE_INVALID",
+            f"'{owner}' is not an owner role: lowercase letters, digits, and hyphens",
+            exit_code=EXIT_USAGE,
+        )
     if name in RESERVED_BUNDLE_NAMES:
         raise CommandError(
             "RESERVED_BUNDLE_NAME",
@@ -503,6 +561,7 @@ def new_concept(
         "version": "DRAFT",
         "title": title,
         "description": description,
+        **({"owner": owner} if owner else {}),
         "imports": [],
         "scds": [scd_id],
         "provenance": {**provenance, "rationale": f"{title} concept bundle"},

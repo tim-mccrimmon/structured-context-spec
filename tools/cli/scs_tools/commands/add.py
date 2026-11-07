@@ -63,6 +63,8 @@ def _variables(base_path: Path, author, email, out: Output) -> dict:
         # Provenance identifies a person as `Name <email>` (D-28, D-63)
         "created_by": f"{author_info} <{email_info}>",
         "created_at": now,
+        # Template defaults that depend on the ontology, such as an owner role (D-92)
+        "ontology": _read_ontology_model(base_path / ".scs" / "config"),
     }
 
 
@@ -149,6 +151,9 @@ def scd(envelope, out, scd_name, author, email, force, dry_run, workspace):
 )
 @click.option("--title", default=None, help="With --new: the concept's title")
 @click.option("--description", default=None, help="With --new: the concept's description")
+@click.option(
+    "--owner", default=None, help="With --new: the role accountable for the concept (D-92)"
+)
 @machine_command("add bundle")
 def bundle(
     envelope,
@@ -162,6 +167,7 @@ def bundle(
     new_concept,
     title,
     description,
+    owner,
 ):
     """
     Add a concept bundle to the workspace
@@ -184,12 +190,20 @@ def bundle(
     concept:NAME to the ontology manifest, and adds bundle:NAME to the root bundle's imports.
 
     \b
-        scs add bundle groceries --new --title "Groceries" --author "Jane Doe" --email jane@acme.org
+        scs add bundle groceries --new --title "Groceries" --owner owner \\
+            --author "Jane Doe" --email jane@acme.org
 
     See also: scs bundle list --available
     """
     from scs_tools.utils.project_types import ONTOLOGY_MODELS
 
+    if owner and not new_concept:
+        raise CommandError(
+            "USAGE_ERROR",
+            "--owner goes with --new; a template's concept has its default owner role. Change "
+            "it with 'scs bundle set-owner'",
+            exit_code=EXIT_USAGE,
+        )
     if new_concept:
         if force:
             raise CommandError(
@@ -198,7 +212,14 @@ def bundle(
         ws = maintain.open_workspace(workspace, None)
         variables = _variables(ws.path, author, email, out)
         maintain.new_concept(
-            envelope, ws, bundle_name, title, description, variables["created_by"], dry_run
+            envelope,
+            ws,
+            bundle_name,
+            title,
+            description,
+            variables["created_by"],
+            dry_run,
+            owner=owner,
         )
         verb = "Would create" if dry_run else "Created"
         out.echo(f"{verb} concept {bundle_name}:")

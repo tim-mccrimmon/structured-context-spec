@@ -3,6 +3,7 @@ type: concept
 version: DRAFT
 title: Training & Competency Concept Bundle
 description: Role-based training, meaning what leadership and staff need to know before using AI.
+owner: hr
 imports: []
 scds:
 - scd:project:training-competency

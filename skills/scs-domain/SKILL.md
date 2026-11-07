@@ -137,8 +137,8 @@ support.
 ## 4. Profile and people
 
 Ask the profile questions that apply and the people questions, from
-[references/intake.md](references/intake.md): leadership roles, who owns each concept, and who
-approves versions. Pace them, record each group of answers, and confirm proposals before
+[references/intake.md](references/intake.md): leadership roles, the person who holds each
+section owner role (`scs intake set owners`), and who approves versions. Pace them, record each group of answers, and confirm proposals before
 recording them.
 
 **Checkpoint:** commit the intake.

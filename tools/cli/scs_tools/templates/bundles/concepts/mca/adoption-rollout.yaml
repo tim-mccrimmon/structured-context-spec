@@ -3,6 +3,7 @@ type: concept
 version: DRAFT
 title: Adoption & Rollout Concept Bundle
 description: Phased AI rollout per department, with rollback triggers if a workflow is not working.
+owner: operations
 imports: []
 scds:
 - scd:project:adoption-rollout

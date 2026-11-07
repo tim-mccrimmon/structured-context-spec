@@ -194,6 +194,7 @@ scs bundle add-import bundle:security
 scs bundle add-scd --help
 scs bundle remove-scd --help            # retire an SCD
 scs bundle pin --help                   # pin an import to a released version
+scs bundle set-owner quality -b bundles/concepts/qms-records.yaml   # a section's owner role
 scs bundle diff                         # latest version -> working tree
 scs bundle diff --from 1.0.0 --to 1.1.0 --json
 scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme-health.org>"

@@ -67,19 +67,46 @@ If the user has no documents and no website, say that is fine and go on with the
 ## People
 
 Ask who is involved, and record them as an answer, `q-people-1`, so drafted items can cite
-it. Record each person by name and role; ask for an email only for someone who approves
-versions, unless the user offers it. Propose names and roles you find in the documents, and ask the user to confirm or correct
-them. Take the people in two messages: first who is involved and in which role; then, once
-that is settled, who owns which concept (for a Domain) and who approves versions.
-
-For concept owners, propose an owner for every concept yourself, from the people and their
-roles, as one table, and ask the user to confirm or correct it: that is one question. Never
-list the concepts with blanks for the user to fill in.
+it. Record each person by name and role; ask for an email only for a section owner or someone
+who approves versions, unless the user offers it. Propose names and roles you find in the
+documents, and ask the user to confirm or correct them. Take the people in two messages: first
+who is involved and in which role; then, once that is settled, who owns each section and who
+approves versions.
 
 - **Domain:** leadership roles that set or own the rules: for example CEO, CTO, CISO, quality,
-  regulatory, legal. Ask who owns each concept the ontology covers.
+  regulatory, legal.
 - **Project:** the team: lead, developers, quality or regulatory reviewer, and the business
   owner.
+
+### Section owners
+
+Every section (concept bundle) has an owner role: the person accountable for that section,
+who reviews and approves it. The templates give each concept a default role; `scs status`
+lists them under `owners.sections`, with `unmapped_roles` for roles no one holds yet. Propose
+a person for every role yourself, from the people and their roles, as one table (role, the
+sections it owns, the person, their title), and ask the user to confirm or correct it: that is
+one question. Never list the roles with blanks for the user to fill in. A person may hold
+several roles; a small organization often merges them.
+
+Record each role with its person (`Name <email>`):
+
+```
+scripts/scs_engine.py run scs intake set owners '{role: quality, person: Jane Doe <jane@acme.example>, title: VP Quality}' --workspace domain --dry-run
+```
+
+If the user wants a section owned by a different role than its default, change the bundle's
+role, then map the new role:
+
+```
+scripts/scs_engine.py run scs bundle set-owner regulatory --bundle bundles/concepts/compliance-governance.yaml --workspace domain --dry-run
+```
+
+A personal Domain has one role, `owner`: map it to the person. Versioning a section fails until
+its role is mapped (`VERSION_OWNER_UNMAPPED`), so settle owners before the first version. A
+change of person later is an intake change only and needs no new version; a change of role
+changes the bundle and needs one.
+
+### Approvers
 
 Then ask who approves new versions of this workspace's context, and record each person:
 
@@ -129,6 +156,7 @@ The engine validates each value against the intake schema. Pass YAML in these sh
 | `risk` | `{classification: ..., cites: [std:...], rationale: ...}` |
 | `certifications`, `data`, `boundaries`, `practices` | lists of strings; a new list replaces the old one |
 | `approvers`, `source_documents`, `answers` | one entry per call: added, or replacing the entry with the same `person` or `id` |
+| `owners` | `{role: ..., person: Name <email>, title: ...}`, one per call, replacing the entry with the same `role` |
 | `owner` | `Name <email>` |
 
 ## Answers

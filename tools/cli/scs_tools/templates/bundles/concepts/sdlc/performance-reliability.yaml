@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Performance & Reliability Concept Bundle"
 description: "Performance requirements, reliability targets, and resilience patterns for {{ display_name }}"
+owner: engineering
 
 imports: []
 
