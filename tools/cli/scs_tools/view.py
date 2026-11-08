@@ -447,9 +447,17 @@ def _release_table(layer: Dict[str, Any]) -> str:
         )
     if r.get("approved_by"):
         when = f" on {_e(r['approved_at'])}" if r.get("approved_at") else ""
-        rows.append(("Version approved by", f"{_e(r['approved_by'])}{when}"))
+        rows.append(("Released by", f"{_e(r['approved_by'])}{when}"))
     if r.get("approval_notes"):
-        rows.append(("Approval notes", _e(r["approval_notes"])))
+        rows.append(("Release notes", _e(r["approval_notes"])))
+    if not r["draft"]:
+        rows.append(
+            (
+                "Certification",
+                "Not part of this package. Where the organization certifies this version, "
+                "the certification is recorded in its own review or quality system.",
+            )
+        )
     if r.get("release_date"):
         rows.append(("Released", _e(r["release_date"])))
     if r.get("tag"):

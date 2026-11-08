@@ -68,10 +68,10 @@ If the user has no documents and no website, say that is fine and go on with the
 
 Ask who is involved, and record them as an answer, `q-people-1`, so drafted items can cite
 it. Record each person by name and role; ask for an email only for a section owner or someone
-who approves versions, unless the user offers it. Propose names and roles you find in the
+who releases versions, unless the user offers it. Propose names and roles you find in the
 documents, and ask the user to confirm or correct them. Take the people in two messages: first
 who is involved and in which role; then, once that is settled, who owns each section and who
-approves versions.
+releases versions.
 
 - **Domain:** leadership roles that set or own the rules: for example CEO, CTO, CISO, quality,
   regulatory, legal.
@@ -106,9 +106,10 @@ its role is mapped (`VERSION_OWNER_UNMAPPED`), so settle owners before the first
 change of person later is an intake change only and needs no new version; a change of role
 changes the bundle and needs one.
 
-### Approvers
+### Who releases versions
 
-Then ask who approves new versions of this workspace's context, and record each person:
+Then ask who releases new versions of this workspace's context, and record each person (the
+engine calls them approvers):
 
 ```
 scripts/scs_engine.py run scs intake set approvers '{person: Jane Doe <jane@acme.example>, role: Quality Manager}' --workspace domain --dry-run
@@ -176,4 +177,4 @@ Pass the YAML on stdin with a heredoc, as above, so no file is written. `answere
 omitted. Giving an existing `id` replaces that answer. The person answering is the author
 named when the workspace was created, unless the user says otherwise; do not ask again.
 A record for a public repository may name roles (`role:quality-manager`) instead of people,
-but a version's approver is always a person.
+but whoever releases a version is always a named person.

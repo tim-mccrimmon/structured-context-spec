@@ -29,8 +29,9 @@ do every write.
    the diagnostics.
 4. Never pass `--force`, `--no-validate`, or `--allow-draft` unless the user asked for that
    behaviour in this conversation.
-5. Never choose an approver, take one from git config or the environment without asking, or
-   record yourself or the model as one. Approvers are people the user names: `Name <email>`.
+5. Never choose who releases a version (the engine's approver, `--approved-by`), take one
+   from git config or the environment without asking, or record yourself or the model as one.
+   It is a person the user names: `Name <email>`.
 6. Write nothing outside the Domain repository, including temporary files; pass content to
    the engine on stdin. Source documents go nowhere but this conversation.
 7. Placing artifacts in AI services, multi-person review or approval workflows, hosted or
@@ -88,11 +89,11 @@ Before any question, tell the user in a short message:
 
 - what happens: creating the Project, gathering its documents, a few questions at a time about
   the work and the team, drafting its rules, reviewing them together with the Domain's, then
-  releasing a version that a named person approves and compiling it;
+  releasing a version in the name of a person they choose and compiling it;
 - what is needed on the computer: git, which SCS uses to keep each change and version (no
   GitHub account or git setup is needed), and the SCS tools; step 0 has already checked both;
 - what helps to have ready: the project brief or requirements, the team's names and roles, and
-  who approves a version;
+  who releases a version;
 - that the Domain's rules are fixed in this session: a conflict with one is recorded as a
   question for the Domain owner, not changed here;
 - that they can stop at any point; a new session picks up from `scs status`.
@@ -132,7 +133,7 @@ Domain documents are already in the Domain; do not record them again.
 Ask the Project profile questions and the team questions, from
 [references/intake.md](references/intake.md): the lead, the developers, the quality or
 regulatory reviewer, the business owner, the person who holds each section owner role
-(`scs intake set owners`), and who approves versions. Pace them, record each
+(`scs intake set owners`), and who releases versions. Pace them, record each
 group of answers, and confirm proposals before recording them.
 
 **Checkpoint:** commit the intake.

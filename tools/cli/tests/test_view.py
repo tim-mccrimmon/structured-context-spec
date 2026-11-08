@@ -138,7 +138,7 @@ def repo(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return root
 
 
-def test_a_released_project_shows_its_digest_approver_and_released_domain(repo: Path):
+def test_a_released_project_shows_its_digest_who_released_it_and_released_domain(repo: Path):
     code, data = run_json("view", "bundles/project-bundle.yaml", "--version", "1.0.0")
     assert code == 0, data
     result = data["result"]
@@ -148,7 +148,9 @@ def test_a_released_project_shows_its_digest_approver_and_released_domain(repo: 
     html = (repo / "projects/app" / result["path"].split("projects/app/")[1]).read_text()
     assert result["source_digest"] in html
     assert "Matches the released version" in html
-    assert "Sam Lee" in html
+    assert "<th>Released by</th><td>Sam Lee" in html
+    assert "approved by" not in html.lower()
+    assert "<th>Certification</th><td>Not part of this package." in html
     assert "Prohibited: pastebins." in html
     assert "Prohibited: shared passwords." in html
     assert "projects/app/bundles/app-v1.0.0-MANIFEST.yaml" not in html

@@ -1,8 +1,15 @@
 # Versioning
 
 A version is a git tag, `<workspace>/<bundle-name>-v<version>`, on a commit holding the whole
-workspace, with a manifest recording the approver and a content digest. It cannot be changed
-without detection. A named person approves it, never you. Validate before versioning.
+workspace, with a manifest recording who released it and a content digest. It cannot be
+changed without detection. A person the user names releases it, never you. Validate before
+versioning.
+
+Releasing is not certifying. The person who releases a version authorizes it into the
+repository; the engine records them as the approver (`--approved-by`, `version_approved_by`).
+Where an organization formally approves its AI context, in a review or quality system, that
+happens afterwards and outside SCS. Say "released by", not "approved by", so the two are not
+confused.
 
 ## 1. Show what changes
 
@@ -22,11 +29,11 @@ report.
 List the review findings still `deferred` (`scs status`, `intake.deferred`) and raise each
 again. They never block the version.
 
-## 3. Get the approver and the version
+## 3. Get who releases it and the version
 
-Ask the user who approves this version, as `Name <email>`. The approver is recorded as the
-commit's author. If the engine's diagnostics suggest a value (`suggestion.approved_by`), you may
-offer it, but only the user's answer counts. Ask for optional version notes.
+Ask the user who releases this version, as `Name <email>`. They are recorded as the approver
+(`--approved-by`) and as the commit's author. If the engine's diagnostics suggest a value
+(`suggestion.approved_by`), you may offer it, but only the user's answer counts. Ask for optional version notes.
 
 Ask which version to release; never choose it. Show the latest version (`scs status`,
 `latest_version`) and suggest the next one: patch for wording fixes, minor for added rules,
@@ -51,7 +58,7 @@ root as well as each concept bundle:
 - the pin it changes in the root (`scs bundle pin <name> --version <v>`);
 - the commit and the tag `<workspace>/<bundle-name>-v<version>`.
 
-One confirmation, naming the approver, may cover the whole plan. It covers versioning and
+One confirmation, naming who releases it, may cover the whole plan. It covers versioning and
 pinning only: compiling comes after the versions are reported, with its own dry run and yes.
 Then run each step's `--dry-run` first; if its `changes` differ from the plan, stop and show
 the user.

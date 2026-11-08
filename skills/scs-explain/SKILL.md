@@ -27,8 +27,9 @@ package, into the workspace's `dist/` directory.
    the diagnostics.
 4. Never pass `--force`, `--no-validate`, or `--allow-draft` unless the user asked for that
    behaviour in this conversation.
-5. Never choose an approver, take one from git config or the environment without asking, or
-   record yourself or the model as one. Approvers are people the user names: `Name <email>`.
+5. Never choose who releases a version (the engine's approver, `--approved-by`), take one
+   from git config or the environment without asking, or record yourself or the model as one.
+   It is a person the user names: `Name <email>`.
 6. Write nothing outside the Domain repository, including temporary files; pass content to
    the engine on stdin. Source documents go nowhere but this conversation.
 7. Placing artifacts in AI services, multi-person review or approval workflows, hosted or
@@ -59,7 +60,9 @@ version. That distinguishes it from retrieved context, which changes with every 
   project's. Both live in one git repository, the Domain repository, and each compiles to its
   own artifact.
 - Content is **prohibitions** (absolute), **directives** (instructions), and **facts**.
-- A **version** is a git tag with an approver and a content digest; changing it is detectable.
+- A **version** is a git tag naming who released it, with a content digest; changing it is
+  detectable. Releasing a version is not certifying it: where an organization formally approves
+  its AI context, that happens afterwards in its own review or quality system, outside SCS.
 - SCS ends at the validated, versioned bundle and its compiled artifact. Placing artifacts in
   AI services, review workflows, registries, and runtime serving are outside it.
 
@@ -111,11 +114,13 @@ are `<bundle-name>/<scd-name>/<id>`, so any rule can be traced to its bundle and
 ## Review package
 
 A review package is one self-contained HTML file showing a bundle the way its reviewers need
-it: the release (version, content digest and whether it matches, approver), a summary built
-from counts, a contents tree, and every prohibition, rule, and fact word for word with its id,
+it: the release (version, content digest and whether it matches, who released it), a summary
+built from counts, a contents tree, and every prohibition, rule, and fact word for word with its id,
 source, citations, and the exact line the AI receives. A Project's package also shows the
 Domain's rules, marked as inherited. Nothing in it is written by AI, and the same release
-always produces the same file, so it can be attached to a review or approval record.
+always produces the same file, so it can be attached to a review or approval record. It names
+who released the version, not who certified it: it is made before any certification, which is
+recorded in the organization's own system.
 
 ```
 scripts/scs_engine.py run scs view <bundle-file> --version <v> --dry-run

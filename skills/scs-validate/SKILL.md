@@ -27,8 +27,9 @@ judge of validity; never decide it yourself.
    the diagnostics.
 4. Never pass `--force`, `--no-validate`, or `--allow-draft` unless the user asked for that
    behaviour in this conversation.
-5. Never choose an approver, take one from git config or the environment without asking, or
-   record yourself or the model as one. Approvers are people the user names: `Name <email>`.
+5. Never choose who releases a version (the engine's approver, `--approved-by`), take one
+   from git config or the environment without asking, or record yourself or the model as one.
+   It is a person the user names: `Name <email>`.
 6. Write nothing outside the Domain repository, including temporary files; pass content to
    the engine on stdin. Source documents go nowhere but this conversation.
 7. Placing artifacts in AI services, multi-person review or approval workflows, hosted or
