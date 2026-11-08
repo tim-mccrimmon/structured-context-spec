@@ -55,7 +55,8 @@ its README.
 
 In the same message, ask one optional question: is there a website whose pages should inform the
 answers (the organization's site for a Domain, the product's or client's for a Project)? If the
-user gives one, read the pages they name; the home page and an About page are usually enough.
+user gives one, read the pages they name with your web-reading tool (WebFetch in Claude Code),
+not a shell command such as `curl`; the home page and an About page are usually enough.
 Save the text of each page as a dated Markdown copy in `sources/`, named
 `website-<host>-<page>-<YYYY-MM-DD>.md`, starting with the URL and the date it was read; show
 the file names and get a yes first, as for any write. Record each copy like a document, with its
@@ -67,8 +68,8 @@ If the user has no documents and no website, say that is fine and go on with the
 ## People
 
 Ask who is involved, and record them as an answer, `q-people-1`, so drafted items can cite
-it. Record each person by name and role; ask for an email only for a section owner or someone
-who releases versions, unless the user offers it. Propose names and roles you find in the
+it. Record each person by name and role; ask for an email only from whoever releases versions,
+unless the user offers it. Propose names and roles you find in the
 documents, and ask the user to confirm or correct them. Take the people in two messages: first
 who is involved and in which role; then, once that is settled, who owns each section and who
 releases versions.
@@ -88,10 +89,11 @@ sections it owns, the person, their title), and ask the user to confirm or corre
 one question. Never list the roles with blanks for the user to fill in. A person may hold
 several roles; a small organization often merges them.
 
-Record each role with its person (`Name <email>`):
+Record each role with its person's name and title. Do not ask for owners' emails; record one
+only if the user gives it (`Jane Doe <jane@acme.example>`):
 
 ```
-scripts/scs_engine.py run scs intake set owners '{role: quality, person: Jane Doe <jane@acme.example>, title: VP Quality}' --workspace domain --dry-run
+scripts/scs_engine.py run scs intake set owners '{role: quality, person: Jane Doe, title: VP Quality}' --workspace domain --dry-run
 ```
 
 If the user wants a section owned by a different role than its default, change the bundle's
@@ -157,7 +159,7 @@ The engine validates each value against the intake schema. Pass YAML in these sh
 | `risk` | `{classification: ..., cites: [std:...], rationale: ...}` |
 | `certifications`, `data`, `boundaries`, `practices` | lists of strings; a new list replaces the old one |
 | `approvers`, `source_documents`, `answers` | one entry per call: added, or replacing the entry with the same `person` or `id` |
-| `owners` | `{role: ..., person: Name <email>, title: ...}`, one per call, replacing the entry with the same `role` |
+| `owners` | `{role: ..., person: Name, title: ...}` (email optional), one per call, replacing the entry with the same `role` |
 | `owner` | `Name <email>` |
 
 ## Answers

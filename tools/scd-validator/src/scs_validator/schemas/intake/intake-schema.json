@@ -73,12 +73,12 @@
             "pattern": "^[a-z0-9][a-z0-9-]*$",
             "description": "An owner role named by a bundle's owner field"
           },
-          "person": {"$ref": "#/$defs/person"},
+          "person": {"$ref": "#/$defs/owner_person"},
           "title": {"type": "string", "minLength": 1, "description": "Job title"}
         },
         "additionalProperties": false
       },
-      "description": "Who holds each owner role: the person accountable for the sections with that role, who reviews and approves them (D-92). Outside the content digest, so a change of person needs no new version"
+      "description": "Who holds each owner role: the person accountable for the sections with that role, who reviews and approves them (D-92). The person is a name; the email is optional. Outside the content digest, so a change of person needs no new version"
     },
     "source_documents": {
       "type": "array",
@@ -193,6 +193,13 @@
       "type": "string",
       "pattern": "^[^<>\\s][^<>]*\\s<[^<>\\s@]+@[^<>\\s@]+>$",
       "not": {"pattern": "^role:"}
+    },
+    "owner_person": {
+      "description": "A section owner: Name, or Name <email> (D-92). The email is optional for owners; whoever releases a version is always Name <email>",
+      "anyOf": [
+        {"$ref": "#/$defs/person"},
+        {"type": "string", "pattern": "^[^<>\\s][^<>]*[^<>\\s]$", "not": {"pattern": "^role:"}}
+      ]
     },
     "role": {
       "description": "Role-only attribution, role:<name>, allowed in intake.yaml only (D-28)",

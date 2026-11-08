@@ -60,7 +60,7 @@ def set_field(envelope, out, field, value, workspace, dry_run):
         scs intake set audience organization
         scs intake set certifications '[std:iso-13485:2016, std:iec-62304:2006-a1]'
         scs intake set approvers '{person: Jane Doe <jane@acme-health.org>, role: QA Lead}'
-        scs intake set owners '{role: quality, person: Jane Doe <jane@acme-health.org>}'
+        scs intake set owners '{role: quality, person: Jane Doe, title: VP Quality}'
         scs intake set answers - < answer.yaml
     """
     stdin = sys.stdin.read() if value == "-" else None

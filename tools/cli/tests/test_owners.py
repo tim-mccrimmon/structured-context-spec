@@ -126,6 +126,17 @@ def test_owners_upsert_by_role(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     assert intake["owners"] == [{"role": "quality", "person": "Lee Wu <lee@acme.example>"}]
     code, data = run_json("intake", "set", "owners", "{role: quality, person: role:qa}")
     assert code != 0 and "INTAKE_SCHEMA_INVALID" in codes(data)
+    code, data = run_json("intake", "set", "owners", "{role: quality, person: Lee <bad}")
+    assert code != 0 and "INTAKE_SCHEMA_INVALID" in codes(data)
+
+
+def test_an_owner_needs_no_email(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    repo = new_repo(tmp_path, monkeypatch, "personal")
+    code, data = run_json(
+        "intake", "set", "owners", "{role: owner, person: Jo Doe, title: Founder}"
+    )
+    assert code == 0, data
+    assert "BUNDLE_OWNER_UNMAPPED" not in [d["code"] for d in validate(repo)]
 
 
 def test_versioning_needs_an_owner_mapped_to_a_person(

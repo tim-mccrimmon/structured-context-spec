@@ -58,6 +58,9 @@ root as well as each concept bundle:
 - the pin it changes in the root (`scs bundle pin <name> --version <v>`);
 - the commit and the tag `<workspace>/<bundle-name>-v<version>`.
 
+Write out every file by its name, including the root bundle file the pin changes; never "its
+manifest" or "the root".
+
 One confirmation, naming who releases it, may cover the whole plan. It covers versioning and
 pinning only: compiling comes after the versions are reported, with its own dry run and yes.
 Then run each step's `--dry-run` first; if its `changes` differ from the plan, stop and show

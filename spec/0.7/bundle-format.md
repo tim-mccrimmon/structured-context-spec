@@ -769,8 +769,9 @@ publicly, the record MAY use role-only attribution instead, written `role:<name>
 manifest's approver is always a person.
 
 The record's `owners` list maps each owner role named by the workspace's bundles (§5.1) to the
-person who holds it: `role`, `person` (`Name <email>`, never role-only), and an optional
-`title`. One person MAY hold several roles.
+person who holds it: `role`, `person` (a name, `Name` or `Name <email>`, never role-only),
+and an optional `title`. The email MAY be omitted for an owner; the person who releases a
+version is always `Name <email>`. One person MAY hold several roles.
 
 ### 8.5 Versions in the Repository
 
