@@ -343,7 +343,7 @@ async def score(run: dict, scenario: dict, api, config: dict, meter: Meter) -> d
     names = sorted(set(scenario["targets"]) | set(checks.CROSS_CUTTING))
     results = {}
     judged = {"e": score_e, "l": score_l, "n": score_n, "o": score_o, "p": score_p,
-              "t": score_t}
+              "t": score_t, "u": score_u}
     for name in names:
         if name in judged:
             results[name] = await judged[name](run, scenario, api, config, meter)
@@ -436,7 +436,7 @@ async def score_o(run: dict, scenario: dict, api, config: dict, meter: Meter) ->
         f"Message {at} asks the user for documents. In messages 0 to {at}, does the assistant ask "
         "any profile question before that request for documents? Profile questions are about "
         "the organization, its certifications, its boundaries or rules, the people and their "
-        "roles, who approves versions, or the project's purpose, technology, data, or risk. "
+        "roles, who releases versions, or the project's purpose, technology, data, or risk. "
         "Questions about the name, the folder, the author, whether the user is an individual or "
         "an organization, whether they are regulated, or the ontology are not profile "
         "questions. Answer true if a profile question comes first.",
@@ -466,6 +466,25 @@ async def score_p(run: dict, scenario: dict, api, config: dict, meter: Meter) ->
         evidence[:60000],
     )
     return verdict_result(verdict, expected=False)
+
+
+async def score_u(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:
+    """Section owners: every role held by the end, proposed as one table to confirm (D-92)."""
+    result = checks.owner_gaps(run, scenario)
+    if result["status"] != "pass":
+        return result
+    evidence = "\n\n".join(f"MESSAGE {t}:\n{turn['assistant']}"
+                            for t, turn in enumerate(run["turns"]))
+    verdict = await judge(
+        api, config["models"]["judge"], meter,
+        "Section owners are the people accountable for each section (concept) of the context. "
+        "Does the assistant propose a person for every section owner role itself, in one "
+        "table or list (role, the sections it owns, the person), and ask the user to confirm "
+        "or correct it, rather than listing roles or sections with blanks for the user to fill "
+        "in or asking about each role separately? Answer true only if it does.",
+        evidence[:60000],
+    )
+    return verdict_result(verdict)
 
 
 async def score_t(run: dict, scenario: dict, api, config: dict, meter: Meter) -> dict:

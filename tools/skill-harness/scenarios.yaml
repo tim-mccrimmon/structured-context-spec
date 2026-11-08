@@ -28,7 +28,7 @@ scenarios:
   domain-init:
     fixture: empty
     init: true
-    targets: [j, n, o, p, s]
+    targets: [j, n, o, p, s, u]
     # The sandbox refuses writes to .git/config and .git/hooks, so git init cannot run in it;
     # this scenario runs with a guard hook instead (harness.py, bash_guard).
     sandbox: false
@@ -46,7 +46,9 @@ scenarios:
         CTO, owns the AI policy; you, Pat Lee, Quality Manager.
       - Boundaries: no consumer AI chat services with company or patient data; never use real
         patient data in development.
-      - Approver for versions, if asked: Pat Lee <pat@acme-health.org>, Quality Manager.
+      - Who releases versions, if asked: Pat Lee <pat@acme-health.org>, Quality Manager.
+      - Section owners: accept sensible proposals; Sam owns AI governance and security, you
+        own quality, Morgan owns anything executive.
       - Goal: the Domain exists, your policy is recorded, the company's answers and people are
         recorded, and that work is committed. You do not need to draft rules or release a
         version in this conversation; when the assistant moves on to drafting, you are done.
@@ -79,7 +81,7 @@ scenarios:
   project-init:
     fixture: released
     init: true
-    targets: [j, n, o, p, s]
+    targets: [j, n, o, p, s, u]
     workspace: portal
     max_user_turns: 24
     budget_usd: 5.00
@@ -94,7 +96,9 @@ scenarios:
         developers; you, Pat Lee, quality reviewer; Morgan Chen, business owner.
       - The portal handles PHI and PII, no payment data. No software safety class applies.
       - Boundaries: none beyond the company's.
-      - Approver for versions, if asked: Pat Lee <pat@acme-health.org>.
+      - Who releases versions, if asked: Pat Lee <pat@acme-health.org>.
+      - Section owners: accept sensible proposals; Riley owns anything product or technical,
+        you own quality, Morgan owns anything business.
       - Goal: the portal project exists, the brief is recorded, the project's answers and team
         are recorded, and that work is committed. You do not need to draft rules or release a
         version; when the assistant moves on to drafting, you are done.

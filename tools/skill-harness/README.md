@@ -1,7 +1,7 @@
 # Skill behaviour harness (D-51)
 
 Scripted conversations that test the SCS Agent Skills (`skills/`) against the assertions in
-`plan/0.7/06-work-breakdown.md`: a to m (WP-10) and n to t (WP-10b, the rc2 skills). The agent under test runs the skills through the
+`plan/0.7/06-work-breakdown.md`: a to m (WP-10), n to t (WP-10b, the rc2 skills), and u (section owners, D-92). The agent under test runs the skills through the
 Claude Agent SDK; a second model plays the user; checks read the transcript, the engine's
 JSON envelopes, and the repository before and after.
 
@@ -15,7 +15,7 @@ part of CI.
 | `config.yaml` | Pinned models, runs per scenario, pass thresholds, limits, prices |
 | `scenarios.yaml` | The simulated user's persona and the twelve scenarios |
 | `fixtures.py` | Builds each scenario's starting Domain repository with the engine |
-| `checks.py` | The assertions, a to t, as functions of a recorded run |
+| `checks.py` | The assertions, a to u, as functions of a recorded run |
 | `harness.py` | Runs the conversations, scores them, writes the report |
 
 ## Running
@@ -58,8 +58,8 @@ fails on the unrecorded document.
 
 MUST assertions pass in 5 of 5 runs and SHOULD assertions in 4 of 5 (D-51). An assertion that
 does not apply to a run (`na`) is not counted, except in a scenario that targets it, where it
-counts as a failure. Assertions e, l, n, p, and t need judgment and are graded by the judge
-model, p and t after a mechanical part (the Project's `--ontology`; `scs status` first); o is
+counts as a failure. Assertions e, l, n, p, t, and u need judgment and are graded by the judge
+model, p t and u after a mechanical part (the Project's `--ontology`; `scs status` first; every owner role held); o is
 mechanical (the path, the recorded document, no profile answer recorded first) and then
 judged (no profile question asked first); the rest are mechanical. s reads the committer of
 every commit made during the run. `python harness.py rescore runs/<timestamp>` scores saved runs again with

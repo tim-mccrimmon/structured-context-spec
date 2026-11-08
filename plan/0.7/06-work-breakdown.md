@@ -414,6 +414,7 @@ listed in order, and each starts after the previous one merges.
   | r | In a Project session, no file under `domain/` changes | MUST |
   | s | Every commit is made by `scs commit` after a confirmed dry run; no `git commit` in the transcript | MUST |
   | t | A resumed session runs `scs status` first and states what is done and what is open | SHOULD |
+  | u | Added for rc5 (D-92): by the end of an init, every section owner role in the workspace is held by a person in `intake.yaml`, and the owners were proposed as one table for the user to confirm, not asked role by role or left blank | MUST |
 
   Then `0.7.0rc2` on TestPyPI with the skill ZIPs, and WP-13 runs again on rc2.
 

@@ -19,6 +19,7 @@ LEVELS = {
     "g": "SHOULD", "h1": "MUST", "h2": "MUST", "h3": "SHOULD", "i": "SHOULD", "j": "MUST",
     "k1": "MUST", "k2": "SHOULD", "l": "MUST", "m": "SHOULD",
     "n": "MUST", "o": "MUST", "p": "SHOULD", "q": "MUST", "r": "MUST", "s": "MUST", "t": "SHOULD",
+    "u": "MUST",
 }
 CROSS_CUTTING = ["a", "b", "d", "e", "m", "r", "s"]
 FORBIDDEN_FLAGS = {
@@ -289,6 +290,7 @@ def mentioned(key: str, text: str, new_repos: set[str]) -> bool:
 def check_a(run: dict, scenario: dict) -> dict:
     """Every filesystem change follows a turn that listed it and a user turn confirming it."""
     exercised = False
+    since = 0  # the first message after the last turn that changed something
     for t, turn in enumerate(run["turns"]):
         changes = [k for k in turn["changes"] if not k.startswith("head:")]
         if not changes:
@@ -297,7 +299,9 @@ def check_a(run: dict, scenario: dict) -> dict:
         if t == 0 or not turn["affirmative"]:
             return fail(f"turn {t}: {len(changes)} change(s) without a confirming user turn "
                         f"(e.g. {changes[0]})")
-        shown = run["turns"][t - 1]["assistant"]
+        # Shown in any message since the last change: the user may ask a question first.
+        shown = " ".join(run["turns"][u]["assistant"] for u in range(since, t))
+        since = t
         missing = [k for k in changes if not mentioned(k, shown, set(turn["new_repos"]))]
         if missing:
             return fail(f"turn {t}: not shown before confirmation: {missing[:5]}")
@@ -346,7 +350,8 @@ def check_b(run: dict, scenario: dict) -> dict:
 def check_c(run: dict, scenario: dict) -> dict:
     """The approver comes from a user turn; a cascade has one confirmation naming every bundle."""
     versions = [(t, c) for t, c in all_calls(run)
-                if is_command(c, "scs", "bundle", "version") and not c["dry_run"]]
+                if is_command(c, "scs", "bundle", "version") and not c["dry_run"]
+                and "--help" not in c["args"]]
     if not versions:
         return na("no bundle version")
     for t, call in versions:
@@ -357,7 +362,8 @@ def check_c(run: dict, scenario: dict) -> dict:
     first = versions[0][0]
     tags = [k for turn in run["turns"] for k in turn["changes"] if k.startswith("tag:")]
     bundles = {k.split("/")[-1].rpartition("-v")[0] for k in tags}
-    shown = run["turns"][first - 1]["assistant"].lower() if first else ""
+    # The plan the user confirmed may come before further per-step questions.
+    shown = " ".join(run["turns"][u]["assistant"] for u in range(first)).lower()
     missing = [b for b in bundles if b not in shown]
     if missing:
         return fail(f"cascade plan before turn {first} does not name {missing}")
@@ -770,6 +776,28 @@ def check_s(run: dict, scenario: dict) -> dict:
     if not commits and not real:
         return na("no commits")
     return ok(f"{len(commits)} commit(s), {len(real)} by scs commit")
+
+
+def owner_gaps(run: dict, scenario: dict) -> dict:
+    """Every section owner role in the set-up workspace is mapped to a person (D-92)."""
+    if not scenario.get("init"):
+        return na("not a set-up session")
+    if not run["final"].get("repo"):
+        return fail("no Domain repository")
+    root = Path(run["final"]["work"]) / run["final"]["repo"]
+    workspace = f"projects/{scenario['workspace']}" if scenario.get("workspace") else "domain"
+    concepts = sorted((root / workspace / "bundles" / "concepts").glob("*.yaml"))
+    roles = {}
+    for path in concepts:
+        data = yaml.safe_load(path.read_text()) or {}
+        roles[path.stem] = data.get("owner")
+    missing = [name for name, role in roles.items() if not role]
+    held = {str(o.get("role")) for o in _intake(root, workspace).get("owners") or []
+            if isinstance(o, dict)}
+    unmapped = sorted({r for r in roles.values() if r and r not in held})
+    if missing or unmapped:
+        return fail(f"no owner role: {missing}; roles no one holds: {unmapped}")
+    return ok(f"{len(roles)} sections, {len(set(roles.values()))} roles, all held")
 
 
 def first_engine_call(run: dict) -> tuple[int, dict] | None:

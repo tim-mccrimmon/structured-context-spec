@@ -260,6 +260,8 @@ def invalid(work: Path, env: dict) -> dict:
 def ready(work: Path, env: dict) -> dict:
     repo = _domain(work, env)
     _prohibitions(repo, GOOD)
+    # The one owner role is held (D-92), so versioning is not refused for it.
+    run(env, repo / "domain", "scs", "intake", "set", "owners", "{role: owner, person: Pat Lee}")
     run(env, repo, "scs", "intake", "record-finding", "--workspace", "domain", "--id", "rf-1",
         "--kind", "missing-protection", "--target", "scd:project:prohibited#NO-001",
         "--finding", "No approved alternative is named for personal AI accounts",
