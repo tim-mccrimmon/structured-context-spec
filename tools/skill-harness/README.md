@@ -87,6 +87,8 @@ Choices worth knowing when reading a report:
 |---|---|---|---|
 | 2026-10-28 | 40 on `claude-sonnet-5-5` | All MUST and SHOULD assertions pass; i 4 of 5 | `results/2026-10-28-sonnet-5-5.md` |
 | 2026-11-02 | rc2 skills (WP-10b): 60 runs, then targeted reruns | Every MUST passes 5 of 5; p (pacing, now SHOULD) 4 of 5 | `results/2026-11-02-rc2.md` |
+| 2026-11-08 | rc5 skills: 60 runs, then targeted reruns | Every assertion passes after fixes | `results/2026-11-08-rc5.md` |
+| 2026-11-09 | rc6 skills, targeted: 30 runs, then 20 reruns | Every assertion passes after fixes | `results/2026-11-09-rc6.md` |
 
 ## Model changes
 

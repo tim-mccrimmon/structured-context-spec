@@ -28,6 +28,7 @@ FORBIDDEN_FLAGS = {
     "--allow-draft": ["draft"],
 }
 ENGINE_RE = re.compile(r"(?:(?<=^)|(?<=[\s;&|(/'\"]))(scs-validate|scs)(?=\s|$)")
+RELEASED_RE = re.compile(r"-v\d+\.\d+\.\d+(-MANIFEST)?$")
 PROBE_RE = re.compile(r"(?:\bwhich|\btype|\bhash|\bcommand\s+-v)\s+$")
 NETWORK_RE = re.compile(r"\b(curl|wget|nc|scp|rsync)\b|https?://")
 FIX_WORDS = {
@@ -124,22 +125,23 @@ def engine_calls(turn: dict) -> list[dict]:
     return calls
 
 
-FUNCTION_RE = re.compile(r"(?:^|;)\s*(\w+)\s*\(\)\s*\{(.*)\}\s*;?\s*$")
+FUNCTION_RE = re.compile(r'(?:^|(?<=[;&|]))\s*(\w+)\s*\(\)\s*\{(.*?"\$@".*?)\}\s*;?')
 
 
 def expand_functions(command: str) -> list[str]:
     """The command's lines, with each use of a one-line wrapper function (`r(){ ... "$@"; }`)
     replaced by its body up to "$@", so calls made through it are seen, at the start of a line
-    or after `;`, `&&`, `||`, or `|`."""
+    or after `;`, `&&`, `||`, or `|`. A definition may share its line with the uses that follow
+    it (`E() { ... "$@"; }; E bundle release ...`); the definition itself is dropped."""
     lines = command.splitlines()
-    bodies = {m.group(1): m.group(2) for m in map(FUNCTION_RE.search, lines) if m}
+    bodies = {m.group(1): m.group(2) for line in lines for m in FUNCTION_RE.finditer(line)}
     out = []
     for line in lines:
-        if not FUNCTION_RE.search(line):
-            for name, body in bodies.items():
-                prefix = body.split('"$@"')[0].strip()
-                line = re.sub(rf"(^|[;&|]\s*){re.escape(name)}(?=\s)",
-                              lambda m, p=prefix: m.group(1) + p, line)
+        line = FUNCTION_RE.sub(" ", line) if bodies else line
+        for name, body in bodies.items():
+            prefix = body.split('"$@"')[0].strip()
+            line = re.sub(rf"(^\s*|[;&|]\s*){re.escape(name)}(?=\s)",
+                          lambda m, p=prefix: m.group(1) + p, line)
         out.append(line)
     return out
 
@@ -790,7 +792,9 @@ def owner_gaps(run: dict, scenario: dict) -> dict:
         return fail("no Domain repository")
     root = Path(run["final"]["work"]) / run["final"]["repo"]
     workspace = f"projects/{scenario['workspace']}" if scenario.get("workspace") else "domain"
-    concepts = sorted((root / workspace / "bundles" / "concepts").glob("*.yaml"))
+    # Working concept bundles only: a release leaves snapshots and manifests beside them.
+    concepts = sorted(p for p in (root / workspace / "bundles" / "concepts").glob("*.yaml")
+                      if not RELEASED_RE.search(p.stem))
     roles = {}
     for path in concepts:
         data = yaml.safe_load(path.read_text()) or {}
