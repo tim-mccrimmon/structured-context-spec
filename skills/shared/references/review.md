@@ -21,6 +21,15 @@ Look both ways: for rules that are too loose, and for rules too tight to let the
 useful. Base framework findings on what a citation names and on what you know of the
 framework; say when you are unsure, and never quote a standard's text as if you had it.
 
+## Sweep the sources
+
+Before the review settles, go through each source document clause by clause, and check that
+every clause relevant to AI use is drafted into an item (it appears in some `derived_from`),
+deliberately left out, or raised with the user. List the clauses nothing covers, by document
+and locator, and ask the user about each: draft it, leave it out, or defer it. A clause left
+out because it informs people rather than the assistant (see [drafting.md](drafting.md), "Writing for the
+assistant") is listed too, so the user sees it was considered.
+
 ## Presenting a finding
 
 Present findings a few at a time, most serious first. For each, in plain language:

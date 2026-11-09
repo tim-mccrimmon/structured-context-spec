@@ -40,6 +40,34 @@ Ids are unique within an SCD across all three (`DC-001`, `NO-002`). Standards ap
 citations (`std:iso-13485:2016#7.3.9`); never copy a standard's text into an SCD, even if the
 user pastes it.
 
+## Writing for the assistant
+
+Everything compiled is read by an AI assistant in the middle of a task. A policy is usually
+written for people, so drafting it faithfully can produce rules the assistant cannot act on.
+For each item, ask: could the assistant do this, or know this, while helping someone?
+
+- **A directive says what the assistant does when it meets the case.** "Check content before
+  it is sent outside the company" is a control someone else runs; the assistant cannot
+  intercept anything. Write what it does itself: "When drafting content for an external
+  recipient, leave out customer names and internal project codes, and point out any you were
+  given."
+- **Administration is not the assistant's.** Which model version is approved, how accounts are
+  provisioned, who grants access, how vendors are qualified, how long records are kept: these
+  inform people. Leave them out of prohibitions, directives, and facts. If the user wants them
+  kept, put them in the SCD's `summary`, which is not compiled, and say so. Keep a fact only
+  when the assistant needs it to answer or act correctly, such as which tool is approved for a
+  task.
+- **A detection pattern is not a rule.** A list of what a monitoring tool looks for (card
+  number formats, keyword lists) tells the assistant nothing to do. Draft the behaviour behind
+  it instead, usually a prohibition on the data itself, or leave it out.
+- **Facts state what is true now.** When a source describes a process that is planned or not
+  yet in operation, say so in the fact ("A review board is planned; until it meets, the CTO
+  approves new AI tools"), and keep the same tense for every such process. Never state a
+  planned process as current. Ask the user when the source does not say which it is.
+
+When you leave something out or move it to `summary`, tell the user what and why, so the
+decision is theirs.
+
 ## Provenance
 
 Give every item a `derived_from` entry:

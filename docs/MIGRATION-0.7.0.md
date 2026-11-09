@@ -373,6 +373,10 @@ These edit the files' text, so comments and layout survive.
   and fix until the rules settle. Section owners and who releases versions are asked at
   release, where the engine enforces them. A Project session assesses the Domain and the
   Project together; Domain issues become questions for the Domain owner.
+- **Drafting guidance for the assistant as reader.** The skills write each directive as what
+  the assistant does when it meets the case, keep administration and detection patterns out of
+  compiled content (or in the uncompiled `summary`, if the user wants them kept), state planned
+  processes as planned, and sweep the sources for uncovered clauses before the review settles.
 - **One confirmation may cover a batch of writes** (`agent-interface.md` §7). An agent shows
   every planned change in the batch first and asks again if a dry run differs. Commits,
   versions, and tags keep their own confirmation.

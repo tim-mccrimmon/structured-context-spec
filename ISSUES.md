@@ -12,11 +12,10 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-80 issues: open 26 · in-progress 1 · proposed 1 · deferred 3 · done 49.
+80 issues: open 25 · in-progress 1 · proposed 1 · deferred 3 · done 50.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
-| rc6 | ISS-062 | Skills: drafting guidance for the assistant as reader | open | high | M | no | strong |
 | rc7 | ISS-068 | Approval record and check | open | high | M | yes | strong |
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.7.0 | ISS-055 | Acceptance test: real Domains through the skills (WP-13) | in-progress | high | M | no | strong |
@@ -1126,7 +1125,8 @@ no engine command and meant recreating the repository. Add a command that change
 step (a new version where released content changes).
 
 ### ISS-062 - Skills: drafting guidance for the assistant as reader
-**Status:** open
+**Status:** done (2026-11-09, rc6): drafting.md "Writing for the assistant"; review.md
+"Sweep the sources"; the audience marker itself stays ISS-064 (0.8)
 **Target:** rc6 · **Priority:** high · **Effort:** M · **Spec:** no · **Evidence:** strong
 Drafting faithfully from a policy produced rules an assistant cannot act on (checks "before
 content is sent", model pinning, account setup), detection patterns turned into rules, facts

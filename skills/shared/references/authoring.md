@@ -64,7 +64,7 @@ A Project cannot lift a Domain prohibition. Changing one needs a new Domain vers
 | Field | Required | Notes |
 |---|---|---|
 | `id` | yes | Unique within the SCD |
-| `directive` | yes | One instruction, as the agent should read it |
+| `directive` | yes | One instruction: what the assistant does when it meets the case ([drafting.md](drafting.md)) |
 | `cites` | no | Citations |
 
 ## Facts
