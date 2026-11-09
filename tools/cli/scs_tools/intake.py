@@ -53,6 +53,17 @@ def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _citations(value: Any) -> List[str]:
+    """Every string in an intake value that starts with `std:`."""
+    if isinstance(value, str):
+        return [value] if value.startswith("std:") else []
+    if isinstance(value, dict):
+        return [c for v in value.values() for c in _citations(v)]
+    if isinstance(value, list):
+        return [c for v in value for c in _citations(v)]
+    return []
+
+
 class Record:
     """A workspace's intake record, read but not yet written."""
 
@@ -101,11 +112,14 @@ class Record:
         schema_dir = _schema_dir()
         errors = schema_errors(self.data, schema_dir)
         if errors:
-            raise CommandError(
-                "INTAKE_SCHEMA_INVALID",
-                "The change would make the intake record invalid: " + "; ".join(errors),
-                path=self.shown(),
-            )
+            message = "The change would make the intake record invalid: " + "; ".join(errors)
+            if any("+" in c for c in _citations(self.data)):
+                message += (
+                    ". A citation edition cannot contain '+': write an amended edition as a slug,"
+                    " for example std:iec-62304:2006-a1 for IEC 62304:2006+A1:2015"
+                    " (spec/0.7/citations.md section 3)"
+                )
+            raise CommandError("INTAKE_SCHEMA_INVALID", message, path=self.shown())
         schema = json.loads(schema_dir.joinpath(*SCHEMA).read_text(encoding="utf-8"))
         order = list(schema["properties"])
         ordered = {k: self.data[k] for k in sorted(self.data, key=order.index)}

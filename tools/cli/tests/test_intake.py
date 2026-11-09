@@ -119,6 +119,18 @@ def test_intake_set_refuses_an_invalid_change(repo: Path, field, value, code, ex
     assert (app / "intake.yaml").read_bytes() == before
 
 
+def test_a_citation_with_a_plus_is_refused_with_the_slug_form_named(repo: Path):
+    data = envelope(
+        run("intake", "set", "certifications", "[std:iec-62304:2006+a1:2015]", "--json")
+    )
+    assert codes(data) == ["INTAKE_SCHEMA_INVALID"]
+    assert "std:iec-62304:2006-a1" in data["diagnostics"][0]["message"]
+
+    data = envelope(run("intake", "set", "certifications", "[iso-13485]", "--json"))
+    assert codes(data) == ["INTAKE_SCHEMA_INVALID"]
+    assert "slug" not in data["diagnostics"][0]["message"]
+
+
 def test_record_finding_conforms_and_numbers_findings(repo: Path):
     decided = ["--decided-by", PERSON, "--decided-at", "2026-10-20T14:40:00Z"]
     data = conforms(repo, *FINDING, "--decision", "deferred", *decided)

@@ -390,6 +390,18 @@ def test_several_scds_are_retired_as_one_change(repo: Path):
     assert "concept:prohibited" not in manifest and "concept:groceries" not in manifest
 
 
+def test_a_bare_scd_name_is_refused_with_the_full_id_suggested(repo: Path):
+    data = envelope(run("bundle", "remove-scd", "prohibited", "--json"))
+    assert codes(data) == ["SCD_NOT_LISTED"]
+    diagnostic = data["diagnostics"][0]
+    assert "scd:project:prohibited" in diagnostic["message"]
+    assert diagnostic["suggestion"] == {"scd_id": "scd:project:prohibited"}
+
+    data = envelope(run("bundle", "remove-scd", "nothing-by-this-name", "--json"))
+    assert codes(data) == ["SCD_NOT_LISTED"]
+    assert data["diagnostics"][0]["suggestion"] is None
+
+
 def test_remove_scd_keeps_the_comments_of_the_files_it_edits(repo: Path):
     assert run("add", "bundle", "groceries", "--new", *AUTHOR).exit_code == 0
     assert run("bundle", "remove-scd", "scd:project:groceries").exit_code == 0

@@ -465,6 +465,15 @@ def remove_scd(
         elif len(listing) == 1:
             path, data = listing[0][1], listing[0][2]
         elif not listing:
+            listed = {str(s) for b in bundles for s in b[2].get("scds") or []}
+            matches = sorted(s for s in listed if s.rsplit(":", 1)[-1] == scd_id)
+            if not scd_id.startswith("scd:") and len(matches) == 1:
+                raise CommandError(
+                    "SCD_NOT_LISTED",
+                    f"No bundle in this workspace lists {scd_id}; SCDs are named by their "
+                    f"full id, {matches[0]}",
+                    suggestion={"scd_id": matches[0]},
+                )
             raise CommandError("SCD_NOT_LISTED", f"No bundle in this workspace lists {scd_id}")
         else:
             names = ", ".join(b[0] for b in listing)
