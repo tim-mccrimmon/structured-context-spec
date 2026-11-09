@@ -39,7 +39,7 @@ is published, the release candidate is on TestPyPI:
 
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc5"
+  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc6"
 ```
 
 ### From source

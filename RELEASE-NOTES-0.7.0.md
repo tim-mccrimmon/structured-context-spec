@@ -1,6 +1,6 @@
 # SCS 0.7.0 Release Notes
 
-**Status:** release candidate `0.7.0rc5`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
+**Status:** release candidate `0.7.0rc6`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
 
 ---
 
@@ -45,7 +45,11 @@ made, coded `diagnostics`, and a `result`. Commands that write accept `--dry-run
 the same changes without making them. Every diagnostic code is registered in
 [`schema/diagnostics/codes.yaml`](schema/diagnostics/codes.yaml). New engine commands let an
 agent maintain a workspace without editing files: `scs scd write`, `scs bundle pin`,
-`add-import`, `add-scd`, `remove-scd`, and `scs add bundle --new`.
+`add-import`, `add-scd`, `remove-scd`, and `scs add bundle --new`. `scs bundle release`
+versions a root bundle and the concept bundles it needs in one command: each changed concept
+bundle is versioned and pinned, then the root, with one approver. Its dry run rehearses the
+whole release and lists every snapshot, manifest, pin, commit, and tag; a failed release undoes
+every step.
 
 ### Intake and provenance
 
@@ -68,11 +72,16 @@ it never merges or drops a rule. See
 
 Four skills in the open Agent Skills format, in [`skills/`](skills/README.md), operate SCS
 through the tools. `scs-domain` and `scs-project` each take one workspace from setup through
-source documents, intake, drafting, advisory review, and versioning to a compiled artifact,
-and resume or update it from `scs status`; `scs-validate` checks and fixes, and `scs-explain`
+source documents and intake to a draft of every rule in one pass, a draft review package,
+advisory review until the rules settle, and then, at release, section owners, the person who
+releases it, a version, and a compiled artifact; they resume or update it from `scs status`.
+Drafting is written for the assistant as reader: each directive says what the assistant does
+when it meets the case, and the sources are swept for uncovered clauses before review settles; `scs-validate` checks and fixes, and `scs-explain`
 answers questions. They share one set of rules: write only through the engine, show a dry run
 and get an explicit yes before every change and commit, never choose an approver, and stay
-inside the Domain repository. They install in Claude Code and in Claude (claude.ai).
+inside the Domain repository. One yes may cover a batch of writes once every change in it is
+shown; commits, versions, and tags keep their own. They install in Claude Code and in Claude
+(claude.ai).
 
 ### The agent interface, specified
 
@@ -131,11 +140,11 @@ outside SCS, and this guidance is expected to change in 0.8.
 
 ## Testing the release candidate
 
-`0.7.0rc5` is published to TestPyPI only:
+`0.7.0rc6` is published to TestPyPI only:
 
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc5"
+  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc6"
 ```
 
 The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI. Claude
@@ -147,9 +156,9 @@ The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI
 
 - **Skill behaviour tests.** The scripted-conversation tests of the skills (plan decision
   D-51) run against a simulated user; pacing (at most three questions per message) is held to
-  4 of 5 runs, not 5 of 5. On rc5 every assertion passed, pacing included, after the five
-  scenarios the rc5 changes touched were rerun; the other seven passed in the full run before
-  those changes. Acceptance with a real user (WP-13) passed on rc2 and is rerun on rc5.
+  4 of 5 runs, not 5 of 5. On rc6 every assertion passed, pacing included, in the six
+  scenarios the rc6 changes touched, after fixes and reruns; the other seven were last run on
+  rc5. Acceptance with a real user (WP-13) passed on rc5 and is rerun on rc6.
 - **Install matrix.** Claude Code and Claude are recorded; Cursor, Codex, and GitHub Copilot
   are not yet tried.
 - **Generated CI.** The workflow `scs new domain` writes installs `scs-validator` 0.7.x from
