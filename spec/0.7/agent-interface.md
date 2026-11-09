@@ -283,6 +283,14 @@ and 2) if, before asking, the agent shows a cascade plan listing every snapshot,
 commit, and tag, and the confirmation names the approver. The agent then runs each step's
 `--dry-run` and stops if a result differs from the plan.
 
+**Batches.** Drafting usually means many small writes: answers, SCDs, bundle edits. One
+confirmation MAY cover a batch of writes (item 1) if, before asking, the agent shows every
+planned change in the batch, by file and in plain language, and stops to ask again if any
+step's `--dry-run` result differs from what it showed. A batch MUST NOT include a commit,
+`scs bundle version`, or a tag; each of those keeps its own confirmation, or is covered by a
+cascade confirmation as above. Recording advisory review findings (item 7) is unchanged: each
+decision is the user's.
+
 ---
 
 ## 8. Change Summary

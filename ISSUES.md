@@ -12,15 +12,13 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-80 issues: open 30 · in-progress 1 · proposed 1 · deferred 3 · done 45.
+80 issues: open 28 · in-progress 1 · proposed 1 · deferred 3 · done 47.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | rc6 | ISS-056 | Skills: content first, rigor at release | open | high | L | no | strong |
-| rc6 | ISS-057 | Agent interface: confirmation at checkpoints | open | high | S | yes | strong |
 | rc6 | ISS-058 | One-command release with an internal cascade | open | high | M | yes | strong |
 | rc6 | ISS-062 | Skills: drafting guidance for the assistant as reader | open | high | M | no | strong |
-| rc6 | ISS-059 | Small engine fixes from acceptance | open | medium | S | yes | once |
 | rc7 | ISS-068 | Approval record and check | open | high | M | yes | strong |
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.7.0 | ISS-055 | Acceptance test: real Domains through the skills (WP-13) | in-progress | high | M | no | strong |
@@ -1083,7 +1081,8 @@ Projects: assess the Domain and Project together; Domain issues become questions
 Domain owner, not edits.
 
 ### ISS-057 - Agent interface: confirmation at checkpoints
-**Status:** open
+**Status:** done (2026-11-09, rc6): §7 "Batches" paragraph; skill rule 2 and the drafting
+reference allow one yes per batch
 **Target:** rc6 · **Priority:** high · **Effort:** S · **Spec:** yes · **Evidence:** strong
 About 40 confirmations in one Domain session, many for single uncommitted writes. Amend
 `spec/0.7/agent-interface.md` §7 item 1 so one confirmation MAY cover a batch of writes when
@@ -1101,12 +1100,15 @@ Add one command (name to decide) that versions changed concept bundles, pins the
 versions the root, with one dry run listing every snapshot, manifest, pin, commit, and tag.
 
 ### ISS-059 - Small engine fixes from acceptance
-**Status:** open
-**Target:** rc6 · **Priority:** medium · **Effort:** S · **Spec:** yes · **Evidence:** once
+**Status:** done (2026-11-09, rc6)
+**Target:** rc6 · **Priority:** medium · **Effort:** S · **Spec:** no · **Evidence:** once
 - `scs bundle remove-scd` with a bare name fails with `SCD_NOT_LISTED`; the message should
-  suggest the full id (`scd:project:<name>`).
+  suggest the full id (`scd:project:<name>`). Done: when exactly one listed SCD has that
+  name, the message names it and `suggestion` carries `{"scd_id": ...}`.
 - Citation editions reject `+` (`std:iec-62304:2006+a1:2015`, `INTAKE_SCHEMA_INVALID`), the
-  way the standard's amended edition is usually written.
+  way the standard's amended edition is usually written. Resolved without a grammar change:
+  the slug form (`std:iec-62304:2006-a1`, citations.md section 3) stays, and the intake
+  error now names it when a citation contains `+`.
 
 ### ISS-060 - Item-level SCD edits
 **Status:** open

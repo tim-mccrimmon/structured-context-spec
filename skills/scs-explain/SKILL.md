@@ -22,7 +22,10 @@ package, into the workspace's `dist/` directory.
    (each path, and any git commit or tag) in plain language, and get an explicit yes. Then run
    it for real. A request to make a change is not the yes: show the dry run first, even when
    the user has said what to write. Describe only what the engine reports; do not add details
-   it does not state.
+   it does not state. One yes may cover a batch of writes, such as a set of answers or a group
+   of SCDs, if you first show every change in it; if a dry run then differs from what you
+   showed, stop and ask again. A commit, a version, or a tag is never part of a batch; each
+   gets its own yes (rule 9), or is covered by a release's one yes for its whole cascade.
 3. Report success only when the envelope says `"ok": true`. Otherwise say what failed, using
    the diagnostics.
 4. Never pass `--force`, `--no-validate`, or `--allow-draft` unless the user asked for that

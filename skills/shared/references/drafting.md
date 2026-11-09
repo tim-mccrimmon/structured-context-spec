@@ -64,6 +64,8 @@ organization's rules from yours.
 | See what is there | `scs bundle list`, `scs bundle info <name>` |
 
 Every one takes `--dry-run`; use it, show the changes, and confirm before the real run.
+Work through a group of SCDs as one batch: show every planned change in the group, get one
+yes, then run them, stopping to ask again if a dry run differs from what you showed.
 `scs scd write` validates the SCD before writing and refuses an invalid one; explain its
 diagnostics in plain language.
 
