@@ -30,7 +30,7 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 | 0.8 | ISS-065 | Placement facts | open | high | L | yes | strong |
 | 0.8 | ISS-077 | Starter Domains per ontology | open | high | L | yes | expected |
 | 0.8 (proposed) | ISS-060 | Item-level SCD edits | open | medium | M | no | strong |
-| 0.8 (decide after ISS-056) | ISS-063 | Skills: assessment pass | open | medium | L | no | once |
+| 0.8 (decide after the WP-13 rc6 rerun) | ISS-063 | Skills: assessment pass | open | medium | L | no | once |
 | 0.8 | ISS-066 | Duplicate rules within a bundle | open | medium | S | no | once |
 | 0.8 | ISS-074 | Rename the approver fields to "released by" | open | medium | M | yes | strong |
 | 0.8 | ISS-075 | Project records the Domain version it was reviewed against | open | medium | M | yes | once |
@@ -1050,8 +1050,10 @@ is demand.
 ### ISS-055 - Acceptance test: real Domains through the skills (WP-13)
 **Status:** in-progress: redefined by D-80 (2026-10-29) as two real scenarios through Claude
 Code with the skills; the 0.6 baseline run was dropped. Test 1 (personal) done 2026-10-30;
-Test 2 (CDMO) passed on rc2 2026-11-04; rerun on rc5 with the Domain done 2026-11-08 and the
-Project next (WP-13).
+Test 2 (CDMO) passed on rc2 2026-11-04 and on rc5 2026-11-09 (Domain and Project, each in its
+own session; its findings became ISS-056 to ISS-067). Rerun on rc6 next: kit 0.7.0rc6-1 and
+the rc6 skills are installed on the test machine (2026-11-09). Close after the rc6 rerun
+passes.
 **Target:** 0.7.0 · **Priority:** high · **Effort:** M · **Spec:** no · **Evidence:** strong
 RFC 0002 appendix. Onboard Omarchy (one Domain repository, two Projects) entirely through a chat
 client using the skills, with no direct CLI use and no reading of the spec, and record every
@@ -1137,13 +1139,15 @@ for unused clauses before release.
 
 ### ISS-063 - Skills: assessment pass
 **Status:** open
-**Target:** 0.8 (decide after ISS-056) · **Priority:** medium · **Effort:** L · **Spec:** no · **Evidence:** once
+**Target:** 0.8 (decide after the WP-13 rc6 rerun) · **Priority:** medium · **Effort:** L · **Spec:** no · **Evidence:** once
 Review finds what is wrong but rarely what is missing. Add a pass to the draft cycle that runs
 typical tasks against the compiled draft and returns a gap list (covered, partial, absent; too
 tight; unclear gates) for the reviewer to fill in or defer. It points to gaps and never writes
 policy. A manual run against a 92-item artifact found two source clauses the draft had missed
 and four topics nobody had raised, and showed which rules would be too tight in practice, for
-the owners to decide.
+the owners to decide. rc6 covers part of this: ISS-056 has a Project assess the Domain and the
+Project together, and ISS-062 sweeps the sources for uncovered clauses before review settles.
+The rc6 rerun shows whether a task-based pass is still needed.
 
 ### ISS-064 - Audience of SCD items
 **Status:** open
