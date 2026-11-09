@@ -1,7 +1,8 @@
 name: docs-ci
 
 # Checks for spec/, docs/, rfcs/ and skills/ (WP-11rc): relative links resolve, the 0.7 migration
-# guide matches its fragments, and the files copied into the skills match their sources.
+# guide matches its fragments, the files copied into the skills match their sources, and the
+# ISSUES.md scorecard is current.
 
 on:
   push:
@@ -14,6 +15,7 @@ on:
       - "schema/diagnostics/**"
       - "scripts/**"
       - "README.md"
+      - "ISSUES.md"
       - "CONTRIBUTING.md"
       - ".github/workflows/docs-ci.yml"
   pull_request:
@@ -25,6 +27,7 @@ on:
       - "schema/diagnostics/**"
       - "scripts/**"
       - "README.md"
+      - "ISSUES.md"
       - "CONTRIBUTING.md"
       - ".github/workflows/docs-ci.yml"
 
@@ -38,6 +41,8 @@ jobs:
           python-version: "3.12"
       - name: Relative links
         run: python scripts/check_links.py
+      - name: ISSUES.md scorecard is current
+        run: python scripts/issues_scorecard.py --check
       - name: Migration guide assembled from docs/migration.d
         run: python scripts/assemble_migration.py --check
       - name: Skill copies match their sources
