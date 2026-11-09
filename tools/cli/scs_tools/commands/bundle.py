@@ -20,6 +20,7 @@ from scs_tools.machine import (
     Output,
     machine_command,
 )
+from scs_tools.release import release_bundle
 from scs_tools.utils.files import get_template_path
 from scs_tools.utils.project_types import ONTOLOGY_MODELS
 from scs_tools.versioning import version_bundle
@@ -369,6 +370,81 @@ def version(
         bundle_file = found[0]
     version_bundle(
         envelope, out, bundle_file, version_number, approved_by, notes, no_validate, dry_run
+    )
+
+
+@bundle.command()
+@click.option(
+    "--bundle",
+    "-b",
+    "bundle_file",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Root bundle to release (default: the workspace's domain or project bundle)",
+)
+@click.option(
+    "--workspace",
+    default=None,
+    help="Workspace: domain or a Project name (default: the current one)",
+)
+@click.option("--version", "-v", "version_number", required=True, help="The root's new version")
+@click.option(
+    "--concept",
+    "concepts",
+    multiple=True,
+    metavar="NAME=VERSION",
+    help="A concept bundle's new version; repeat for each changed concept bundle",
+)
+@click.option(
+    "--approved-by",
+    help="The approver, Name <email> (required; never taken from git config)",
+)
+@click.option("--notes", help="Version notes, used for every version in the release")
+@click.option(
+    "--no-validate",
+    is_flag=True,
+    help="Skip content validation (integrity checks still run; recorded in the manifests)",
+)
+@click.option("--dry-run", is_flag=True, help="Report what would be written; write nothing")
+@machine_command("bundle release")
+def release(
+    envelope: Envelope,
+    out: Output,
+    bundle_file,
+    workspace,
+    version_number,
+    concepts,
+    approved_by,
+    notes,
+    no_validate,
+    dry_run,
+):
+    """
+    Release a root bundle with the concept bundles it needs, in one command
+
+    Versions each concept bundle that is unpinned or changed since its pinned version, pins it
+    in the root, then versions the root: the cascade of 'scs bundle version' and 'scs bundle
+    pin' steps, with one approver. Each changed concept bundle needs --concept NAME=VERSION;
+    run without them to see which do. The dry run performs the whole release on a scratch copy
+    and lists every snapshot, manifest, pin, commit, and tag. If a step fails, every completed
+    step is undone.
+
+    \b
+    Examples:
+        scs bundle release --version 1.0.0 --concept security=1.0.0 \\
+            --concept privacy=1.1.0 --approved-by "Jane Doe <jane@acme.com>" --dry-run
+    """
+    release_bundle(
+        envelope,
+        out,
+        bundle_file,
+        workspace,
+        version_number,
+        concepts,
+        approved_by,
+        notes,
+        no_validate,
+        dry_run,
     )
 
 

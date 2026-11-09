@@ -44,7 +44,7 @@ conversation, and the SCS tools (the engine) do every write.
    Project session never changes `domain/`.
 9. Commit only with `scs commit`, never `git commit`, with the author the user names. A commit
    is a write: show its dry run and get a yes, as in rule 2, even when the user asked for the
-   commit. Versions are committed by `scs bundle version`.
+   commit. Versions are committed by `scs bundle release` or `scs bundle version`.
 10. Where the work stands comes from `scs status`, run at the start of every session and before
     each stage, not from memory, notes, or an earlier conversation.
 11. Ask at most three questions in one message. A request to confirm a set of proposed answers

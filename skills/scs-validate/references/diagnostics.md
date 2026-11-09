@@ -101,6 +101,8 @@ Every code the SCS tools emit, with its severity. Generated from
 | `RELATIONSHIP_TYPE_MISSING` | error | An SCD relationship has no type field. |
 | `RELEASED_OWNER_MISSING` | warning | The latest released version of a section names no owner role, so no one is accountable for it (D-92). |
 | `RELEASED_OWNER_UNMAPPED` | warning | The latest released version of a section is owned by a role that no one in the workspace's intake.yaml owners holds now (D-92). |
+| `RELEASE_DRY_RUN_UNSUPPORTED` | error | scs bundle release --dry-run rehearses the release on a copy of the repository, which needs the repository's own .git directory; a linked worktree or submodule is refused (ISS-058). |
+| `RELEASE_VERSION_REQUIRED` | error | scs bundle release found concept bundles that are unpinned or changed since their pinned version and have no --concept NAME=VERSION; the suggestion lists them with their latest versions (ISS-058); exit code 3. |
 | `RESERVED_BUNDLE_NAME` | error | A bundle is named plan, test-plan, or qa, which are reserved for a later release (D-33). |
 | `RULES_DIR_NOT_FOUND` | error | The validation rules directory does not exist. |
 | `RULES_FILE_NOT_FOUND` | error | A validation rules file is missing from the rules directory. |

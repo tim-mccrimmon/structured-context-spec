@@ -1,0 +1,10 @@
+# Diagnostic codes added in rc6.
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  RELEASE_VERSION_REQUIRED:
+    severity: error
+    meaning: scs bundle release found concept bundles that are unpinned or changed since their pinned version and have no --concept NAME=VERSION; the suggestion lists them with their latest versions (ISS-058); exit code 3.
+  RELEASE_DRY_RUN_UNSUPPORTED:
+    severity: error
+    meaning: scs bundle release --dry-run rehearses the release on a copy of the repository, which needs the repository's own .git directory; a linked worktree or submodule is refused (ISS-058).

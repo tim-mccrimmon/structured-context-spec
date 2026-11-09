@@ -83,8 +83,9 @@ codes match the registry enforces it.
 | 6.8a | Do not write outside the Domain repository | MUST NOT | `agent-interface.md` §7 item 8, §10 | Stated |
 | 6.8b | After compiling, tell the user where the artifact belongs, using the placement guide, and leave placing it to the user | SHOULD | `agent-interface.md` §10 | Stated |
 
-The cascade confirmation (one confirmation MAY cover a bottom-up versioning cascade) is stated
-in `agent-interface.md` §7.
+The cascade confirmation (one confirmation MAY cover a bottom-up versioning cascade), the
+one-command release that runs it (ISS-058), and the batch confirmation for drafting writes
+(ISS-057) go beyond the RFC; they are stated in `agent-interface.md` §7.
 
 ## Section 7. Change summary
 

@@ -24,6 +24,7 @@ ORDER = [
     "WP-10.md",  # Agent Skills
     "WP-10b.md",  # Status, commits, source documents (rc2)
     "D-92.md",  # Section owners (rc4)
+    "rc6.md",  # One-command release, batch confirmation (rc6)
     "housekeeping.md",
     "ISS-042-045.md",
 ]

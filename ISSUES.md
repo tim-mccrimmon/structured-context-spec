@@ -12,12 +12,11 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-80 issues: open 28 · in-progress 1 · proposed 1 · deferred 3 · done 47.
+80 issues: open 27 · in-progress 1 · proposed 1 · deferred 3 · done 48.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | rc6 | ISS-056 | Skills: content first, rigor at release | open | high | L | no | strong |
-| rc6 | ISS-058 | One-command release with an internal cascade | open | high | M | yes | strong |
 | rc6 | ISS-062 | Skills: drafting guidance for the assistant as reader | open | high | M | no | strong |
 | rc7 | ISS-068 | Approval record and check | open | high | M | yes | strong |
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
@@ -1091,7 +1090,8 @@ versioning, and stops if a dry run differs from the plan. Commits and versions k
 confirmation. Recording every review finding (§7 item 7) is unchanged.
 
 ### ISS-058 - One-command release with an internal cascade
-**Status:** open
+**Status:** done (2026-11-09, rc6): `scs bundle release`; its dry run rehearses the release on a
+scratch copy, and a failed release undoes every step. §7 and the versioning reference updated
 **Target:** rc6 · **Priority:** high · **Effort:** M · **Spec:** yes · **Evidence:** strong
 Releasing a Domain took 21 engine operations (each concept bundle versioned and pinned, then
 the root), and the root cannot be dry-run until its imports are pinned

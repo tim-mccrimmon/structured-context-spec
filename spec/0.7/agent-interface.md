@@ -283,6 +283,12 @@ and 2) if, before asking, the agent shows a cascade plan listing every snapshot,
 commit, and tag, and the confirmation names the approver. The agent then runs each step's
 `--dry-run` and stops if a result differs from the plan.
 
+An engine MAY run the cascade as one command; the reference engine's is `scs bundle release`.
+Its `--dry-run` MUST report every snapshot, manifest, pin, commit, and tag the release would
+make, the root's included, and if any step fails the release MUST undo every step it completed.
+An agent using such a command SHOULD show that dry run as the cascade plan and run the command
+once confirmed, without separate per-step dry runs.
+
 **Batches.** Drafting usually means many small writes: answers, SCDs, bundle edits. One
 confirmation MAY cover a batch of writes (item 1) if, before asking, the agent shows every
 planned change in the batch, by file and in plain language, and stops to ask again if any
