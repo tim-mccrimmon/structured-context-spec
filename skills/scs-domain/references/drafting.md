@@ -4,13 +4,19 @@ How to turn intent and source documents into SCS content: **prohibitions** (abso
 **directives** (instructions), and **facts** (statements to know). Only these three are
 compiled. The field-level rules are in [authoring.md](authoring.md).
 
-## Start from the templates
+## Start from the sources
 
-The scaffold supplies every template for the ontology. Templates hold placeholders (`TODO`, or
-`"[...]"` hints); `scs status` lists the SCDs that still have them (`scds.placeholders`). Go
-through the templates with the user: fill the ones that apply, and retire the rest with
-`scs bundle remove-scd`. A `personal` Domain gets only boundaries; define the person's other
-concepts with them using `scs add bundle <name> --new`.
+Draft from the sources outward, in one pass. Read the documents and answers, list the topics
+they cover, and place each topic in a concept: an existing template SCD where one fits, a new
+SCD or concept where none does (`scs add scd`, `scs add bundle <name> --new`). Draft every SCD
+that has material, giving each item its `derived_from` as you write it, not afterwards.
+
+Then use the ontology's templates as a coverage check. Templates hold placeholders (`TODO`, or
+`"[...]"` hints); `scs status` lists the SCDs that still have them (`scds.placeholders`). For
+each template with no material, ask the user whether the topic applies, in one list: if it
+does, it is a gap to fill with an answer; if not, retire it with `scs bundle remove-scd`.
+Retiring a template never removes a topic the sources raise. A `personal` Domain gets only
+boundaries; define the person's other concepts with them using `scs add bundle <name> --new`.
 
 Removing the last SCD of a concept bundle also removes the bundle, its import in the root
 bundle, and its entry in the ontology manifest. Retire several SCDs in one call

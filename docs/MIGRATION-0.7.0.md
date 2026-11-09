@@ -367,6 +367,12 @@ These edit the files' text, so comments and layout survive.
   rehearses the release on a scratch copy of the repository and lists every snapshot, manifest,
   pin, commit, and tag, the root's included. If a step fails, every completed step is undone.
   `scs bundle version` and `scs bundle pin` are unchanged.
+- **The scs-domain and scs-project skills put content first.** After the documents and the
+  profile, they draft every SCD in one pass from the sources, using the ontology's templates as
+  a coverage check, then offer a draft review package (`scs view --allow-draft`), and review
+  and fix until the rules settle. Section owners and who releases versions are asked at
+  release, where the engine enforces them. A Project session assesses the Domain and the
+  Project together; Domain issues become questions for the Domain owner.
 - **One confirmation may cover a batch of writes** (`agent-interface.md` §7). An agent shows
   every planned change in the batch first and asks again if a dry run differs. Commits,
   versions, and tags keep their own confirmation.

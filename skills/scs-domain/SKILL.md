@@ -80,7 +80,7 @@ one, run `scs status --workspace domain` there and choose the mode:
 |---|---|
 | No repository yet | **Set up**: start at step 1 |
 | No intake record, or SCDs with placeholders, or no version | **Resume**: say what is done and what is left, then continue at that stage |
-| A released version | **Update**: step 8 |
+| A released version | **Update**: step 9 |
 
 Tell the user which mode you chose and why, from the status, before going on.
 
@@ -89,12 +89,14 @@ Tell the user which mode you chose and why, from the status, before going on.
 Before any question, tell the user in a short message:
 
 - what happens: setting up the Domain, gathering documents, a few questions at a time,
-  drafting the rules, reviewing them together, then releasing a version in the name of a person
-  they choose and compiling it for their AI tools;
+  drafting all the rules from the documents in one pass, a draft review package they can read
+  and share, reviewing and fixing until the rules settle, then naming who owns each section and
+  who releases, releasing a version, and compiling it for their AI tools;
 - what is needed on the computer: git, which SCS uses to keep each change and version (no
   GitHub account or git setup is needed), and the SCS tools; step 0 has already checked both;
 - what helps to have ready: the organization's AI usage policy and any related policies or
-  SOPs, the names and roles of the people who own the rules, and who releases a version;
+  SOPs, and the people involved and their roles; who owns each section and who releases a
+  version are asked at the end, once the rules are reviewed;
 - that they can stop at any point: the work is saved in the repository as it goes, and a new
   session picks up from `scs status`;
 - that Projects come later, each in its own session with the scs-project skill, once the
@@ -138,12 +140,12 @@ read, as [references/intake.md](references/intake.md) describes: give the exact
 `domain/sources/` path, wait for the user, then record each document and read it. Propose the answers the documents
 support.
 
-## 4. Profile and people
+## 4. Profile
 
-Ask the profile questions that apply and the people questions, from
-[references/intake.md](references/intake.md): leadership roles, the person who holds each
-section owner role (`scs intake set owners`), and who releases versions. Pace them, record
-each group of answers, and confirm proposals before recording them.
+Ask the profile questions that apply, then who is involved and in which role (the people
+answer, `q-people-1`), from [references/intake.md](references/intake.md). Pace them, record
+each group of answers, and confirm proposals before recording them. Section owners and who
+releases versions are asked at release (step 8), not here.
 
 **Checkpoint:** commit the intake.
 
@@ -155,34 +157,64 @@ scripts/scs_engine.py run scs commit --workspace domain -m "Record the Domain in
 ## 5. Draft
 
 Follow [references/drafting.md](references/drafting.md) and
-[references/authoring.md](references/authoring.md). Go through the templates with the user,
-retire what does not apply, and draft each kept SCD from the documents and answers, a concept
-at a time. Show each draft and its dry run before writing. Then validate
-(`scs-validate --strict` at the repository root) and explain the result.
+[references/authoring.md](references/authoring.md). Draft from the sources outward, in one
+pass: work out the topics the documents and answers cover, place each in its concept, and
+draft every SCD that has material, giving each item its `derived_from` as you write it. Then
+use the ontology's templates as a coverage check: for a template with no material, ask whether
+the topic applies before retiring it. Show each concept's drafts as one batch, with their dry
+runs, and get one yes per batch. Then validate (`scs-validate --strict` at the repository root)
+and explain the result.
 
 **Checkpoint:** `scs commit --workspace domain`, as above, with a message naming what was
 drafted.
 
-## 6. Review
+## 6. Draft review package
+
+Offer the user a review package of the draft: one HTML file with every prohibition, rule, and
+fact, its source, and the line the AI receives, marked as not for approval. It is the first
+time they see the whole Domain in one place, and they can share it with the people who own the
+sections. If they want it, that is their request for `--allow-draft`:
+
+```
+scripts/scs_engine.py run scs view bundles/domain-bundle.yaml --allow-draft --dry-run
+```
+
+Show the path, get a yes, write it (it goes to `domain/dist/`), and tell the user where it is.
+Ask them to read it and bring back what they or others want changed. If they decline, go on to
+the review.
+
+## 7. Review
 
 Review the whole Domain with the user, as [references/review.md](references/review.md)
-describes, and record each finding and decision. Commit the decisions (`scs commit`).
+describes, together with any comments from the package, and record each finding and decision.
+Make the changes the user confirms, validate again, and repeat until nothing more changes; a
+new draft package can be written after a round of changes. Commit the decisions and changes
+(`scs commit`).
 
-## 7. Version and compile
+## 8. Release and compile
+
+Now settle who is accountable, as [references/intake.md](references/intake.md) describes
+("Section owners", "Who releases versions"): propose a person for each section owner role as
+one table and record the confirmed owners, then ask who releases versions and record them.
+Commit the intake (`scs commit`). The engine refuses a version until every section's owner is
+mapped.
+
+In an update, the owners and releasers are already recorded: show them and ask only whether
+they have changed.
 
 Release a version as [references/versioning.md](references/versioning.md) describes: the
-person who releases it and the version number come from the user. Then compile it and advise
+person who releases it and the version numbers come from the user. Then compile it and advise
 on placement, as [references/compiling.md](references/compiling.md) describes.
 
 Finish with `scs status --workspace domain`, and tell the user what they have: the version, its
 tag, the compiled artifact. Their Projects can start now, each in a new session with the
 scs-project skill.
 
-## 8. Update
+## 9. Update
 
 For a Domain with a released version, start from what changed: `scs status` (changes since the
 version, deferred findings, unrecorded sources) and `scs bundle diff <bundle-file>`. Ask what
 the user wants to change and why, for example a new or revised policy, or a question a Project
-recorded for the Domain owner. Then go through steps 3 to 7 for only what changes: record any
+recorded for the Domain owner. Then go through steps 3 to 8 for only what changes: record any
 new document, draft, review, validate, commit, version, and compile. A new Domain version does
 not change any Project; tell the user each Project can review against it in its own session.

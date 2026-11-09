@@ -12,11 +12,10 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-80 issues: open 27 · in-progress 1 · proposed 1 · deferred 3 · done 48.
+80 issues: open 26 · in-progress 1 · proposed 1 · deferred 3 · done 49.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
-| rc6 | ISS-056 | Skills: content first, rigor at release | open | high | L | no | strong |
 | rc6 | ISS-062 | Skills: drafting guidance for the assistant as reader | open | high | M | no | strong |
 | rc7 | ISS-068 | Approval record and check | open | high | M | yes | strong |
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
@@ -1067,7 +1066,9 @@ artifact. These are problems in SCS and the skills; problems in the source mater
 the organization and are not tracked here. Planning detail stays in `plan/`.
 
 ### ISS-056 - Skills: content first, rigor at release
-**Status:** open
+**Status:** done (2026-11-09, rc6): scs-domain and scs-project reordered (draft in one pass,
+draft review package, review until settled, owners and releaser at release); intake and drafting
+references updated
 **Target:** rc6 · **Priority:** high · **Effort:** L · **Spec:** no · **Evidence:** strong
 Everything a release needs (routing, profile, people, owners, releaser, template triage) comes
 before any draft is visible, so the first human review happens on a released version. Reorder

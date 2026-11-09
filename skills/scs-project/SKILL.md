@@ -81,7 +81,7 @@ run `scs status` at its root.
 - **The Project does not exist:** **set up**, from step 1.
 - **The Project exists without an intake record, with placeholders, or without a version:**
   **resume**; say what is done and what is left, then continue at that stage.
-- **The Project has a released version:** **update**, step 8.
+- **The Project has a released version:** **update**, step 9.
 
 Tell the user which mode you chose and why, from the status, and which Domain version the
 Project builds on.
@@ -91,12 +91,13 @@ Project builds on.
 Before any question, tell the user in a short message:
 
 - what happens: creating the Project, gathering its documents, a few questions at a time about
-  the work and the team, drafting its rules, reviewing them together with the Domain's, then
-  releasing a version in the name of a person they choose and compiling it;
+  the work and the team, drafting all its rules in one pass, a draft review package that shows
+  them beside the Domain's, reviewing and fixing until they settle, then naming who owns each
+  section and who releases, releasing a version, and compiling it;
 - what is needed on the computer: git, which SCS uses to keep each change and version (no
   GitHub account or git setup is needed), and the SCS tools; step 0 has already checked both;
-- what helps to have ready: the project brief or requirements, the team's names and roles, and
-  who releases a version;
+- what helps to have ready: the project brief or requirements, and the team's names and roles;
+  who owns each section and who releases a version are asked at the end;
 - that the Domain's rules are fixed in this session: a conflict with one is recorded as a
   question for the Domain owner, not changed here;
 - that they can stop at any point; a new session picks up from `scs status`.
@@ -133,11 +134,11 @@ Domain documents are already in the Domain; do not record them again.
 
 ## 4. Profile and team
 
-Ask the Project profile questions and the team questions, from
-[references/intake.md](references/intake.md): the lead, the developers, the quality or
-regulatory reviewer, the business owner, the person who holds each section owner role
-(`scs intake set owners`), and who releases versions. Pace them, record each
-group of answers, and confirm proposals before recording them.
+Ask the Project profile questions, then the team (the lead, the developers, the quality or
+regulatory reviewer, the business owner) as the people answer, from
+[references/intake.md](references/intake.md). Pace them, record each group of answers, and
+confirm proposals before recording them. Section owners and who releases versions are asked at
+release (step 8), not here.
 
 **Checkpoint:** commit the intake.
 
@@ -149,22 +150,54 @@ scripts/scs_engine.py run scs commit --workspace <name> -m "Record the Project i
 ## 5. Draft
 
 Read the Domain's released rules first (see [references/review.md](references/review.md), "The
-Domain in a Project review"), so the Project neither repeats nor contradicts them. Then follow
-[references/drafting.md](references/drafting.md) and
-[references/authoring.md](references/authoring.md): go through the templates, retire what does
-not apply, and draft the rest from the documents and answers. Scope limits are facts or
-directives. Validate (`scs-validate --strict` at the repository root) and explain the result.
+Domain in a Project review"), and assess the Domain and the Project together: what the Domain
+already covers, so the Project does not repeat it, and which Domain rules would block or
+conflict with the Project's work. A Domain issue becomes a question for the Domain owner,
+recorded at review; it is never an edit to `domain/`.
+
+Then follow [references/drafting.md](references/drafting.md) and
+[references/authoring.md](references/authoring.md). Draft from the sources outward, in one
+pass: every SCD the Project's documents and answers support, each item with its `derived_from`
+as you write it. Use the templates as a coverage check: for a template with no material, ask
+whether the topic applies before retiring it. Scope limits are facts or directives. Show each
+concept's drafts as one batch and get one yes per batch. Validate (`scs-validate --strict` at
+the repository root) and explain the result.
 
 **Checkpoint:** `scs commit --workspace <name>`, with a message naming what was drafted.
 
-## 6. Review with the Domain
+## 6. Draft review package
+
+Offer the user a review package of the draft: one HTML file with the Project's rules and,
+marked as inherited, the Domain's released rules, so they read the two together. It is marked
+as not for approval. If they want it, that is their request for `--allow-draft`:
+
+```
+scripts/scs_engine.py run scs view bundles/project-bundle.yaml --allow-draft --dry-run
+```
+
+Show the path, get a yes, write it (it goes to the Project's `dist/`), and tell the user where
+it is. Ask them to read it and bring back what they or the team want changed. If they decline,
+go on to the review.
+
+## 7. Review with the Domain
 
 Review the Project and the Domain together, as [references/review.md](references/review.md)
-describes. Look especially for Domain rules that would block the Project's work. Record each
-finding in the Project; a Domain conflict is a deferred `layer-conflict`, phrased as a question
-for the Domain owner. Commit the decisions (`scs commit`).
+describes, with any comments from the package. Look especially for Domain rules that would
+block the Project's work. Record each finding in the Project; a Domain conflict is a deferred
+`layer-conflict`, phrased as a question for the Domain owner. Make the changes the user
+confirms, validate again, and repeat until nothing more changes. Commit the decisions and
+changes (`scs commit`).
 
-## 7. Version and compile
+## 8. Release and compile
+
+Now settle who is accountable, as [references/intake.md](references/intake.md) describes
+("Section owners", "Who releases versions"): propose a person for each section owner role as
+one table and record the confirmed owners, then ask who releases versions and record them.
+Commit the intake (`scs commit`). The engine refuses a version until every section's owner is
+mapped.
+
+In an update, the owners and releasers are already recorded: show them and ask only whether
+they have changed.
 
 Release a version as [references/versioning.md](references/versioning.md) describes, then
 compile it and advise on placement, as [references/compiling.md](references/compiling.md)
@@ -174,10 +207,10 @@ describes: the Project's artifact is loaded with the Domain's, so preview the tw
 Finish with `scs status --workspace <name>`, and tell the user what they have, and any
 questions recorded for the Domain owner.
 
-## 8. Update
+## 9. Update
 
 For a Project with a released version, start from what changed: `scs status` (changes since the
 version, deferred findings, unrecorded sources, and the Domain's latest version) and
 `scs bundle diff <bundle-file>`. Ask what the user wants to change and why, and whether the
-Project has been reviewed against the Domain's latest version. Then go through steps 3 to 7 for
+Project has been reviewed against the Domain's latest version. Then go through steps 3 to 8 for
 only what changes; when the Domain has a new version, review the Project against it.

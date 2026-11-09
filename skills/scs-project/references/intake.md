@@ -70,9 +70,10 @@ If the user has no documents and no website, say that is fine and go on with the
 Ask who is involved, and record them as an answer, `q-people-1`, so drafted items can cite
 it. Record each person by name and role; ask for an email only from whoever releases versions,
 unless the user offers it. Propose names and roles you find in the
-documents, and ask the user to confirm or correct them. Take the people in two messages: first
-who is involved and in which role; then, once that is settled, who owns each section and who
-releases versions.
+documents, and ask the user to confirm or correct them. Ask who is involved and in which role
+with the profile, so drafted items can cite them. Ask who owns each section and who releases
+versions later, at release, once the drafts are reviewed: the draft decides which sections
+there are, and the engine refuses a version until they are recorded.
 
 - **Domain:** leadership roles that set or own the rules: for example CEO, CTO, CISO, quality,
   regulatory, legal.
@@ -104,7 +105,8 @@ scripts/scs_engine.py run scs bundle set-owner regulatory --bundle bundles/conce
 ```
 
 A personal Domain has one role, `owner`: map it to the person. Versioning a section fails until
-its role is mapped (`VERSION_OWNER_UNMAPPED`), so settle owners before the first version. A
+its role is mapped (`VERSION_OWNER_UNMAPPED`), so settle owners at release, before the first
+version. A
 change of person later is an intake change only and needs no new version; a change of role
 changes the bundle and needs one.
 
