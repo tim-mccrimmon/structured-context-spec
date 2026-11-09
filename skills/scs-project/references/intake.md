@@ -40,8 +40,9 @@ difference.
 
 ## Source documents
 
-Ask for documents before the profile questions: they answer many of them. Give the exact path
-of the workspace's `sources/` folder (from `scs status`, `path`), ask the user to copy the
+Ask for documents before the profile questions: they answer many of them. Give the full path
+of the workspace's `sources/` folder, absolute, in the message that asks for the documents
+(the repository root plus `scs status` `path`), ask the user to copy the
 documents there, and wait until they say it is done. Then run `scs status` again: the
 `sources.files` it lists are the documents to record. Record each one:
 
@@ -85,9 +86,11 @@ there are, and the engine refuses a version until they are recorded.
 Every section (concept bundle) has an owner role: the person accountable for that section,
 who reviews and approves it. The templates give each concept a default role; `scs status`
 lists them under `owners.sections`, with `unmapped_roles` for roles no one holds yet. Propose
-a person for every role yourself, from the people and their roles, as one table (role, the
+a person for every role yourself, from the people already recorded (the people answer in
+`intake.yaml`, usually `q-people-1`, and the source documents), as one table (role, the
 sections it owns, the person, their title), and ask the user to confirm or correct it: that is
-one question. Never list the roles with blanks for the user to fill in. A person may hold
+one question. Do this even when there is one role. Never ask who holds a role, and never list
+the roles with blanks for the user to fill in. A person may hold
 several roles; a small organization often merges them.
 
 Record each role with its person's name and title. Do not ask for owners' emails; record one

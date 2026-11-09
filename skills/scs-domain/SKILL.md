@@ -136,8 +136,8 @@ initial commit itself. Record the routing answers with `scs intake set` (see the
 ## 3. Documents
 
 Before the profile questions, ask for the source documents, and whether there is a website to
-read, as [references/intake.md](references/intake.md) describes: give the exact
-`domain/sources/` path, wait for the user, then record each document and read it. Propose the answers the documents
+read, as [references/intake.md](references/intake.md) describes: give the full,
+absolute path of `domain/sources/`, wait for the user, then record each document and read it. Propose the answers the documents
 support.
 
 ## 4. Profile
@@ -160,8 +160,8 @@ Follow [references/drafting.md](references/drafting.md) and
 [references/authoring.md](references/authoring.md). Draft from the sources outward, in one
 pass: work out the topics the documents and answers cover, place each in its concept, and
 draft every SCD that has material, giving each item its `derived_from` as you write it. Then
-use the ontology's templates as a coverage check: for a template with no material, ask whether
-the topic applies before retiring it. Show each concept's drafts as one batch, with their dry
+use the ontology's templates as a coverage check: for the templates with no material, propose
+which to retire and which to keep as gaps, as one list to confirm. Show each concept's drafts as one batch, with their dry
 runs, and get one yes per batch. Then validate (`scs-validate --strict` at the repository root)
 and explain the result.
 
@@ -194,8 +194,9 @@ new draft package can be written after a round of changes. Commit the decisions 
 ## 8. Release and compile
 
 Now settle who is accountable, as [references/intake.md](references/intake.md) describes
-("Section owners", "Who releases versions"): propose a person for each section owner role as
-one table and record the confirmed owners, then ask who releases versions and record them.
+("Section owners", "Who releases versions"): read the people recorded in the intake, propose
+a person for each section owner role yourself as one table, never asking who holds a role, and
+record the confirmed owners; then ask who releases versions and record them.
 Commit the intake (`scs commit`). The engine refuses a version until every section's owner is
 mapped.
 

@@ -13,13 +13,16 @@ that has material, giving each item its `derived_from` as you write it, not afte
 
 Then use the ontology's templates as a coverage check. Templates hold placeholders (`TODO`, or
 `"[...]"` hints); `scs status` lists the SCDs that still have them (`scds.placeholders`). For
-each template with no material, ask the user whether the topic applies, in one list: if it
-does, it is a gap to fill with an answer; if not, retire it with `scs bundle remove-scd`.
-Retiring a template never removes a topic the sources raise. A `personal` Domain gets only
+the templates with no material, propose the outcome yourself, as one list to confirm or
+correct: for each, retire it or keep it as a gap, with a short reason from the sources and
+answers. That is one question; never ask the user to sort the templates themselves. A kept gap
+is filled with an answer; a retired template is removed with `scs bundle remove-scd`. Retiring
+a template never removes a topic the sources raise. A `personal` Domain gets only
 boundaries; define the person's other concepts with them using `scs add bundle <name> --new`.
 
 Removing the last SCD of a concept bundle also removes the bundle, its import in the root
-bundle, and its entry in the ontology manifest. Retire several SCDs in one call
+bundle, and its entry in the ontology manifest. Relationships in other SCDs that point at a
+retired SCD are removed too (`result.relationships_removed`), so none is left dangling. Retire several SCDs in one call
 (`scs bundle remove-scd <id> <id> ... --dry-run`), so one dry run shows everything that goes;
 dry runs made one at a time against the same files miss it. Show that dry run's `changes` and
 name each concept bundle in `result.removed[].bundle_removed`, then get the yes. Afterwards,

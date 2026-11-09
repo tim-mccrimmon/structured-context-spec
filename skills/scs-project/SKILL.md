@@ -128,7 +128,7 @@ Show the planned changes, get a yes, then run it. The engine commits the new Pro
 
 Before the profile questions, ask for the Project's documents (the brief, requirements, design
 notes), and whether there is a website to read, as [references/intake.md](references/intake.md)
-describes: give the exact `projects/<name>/sources/` path, wait for the user, then record each
+describes: give the full, absolute path of `projects/<name>/sources/`, wait for the user, then record each
 document and read it.
 Domain documents are already in the Domain; do not record them again.
 
@@ -158,8 +158,8 @@ recorded at review; it is never an edit to `domain/`.
 Then follow [references/drafting.md](references/drafting.md) and
 [references/authoring.md](references/authoring.md). Draft from the sources outward, in one
 pass: every SCD the Project's documents and answers support, each item with its `derived_from`
-as you write it. Use the templates as a coverage check: for a template with no material, ask
-whether the topic applies before retiring it. Scope limits are facts or directives. Show each
+as you write it. Use the templates as a coverage check: for the templates with no material,
+propose which to retire and which to keep as gaps, as one list to confirm. Scope limits are facts or directives. Show each
 concept's drafts as one batch and get one yes per batch. Validate (`scs-validate --strict` at
 the repository root) and explain the result.
 
@@ -191,8 +191,9 @@ changes (`scs commit`).
 ## 8. Release and compile
 
 Now settle who is accountable, as [references/intake.md](references/intake.md) describes
-("Section owners", "Who releases versions"): propose a person for each section owner role as
-one table and record the confirmed owners, then ask who releases versions and record them.
+("Section owners", "Who releases versions"): read the people recorded in the intake, propose
+a person for each section owner role yourself as one table, never asking who holds a role, and
+record the confirmed owners; then ask who releases versions and record them.
 Commit the intake (`scs commit`). The engine refuses a version until every section's owner is
 mapped.
 

@@ -380,6 +380,9 @@ These edit the files' text, so comments and layout survive.
 - **One confirmation may cover a batch of writes** (`agent-interface.md` §7). An agent shows
   every planned change in the batch first and asks again if a dry run differs. Commits,
   versions, and tags keep their own confirmation.
+- **`scs bundle remove-scd` removes relationships to a retired SCD.** Relationships in the
+  workspace's other SCDs that target it are removed, with comments kept, and listed in
+  `result.relationships_removed`, so `scs-validate --strict` reports no dangling targets.
 - **`scs bundle remove-scd` suggests the full id** when given a bare SCD name that matches one
   listed SCD (`SCD_NOT_LISTED`, `suggestion.scd_id`).
 - **The intake error for a citation containing `+` names the slug form**

@@ -8,10 +8,11 @@ command works out every file it will write before writing any of them; `--dry-ru
 from __future__ import annotations
 
 import re
+import textwrap
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import yaml
 from scs_validator.envelope import Change, relative
@@ -116,6 +117,63 @@ def replace_item(text: str, key: str, old: str, new: str) -> str:
         if _item(lines[i]) == old:
             lines[i] = lines[i].replace(old, new, 1)
     return "".join(lines)
+
+
+def _target_of(entry: List[str]) -> Optional[str]:
+    try:
+        data = yaml.safe_load(textwrap.dedent("".join(entry)))
+    except yaml.YAMLError:
+        return None
+    if isinstance(data, list) and data and isinstance(data[0], dict):
+        return str(data[0].get("target", "")) or None
+    return None
+
+
+def remove_relationships(text: str, targets: Set[str]) -> Tuple[str, List[str]]:
+    """Drop the SCD's `relationships` entries whose target is in `targets`, keeping comments and
+    layout; returns the new text and the targets dropped."""
+    data = yaml.safe_load(text) or {}
+    current = data.get("relationships") if isinstance(data, dict) else None
+    if not isinstance(current, list) or not any(
+        isinstance(r, dict) and str(r.get("target")) in targets for r in current
+    ):
+        return text, []
+    kept = [r for r in current if not (isinstance(r, dict) and str(r.get("target")) in targets)]
+    dropped = [str(r.get("target")) for r in current if r not in kept]
+    lines = text.splitlines(keepends=True)
+    found = _block(lines, "relationships")
+    if found is not None and not found[2]:
+        start, end, _ = found
+        entries: List[Tuple[int, int]] = []
+        i = start + 1
+        while i < end:
+            match = re.match(r"^(\s*)-\s", lines[i])
+            if not match:
+                i += 1
+                continue
+            indent = len(match.group(1))
+            j = i + 1
+            while j < end:
+                stripped = lines[j].lstrip()
+                depth = len(lines[j]) - len(stripped)
+                if stripped.strip() and (depth <= indent or stripped.startswith("#")):
+                    break
+                j += 1
+            entries.append((i, j))
+            i = j
+        drop = [(a, b) for a, b in entries if _target_of(lines[a:b]) in targets]
+        for a, b in reversed(drop):
+            del lines[a:b]
+        if len(drop) == len(entries):
+            lines[start] = "relationships: []\n"
+        edited = "".join(lines)
+        try:
+            if (yaml.safe_load(edited) or {}).get("relationships") == kept:
+                return edited, dropped
+        except yaml.YAMLError:
+            pass
+    data["relationships"] = kept
+    return str(yaml.safe_dump(data, sort_keys=False, allow_unicode=True)), dropped
 
 
 # ------------------------------------------------------------------ ontology manifest editing
@@ -514,8 +572,22 @@ def remove_scd(
                 )
             item["bundle_removed"] = concept_id
         removed.append(item)
+
+    # Relationships in the workspace's other SCDs that point at a retired SCD go too, so no
+    # reference is left dangling.
+    gone = {str(i["scd"]) for i in removed if i["scd_file_deleted"]}
+    relationships: List[Dict[str, str]] = []
+    for scd_id, entries in sorted(ws.index.scds.items()):
+        for scd_path, _ in entries:
+            scd_path = scd_path.resolve()
+            if not _inside(scd_path, ws.path) or edit.writes.get(scd_path, "") is None:
+                continue
+            text, dropped = remove_relationships(edit.text(scd_path), gone)
+            if dropped:
+                edit.writes[scd_path] = text
+                relationships += [{"scd": scd_id, "target": d} for d in dropped]
     edit.apply(envelope, dry_run)
-    envelope.result = {"removed": removed}
+    envelope.result = {"removed": removed, "relationships_removed": relationships}
 
 
 def new_concept(

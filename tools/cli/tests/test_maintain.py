@@ -402,6 +402,32 @@ def test_a_bare_scd_name_is_refused_with_the_full_id_suggested(repo: Path):
     assert data["diagnostics"][0]["suggestion"] is None
 
 
+def test_retiring_an_scd_drops_relationships_to_it(repo: Path, monkeypatch):
+    monkeypatch.chdir(repo)
+    assert run("new", "project", "web", "--ontology", "sdlc", *AUTHOR, "--no-interactive")
+    web = repo / "projects" / "web"
+    monkeypatch.chdir(web)
+    audit = web / "context" / "project" / "audit-trail.yaml"
+    assert "scd:project:soc2-controls" in audit.read_text()
+    gone = ["scd:project:soc2-controls", "scd:project:data-model"]
+
+    real = conforms(repo, "bundle", "remove-scd", *gone)
+    dropped = real["result"]["relationships_removed"]
+    assert {"scd": "scd:project:audit-trail", "target": "scd:project:soc2-controls"} in dropped
+    text = audit.read_text()
+    assert not any(g in yaml.safe_load(text).get("relationships") or [] for g in gone)
+    assert "# Define how this SCD relates to others" in text  # comments kept
+    assert "relationships: []" in text  # both of its relationships went
+    threat = yaml.safe_load((web / "context/project/threat-model.yaml").read_text())
+    assert [r["target"] for r in threat["relationships"]] == [
+        "scd:project:component-model",
+        "scd:project:authn-authz",
+    ]  # its data-model relationship went; the others stay
+    for path in (web / "context").rglob("*.yaml"):
+        rels = yaml.safe_load(path.read_text()).get("relationships") or []
+        assert not [r for r in rels if isinstance(r, dict) and r.get("target") in gone], path
+
+
 def test_remove_scd_keeps_the_comments_of_the_files_it_edits(repo: Path):
     assert run("add", "bundle", "groceries", "--new", *AUTHOR).exit_code == 0
     assert run("bundle", "remove-scd", "scd:project:groceries").exit_code == 0

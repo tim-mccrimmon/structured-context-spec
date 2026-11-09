@@ -12,7 +12,7 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-80 issues: open 25 · in-progress 1 · proposed 1 · deferred 3 · done 50.
+81 issues: open 25 · in-progress 1 · proposed 1 · deferred 3 · done 51.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -1265,3 +1265,12 @@ Related: ISS-068, `plan/0.8/bundle-review-process.md` phase 5.
 **Status:** open
 **Target:** later · **Priority:** low · **Effort:** M · **Spec:** no · **Evidence:** expected
 Scope an ontology, example bundle, and citations for legal services.
+
+### ISS-081 - Retiring an SCD leaves relationships to it dangling
+**Status:** done (2026-11-09, rc6): `scs bundle remove-scd` also removes relationships in the
+workspace's other SCDs that target a retired SCD, keeping comments
+**Target:** rc6 · **Priority:** high · **Effort:** S · **Spec:** no · **Evidence:** once
+Found by the rc6 skill harness (project-init): retiring sdlc templates such as `soc2-controls`
+and `data-model` left relationship targets in other templates, so `scs-validate --strict`
+exited 2 with eight warnings. The rc6 order (template triage in one batch while drafting) makes
+it more likely.
