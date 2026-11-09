@@ -992,3 +992,101 @@ is demand.
 RFC 0002 appendix. Onboard Omarchy (one Domain repository, two Projects) entirely through a chat
 client using the skills, with no direct CLI use and no reading of the spec, and record every
 point of friction. Compare against a baseline run with the 0.6 tools.
+
+## Workflow and content quality (from 0.7 acceptance, 2026-11-08)
+
+Found in the WP-13 rc5 run (a regulated Domain drafted from a governance specification and an
+employee handbook) and its retrospective, which ran typical tasks against the compiled
+artifact. Proposed targets: rc6 for ISS-056 to ISS-059 and ISS-062, 0.8 for the rest. Planning
+detail stays in `plan/`; this list tracks the work.
+
+### ISS-056 - Skills: content first, rigor at release
+**Status:** open (proposed rc6)
+Everything a release needs (routing, profile, people, owners, releaser, template triage) comes
+before any draft is visible, so the first human review happens on a released version. Reorder
+`scs-domain` and `scs-project`: sources, then a one-pass draft of every SCD with `derived_from`
+captured while drafting, then a draft review package (`scs view --allow-draft`, offered to the
+user), then review and fix until it settles; owners and the releaser are asked at release,
+where the engine already enforces them. Draft from the sources outward and use the ontology
+as a coverage check, so retiring a template never removes a topic the organization needs.
+Projects: assess the Domain and Project together; Domain issues become questions for the
+Domain owner, not edits.
+
+### ISS-057 - Agent interface: confirmation at checkpoints
+**Status:** open (proposed rc6; normative)
+About 40 confirmations in one Domain session, many for single uncommitted writes. Amend
+`spec/0.7/agent-interface.md` §7 item 1 so one confirmation MAY cover a batch of writes when
+the agent first shows every planned change, as the cascade paragraph already allows for
+versioning, and stops if a dry run differs from the plan. Commits and versions keep their own
+confirmation. Recording every review finding (§7 item 7) is unchanged.
+
+### ISS-058 - One-command release with an internal cascade
+**Status:** open (proposed rc6)
+Releasing a Domain took 21 engine operations (each concept bundle versioned and pinned, then
+the root), and the root cannot be dry-run until its imports are pinned
+(`VERSION_IMPORT_NOT_PINNED`), so the plan shown for confirmation cannot name the root's files.
+Add one command (name to decide) that versions changed concept bundles, pins them, and
+versions the root, with one dry run listing every snapshot, manifest, pin, commit, and tag.
+
+### ISS-059 - Small engine fixes from acceptance
+**Status:** open (proposed rc6)
+- `scs bundle remove-scd` with a bare name fails with `SCD_NOT_LISTED`; the message should
+  suggest the full id (`scd:project:<name>`).
+- Citation editions reject `+` (`std:iec-62304:2006+a1:2015`, `INTAKE_SCHEMA_INVALID`), the
+  way the standard's amended edition is usually written.
+
+### ISS-060 - Item-level SCD edits
+**Status:** open (proposed 0.8)
+Adding or changing one prohibition, directive, or fact means re-sending the whole SCD to
+`scs scd write`. Add an engine command to add, replace, or remove one item by id, with
+`--dry-run` showing only that change.
+
+### ISS-061 - Change a workspace's display name
+**Status:** open (proposed 0.8)
+`--title` is written into the config, bundles, and templates at creation; a case-only change had
+no engine command and meant recreating the repository. Add a command that changes it in one
+step (a new version where released content changes).
+
+### ISS-062 - Skills: drafting guidance for the assistant as reader
+**Status:** open (proposed rc6)
+Drafting faithfully from a policy produced rules an assistant cannot act on (checks "before
+content is sent", model pinning, account setup), detection patterns turned into rules, facts
+stating planned processes as current, and two source clauses missed. Guidance: write each
+directive as what the assistant does when it meets the case; keep people-facing material out
+or flagged (see ISS-064); consistent tense for processes not yet in operation; sweep the sources
+for unused clauses before release.
+
+### ISS-063 - Skills: assessment pass
+**Status:** open (proposed 0.8)
+Review finds what is wrong but rarely what is missing. Add a pass to the draft cycle that runs
+typical tasks against the compiled draft and returns a gap list (covered, partial, absent; too
+tight; unclear gates) for the reviewer to fill in or defer. It points to gaps and never writes
+policy. A manual run against a 92-item artifact found two missed clauses, four uncovered
+topics, and rules that made the assistant refuse routine work.
+
+### ISS-064 - Audience of SCD items
+**Status:** open (proposed 0.8; RFC)
+Everything compiles, so content that informs people (vendor qualification, retention,
+accountability tables) enters the assistant's context, where it doubles the artifact and is
+repeated back to users as instructions. In the acceptance artifact 28 of 92 items were of this
+kind. Proposal: an audience marker on items (assistant or people); the review package shows
+both and the compiler emits only assistant items.
+
+### ISS-065 - Placement facts
+**Status:** open (proposed 0.8; RFC, with the placement work)
+Rules that depend on where the assistant runs (which tool, which data tier) cannot resolve,
+because the same artifact goes to every placement. Without it the assistant questioned the user
+on every task; told the tool, it applied the tier rules as written. Give placement a home for
+such facts.
+
+### ISS-066 - Duplicate rules within a bundle
+**Status:** open (proposed 0.8)
+`scs stack` reports duplicates across layers only. Six clusters of the same rule appeared across
+sections of one Domain. Add a within-bundle duplicate check (validator or `scs stack`).
+
+### ISS-067 - Meta rule M-002: rule ids cited throughout
+**Status:** open (observed once)
+M-002 asks the assistant to name the rule id when a rule makes it decline, limit, or change what
+it does. In the acceptance scenarios answers cited 3 to 14 rule ids each, including where
+nothing was declined, which made them hard to read. Check on more runs before rewording;
+changing it is a new meta bundle version.
