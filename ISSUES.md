@@ -16,12 +16,12 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
-| rc6 (proposed) | ISS-056 | Skills: content first, rigor at release | open | high | L | no | strong |
-| rc6 (proposed) | ISS-057 | Agent interface: confirmation at checkpoints | open | high | S | yes | strong |
-| rc6 (proposed) | ISS-058 | One-command release with an internal cascade | open | high | M | yes | strong |
-| rc6 (proposed) | ISS-062 | Skills: drafting guidance for the assistant as reader | open | high | M | no | strong |
-| rc6 | ISS-068 | Approval record and check | open | high | M | yes | strong |
-| rc6 (proposed) | ISS-059 | Small engine fixes from acceptance | open | medium | S | yes | once |
+| rc6 | ISS-056 | Skills: content first, rigor at release | open | high | L | no | strong |
+| rc6 | ISS-057 | Agent interface: confirmation at checkpoints | open | high | S | yes | strong |
+| rc6 | ISS-058 | One-command release with an internal cascade | open | high | M | yes | strong |
+| rc6 | ISS-062 | Skills: drafting guidance for the assistant as reader | open | high | M | no | strong |
+| rc6 | ISS-059 | Small engine fixes from acceptance | open | medium | S | yes | once |
+| rc7 | ISS-068 | Approval record and check | open | high | M | yes | strong |
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.7.0 | ISS-055 | Acceptance test: real Domains through the skills (WP-13) | in-progress | high | M | no | strong |
 | 0.7.0 | ISS-023 | `docs/` documentation website: migrate to concept terminology | open | medium | M | no | strong |
@@ -1071,7 +1071,7 @@ the organization and are not tracked here. Planning detail stays in `plan/`.
 
 ### ISS-056 - Skills: content first, rigor at release
 **Status:** open
-**Target:** rc6 (proposed) · **Priority:** high · **Effort:** L · **Spec:** no · **Evidence:** strong
+**Target:** rc6 · **Priority:** high · **Effort:** L · **Spec:** no · **Evidence:** strong
 Everything a release needs (routing, profile, people, owners, releaser, template triage) comes
 before any draft is visible, so the first human review happens on a released version. Reorder
 `scs-domain` and `scs-project`: sources, then a one-pass draft of every SCD with `derived_from`
@@ -1084,7 +1084,7 @@ Domain owner, not edits.
 
 ### ISS-057 - Agent interface: confirmation at checkpoints
 **Status:** open
-**Target:** rc6 (proposed) · **Priority:** high · **Effort:** S · **Spec:** yes · **Evidence:** strong
+**Target:** rc6 · **Priority:** high · **Effort:** S · **Spec:** yes · **Evidence:** strong
 About 40 confirmations in one Domain session, many for single uncommitted writes. Amend
 `spec/0.7/agent-interface.md` §7 item 1 so one confirmation MAY cover a batch of writes when
 the agent first shows every planned change, as the cascade paragraph already allows for
@@ -1093,7 +1093,7 @@ confirmation. Recording every review finding (§7 item 7) is unchanged.
 
 ### ISS-058 - One-command release with an internal cascade
 **Status:** open
-**Target:** rc6 (proposed) · **Priority:** high · **Effort:** M · **Spec:** yes · **Evidence:** strong
+**Target:** rc6 · **Priority:** high · **Effort:** M · **Spec:** yes · **Evidence:** strong
 Releasing a Domain took 21 engine operations (each concept bundle versioned and pinned, then
 the root), and the root cannot be dry-run until its imports are pinned
 (`VERSION_IMPORT_NOT_PINNED`), so the plan shown for confirmation cannot name the root's files.
@@ -1102,7 +1102,7 @@ versions the root, with one dry run listing every snapshot, manifest, pin, commi
 
 ### ISS-059 - Small engine fixes from acceptance
 **Status:** open
-**Target:** rc6 (proposed) · **Priority:** medium · **Effort:** S · **Spec:** yes · **Evidence:** once
+**Target:** rc6 · **Priority:** medium · **Effort:** S · **Spec:** yes · **Evidence:** once
 - `scs bundle remove-scd` with a bare name fails with `SCD_NOT_LISTED`; the message should
   suggest the full id (`scd:project:<name>`).
 - Citation editions reject `+` (`std:iec-62304:2006+a1:2015`, `INTAKE_SCHEMA_INVALID`), the
@@ -1124,7 +1124,7 @@ step (a new version where released content changes).
 
 ### ISS-062 - Skills: drafting guidance for the assistant as reader
 **Status:** open
-**Target:** rc6 (proposed) · **Priority:** high · **Effort:** M · **Spec:** no · **Evidence:** strong
+**Target:** rc6 · **Priority:** high · **Effort:** M · **Spec:** no · **Evidence:** strong
 Drafting faithfully from a policy produced rules an assistant cannot act on (checks "before
 content is sent", model pinning, account setup), detection patterns turned into rules, facts
 stating planned processes as current, and two source clauses missed. Guidance: write each
@@ -1180,7 +1180,7 @@ here so this file holds the whole backlog.
 
 ### ISS-068 - Approval record and check
 **Status:** open
-**Target:** rc6 · **Priority:** high · **Effort:** M · **Spec:** yes · **Evidence:** strong
+**Target:** rc7 · **Priority:** high · **Effort:** M · **Spec:** yes · **Evidence:** strong
 Phase 2 of `plan/0.8/bundle-review-process.md`. A record beside the version manifest naming the
 system of record, record id, decision, approvers, the certified content digest, and the review
 package checksum; a command (name to decide) that fails on a digest mismatch or a missing record,
