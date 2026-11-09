@@ -1,7 +1,7 @@
 # Skill behaviour harness (D-51)
 
 Scripted conversations that test the SCS Agent Skills (`skills/`) against the assertions in
-`plan/0.7/06-work-breakdown.md`: a to m (WP-10), n to t (WP-10b, the rc2 skills), and u (section owners, D-92). The agent under test runs the skills through the
+`plan/0.7/06-work-breakdown.md`: a to m (WP-10), n to t (WP-10b, the rc2 skills), u (section owners, D-92), and v (content first, ISS-056). The agent under test runs the skills through the
 Claude Agent SDK; a second model plays the user; checks read the transcript, the engine's
 JSON envelopes, and the repository before and after.
 
@@ -13,9 +13,9 @@ part of CI.
 | File | What it holds |
 |---|---|
 | `config.yaml` | Pinned models, runs per scenario, pass thresholds, limits, prices |
-| `scenarios.yaml` | The simulated user's persona and the twelve scenarios |
+| `scenarios.yaml` | The simulated user's persona and the thirteen scenarios |
 | `fixtures.py` | Builds each scenario's starting Domain repository with the engine |
-| `checks.py` | The assertions, a to u, as functions of a recorded run |
+| `checks.py` | The assertions, a to v, as functions of a recorded run |
 | `harness.py` | Runs the conversations, scores them, writes the report |
 
 ## Running
@@ -73,6 +73,11 @@ Choices worth knowing when reading a report:
 - e ignores a failure that the agent retried in the same turn (the same operation, and for
   `bundle version` the same `--bundle`). A retry whose output went into a pipe counts as
   superseding, so a second failure hidden by the pipe is not caught.
+- c, g, and h3 count `scs bundle release` (ISS-058) as a version, as well as
+  `scs bundle version`.
+- Since rc6 (ISS-056) the skills ask section owners and the releaser at release, not in
+  set-up: u is scored on `release-owners`, and v checks that `domain-init` and `project-init`,
+  which stop at drafting, record no owners or approvers.
 - l scores only the reply to the out-of-scope request; a step the user then asks for on its
   own, such as a compile, is in scope.
 

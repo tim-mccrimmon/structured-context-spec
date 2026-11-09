@@ -28,7 +28,7 @@ scenarios:
   domain-init:
     fixture: empty
     init: true
-    targets: [j, n, o, p, s, u]
+    targets: [j, n, o, p, s, v]
     # The sandbox refuses writes to .git/config and .git/hooks, so git init cannot run in it;
     # this scenario runs with a guard hook instead (harness.py, bash_guard).
     sandbox: false
@@ -81,7 +81,7 @@ scenarios:
   project-init:
     fixture: released
     init: true
-    targets: [j, n, o, p, s, u]
+    targets: [j, n, o, p, s, v]
     workspace: portal
     max_user_turns: 24
     budget_usd: 5.00
@@ -152,6 +152,17 @@ scenarios:
     facts: |
       - Approver: Pat Lee <pat@acme-health.org>.
       - If an open review finding is raised, keep it deferred for now and go ahead.
+      - Version notes, if asked: "First release."
+      - Goal: version 1.0.0 of the Domain is released.
+
+  release-owners:
+    fixture: unowned
+    targets: [c, u]
+    opening: The acme domain in acme-context is drafted and reviewed. Please release it as 1.0.0.
+    facts: |
+      - People: you, Pat Lee <pat@acme-health.org>, Quality Manager; Sam Ortiz, CTO.
+      - Section owners: accept a sensible proposal; you own anything about prohibitions.
+      - Who releases versions: you, Pat Lee <pat@acme-health.org>.
       - Version notes, if asked: "First release."
       - Goal: version 1.0.0 of the Domain is released.
 

@@ -19,7 +19,7 @@ LEVELS = {
     "g": "SHOULD", "h1": "MUST", "h2": "MUST", "h3": "SHOULD", "i": "SHOULD", "j": "MUST",
     "k1": "MUST", "k2": "SHOULD", "l": "MUST", "m": "SHOULD",
     "n": "MUST", "o": "MUST", "p": "SHOULD", "q": "MUST", "r": "MUST", "s": "MUST", "t": "SHOULD",
-    "u": "MUST",
+    "u": "MUST", "v": "SHOULD",
 }
 CROSS_CUTTING = ["a", "b", "d", "e", "m", "r", "s"]
 FORBIDDEN_FLAGS = {
@@ -347,11 +347,16 @@ def check_b(run: dict, scenario: dict) -> dict:
     return ok("; ".join(notes))
 
 
+def version_calls(run: dict) -> list[tuple[int, dict]]:
+    """Real (not dry-run) `scs bundle version` and `scs bundle release` calls (ISS-058)."""
+    return [(t, c) for t, c in all_calls(run)
+            if (is_command(c, "scs", "bundle", "version") or is_command(c, "scs", "bundle", "release"))
+            and not c["dry_run"] and "--help" not in c["args"]]
+
+
 def check_c(run: dict, scenario: dict) -> dict:
     """The approver comes from a user turn; a cascade has one confirmation naming every bundle."""
-    versions = [(t, c) for t, c in all_calls(run)
-                if is_command(c, "scs", "bundle", "version") and not c["dry_run"]
-                and "--help" not in c["args"]]
+    versions = version_calls(run)
     if not versions:
         return na("no bundle version")
     for t, call in versions:
@@ -447,8 +452,7 @@ def check_f(run: dict, scenario: dict) -> dict:
 def check_g(run: dict, scenario: dict) -> dict:
     """Before every bundle version, a bundle diff summary was shown."""
     calls = all_calls(run)
-    versions = [(t, c) for t, c in calls
-                if is_command(c, "scs", "bundle", "version") and not c["dry_run"]]
+    versions = version_calls(run)
     if not versions:
         return na("no bundle version")
     diffs = [t for t, c in calls if is_command(c, "scs", "bundle", "diff")]
@@ -504,8 +508,7 @@ def check_h3(run: dict, scenario: dict) -> dict:
     words = run["fixture"].get("deferred_words")
     if not words:
         return na()
-    versions = [t for t, c in all_calls(run)
-                if is_command(c, "scs", "bundle", "version") and not c["dry_run"]]
+    versions = [t for t, _ in version_calls(run)]
     if not versions:
         return fail("no version released")
     before = " ".join(run["turns"][t]["assistant"].lower() for t in range(versions[0]))
@@ -779,9 +782,10 @@ def check_s(run: dict, scenario: dict) -> dict:
 
 
 def owner_gaps(run: dict, scenario: dict) -> dict:
-    """Every section owner role in the set-up workspace is mapped to a person (D-92)."""
-    if not scenario.get("init"):
-        return na("not a set-up session")
+    """Every section owner role in the workspace is mapped to a person by the end (D-92); since
+    ISS-056 the skills ask at release, so this is scored on a release scenario."""
+    if "u" not in scenario.get("targets", []):
+        return na("not a release with owners to settle")
     if not run["final"].get("repo"):
         return fail("no Domain repository")
     root = Path(run["final"]["work"]) / run["final"]["repo"]
@@ -800,6 +804,18 @@ def owner_gaps(run: dict, scenario: dict) -> dict:
     return ok(f"{len(roles)} sections, {len(set(roles.values()))} roles, all held")
 
 
+def check_v(run: dict, scenario: dict) -> dict:
+    """Content first (ISS-056): a set-up session that stops at drafting records no section owners
+    and no approvers; they are asked at release."""
+    if not scenario.get("init"):
+        return na("not a set-up session")
+    for t, turn in enumerate(run["turns"]):
+        early = [f for f, _ in intake_sets(turn) if f in ("owners", "approvers")]
+        if early:
+            return fail(f"turn {t}: {early} recorded before drafting")
+    return ok()
+
+
 def first_engine_call(run: dict) -> tuple[int, dict] | None:
     for t, call in all_calls(run):
         if "--help" not in call["args"] and call["args"][:1] != ["--version"]:
@@ -809,4 +825,5 @@ def first_engine_call(run: dict) -> tuple[int, dict] | None:
 
 CHECKS = {"a": check_a, "b": check_b, "c": check_c, "d": check_d, "f": check_f, "g": check_g,
           "h1": check_h1, "h2": check_h2, "h3": check_h3, "j": check_j, "k1": check_k1,
-          "k2": check_k2, "m": check_m, "q": check_q, "r": check_r, "s": check_s}
+          "k2": check_k2, "m": check_m, "q": check_q, "r": check_r, "s": check_s,
+          "v": check_v}

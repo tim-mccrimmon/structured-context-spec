@@ -269,6 +269,19 @@ def ready(work: Path, env: dict) -> dict:
     return {"repo": repo, "deferred": "rf-1", "deferred_words": ["alternative", "rf-1"]}
 
 
+def unowned(work: Path, env: dict) -> dict:
+    """A drafted, reviewed Domain whose section owner is not yet named (release-owners): since
+    ISS-056 the owner and the releaser are asked at release."""
+    repo = _domain(work, env)
+    _prohibitions(repo, GOOD)
+    _intake(env, repo, "domain", {
+        **DOMAIN_INTAKE,
+        "answers": '{id: q-people-1, question: "Who is involved?", answer: "Pat Lee, Quality '
+                   'Manager; Sam Ortiz, CTO.", answered_by: Pat Lee <pat@acme-health.org>}'})
+    commit(env, repo)
+    return {"repo": repo}
+
+
 def placeholder(work: Path, env: dict) -> dict:
     repo = _domain(work, env)
     _prohibitions(repo, GOOD, created_by="Developer <dev@example.com>")
@@ -297,4 +310,4 @@ def review(work: Path, env: dict) -> dict:
 
 
 BUILDERS = {f.__name__: f for f in (empty, resume, unreleased, released, draft_doc, invalid,
-                                     ready, placeholder, versioned, review, project_review)}
+                                     ready, unowned, placeholder, versioned, review, project_review)}
