@@ -12,16 +12,16 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-81 issues: open 22 · in-progress 1 · proposed 1 · deferred 3 · done 54.
+82 issues: open 22 · in-progress 1 · proposed 1 · deferred 3 · done 55.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
-| rc7 | ISS-068 | Approval record and check | open | high | M | yes | strong |
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.7.0 | ISS-055 | Acceptance test: real Domains through the skills (WP-13) | in-progress | high | M | no | strong |
 | 0.7.0 | ISS-023 | `docs/` documentation website: migrate to concept terminology | open | medium | M | no | strong |
 | 0.7.0 | ISS-070 | Examples rebuilt as Domain repositories | open | medium | M | no | strong |
 | 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
+| 0.7.0 | ISS-082 | Guidance: an external approval cites the version and content digest | open | medium | S | yes | strong |
 | 0.7.x | ISS-040 | Docs and validator message do not say that concept relationships belong in the ontology | open | low | S | no | once |
 | 0.8 | ISS-064 | Audience of SCD items | open | high | L | yes | strong |
 | 0.8 | ISS-065 | Placement facts | open | high | L | yes | strong |
@@ -1183,7 +1183,12 @@ Work that was tracked only in `plan/`, the release notes, or the maintainer's ta
 here so this file holds the whole backlog.
 
 ### ISS-068 - Approval record and check
-**Status:** open
+**Status:** done (2026-11-10): closed without building it. The approval record and its check
+belong outside SCS: the organization's QMS is the source of truth for which version is
+approved, and SCP checks the deployed artifact against it. SCS already makes each version
+identifiable and checkable (tag, content digest, `source_digest` in the compiled artifact,
+`--verify-version`, digest on the review package cover). What SCS still owes is guidance on
+citing the version and digest: ISS-082
 **Target:** rc7 · **Priority:** high · **Effort:** M · **Spec:** yes · **Evidence:** strong
 Phase 2 of `plan/0.8/bundle-review-process.md`. A record beside the version manifest naming the
 system of record, record id, decision, approvers, the certified content digest, and the review
@@ -1284,3 +1289,18 @@ Found by the rc6 skill harness (project-init): retiring sdlc templates such as `
 and `data-model` left relationship targets in other templates, so `scs-validate --strict`
 exited 2 with eight warnings. The rc6 order (template triage in one batch while drafting) makes
 it more likely.
+
+### ISS-082 - Guidance: an external approval cites the version and content digest
+**Status:** open
+**Target:** 0.7.0 · **Priority:** medium · **Effort:** S · **Spec:** yes · **Evidence:** strong
+Replaces ISS-068. A regulated organization approves governance content in its own system of
+record (a QMS), and a runtime such as SCP checks what is deployed against that approval. A
+version number is a label; the content digest pins the exact content. SCS has the mechanics
+(content digest in the version manifest, `source_digest` in the compiled artifact, digest on
+the review package cover) but does not say how they connect to an external approval.
+(1) `spec/0.7/governance-and-compliance.md` §8, after "Version": an external approval record
+SHOULD cite the version and its content digest; the compiled artifact carries the same digest
+as `source_digest`, so whoever deploys or audits it can confirm it is the approved content;
+checking that at runtime is outside SCS. A clarification, not a new field: no RFC.
+(2) scs-domain and scs-project step 8: after a release, tell the user what to cite in their
+approval record (version, content digest, review package path).
