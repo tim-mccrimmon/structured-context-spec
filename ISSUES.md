@@ -12,7 +12,7 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-81 issues: open 24 · in-progress 1 · proposed 1 · deferred 3 · done 52.
+81 issues: open 22 · in-progress 1 · proposed 1 · deferred 3 · done 54.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -22,8 +22,6 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 | 0.7.0 | ISS-023 | `docs/` documentation website: migrate to concept terminology | open | medium | M | no | strong |
 | 0.7.0 | ISS-070 | Examples rebuilt as Domain repositories | open | medium | M | no | strong |
 | 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
-| 0.7.0 | ISS-072 | `skills/README.md` install order is stale | open | low | S | no | once |
-| 0.7.0 | ISS-073 | Intermittent CLI test failure | open | low | S | no | once |
 | 0.7.x | ISS-040 | Docs and validator message do not say that concept relationships belong in the ontology | open | low | S | no | once |
 | 0.8 | ISS-064 | Audience of SCD items | open | high | L | yes | strong |
 | 0.8 | ISS-065 | Placement facts | open | high | L | yes | strong |
@@ -1217,13 +1215,19 @@ generate them in CI or check them in and version them in CI.
 not yet tried.
 
 ### ISS-072 - `skills/README.md` install order is stale
-**Status:** open
+**Status:** done (2026-11-10): README describes the engine's order, bundled or uploaded
+wheels first when present, then PyPI, then a GitHub tag
 **Target:** 0.7.0 · **Priority:** low · **Effort:** S · **Spec:** no · **Evidence:** once
 The engine recommends bundled wheels first (since `302ff52`); the README still lists the old
 order.
 
 ### ISS-073 - Intermittent CLI test failure
-**Status:** open
+**Status:** done (2026-11-10): not a compile or Python 3.14 problem. `scs new`'s commits start
+git's background auto maintenance, which repacks `.git` (loose objects into a pack,
+`info/refs`, multi-pack-index) about a second later, while the test compares snapshots that
+include `.git`. Reproduced with no command at all between snapshots. The test git config now
+sets `maintenance.auto = false` and `gc.auto = 0`; 40 of 40 pass with a 1.5 s wait, against
+about 1 in 8 failing before
 **Target:** 0.7.0 · **Priority:** low · **Effort:** S · **Spec:** no · **Evidence:** once
 `test_compile_writes_dist_bundle_name_version` failed once and has passed since. Not
 investigated.

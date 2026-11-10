@@ -38,9 +38,10 @@ Checked 2026-10-28 against [Claude Code: skills](https://code.claude.com/docs/en
 ## Installing the SCS tools
 
 Each skill's `scripts/scs_engine.py check` reports whether the tools are installed and new
-enough, and `install-plan` gives the command to show the user, in the D-27 order: PyPI, a GitHub
-tag, then wheels bundled with the skill or uploaded to the chat. The skill installs nothing
-without the user's agreement. What works in each client is recorded in
+enough, and `install-plan` gives the commands to show the user. When the skill has bundled
+wheels, or wheels were uploaded to the chat, those come first and are recommended; then PyPI,
+then a GitHub tag, each pinned to the release (the D-27 sources, with bundled wheels first since
+`302ff52`). The skill installs nothing without the user's agreement. What works in each client is recorded in
 [`docs/install-matrix.md`](../docs/install-matrix.md).
 
 ## Maintaining the skills

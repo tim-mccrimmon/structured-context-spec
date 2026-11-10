@@ -67,6 +67,9 @@ def isolated_git(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     config.write_text(
         "[commit]\n\tgpgsign = true\n[tag]\n\tgpgSign = true\n\tforceSignAnnotated = true\n"
         f"[core]\n\thooksPath = {hooks}\n\tautocrlf = true\n"
+        # No background maintenance after the engine's commits: it repacks .git while a test
+        # compares snapshots of the repository (ISS-073)
+        "[maintenance]\n\tauto = false\n[gc]\n\tauto = 0\n"
     )
     monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(config))
     monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
