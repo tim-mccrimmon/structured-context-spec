@@ -71,10 +71,10 @@ If the user has no documents and no website, say that is fine and go on with the
 Ask who is involved, and record them as an answer, `q-people-1`, so drafted items can cite
 it. Record each person by name and role; ask for an email only from whoever releases versions,
 unless the user offers it. Propose names and roles you find in the
-documents, and ask the user to confirm or correct them. Ask who is involved and in which role
-with the profile, so drafted items can cite them. Ask who owns each section and who releases
-versions later, at release, once the drafts are reviewed: the draft decides which sections
-there are, and the engine refuses a version until they are recorded.
+documents, and ask the user to confirm or correct them. Ask who owns each section once the
+draft is done, before the draft review package: the draft decides which sections there are, and
+the section owners are its primary reviewers, so the package names them. Ask who releases
+versions at release. The engine refuses a version until both are recorded.
 
 - **Domain:** leadership roles that set or own the rules: for example CEO, CTO, CISO, quality,
   regulatory, legal.
@@ -108,14 +108,15 @@ scripts/scs_engine.py run scs bundle set-owner regulatory --bundle bundles/conce
 ```
 
 A personal Domain has one role, `owner`: map it to the person. Versioning a section fails until
-its role is mapped (`VERSION_OWNER_UNMAPPED`), so settle owners at release, before the first
-version. A
+its role is mapped (`VERSION_OWNER_UNMAPPED`), so settle owners after drafting, before the
+draft review package; at release, check that every section, including any added in review,
+still has one. A
 change of person later is an intake change only and needs no new version; a change of role
 changes the bundle and needs one.
 
 ### Who releases versions
 
-Then ask who releases new versions of this workspace's context, and record each person (the
+At release, ask who releases new versions of this workspace's context, and record each person (the
 engine calls them approvers):
 
 ```
@@ -141,7 +142,7 @@ When `audience: organization`, or `regulated: true`.
 | Field | Ask | Notes |
 |---|---|---|
 | `organization` | Name, products or services, sites | |
-| `certifications` | Standards, regulations, and editions in scope | Citation references such as `std:iso-13485:2016` or `std:hipaa`; they drive `cites`. Never the standard's text |
+| `certifications` | Standards, regulations, and editions in scope | Citation references in the form in [authoring.md](authoring.md) ("Citations"), such as `std:iso-13485:2016`, `std:21-cfr-820` or `std:hipaa`; they drive `cites`. Never the standard's text |
 | `boundaries` | What is explicitly out of bounds for AI tools | The main source of prohibitions |
 
 ## Project

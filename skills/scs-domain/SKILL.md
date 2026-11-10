@@ -89,14 +89,14 @@ Tell the user which mode you chose and why, from the status, before going on.
 Before any question, tell the user in a short message:
 
 - what happens: setting up the Domain, gathering documents, a few questions at a time,
-  drafting all the rules from the documents in one pass, a draft review package they can read
-  and share, reviewing and fixing until the rules settle, then naming who owns each section and
-  who releases, releasing a version, and compiling it for their AI tools;
+  drafting all the rules from the documents in one pass, naming who owns each section, a draft
+  review package they can read and share with those owners, reviewing and fixing until the rules
+  settle, then naming who releases, releasing a version, and compiling it for their AI tools;
 - what is needed on the computer: git, which SCS uses to keep each change and version (no
   GitHub account or git setup is needed), and the SCS tools; step 0 has already checked both;
 - what helps to have ready: the organization's AI usage policy and any related policies or
-  SOPs, and the people involved and their roles; who owns each section and who releases a
-  version are asked at the end, once the rules are reviewed;
+  SOPs, and the people involved and their roles; who owns each section is asked once the draft
+  shows which sections there are, and who releases a version at the end;
 - that they can stop at any point: the work is saved in the repository as it goes, and a new
   session picks up from `scs status`;
 - that Projects come later, each in its own session with the scs-project skill, once the
@@ -144,8 +144,8 @@ support.
 
 Ask the profile questions that apply, then who is involved and in which role (the people
 answer, `q-people-1`), from [references/intake.md](references/intake.md). Pace them, record
-each group of answers, and confirm proposals before recording them. Section owners and who
-releases versions are asked at release (step 8), not here.
+each group of answers, and confirm proposals before recording them. Section owners are asked
+after drafting (step 6) and who releases versions at release (step 8), not here.
 
 **Checkpoint:** commit the intake.
 
@@ -168,12 +168,18 @@ and explain the result.
 **Checkpoint:** `scs commit --workspace domain`, as above, with a message naming what was
 drafted.
 
-## 6. Draft review package
+## 6. Section owners and draft review package
 
-Offer the user a review package of the draft: one HTML file with every prohibition, rule, and
-fact, its source, and the line the AI receives, marked as not for approval. It is the first
-time they see the whole Domain in one place, and they can share it with the people who own the
-sections. If they want it, that is their request for `--allow-draft`:
+The section owners are the primary reviewers, so settle them before the package, as
+[references/intake.md](references/intake.md) describes ("Section owners"): read the people
+recorded in the intake, propose a person for each section owner role yourself as one table,
+never asking who holds a role, and record the confirmed owners. Commit the intake
+(`scs commit`).
+
+Then offer the user a review package of the draft: one HTML file with every prohibition, rule,
+and fact, its source, the line the AI receives, and each section's owner, marked as not for
+approval. It is the first time they see the whole Domain in one place, and they can share it
+with the section owners, each reviewing their own sections. If they want it, that is their request for `--allow-draft`:
 
 ```
 scripts/scs_engine.py run scs view bundles/domain-bundle.yaml --allow-draft --dry-run
@@ -193,12 +199,11 @@ new draft package can be written after a round of changes. Commit the decisions 
 
 ## 8. Release and compile
 
-Now settle who is accountable, as [references/intake.md](references/intake.md) describes
-("Section owners", "Who releases versions"): read the people recorded in the intake, propose
-a person for each section owner role yourself as one table, never asking who holds a role, and
-record the confirmed owners; then ask who releases versions and record them.
-Commit the intake (`scs commit`). The engine refuses a version until every section's owner is
-mapped.
+Check that every section still has its owner, including any section added in review (`scs
+status`, `owners.unmapped_roles`), and propose one for each that does not. Then ask who releases
+versions and record them, as [references/intake.md](references/intake.md) describes ("Who
+releases versions"). Commit the intake (`scs commit`). The engine refuses a version until every
+section's owner is mapped.
 
 In an update, the owners and releasers are already recorded: show them and ask only whether
 they have changed.

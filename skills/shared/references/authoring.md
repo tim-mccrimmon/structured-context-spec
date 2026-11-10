@@ -89,6 +89,14 @@ It is never compiled. An unknown id is `DERIVED_FROM_UNRESOLVED` (a warning; fai
 `std:<standard>[:<edition>][#<clause>]`, for example `std:iec-62304:2006-a1#5.1`. A citation
 names a clause; it never carries the clause's text.
 
+Use these forms from the first proposal, not after a dry run fails:
+
+- `std:` is the only prefix, for regulations and laws as well as standards: `std:21-cfr-820`,
+  `std:eu-mdr-2017-745`, `std:eu-ai-act-2024-1689`, `std:hipaa`. There is no `reg:`.
+- An edition has letters, digits, dots and hyphens only. Write an amendment with a hyphen, never
+  `+`: IEC 62304:2006+A1:2015 is `std:iec-62304:2006-a1`.
+- The standard part is lowercase letters, digits, dots and hyphens: `std:iso-13485:2016`.
+
 ## Writing an SCD
 
 Pass the YAML on stdin with a heredoc, so no draft file is written anywhere:

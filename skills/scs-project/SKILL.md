@@ -92,12 +92,13 @@ Before any question, tell the user in a short message:
 
 - what happens: creating the Project, gathering its documents, a few questions at a time about
   the work and the team, drafting all its rules in one pass, a draft review package that shows
-  them beside the Domain's, reviewing and fixing until they settle, then naming who owns each
-  section and who releases, releasing a version, and compiling it;
+  them beside the Domain's and names who owns each section, reviewing and fixing until they
+  settle, then naming who releases, releasing a version, and compiling it;
 - what is needed on the computer: git, which SCS uses to keep each change and version (no
   GitHub account or git setup is needed), and the SCS tools; step 0 has already checked both;
 - what helps to have ready: the project brief or requirements, and the team's names and roles;
-  who owns each section and who releases a version are asked at the end;
+  who owns each section is asked once the draft shows which sections there are, and who
+  releases a version at the end;
 - that the Domain's rules are fixed in this session: a conflict with one is recorded as a
   question for the Domain owner, not changed here;
 - that they can stop at any point; a new session picks up from `scs status`.
@@ -137,8 +138,8 @@ Domain documents are already in the Domain; do not record them again.
 Ask the Project profile questions, then the team (the lead, the developers, the quality or
 regulatory reviewer, the business owner) as the people answer, from
 [references/intake.md](references/intake.md). Pace them, record each group of answers, and
-confirm proposals before recording them. Section owners and who releases versions are asked at
-release (step 8), not here.
+confirm proposals before recording them. Section owners are asked after drafting (step 6) and
+who releases versions at release (step 8), not here.
 
 **Checkpoint:** commit the intake.
 
@@ -165,11 +166,17 @@ the repository root) and explain the result.
 
 **Checkpoint:** `scs commit --workspace <name>`, with a message naming what was drafted.
 
-## 6. Draft review package
+## 6. Section owners and draft review package
 
-Offer the user a review package of the draft: one HTML file with the Project's rules and,
-marked as inherited, the Domain's released rules, so they read the two together. It is marked
-as not for approval. If they want it, that is their request for `--allow-draft`:
+The section owners are the primary reviewers, so settle them before the package, as
+[references/intake.md](references/intake.md) describes ("Section owners"): read the team
+recorded in the intake, propose a person for each section owner role yourself as one table,
+never asking who holds a role, and record the confirmed owners. Commit the intake
+(`scs commit`).
+
+Then offer the user a review package of the draft: one HTML file with the Project's rules, each
+section's owner, and, marked as inherited, the Domain's released rules, so they read the two
+together. It is marked as not for approval. If they want it, that is their request for `--allow-draft`:
 
 ```
 scripts/scs_engine.py run scs view bundles/project-bundle.yaml --allow-draft --dry-run
@@ -190,12 +197,11 @@ changes (`scs commit`).
 
 ## 8. Release and compile
 
-Now settle who is accountable, as [references/intake.md](references/intake.md) describes
-("Section owners", "Who releases versions"): read the people recorded in the intake, propose
-a person for each section owner role yourself as one table, never asking who holds a role, and
-record the confirmed owners; then ask who releases versions and record them.
-Commit the intake (`scs commit`). The engine refuses a version until every section's owner is
-mapped.
+Check that every section still has its owner, including any section added in review (`scs
+status`, `owners.unmapped_roles`), and propose one for each that does not. Then ask who releases
+versions and record them, as [references/intake.md](references/intake.md) describes ("Who
+releases versions"). Commit the intake (`scs commit`). The engine refuses a version until every
+section's owner is mapped.
 
 In an update, the owners and releasers are already recorded: show them and ask only whether
 they have changed.
