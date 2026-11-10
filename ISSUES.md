@@ -12,7 +12,7 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-81 issues: open 25 · in-progress 1 · proposed 1 · deferred 3 · done 51.
+81 issues: open 24 · in-progress 1 · proposed 1 · deferred 3 · done 52.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -20,7 +20,6 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.7.0 | ISS-055 | Acceptance test: real Domains through the skills (WP-13) | in-progress | high | M | no | strong |
 | 0.7.0 | ISS-023 | `docs/` documentation website: migrate to concept terminology | open | medium | M | no | strong |
-| 0.7.0 | ISS-069 | `BUNDLE_SCD_UNRESOLVED`: warning or error | open | medium | S | maybe | expected |
 | 0.7.0 | ISS-070 | Examples rebuilt as Domain repositories | open | medium | M | no | strong |
 | 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
 | 0.7.0 | ISS-072 | `skills/README.md` install order is stale | open | low | S | no | once |
@@ -1195,8 +1194,11 @@ usable in CI. Open: whether the record is committed after the tag, block or warn
 Domains require it.
 
 ### ISS-069 - `BUNDLE_SCD_UNRESOLVED`: warning or error
-**Status:** open
-**Target:** 0.7.0 · **Priority:** medium · **Effort:** S · **Spec:** maybe · **Evidence:** expected
+**Status:** done (2026-11-10): kept as a warning. It already blocks where it matters: releasing
+a version runs strict validation, which fails on warnings, and `scs compile` rejects unresolved
+SCDs. A draft stays valid in loose mode, and the engine itself keeps listings and files
+together (`scs add scd`, `remove-scd`). The example that prompted the revert is rebuilt in
+ISS-070. No code change.
 An SCD listed in a bundle that cannot be resolved is a warning. Making it an error was agreed,
 then reverted because `examples/medical-device-cdmo/` lists SCD slots on purpose. Decide with
 ISS-070.
