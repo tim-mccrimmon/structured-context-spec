@@ -12,7 +12,7 @@ is fine, writing is not). Check:
 | `kind` | Look for |
 |---|---|
 | `framework-conflict` | A rule that contradicts a framework the workspace cites. Example: a directive that lets the assistant mark records approved, where 21 CFR 820 is cited and approval is a human sign-off |
-| `missing-protection` | Something the intake says is present (PHI, payment data, safety-class C software, client confidential data) with no prohibition or directive covering it |
+| `missing-protection` | Something the intake says is present (PHI, payment data, safety-class C software, client confidential data) with no prohibition or directive covering it. In a regulated workspace, also a missing rule against presenting invented content as fact: the assistant must not invent citations, clauses, requirements, data, or numbers, and says when it is unsure. A source that makes users responsible for accuracy is enough to trace it to |
 | `technical-risk` | A rule that weakens security, auditability, or traceability: disabling logging, sharing credentials, skipping review. Also a rule so broad that it blocks the work the context is for, such as a prohibition that forbids what the Project must build |
 | `ethical-risk` | A rule that could cause harm, deception, or unfair treatment of people |
 | `layer-conflict` | A rule that contradicts one in another layer loaded with it: in a Project, the Domain (see below) |

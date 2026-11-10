@@ -32,7 +32,12 @@ report what the real run's envelope says, not what you expected.
 
 - A **prohibition** is binary: a `subject` noun phrase, a `kind` (`tool` or `practice`), and
   optionally `instead`. If something is allowed in some cases, narrow the subject until what
-  remains is always forbidden.
+  remains is always forbidden. It is something the assistant itself must never do, use, or
+  recommend. A rule only a person can break, such as which account they sign in with, whether
+  they share credentials, or which tools they install, is not the assistant's to obey: draft
+  it as one directive that says when to remind the user ("If the user describes using a
+  personal AI account or an unapproved tool, remind them that ..."), and group such rules
+  into one directive where they share a trigger.
 - A **directive** is one instruction an agent reads.
 - A **fact** is one checkable statement. A rule phrased as a fact is a directive.
 - A **scope limit**, such as "this Project covers time entry only" or "the first release does
