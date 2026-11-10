@@ -28,7 +28,7 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 | 0.8 | ISS-077 | Starter Domains per ontology | open | high | L | yes | expected |
 | 0.8 (proposed) | ISS-060 | Item-level SCD edits | open | medium | M | no | strong |
 | 0.8 (decide after the WP-13 rc6 rerun) | ISS-063 | Skills: assessment pass | open | medium | L | no | once |
-| 0.8 | ISS-066 | Duplicate rules within a bundle | open | medium | S | no | once |
+| 0.8 | ISS-066 | Duplicate rules within a bundle, and its size | open | medium | M | no | strong |
 | 0.8 | ISS-074 | Rename the approver fields to "released by" | open | medium | M | yes | strong |
 | 0.8 | ISS-075 | Project records the Domain version it was reviewed against | open | medium | M | yes | once |
 | 0.8 | ISS-076 | Starter outline from the ontology | open | medium | M | no | once |
@@ -1163,11 +1163,19 @@ resolve, because the same artifact goes to every placement and SCS has no place 
 was placed. Without it the assistant asked the user on every task; given one line naming the
 tool, it applied the rules. Give placement a home for such facts.
 
-### ISS-066 - Duplicate rules within a bundle
+### ISS-066 - Duplicate rules within a bundle, and its size
 **Status:** open
-**Target:** 0.8 · **Priority:** medium · **Effort:** S · **Spec:** no · **Evidence:** once
+**Target:** 0.8 · **Priority:** medium · **Effort:** M · **Spec:** no · **Evidence:** strong
 `scs stack` reports duplicates across layers only. Six clusters of the same rule appeared across
 sections of one Domain. Add a within-bundle duplicate check (validator or `scs stack`).
+Seen again in the WP-13 rc6 run (2026-11-10): the first draft had 92 items, about 21.9K
+characters, as long as the one policy it came from; eleven topics were stated two to nine times
+across sections (CSS classification, humans decide, 24-hour reporting). The skills now run a
+consolidation pass before the draft package (drafting.md, "Consolidate before the draft
+package"); this issue is the engine support so it does not rely on the agent noticing:
+(1) flag near-duplicate items across a workspace's sections; (2) show the item count and
+compiled size in `scs status` and on the review package cover, against the placement's limit
+when one is known (ISS-065), so "too big" is visible while drafting, not only at placement.
 
 ### ISS-067 - Meta rule M-002: rule ids cited throughout
 **Status:** open

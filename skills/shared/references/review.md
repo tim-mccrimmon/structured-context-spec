@@ -30,6 +30,10 @@ and locator, and ask the user about each: draft it, leave it out, or defer it. A
 out because it informs people rather than the assistant (see [drafting.md](drafting.md), "Writing for the
 assistant") is listed too, so the user sees it was considered.
 
+After each round of changes, repeat the consolidation check ([drafting.md](drafting.md),
+"Consolidate before the draft package"): changes in review tend to restate rules that already
+exist. A merge or a move to `summary` is a plain edit, not a recorded finding.
+
 ## Presenting a finding
 
 Present findings a few at a time, most serious first. For each, in plain language:

@@ -161,8 +161,10 @@ Then follow [references/drafting.md](references/drafting.md) and
 pass: every SCD the Project's documents and answers support, each item with its `derived_from`
 as you write it. Use the templates as a coverage check: for the templates with no material,
 propose which to retire and which to keep as gaps, as one list to confirm. Scope limits are facts or directives. Show each
-concept's drafts as one batch and get one yes per batch. Validate (`scs-validate --strict` at
-the repository root) and explain the result.
+concept's drafts as one batch and get one yes per batch. Then consolidate, as
+[references/drafting.md](references/drafting.md) describes ("Consolidate before the draft
+package"), including items that repeat a Domain rule. Validate (`scs-validate --strict` at the
+repository root) and explain the result.
 
 **Checkpoint:** `scs commit --workspace <name>`, with a message naming what was drafted.
 

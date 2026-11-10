@@ -71,6 +71,27 @@ For each item, ask: could the assistant do this, or know this, while helping som
 When you leave something out or move it to `summary`, tell the user what and why, so the
 decision is theirs.
 
+## Consolidate before the draft package
+
+Drafting section by section restates shared rules in each section (who decides, how to report,
+what needs classification first), and drafting faithfully keeps reference material people need
+but the assistant cannot use. Before the draft package, go through every item in the workspace
+once, across all its sections:
+
+- **Merge items that say the same thing.** Keep one, in the section that owns the topic, with
+  the `derived_from` of every item it replaces; keep a fact only if the rule needs it. A
+  prohibition and a directive that cover the same case are one item: keep the prohibition, and
+  a directive only for what the assistant does that the prohibition does not say.
+- **Move reference material to `summary`.** Lists of document or procedure numbers the
+  assistant cannot open, facts about the organization's own documents, administration, and
+  people's names where a role is enough: these inform people, as above.
+- **Keep what prevents over-caution.** A fact saying what AI may help with, or a rule scoped to
+  ask only when the assistant does not know, keeps the assistant useful; do not merge it away.
+
+Show the result as one batch: each merge (the items replaced and the one kept), each move to
+`summary`, and the number of prohibitions, directives, and facts before and after. Get one
+yes, then validate again.
+
 ## Provenance
 
 Give every item a `derived_from` entry:

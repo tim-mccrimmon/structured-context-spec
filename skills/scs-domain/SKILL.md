@@ -162,8 +162,11 @@ pass: work out the topics the documents and answers cover, place each in its con
 draft every SCD that has material, giving each item its `derived_from` as you write it. Then
 use the ontology's templates as a coverage check: for the templates with no material, propose
 which to retire and which to keep as gaps, as one list to confirm. Show each concept's drafts as one batch, with their dry
-runs, and get one yes per batch. Then validate (`scs-validate --strict` at the repository root)
-and explain the result.
+runs, and get one yes per batch. Then consolidate, as [references/drafting.md](references/drafting.md)
+describes ("Consolidate before the draft package"): merge items that say the same thing across
+sections, move reference material to `summary`, and show the item count before and after as
+one batch. Then validate (`scs-validate --strict` at the repository root) and explain the
+result.
 
 **Checkpoint:** `scs commit --workspace domain`, as above, with a message naming what was
 drafted.
