@@ -161,6 +161,11 @@ content:
 Optional at the schema level (`project-tier.md` §4.2), but expected for an SCD that lives
 in a concept bundle.
 
+An SCD links to its concept only through this field. An SCD's `relationships` target other SCDs
+or citations, never `concept:` ids ([core-model.md](core-model.md) §6); a link between two
+concepts is declared once, in the domain manifest's ontology (`concepts[].relationships`, §3.1).
+The validator says so when an SCD relationship targets a `concept:` id.
+
 ---
 
 ## 4. Ontology Models

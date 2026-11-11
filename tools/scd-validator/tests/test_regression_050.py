@@ -452,3 +452,19 @@ def test_mca_example_is_client_neutral():
         assert not _client_names(text), path.name
         for title in ("Company AI Use Policy", "Departmental Context", "Company Overview"):
             assert title not in text, (path.name, title)
+
+
+def test_concept_relationship_target_points_to_the_ontology(tmp_path: Path):
+    """ISS-040: an SCD relationship to a concept: id says where concept links belong."""
+    scd = tmp_path / "t.yaml"
+    scd.write_text(
+        "id: scd:project:t\ntype: project\ntitle: T\nversion: DRAFT\ndescription: d\n"
+        "content:\n  directives:\n    - id: T-1\n      directive: Do it.\n"
+        "relationships:\n  - type: depends-on\n    target: concept:security\n"
+        "provenance:\n  created_by: A B <a@b.test>\n  created_at: '2026-10-01T09:00:00Z'\n"
+        "  rationale: test\n"
+    )
+    result = run(str(scd))
+    assert result.exit_code == 1
+    assert "concepts[].relationships" in result.output
+    assert "domain-ontology.md §3.3" in result.output

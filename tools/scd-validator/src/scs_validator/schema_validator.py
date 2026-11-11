@@ -1,5 +1,6 @@
 """Schema validation module for SCDs."""
 
+import re
 from pathlib import Path
 from typing import Any, Dict
 
@@ -362,6 +363,19 @@ class SchemaValidator:
             missing_field = error.message.split("'")[1] if "'" in error.message else "unknown"
             return f"Missing required field: '{missing_field}'"
         elif error.validator == "pattern":
+            target = error.instance
+            if (
+                isinstance(target, str)
+                and target.startswith("concept:")
+                and re.fullmatch(r"relationships\.\d+\.target", path)
+            ):
+                # ISS-040: concept-to-concept links belong in the Domain Ontology
+                return (
+                    f"Field '{path}' is '{target}', but an SCD relationship targets an SCD "
+                    "(scd:...) or a citation (std:...). Declare a link between concepts in the "
+                    "domain manifest's ontology (concepts[].relationships), and the SCD's own "
+                    "concept with its 'concept' field (domain-ontology.md §3.3)"
+                )
             return f"Field '{path}' does not match required pattern: {error.message}"
         elif error.validator == "type":
             return f"Field '{path}' has incorrect type: {error.message}"

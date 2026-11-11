@@ -12,12 +12,11 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-82 issues: open 18 · proposed 1 · deferred 4 · done 59.
+82 issues: open 17 · proposed 1 · deferred 4 · done 60.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
-| 0.7.x | ISS-040 | Docs and validator message do not say that concept relationships belong in the ontology | open | low | S | no | once |
 | 0.8 | ISS-064 | Audience of SCD items | open | high | L | yes | strong |
 | 0.8 | ISS-065 | Placement facts | open | high | L | yes | strong |
 | 0.8 | ISS-077 | Starter Domains per ontology | open | high | L | yes | expected |
@@ -872,8 +871,9 @@ a visible "Related concepts" section) and keep their owners and departments.
 Related: ISS-029, RELEASE-0.5.0.md Phase 2b.
 
 ### ISS-040 - Docs and validator message do not say that concept relationships belong in the ontology (proposed)
-**Status:** open (narrowed 2026-11-09): the spec part is done (`spec/0.7/core-model.md` §6 note);
-the validator message for a `concept:` relationship target is not.
+**Status:** done (2026-11-11): `core-model.md` §6 note (2026-11-09) and `domain-ontology.md` §3.3
+say where concept links go; the validator's message for a `concept:` relationship target now
+points to the ontology's `concepts[].relationships` and the SCD's `concept` field (tested)
 **Target:** 0.7.x · **Priority:** low · **Effort:** S · **Spec:** no · **Evidence:** once
 Found while validating the MCA engagement's 16 skeleton SCDs: 12 failed because their SCD
 `relationships[].target` values are `concept:` ids, but an SCD relationship must target another SCD

@@ -16,9 +16,12 @@ tools (`scs`, `scs-validate`) in machine mode; the skills carry the conversation
 Run the Domain and each Project in separate sessions. Each session starts from `scs status`, so
 work can stop at any point and resume later.
 
-Status: 0.7 release candidate 2. The rc1 skills (`scs-intake`, `scs-draft`, `scs-review`,
-`scs-version`, `scs-compile`) passed the behaviour tests (D-51); rc2 reorganizes them by workspace
-(D-81), and its behaviour tests (WP-10b) are not yet run. Earlier reports are in
+Status: 0.7 release candidate 6. The behaviour tests last ran on the rc6 skills, and every
+assertion passed after the fixes they prompted
+([2026-11-09](../tools/skill-harness/results/2026-11-09-rc6.md)). The changes since, owners
+before the draft review package, consolidation, and the drafting and review guidance, passed
+the 0.7 acceptance test (ISS-055) through Claude Code on 2026-11-11; the approval-record
+guidance (`references/versioning.md` §6) has not been run yet. Earlier reports are in
 [`tools/skill-harness/results/`](../tools/skill-harness/results/).
 
 ## Installing the skills
