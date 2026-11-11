@@ -100,7 +100,8 @@ def test_validation_works_using_only_the_packaged_schemas():
     domain = REPO / "schema" / "domain" / "examples" / "software-development-domain.yaml"
     if domain.is_file():
         assert _run("--domain", str(domain), "--schema-dir", str(PACKAGED_SCHEMAS)).exit_code == 0
-    checkpoint = REPO / "examples" / "med-adherence" / "project-bundle.yaml"
+    checkpoint = REPO / "examples" / "personal" / "jlee-context" / "domain" / "bundles"
+    checkpoint = checkpoint / "domain-bundle.yaml"
     if checkpoint.is_file():
         assert (
             _run("--bundle", str(checkpoint), "--schema-dir", str(PACKAGED_SCHEMAS)).exit_code == 0
@@ -166,8 +167,9 @@ def test_the_codes_registry_is_built_from_its_fragments():
 @pytest.mark.parametrize(
     "bundle",
     [
-        "examples/two-tier-governance/org/bundles/domain-bundle.yaml",
-        "examples/two-tier-governance/infusion-pump-fw/bundles/project-bundle.yaml",
+        "examples/medtech-cdmo/medtech-context/domain/bundles/domain-bundle.yaml",
+        "examples/medtech-cdmo/medtech-context/projects/infusion-pump-fw/bundles/"
+        "project-bundle.yaml",
     ],
 )
 def test_json_report_validates_against_the_report_schema(bundle: str):

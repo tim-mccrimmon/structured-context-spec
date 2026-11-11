@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -25,7 +24,7 @@ from scs_validator.intake import (
 )
 from scs_validator.utils import resolve_schema_dir
 
-from scs_tools import identity
+from scs_tools import clock, identity
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope
 from scs_tools.maintain import Edit, _dump
 from scs_tools.workspace import repository_root, select_workspace
@@ -50,7 +49,7 @@ def _schema_dir() -> Path:
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return clock.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _citations(value: Any) -> List[str]:

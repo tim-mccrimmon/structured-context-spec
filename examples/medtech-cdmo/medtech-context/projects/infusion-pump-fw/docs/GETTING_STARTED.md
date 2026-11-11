@@ -1,0 +1,150 @@
+# Getting Started with Infusion Pump Firmware
+
+This guide explains how to work with the structured context in this Project bundle workspace.
+
+## What is SCS?
+
+The Structured Context Specification (SCS) is a framework for organizing project context, requirements, and compliance information in a machine-readable, version-controlled format.
+
+## Understanding Your Project Structure
+
+### Bundles
+
+Bundles are collections of related SCDs (Structured Context Documents). This workspace has:
+
+1. **Project Bundle** (`bundles/project-bundle.yaml`): This project's governance. It imports the
+   concept bundles below; it does not import your organization's Domain bundle.
+2. **Concept Bundles** (`bundles/concepts/*.yaml`): One per ontology concept, each listing its SCDs.
+
+### What Agents Receive
+
+Three kinds of SCD content are compiled into what an AI agent receives; the rest of an SCD is
+context for the people who write and review it.
+
+- **Prohibitions** (`content.prohibitions`): tools or practices that are forbidden, with no
+  conditions.
+- **Directives** (`content.directives`): rules the agent is expected to follow.
+- **Facts** (`content.facts`): statements the agent should know.
+
+```yaml
+content:
+  directives:
+    - id: SEC-001
+      directive: Do not include credentials or API keys in generated code.
+      cites:
+        - std:soc2:2017#CC6.1
+```
+
+Compile the bundle into the file a runtime injects:
+
+```bash
+scs compile bundles/project-bundle.yaml --allow-draft   # writes dist/
+```
+
+### Domain Ontology
+
+`ontology/domain-manifest.yaml` is your workspace's Domain Ontology: the concepts (categories) your
+guardrails are organized around, one per concept bundle in `bundles/concepts/`. It starts flat, using
+the Medical-Device CDMO reference ontology. Add depth as you need it (a taxonomy with `parent`,
+`depends-on` / `relates-to` relationships, and `satisfies` citations of the standards a concept addresses),
+and check it with `scs validate --domain ontology/domain-manifest.yaml`.
+
+### SCDs (Structured Context Documents)
+
+SCDs are YAML files that contain specific project information. They live in `context/project/`
+and are grouped by the concept bundles in `bundles/concepts/`.
+
+## Editing Your Project Context
+
+### Step 1: Start with Core SCDs
+
+Begin by editing these essential SCDs:
+
+1. **System Context** (`context/project/system-context.yaml`)
+   - Define what your system does
+   - List external actors and systems
+   - Describe key data flows
+
+2. **Tech Stack** (`context/project/tech-stack.yaml`)
+   - List your languages, frameworks, and tools
+   - Document technology choices and rationale
+
+3. **Data Model** (`context/project/data-model.yaml`)
+   - Define your core data entities
+   - Document relationships and constraints
+
+### Step 2: Fill in Domain-Specific SCDs
+
+Work through each concept bundle and edit the relevant SCDs:
+
+- **Security**: Authentication, data protection, threat model
+- **Compliance**: Regulatory requirements (HIPAA, SOC2, etc.)
+- **Testing**: Test coverage, validation plans, QA procedures
+- **Operations**: Infrastructure, observability, incident response
+
+### Step 3: Review and Refine
+
+- Review bundles to ensure all SCDs are referenced
+- Check that SCD IDs match the file structure
+- Validate that provenance information is accurate
+
+## SCD Format
+
+Each SCD has this structure:
+
+```yaml
+id: scd:project:example-scd
+type: project
+version: "1.0.0"
+status: DRAFT              # DRAFT | ACTIVE | DEPRECATED
+title: "Example SCD"
+description: "Description of what this SCD covers"
+
+domain: example-domain
+topics:
+  - topic-1
+  - topic-2
+
+content:
+  # Your actual content goes here
+  # This is the heart of the SCD
+
+provenance:
+  created_by: "email@example.com"
+  created_at: "2025-01-01T00:00:00Z"
+  rationale: "Why this SCD exists"
+```
+
+## Working with SCS Status
+
+SCDs have three statuses:
+
+- **DRAFT**: Still being developed, content may change
+- **ACTIVE**: Finalized and in use
+- **DEPRECATED**: No longer current, kept for historical reference
+
+Start with all SCDs in DRAFT status. Move to ACTIVE when you're confident the content is accurate and complete.
+
+## Next Steps
+
+1. **Customize SCDs**: Replace placeholder content with your actual project information
+2. **Add More SCDs**: Create additional SCDs as your project needs them
+3. **Version Control**: Commit your changes to track evolution over time
+4. **Review Regularly**: Keep SCDs up-to-date as your project evolves
+
+## Resources
+
+- [SCS Specification](https://github.com/tim-mccrimmon/scs-spec)
+- [SCS Documentation](https://github.com/tim-mccrimmon/scs-spec/tree/main/docs)
+- [Project Structure Guide](https://github.com/tim-mccrimmon/scs-spec/blob/main/docs/random_docs/minimum-project-scds.md)
+
+## Getting Help
+
+- Review example SCDs in the SCS repository
+- Check the SCS FAQ
+- Open an issue on the [SCS GitHub](https://github.com/tim-mccrimmon/scs-spec/issues)
+
+---
+
+**Author**: Dana Reyes (dana.reyes@medtech-cdmo.test)
+**Created**: 2026-10-01T09:00:00+00:00

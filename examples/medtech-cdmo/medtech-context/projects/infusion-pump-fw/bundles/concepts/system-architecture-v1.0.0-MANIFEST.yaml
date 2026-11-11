@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: system-architecture
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:system-architecture
+  type: concept
+  file: system-architecture-v1.0.0.yaml
+  sha256: f9eef59ed5e7ca69bee69d123261d32efbbb6bf85070cf22e81993bc1a17550c
+  size_bytes: 911
+content_digest: sha256:9f1b5866afb37539047e6b19b504f300159e315f34fd5195757d8c3e2dba4ee5
+content_inputs:
+  bundles:
+    bundle:system-architecture:1.0.0: sha256:2cc35509098c578df57d6bd5714cc51d78c53f55d1712fb5b94910e6422ce177
+  scds:
+    scd:project:architecture-constraints: sha256:e0564aac5ce342fc7c60e77ed650fe140ce1e62ef952fab52f26d9e094edfdd2
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Ravi Iyer <ravi.iyer@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: infusion-pump-fw/system-architecture-v1.0.0
+  immutable: true
+  authoritative: true

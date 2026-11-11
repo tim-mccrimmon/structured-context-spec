@@ -1,0 +1,12 @@
+intake_version: '1.0'
+scs_version: 0.7.0
+approvers:
+  - person: Ravi Iyer <ravi.iyer@medtech-cdmo.test>
+    role: Firmware Lead
+owners:
+  - role: it
+    person: Lee Park <lee.park@medtech-cdmo.test>
+    title: IT Director
+  - role: engineering
+    person: Ravi Iyer <ravi.iyer@medtech-cdmo.test>
+    title: Firmware Lead

@@ -1,0 +1,22 @@
+id: scd:project:architecture-constraints
+type: project
+title: "Architecture Constraints"
+version: "DRAFT"
+description: "The pump firmware's safety classification and its safety mechanisms"
+concept: concept:system-architecture
+content:
+  summary: "The firmware is IEC 62304 class C."
+  directives:
+    - id: AC-001
+      directive: "The pump firmware is IEC 62304 software safety class C. Treat every firmware change as safety-relevant."
+      cites:
+        - std:iec-62304:2006-a1#4.3
+    - id: AC-002
+      directive: "Do not propose removing or weakening an alarm, interlock, or dose limit check. Refer such requests to the risk management lead."
+      cites:
+        - std:iso-14971:2019
+relationships: []
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Safety classification from the software development plan"

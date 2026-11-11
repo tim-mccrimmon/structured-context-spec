@@ -1,0 +1,21 @@
+id: bundle:jlee
+type: domain
+version: 1.0.0
+title: Jordan Lee Governance
+description: Governance for all of Jordan Lee's work, organized by the Personal ontology
+imports:
+- bundle:meta:0.6.0
+- bundle:prohibited:1.0.0
+- bundle:clients:1.0.0
+- bundle:writing:1.0.0
+scds: []
+provenance:
+  created_by: Jordan Lee <jordan@jlee-data.test>
+  created_at: '2026-10-01T09:00:00+00:00'
+  rationale: Initial Domain bundle for Jordan Lee
+  version_approved_by: Jordan Lee <jordan@jlee-data.test>
+  version_approved_at: '2026-10-01T09:00:00Z'
+  approval_status: validated
+  validation_passed: true
+  validation_date: '2026-10-01T09:00:00Z'
+  version_notes: First version

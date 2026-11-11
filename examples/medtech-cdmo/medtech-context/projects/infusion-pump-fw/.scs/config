@@ -1,0 +1,7 @@
+# SCS Workspace Configuration
+bundle_type: project
+name: infusion-pump-fw
+display_name: "Infusion Pump Firmware"
+ontology: cdmo
+scs_version: 0.7.0
+tools_version: 0.7.0rc6

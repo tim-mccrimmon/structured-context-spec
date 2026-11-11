@@ -1,0 +1,19 @@
+id: bundle:infusion-pump-fw
+type: project
+version: 1.0.0
+title: Infusion Pump Firmware Governance
+description: Governance for the Infusion Pump Firmware project
+imports:
+- bundle:system-architecture:1.0.0
+- bundle:verification-validation:1.0.0
+scds: []
+provenance:
+  created_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  created_at: '2026-10-01T09:00:00+00:00'
+  rationale: Initial Project bundle for Infusion Pump Firmware
+  version_approved_by: Ravi Iyer <ravi.iyer@medtech-cdmo.test>
+  version_approved_at: '2026-10-01T09:00:00Z'
+  approval_status: validated
+  validation_passed: true
+  validation_date: '2026-10-01T09:00:00Z'
+  version_notes: First approved version

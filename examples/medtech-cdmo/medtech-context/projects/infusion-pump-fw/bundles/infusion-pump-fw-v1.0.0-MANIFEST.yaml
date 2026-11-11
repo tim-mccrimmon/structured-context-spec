@@ -1,0 +1,43 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: infusion-pump-fw
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:infusion-pump-fw
+  type: project
+  file: infusion-pump-fw-v1.0.0.yaml
+  sha256: 41c63346dcb7138371f157bb6be677b4afaf9a45a89f1c5642d0682351f62908
+  size_bytes: 672
+content_digest: sha256:143a9bce0c061ee0974dbba934e8b6f52dcc1fdaa839ea252a9e69a757be0222
+content_inputs:
+  bundles:
+    bundle:infusion-pump-fw:1.0.0: sha256:ba42cd24adaf23cdf792aa4fac2996fadadc91eab51c7065a98a4f60cf2b16a0
+    bundle:system-architecture:1.0.0: sha256:2cc35509098c578df57d6bd5714cc51d78c53f55d1712fb5b94910e6422ce177
+    bundle:verification-validation:1.0.0: sha256:a4af8551d06c1b64bea9a498160ab60e0af92e56e63a4b668ab1a8b483e8809c
+  scds:
+    scd:project:acceptance-criteria: sha256:4c16792a53c269b7e52c8cce2e3d35fe871ad37b55f8321d1304da28dcf693c7
+    scd:project:architecture-constraints: sha256:e0564aac5ce342fc7c60e77ed650fe140ce1e62ef952fab52f26d9e094edfdd2
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles:
+  - bundle:system-architecture:1.0.0
+  - bundle:verification-validation:1.0.0
+  total_scds: 0
+approval:
+  approved_by: Ravi Iyer <ravi.iyer@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: infusion-pump-fw/infusion-pump-fw-v1.0.0
+  immutable: true
+  authoritative: true

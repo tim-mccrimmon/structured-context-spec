@@ -1,0 +1,13 @@
+id: bundle:clients
+type: concept
+version: DRAFT
+title: Client Work
+description: 'How Jordan works with clients: engagements, confidentiality, estimates'
+owner: owner
+imports: []
+scds:
+  - scd:project:clients
+provenance:
+  created_by: Jordan Lee <jordan@jlee-data.test>
+  created_at: '2026-10-01T09:00:00+00:00'
+  rationale: Client Work concept bundle

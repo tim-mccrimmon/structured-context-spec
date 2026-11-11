@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: company
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:company
+  type: concept
+  file: company-v1.0.0.yaml
+  sha256: 7923e2f1948a9c3c6e43c7f09e019a4481905a2cff55389c456e7766a4364bae
+  size_bytes: 606
+content_digest: sha256:a8bf24d0b7e4965bf3ec27db5b98d6b8b0c975532c871e023a6ae717c3f5bb47
+content_inputs:
+  bundles:
+    bundle:company:1.0.0: sha256:0f436a64a80867ad1568dc9e41b3b4c642867acc9ad83a1dff80aaae2bbeec59
+  scds:
+    scd:project:company-profile: sha256:7d2bebb0ad120d7babeaae7330237e3de4e4e689c5d42d68dbc0fd4e2541cbdb
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: domain/company-v1.0.0
+  immutable: true
+  authoritative: true

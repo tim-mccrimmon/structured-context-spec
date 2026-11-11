@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: prohibited
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:prohibited
+  type: concept
+  file: prohibited-v1.0.0.yaml
+  sha256: cedb7551f5282850a5b7ec2ab226654feacaa7d37807a3eeadde15217dad9a9b
+  size_bytes: 625
+content_digest: sha256:55d4d8c6426c6e1c896651662b2a544c95496981cb79c19e786527903064ea65
+content_inputs:
+  bundles:
+    bundle:prohibited:1.0.0: sha256:681ad1cb84b8d8e42e72fad8c362047e35444a2383f092dad3d312e27f11d456
+  scds:
+    scd:project:prohibited: sha256:3f4a8d5465e2d150b9d2737c5daf14c059105c000b0e4da3bc3fd1049ba5549f
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Jordan Lee <jordan@jlee-data.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First version
+release_notes: First version
+distribution:
+  repository: jlee-context
+  branch: main
+  tag: domain/prohibited-v1.0.0
+  immutable: true
+  authoritative: true

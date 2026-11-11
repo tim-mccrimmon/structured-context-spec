@@ -114,7 +114,8 @@ Feedback is welcome in Discussions and Issues.
 
 ## Examples
 
-- [`examples/two-tier-governance/`](examples/two-tier-governance/): a Domain and a Project side by side
+- [`examples/medtech-cdmo/`](examples/medtech-cdmo/): a CDMO's Domain repository with one Project, released and compiled
+- [`examples/personal/`](examples/personal/): one person's Domain repository
 - [`examples/medical-device-cdmo/`](examples/medical-device-cdmo/): the `cdmo` ontology applied
 - [`examples/merchant-cash-advance/`](examples/merchant-cash-advance/): the `mca` ontology applied
 

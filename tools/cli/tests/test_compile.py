@@ -13,7 +13,7 @@ from click.testing import CliRunner
 from scs_tools.cli import cli
 
 REPO = Path(__file__).resolve().parents[3]
-EXAMPLE = REPO / "examples" / "two-tier-governance"
+EXAMPLE = Path(__file__).resolve().parent / "fixtures" / "two-tier-governance"
 DOMAIN = EXAMPLE / "org" / "bundles" / "domain-bundle.yaml"
 PROJECT = EXAMPLE / "infusion-pump-fw" / "bundles" / "project-bundle.yaml"
 SCHEMA = json.loads((REPO / "schema" / "runtime" / "runtime-artifact-schema.json").read_text())

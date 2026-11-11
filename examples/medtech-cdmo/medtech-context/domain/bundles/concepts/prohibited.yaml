@@ -1,0 +1,16 @@
+id: bundle:prohibited
+type: concept
+version: "DRAFT"
+title: "Prohibited Tools and Practices"
+description: "Tools and practices forbidden in all of MedTech CDMO's work"
+owner: ai-governance
+
+imports: []
+
+scds:
+  - scd:project:prohibited
+
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Prohibited Tools and Practices concept bundle for MedTech CDMO"

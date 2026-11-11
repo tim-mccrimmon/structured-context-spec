@@ -1,0 +1,24 @@
+id: bundle:medtech
+type: domain
+version: "DRAFT"
+title: "MedTech CDMO Governance"
+description: "Governance for all of MedTech CDMO's work, organized by the Medical-Device CDMO ontology"
+
+# A Domain bundle imports the published meta bundle and its concept bundles, and contains no
+# SCDs of its own. Concept bundles are unversioned while DRAFT; pin a version once you've run
+# `scs bundle version` on each.
+imports:
+  - bundle:meta:0.6.0
+  - bundle:company:1.0.0
+  - bundle:prohibited:1.0.0
+  - bundle:compliance-governance:1.0.0
+  - bundle:qms-records:1.0.0
+  - bundle:data-provenance:1.0.0
+  - bundle:ai-accountability:1.0.0
+
+scds: []
+
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Initial Domain bundle for MedTech CDMO"

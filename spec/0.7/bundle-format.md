@@ -976,14 +976,13 @@ Ontology Model the organization starts from (SDLC, CDMO, MCA, or one adapted fro
 ## 12. Examples
 
 Working examples are available in `examples/`:
+- `examples/medtech-cdmo/` - A Domain repository on the CDMO Ontology Model with one Project,
+  each released and compiled
+- `examples/personal/` - A personal Domain repository
 - `examples/merchant-cash-advance/` - MCA Ontology Model template: concept bundles and
   skeleton SCDs
 - `examples/medical-device-cdmo/` - CDMO Ontology Model with taxonomy and `satisfies`
   citations
-- `examples/med-adherence/` - A Project bundle organized by concept, with standard
-  citations
-- `examples/chai-standards-bundle/` - A standards bundle (deprecated in 0.6.0; kept for
-  reference)
 
 ---
 

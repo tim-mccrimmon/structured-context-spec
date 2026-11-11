@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: clients
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:clients
+  type: concept
+  file: clients-v1.0.0.yaml
+  sha256: 0b8fa636000846e562ce7e384054558f1c8dfc696d27ce4f7def796ac06ffd97
+  size_bytes: 581
+content_digest: sha256:bc184fee70cf632c9b249ebbe44cff1dccd852d3ef51e08e4e527c5a4cdd1278
+content_inputs:
+  bundles:
+    bundle:clients:1.0.0: sha256:5fc7fb1fc0de1b235b146b757ff7aa982d6c51fb090c7ac2cced254f24233bae
+  scds:
+    scd:project:clients: sha256:28b62547bbf8ccb4b96202adf357c664a892337e1596a2228b8fde3f11ffbb38
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Jordan Lee <jordan@jlee-data.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First version
+release_notes: First version
+distribution:
+  repository: jlee-context
+  branch: main
+  tag: domain/clients-v1.0.0
+  immutable: true
+  authoritative: true

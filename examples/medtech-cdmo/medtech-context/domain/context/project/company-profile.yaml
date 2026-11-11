@@ -1,0 +1,18 @@
+id: scd:project:company-profile
+type: project
+title: "Company Profile"
+version: "DRAFT"
+description: "What MedTech CDMO does and who owns what it makes"
+concept: concept:company
+content:
+  summary: "A contract developer and manufacturer of medical devices."
+  facts:
+    - id: CO-001
+      fact: "MedTech CDMO designs and manufactures medical devices under contract for device companies (clients)."
+    - id: CO-002
+      fact: "Each client owns the designs, specifications, and test data for its devices."
+relationships: []
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Company facts from the intake"

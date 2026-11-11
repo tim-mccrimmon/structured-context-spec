@@ -1,0 +1,7 @@
+# SCS Workspace Configuration
+bundle_type: domain
+name: domain
+display_name: "MedTech CDMO"
+ontology: cdmo
+scs_version: 0.7.0
+tools_version: 0.7.0rc6

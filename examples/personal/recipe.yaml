@@ -1,0 +1,28 @@
+# How examples/build.py makes jlee-context/ with the engine: a personal Domain, with the
+# boundaries the personal ontology supplies and two concepts defined with the owner. The SCDs
+# it writes are the ones under jlee-context/domain/context/project/. See examples/README.md.
+repository: jlee-context
+date: "2026-10-01T09:00:00Z"
+author: "Jordan Lee <jordan@jlee-data.test>"
+
+domain:
+  new: [jlee, --ontology, personal, --title, "Jordan Lee"]
+  concepts:
+    - name: clients
+      title: "Client Work"
+      description: "How Jordan works with clients: engagements, confidentiality, estimates"
+      owner: owner
+    - name: writing
+      title: "Writing"
+      description: "How Jordan wants writing done"
+      owner: owner
+  intake:
+    audience: individual
+    owners:
+      - "{role: owner, person: Jordan Lee <jordan@jlee-data.test>}"
+    approvers:
+      - "{person: Jordan Lee <jordan@jlee-data.test>}"
+  release:
+    version: 1.0.0
+    approved_by: "Jordan Lee <jordan@jlee-data.test>"
+    notes: "First version"

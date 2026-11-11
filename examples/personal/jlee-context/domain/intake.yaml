@@ -1,0 +1,8 @@
+intake_version: '1.0'
+scs_version: 0.7.0
+audience: individual
+approvers:
+  - person: Jordan Lee <jordan@jlee-data.test>
+owners:
+  - role: owner
+    person: Jordan Lee <jordan@jlee-data.test>

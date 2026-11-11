@@ -1,0 +1,49 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: jlee
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:jlee
+  type: domain
+  file: jlee-v1.0.0.yaml
+  sha256: 40de966308a9fa60dd278a29c651003cb7fdd5b3f453fcbff9ea3a22deb929ff
+  size_bytes: 657
+content_digest: sha256:afa2f834676cb98c591f9df0e8a4b0d856ae5f8f2b61d17d35384fccdb3fdb8c
+content_inputs:
+  bundles:
+    bundle:clients:1.0.0: sha256:5fc7fb1fc0de1b235b146b757ff7aa982d6c51fb090c7ac2cced254f24233bae
+    bundle:jlee:1.0.0: sha256:fc33a14c089407d479a1095a1f221114708342a6aa908e3404c1d3a4394f25d1
+    bundle:meta:0.6.0: sha256:30c36b76f57b1e5f8f884d29a159afc2f524d8fd16e686f5b1abc954a66af3dc
+    bundle:prohibited:1.0.0: sha256:681ad1cb84b8d8e42e72fad8c362047e35444a2383f092dad3d312e27f11d456
+    bundle:writing:1.0.0: sha256:f401b814505a35a9cd865690db9c9be716f117f90c7bb647e17c59d48147d33a
+  scds:
+    scd:meta:governance-context: sha256:3b30a3f8a3420b7ee1d805a261df5e8e115ae210f72768515b57473a4ca3d6ea
+    scd:project:clients: sha256:28b62547bbf8ccb4b96202adf357c664a892337e1596a2228b8fde3f11ffbb38
+    scd:project:prohibited: sha256:3f4a8d5465e2d150b9d2737c5daf14c059105c000b0e4da3bc3fd1049ba5549f
+    scd:project:writing: sha256:c763f6a08fd29d3250139ef6ae922b196ea013594656220616b251deaf304b2e
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles:
+  - bundle:meta:0.6.0
+  imported_bundles:
+  - bundle:prohibited:1.0.0
+  - bundle:clients:1.0.0
+  - bundle:writing:1.0.0
+  total_scds: 0
+approval:
+  approved_by: Jordan Lee <jordan@jlee-data.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First version
+release_notes: First version
+distribution:
+  repository: jlee-context
+  branch: main
+  tag: domain/jlee-v1.0.0
+  immutable: true
+  authoritative: true

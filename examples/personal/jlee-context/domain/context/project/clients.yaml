@@ -1,0 +1,23 @@
+id: scd:project:clients
+type: project
+title: "Client Work"
+version: "DRAFT"
+description: "How Jordan works with clients"
+concept: concept:clients
+content:
+  summary: "Jordan is an independent data engineering consultant; client work is confidential."
+  facts:
+    - id: CL-001
+      fact: "Jordan Lee is an independent data engineering consultant working through Lee Data LLC."
+    - id: CL-002
+      fact: "Every client engagement is under a non-disclosure agreement."
+  directives:
+    - id: CL-003
+      directive: "Do not name a client, or describe a client's systems, in anything meant for publication, such as a blog post, talk, or social media post. Describe the work in general terms instead."
+    - id: CL-004
+      directive: "Mark every estimate of effort, cost, or schedule as an estimate, and state the assumptions behind it."
+relationships: []
+provenance:
+  created_by: "Jordan Lee <jordan@jlee-data.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "How Jordan described client work at intake"

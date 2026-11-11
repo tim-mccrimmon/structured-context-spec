@@ -1,0 +1,13 @@
+id: bundle:writing
+type: concept
+version: DRAFT
+title: Writing
+description: How Jordan wants writing done
+owner: owner
+imports: []
+scds:
+  - scd:project:writing
+provenance:
+  created_by: Jordan Lee <jordan@jlee-data.test>
+  created_at: '2026-10-01T09:00:00+00:00'
+  rationale: Writing concept bundle

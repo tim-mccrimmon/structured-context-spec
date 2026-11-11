@@ -13,7 +13,6 @@ import hashlib
 import re
 import tempfile
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -31,7 +30,7 @@ from scs_validator.provenance import is_placeholder
 from scs_validator.resolver import BundleTree, ResolvedBundle, parse_bundle_ref, resolve
 from scs_validator.workspace import CONFIG, LEGACY_ONTOLOGY_MANIFEST, ONTOLOGY_MANIFEST
 
-from scs_tools import __version__, git, identity
+from scs_tools import __version__, clock, git, identity
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output
 from scs_tools.workspace import find_workspace, repository_root, workspace_name
 
@@ -77,7 +76,7 @@ class Release:
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return clock.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _approver(given: Optional[str]) -> str:

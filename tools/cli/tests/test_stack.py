@@ -10,7 +10,7 @@ from click.testing import CliRunner
 
 from scs_tools.cli import cli
 
-EXAMPLES = Path(__file__).resolve().parents[3] / "examples" / "two-tier-governance" / "compiled"
+EXAMPLES = Path(__file__).resolve().parent / "fixtures" / "two-tier-governance" / "compiled"
 
 
 def artifact(

@@ -1,0 +1,26 @@
+intake_version: '1.0'
+scs_version: 0.7.0
+audience: organization
+regulated: true
+certifications:
+  - std:iso-13485:2016
+  - std:21-cfr-820
+approvers:
+  - person: Dana Reyes <dana.reyes@medtech-cdmo.test>
+    role: VP Quality
+owners:
+  - role: executive
+    person: Morgan Chen <morgan.chen@medtech-cdmo.test>
+    title: CEO
+  - role: ai-governance
+    person: Dana Reyes <dana.reyes@medtech-cdmo.test>
+    title: VP Quality
+  - role: regulatory
+    person: Sam Okafor <sam.okafor@medtech-cdmo.test>
+    title: Director of Regulatory Affairs
+  - role: quality
+    person: Dana Reyes <dana.reyes@medtech-cdmo.test>
+    title: VP Quality
+  - role: it
+    person: Lee Park <lee.park@medtech-cdmo.test>
+    title: IT Director

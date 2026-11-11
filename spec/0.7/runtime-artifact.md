@@ -170,31 +170,31 @@ in which two rules or facts share an identifier.
 
 ```yaml
 scs_runtime: '0.7'
-id: bundle:medtech-cdmo
+id: bundle:medtech
 type: domain
 version: 1.0.0
-source_digest: sha256:8c499744256fe9f28061bf59d97a603a1f58934e0435ea4278992f2877f6a840
+source_digest: sha256:37b363d86eefc4006a2cacc1669877501e7fcb21b42915e8e45d60b5119b2f57
 title: MedTech CDMO Governance
-sources: ['bundle:meta:0.6.0', 'bundle:company:1.0.0', 'bundle:prohibited:1.0.0', 'bundle:ai-use:1.0.0', 'bundle:design-controls:1.0.0']
+sources: ['bundle:meta:0.6.0', 'bundle:company:1.0.0', 'bundle:prohibited:1.0.0', 'bundle:compliance-governance:1.0.0', 'bundle:qms-records:1.0.0', 'bundle:data-provenance:1.0.0', 'bundle:ai-accountability:1.0.0']
 rules:
-- id: medtech-cdmo/identity
-  rule: 'When asked which governance bundles are active, state: "Domain bundle bundle:medtech-cdmo version 1.0.0".'
-- id: medtech-cdmo/prohibited/NO-001
-  rule: 'Prohibited: consumer generative AI services and personal AI accounts. Use instead: the company''s private AI service.'
-- id: medtech-cdmo/governance-context/M-001
+- id: medtech/identity
+  rule: 'When asked which governance bundles are active, state: "Domain bundle bundle:medtech version 1.0.0".'
+- id: medtech/prohibited/NO-001
+  rule: 'Prohibited: consumer generative AI services and personal AI accounts. Use instead: the company''s approved AI service.'
+- id: medtech/governance-context/M-001
   rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both. Facts describe the organization and its environment; treat them as true unless the user corrects them.
-- id: medtech-cdmo/ai-review/AI-001
-  rule: Treat everything you produce as a draft. A qualified person must review and approve AI-generated content before it enters a controlled document, the design history file, or device software.
-- id: medtech-cdmo/design-change-control/DCC-001
+- id: medtech/document-control/DOC-001
   rule: Design changes require documented review and approval before implementation.
   cites: ['std:iso-13485:2016#7.3.9']
+- id: medtech/human-authority/HA-001
+  rule: Treat everything you produce as a draft. A qualified person must review and approve AI-generated content before it enters a controlled document, the design history file, or device software.
 facts:
-- id: medtech-cdmo/company-profile/CO-002
-  fact: The quality management system is certified to ISO 13485:2016.
+- id: medtech/regulatory-applicability/RA-001
+  fact: MedTech CDMO's quality management system is certified to ISO 13485:2016.
   cites: ['std:iso-13485:2016']
 ```
 
-(Excerpt of `examples/two-tier-governance/compiled/global.yaml`.)
+(Excerpt of `examples/medtech-cdmo/medtech-context/domain/dist/medtech-1.0.0.yaml`.)
 
 | Field | Required | Description |
 |---|---|---|

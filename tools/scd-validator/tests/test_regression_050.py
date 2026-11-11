@@ -137,7 +137,8 @@ def test_cdmo_ontology_satisfies_citations_are_clean():
 
 def test_strict_mode_turns_warnings_into_exit_code_2():
     # The CHAI example is a standards bundle, deprecated in 0.6.0 (a warning).
-    result = run("--bundle", str(EXAMPLES / "chai-standards-bundle" / "bundle.yaml"), "--strict")
+    chai = Path(__file__).parent / "fixtures" / "chai-standards-bundle" / "bundle.yaml"
+    result = run("--bundle", str(chai), "--strict")
     assert result.exit_code == 2
 
 

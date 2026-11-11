@@ -7,7 +7,6 @@ import json
 import re
 import shutil
 import tempfile
-from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as pkg_version
 from pathlib import Path
@@ -18,7 +17,7 @@ from scs_validator.envelope import SCS_VERSION, Change, relative
 from scs_validator.names import reserved_bundle_name
 from scs_validator.workspace import CONFIG, read_config
 
-from scs_tools import git, identity
+from scs_tools import clock, git, identity
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import (
     copy_template,
@@ -521,7 +520,7 @@ def _scaffold(out, repo, base_path, kind, name, title, ontology, author, email):
         "email": email,
         # Provenance identifies a person as `Name <email>` (D-28, D-63)
         "created_by": f"{author} <{email}>",
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": clock.now().isoformat(),
         "concepts": concepts,
         "config": config,
     }

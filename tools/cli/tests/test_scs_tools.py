@@ -1142,3 +1142,15 @@ def test_scs_init_is_removed():
     assert result.exit_code == 3  # usage error
     assert "No such command 'init'" in result.output
     assert "init" not in CliRunner().invoke(cli, ["--help"]).output.split("Commands:")[1]
+
+
+def test_clock_honors_source_date_epoch(monkeypatch):
+    """A fixed SOURCE_DATE_EPOCH makes every timestamp the engine writes reproducible (ISS-070)."""
+    from datetime import datetime, timezone
+
+    from scs_tools import clock
+
+    monkeypatch.setenv("SOURCE_DATE_EPOCH", "1759309200")
+    assert clock.now() == datetime(2025, 10, 1, 9, 0, tzinfo=timezone.utc)
+    monkeypatch.delenv("SOURCE_DATE_EPOCH")
+    assert abs((clock.now() - datetime.now(timezone.utc)).total_seconds()) < 5

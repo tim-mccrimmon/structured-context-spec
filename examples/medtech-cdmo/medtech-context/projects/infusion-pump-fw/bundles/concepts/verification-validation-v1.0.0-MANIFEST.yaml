@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: verification-validation
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:verification-validation
+  type: concept
+  file: verification-validation-v1.0.0.yaml
+  sha256: 6b4f348c2e4d3e8fb82b621f0ea791b8205ec34110b200038019f3c4d5b452f5
+  size_bytes: 904
+content_digest: sha256:1a2b62ecab87278583325f3c17e7abda35ec37abbfb09230ecdf758fcec0a66c
+content_inputs:
+  bundles:
+    bundle:verification-validation:1.0.0: sha256:a4af8551d06c1b64bea9a498160ab60e0af92e56e63a4b668ab1a8b483e8809c
+  scds:
+    scd:project:acceptance-criteria: sha256:4c16792a53c269b7e52c8cce2e3d35fe871ad37b55f8321d1304da28dcf693c7
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Ravi Iyer <ravi.iyer@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: infusion-pump-fw/verification-validation-v1.0.0
+  immutable: true
+  authoritative: true

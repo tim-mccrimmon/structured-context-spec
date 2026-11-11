@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: ai-accountability
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:ai-accountability
+  type: concept
+  file: ai-accountability-v1.0.0.yaml
+  sha256: 0fe6d580c1ba0f2f06d735788a49703aa07920e581cb0257bc8104c3d99d95d5
+  size_bytes: 904
+content_digest: sha256:83c85fddbd22ba31abf5d6bee14c2c300e27a0b5c92ac16d506cb4f2729bbe14
+content_inputs:
+  bundles:
+    bundle:ai-accountability:1.0.0: sha256:5f32682a69876af997284036c7be2651a35248aefc539a5495b5da6992bd9be7
+  scds:
+    scd:project:human-authority: sha256:72e6c0e400bb11f639b322c015359615b9da671370f7fc0afda397e8373615b1
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: domain/ai-accountability-v1.0.0
+  immutable: true
+  authoritative: true

@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: prohibited
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:prohibited
+  type: concept
+  file: prohibited-v1.0.0.yaml
+  sha256: 36bced4e57115181e0a2c91237a90eed844b7ed4d65b38a1e3120cd183a49d8c
+  size_bytes: 660
+content_digest: sha256:c9a392a2e770c1d4fda015471c3e16692b20936f15f68ae0aeacc9cd8b4b7e5a
+content_inputs:
+  bundles:
+    bundle:prohibited:1.0.0: sha256:16b1ed593710aa98b72bc215e7ed9428087a0820f8b9435d8f975b14e7928d28
+  scds:
+    scd:project:prohibited: sha256:8c35c923cae76d6cedda7d2a642d56db6e280a8a740e66dfd393640981342ce6
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: domain/prohibited-v1.0.0
+  immutable: true
+  authoritative: true

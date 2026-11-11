@@ -2,7 +2,6 @@
 Add command - add SCDs or bundles to an existing SCS project
 """
 
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -12,7 +11,7 @@ from scs_validator.envelope import Change, relative
 from scs_validator.names import RESERVED_BUNDLE_NAMES, bundle_name
 from scs_validator.workspace import CONFIG, load_workspace, read_config
 
-from scs_tools import identity, maintain
+from scs_tools import clock, identity, maintain
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import get_template_path, render_template, write_file
 from scs_tools.utils.project_types import SDLC_INDUSTRY_SCDS, get_project_type_config
@@ -51,7 +50,7 @@ def _common_options(f):
 
 
 def _variables(base_path: Path, author, email, out: Output) -> dict:
-    now = datetime.now(timezone.utc).isoformat()
+    now = clock.now().isoformat()
     # Never invented (D-13, D-71)
     author_info, email_info = identity.author(author, email, prompt=not out.machine)
     project_name = _bundle_owner_name(base_path)

@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: writing
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:writing
+  type: concept
+  file: writing-v1.0.0.yaml
+  sha256: cbf0ed937122861d7ad402cd4ba0c5cf3c391df73cad26ccb8025a271b81304b
+  size_bytes: 530
+content_digest: sha256:d00ac1d79543750471b0fd6486e6c0884f74c728baa8501e010e036f890368cc
+content_inputs:
+  bundles:
+    bundle:writing:1.0.0: sha256:f401b814505a35a9cd865690db9c9be716f117f90c7bb647e17c59d48147d33a
+  scds:
+    scd:project:writing: sha256:c763f6a08fd29d3250139ef6ae922b196ea013594656220616b251deaf304b2e
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Jordan Lee <jordan@jlee-data.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First version
+release_notes: First version
+distribution:
+  repository: jlee-context
+  branch: main
+  tag: domain/writing-v1.0.0
+  immutable: true
+  authoritative: true

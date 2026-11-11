@@ -75,8 +75,8 @@ trying things out, not for placing where other people rely on it.
   instructions may be followed unpredictably. Keep Domain and Project rules consistent.
   RFC 0002's layer-conflict review exists for this reason.
 - Size limits differ widely. Some fields hold only a few thousand characters, which is less than
-  a small Domain artifact. For example, `examples/two-tier-governance/compiled/global.yaml` is
-  about 3,300 bytes. Each page gives the limits it could confirm.
+  a small Domain artifact. For example, `examples/medtech-cdmo/medtech-context/domain/dist/medtech-1.0.0.yaml`
+  is about 4,000 bytes. Each page gives the limits it could confirm.
 - Whether a service loads both layers in a given session is the service's behaviour. SCS does
   not test it. Each page describes what the vendor documents.
 

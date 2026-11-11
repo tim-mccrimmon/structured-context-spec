@@ -1,0 +1,16 @@
+id: scd:project:client-program-segregation
+type: project
+title: "Client Program Segregation"
+version: "DRAFT"
+description: "Keeping each client's work separate"
+concept: concept:data-provenance
+content:
+  summary: "One client's information is never used in another client's work."
+  directives:
+    - id: CPS-001
+      directive: "Treat each client's information as confidential to that client. Do not use one client's information in work for another client."
+relationships: []
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Client segregation from the intake"

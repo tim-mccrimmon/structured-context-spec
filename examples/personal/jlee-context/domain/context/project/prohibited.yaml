@@ -1,0 +1,19 @@
+id: scd:project:prohibited
+type: project
+title: "Prohibited Tools and Practices"
+version: "DRAFT"
+description: "Tools and practices forbidden, without exception, in all of Jordan Lee's work"
+content:
+  summary: "Binary prohibitions that apply to all work"
+  prohibitions:
+    - id: NO-001
+      kind: practice
+      subject: "pasting a client's credentials, keys, or connection strings into a chat or a prompt"
+      instead: "refer to the secret by name and let the client's secret store supply it"
+    - id: NO-002
+      kind: practice
+      subject: "copying one client's code, data, or documents into another client's work"
+provenance:
+  created_by: "Jordan Lee <jordan@jlee-data.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Boundaries Jordan set at intake"

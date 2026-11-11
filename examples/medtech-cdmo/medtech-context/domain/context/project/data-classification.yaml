@@ -1,0 +1,19 @@
+id: scd:project:data-classification
+type: project
+title: "Data Classification"
+version: "DRAFT"
+description: "Client-confidential and patient information"
+concept: concept:data-provenance
+content:
+  summary: "Client information stays with the client; patient information stays out of AI work."
+  facts:
+    - id: DC-001
+      fact: "Client-confidential information includes a client's design files, specifications, test data, and program correspondence."
+  directives:
+    - id: DC-002
+      directive: "Do not include patient health information in responses. If a request contains it, ask the user to remove it."
+relationships: []
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Data handling from the intake"

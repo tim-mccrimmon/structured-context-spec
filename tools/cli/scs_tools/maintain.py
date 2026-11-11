@@ -10,7 +10,6 @@ from __future__ import annotations
 import re
 import textwrap
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -21,6 +20,7 @@ from scs_validator.owners import needs_owner
 from scs_validator.resolver import Index, parse_bundle_ref
 from scs_validator.workspace import ONTOLOGY_MANIFEST, load_workspace
 
+from scs_tools import clock
 from scs_tools.machine import EXIT_USAGE, CommandError, Envelope
 from scs_tools.workspace import find_workspace, repository_root, select_workspace
 
@@ -634,7 +634,7 @@ def new_concept(
 
     title = title or name.replace("-", " ").title()
     description = description or f"{title}: defined with the owner of this workspace"
-    now = datetime.now(timezone.utc).isoformat()
+    now = clock.now().isoformat()
     provenance = {"created_by": created_by, "created_at": now}
     concept_bundle = {
         "id": bundle_id,

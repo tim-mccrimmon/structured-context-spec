@@ -12,13 +12,12 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-82 issues: open 22 · proposed 1 · deferred 3 · done 56.
+82 issues: open 21 · proposed 1 · deferred 3 · done 57.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.7.0 | ISS-023 | `docs/` documentation website: migrate to concept terminology | open | medium | M | no | strong |
-| 0.7.0 | ISS-070 | Examples rebuilt as Domain repositories | open | medium | M | no | strong |
 | 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
 | 0.7.0 | ISS-082 | Guidance: an external approval cites the version and content digest | open | medium | S | yes | strong |
 | 0.7.x | ISS-040 | Docs and validator message do not say that concept relationships belong in the ontology | open | low | S | no | once |
@@ -1216,7 +1215,13 @@ then reverted because `examples/medical-device-cdmo/` lists SCD slots on purpose
 ISS-070.
 
 ### ISS-070 - Examples rebuilt as Domain repositories
-**Status:** open
+**Status:** done (2026-11-11): `examples/medtech-cdmo/` (a fictional CDMO, `cdmo` ontology, one
+Project) and `examples/personal/` (a fictional consultant, `personal` ontology) are Domain
+repositories checked in without `.git`, each made from a `recipe.yaml` by `examples/build.py`
+through the engine (new, retire, scd write, intake, commit, release, compile). The engine honors
+`SOURCE_DATE_EPOCH`, so a rebuild is byte-identical; CI runs `build.py --check`, and `--keep`
+gives the repository with its history and tags. `two-tier-governance` and
+`chai-standards-bundle` moved to test fixtures; `med-adherence` was removed
 **Target:** 0.7.0 · **Priority:** medium · **Effort:** M · **Spec:** no · **Evidence:** strong
 The examples predate 0.7 Domain repositories (layout, tags, manifests). Rebuild at least a
 personal and a CDMO Domain with the engine; they need their own git history for tags, so either

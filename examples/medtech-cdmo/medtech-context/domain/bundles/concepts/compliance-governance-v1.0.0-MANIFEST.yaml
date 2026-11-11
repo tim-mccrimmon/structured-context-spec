@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: compliance-governance
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:compliance-governance
+  type: concept
+  file: compliance-governance-v1.0.0.yaml
+  sha256: 25442fdfc21e828f44018c3b07f70eb2adb92bf332b8115b3d30eaaa59e7c76d
+  size_bytes: 867
+content_digest: sha256:3bd3c6c62220c2ad9e935cfbbe70e9e5ded49eb83bdece68baa1badf52a41493
+content_inputs:
+  bundles:
+    bundle:compliance-governance:1.0.0: sha256:acff272103d6268646cac5aab0d46d24c2a140e078e7c11123be3575804cd9ff
+  scds:
+    scd:project:regulatory-applicability: sha256:a6f0344abf0e2b1dde9f0ac78d91d27a69ccaf656096cbe0adb00e2b065f7b2f
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: domain/compliance-governance-v1.0.0
+  immutable: true
+  authoritative: true

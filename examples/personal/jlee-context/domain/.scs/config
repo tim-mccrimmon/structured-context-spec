@@ -1,0 +1,7 @@
+# SCS Workspace Configuration
+bundle_type: domain
+name: domain
+display_name: "Jordan Lee"
+ontology: personal
+scs_version: 0.7.0
+tools_version: 0.7.0rc6

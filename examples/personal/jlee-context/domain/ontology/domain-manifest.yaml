@@ -1,0 +1,41 @@
+# Domain Ontology manifest for Jordan Lee (SCS 0.7.0, RFC-0001).
+#
+# The ontology is the industry baseline: the concepts (categories) your guardrails are organized
+# around. This workspace uses the personal ontology: its only fixed concept is boundaries
+# (prohibited); add the concepts your own context needs, one concept per
+# concept bundle in bundles/concepts/. Add depth as you need it beyond what's here:
+#   parent: concept:<id>                        a taxonomy (a concept under another concept)
+#   relationships: [{type: depends-on, target: concept:<id>}]      (also: relates-to)
+#   satisfies: [std:<standard>[:<edition>][#<clause>]]   standards a concept addresses (citations)
+# Once a concept bundle has a released version, add `bundle: bundle:<name>:<version>` to its entry.
+#
+# Check it with:  scs validate --domain ontology/domain-manifest.yaml
+
+domain:
+  id: "domain:personal"
+  name: "Personal"
+  version: "0.1.0"
+  description: "Domain Ontology for Jordan Lee: the personal concepts its structured context is organized around"
+  author: "Jordan Lee"
+
+  ontology:
+    concepts:
+      - id: concept:prohibited
+        name: "Prohibited Tools and Practices"
+        description: "Tools and practices forbidden, without exception, in all of the organization's work"
+
+      - id: concept:clients
+        name: "Client Work"
+        description: "How Jordan works with clients: engagements, confidentiality, estimates"
+
+      - id: concept:writing
+        name: "Writing"
+        description: "How Jordan wants writing done"
+
+
+  # Shared base SCD schemas from the core spec, as in the reference domains.
+  schemas:
+    meta:
+      content_schema: "../../scd/meta-scd-content-schema.json"
+    project:
+      content_schema: "../../scd/project-scd-content-schema.json"

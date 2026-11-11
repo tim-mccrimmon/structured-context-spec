@@ -1,0 +1,39 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: data-provenance
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:data-provenance
+  type: concept
+  file: data-provenance-v1.0.0.yaml
+  sha256: f1dc888ce80edfee879acd70927b514350a6c43eb95a3bd64e902c4a8f033f44
+  size_bytes: 858
+content_digest: sha256:5092287fe50b8c8de1ffc68877c50f44e35593975205a9d8ec70c649f44fae06
+content_inputs:
+  bundles:
+    bundle:data-provenance:1.0.0: sha256:bdac2d061f22e667c24ae276dfa5830d6f94790d67cc51af1132c38dd327b899
+  scds:
+    scd:project:client-program-segregation: sha256:6265ee342a5ad65fbeaf7c238835b924db1c6738fe2f644c7cbff254378f9931
+    scd:project:data-classification: sha256:b5d29761e6782bdcdafe1675f1016eaa70db68ae6de54fd25182b63b1353c01c
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 2
+approval:
+  approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: domain/data-provenance-v1.0.0
+  immutable: true
+  authoritative: true

@@ -46,6 +46,8 @@ jobs:
       - name: scs-tools tests
         working-directory: tools/cli
         run: python -m pytest tests
+      - name: Examples are current (rebuilt with the engine, ISS-070)
+        run: python examples/build.py --check
 
   lint:
     # ruff (E, F, W, I), black and mypy, configured in each package's pyproject.toml (ISS-036)

@@ -1,0 +1,59 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: medtech
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:medtech
+  type: domain
+  file: medtech-v1.0.0.yaml
+  sha256: 36d2531332dcc0cf14ca8e115dd12d6743dd40da3224909de99ade53e2002f85
+  size_bytes: 807
+content_digest: sha256:37b363d86eefc4006a2cacc1669877501e7fcb21b42915e8e45d60b5119b2f57
+content_inputs:
+  bundles:
+    bundle:ai-accountability:1.0.0: sha256:5f32682a69876af997284036c7be2651a35248aefc539a5495b5da6992bd9be7
+    bundle:company:1.0.0: sha256:0f436a64a80867ad1568dc9e41b3b4c642867acc9ad83a1dff80aaae2bbeec59
+    bundle:compliance-governance:1.0.0: sha256:acff272103d6268646cac5aab0d46d24c2a140e078e7c11123be3575804cd9ff
+    bundle:data-provenance:1.0.0: sha256:bdac2d061f22e667c24ae276dfa5830d6f94790d67cc51af1132c38dd327b899
+    bundle:medtech:1.0.0: sha256:6a6b17dd1b7b3fc3397e00867299810fd51ff6939ef5bbca3775700534bd97f6
+    bundle:meta:0.6.0: sha256:30c36b76f57b1e5f8f884d29a159afc2f524d8fd16e686f5b1abc954a66af3dc
+    bundle:prohibited:1.0.0: sha256:16b1ed593710aa98b72bc215e7ed9428087a0820f8b9435d8f975b14e7928d28
+    bundle:qms-records:1.0.0: sha256:0fdb28ec5e9c4a558249ec4261abc9a1b12dbe487ed3b3e00d3c82a2fa899f61
+  scds:
+    scd:meta:governance-context: sha256:3b30a3f8a3420b7ee1d805a261df5e8e115ae210f72768515b57473a4ca3d6ea
+    scd:project:client-program-segregation: sha256:6265ee342a5ad65fbeaf7c238835b924db1c6738fe2f644c7cbff254378f9931
+    scd:project:company-profile: sha256:7d2bebb0ad120d7babeaae7330237e3de4e4e689c5d42d68dbc0fd4e2541cbdb
+    scd:project:data-classification: sha256:b5d29761e6782bdcdafe1675f1016eaa70db68ae6de54fd25182b63b1353c01c
+    scd:project:document-control: sha256:35fb06f1a0705948778edde131138c2cae4ddc7dd5f037e9b69428055d248c32
+    scd:project:human-authority: sha256:72e6c0e400bb11f639b322c015359615b9da671370f7fc0afda397e8373615b1
+    scd:project:prohibited: sha256:8c35c923cae76d6cedda7d2a642d56db6e280a8a740e66dfd393640981342ce6
+    scd:project:regulatory-applicability: sha256:a6f0344abf0e2b1dde9f0ac78d91d27a69ccaf656096cbe0adb00e2b065f7b2f
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles:
+  - bundle:meta:0.6.0
+  imported_bundles:
+  - bundle:company:1.0.0
+  - bundle:prohibited:1.0.0
+  - bundle:compliance-governance:1.0.0
+  - bundle:qms-records:1.0.0
+  - bundle:data-provenance:1.0.0
+  - bundle:ai-accountability:1.0.0
+  total_scds: 0
+approval:
+  approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: domain/medtech-v1.0.0
+  immutable: true
+  authoritative: true

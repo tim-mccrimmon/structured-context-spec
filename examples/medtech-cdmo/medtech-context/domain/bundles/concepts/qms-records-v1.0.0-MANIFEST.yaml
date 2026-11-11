@@ -1,0 +1,38 @@
+version: 1.0.0
+release_date: '2026-10-01T09:00:00Z'
+status: validated
+project: qms-records
+tools_version: 0.7.0rc6
+bundle:
+  id: bundle:qms-records
+  type: concept
+  file: qms-records-v1.0.0.yaml
+  sha256: 6ce1f97d0b8259ccd371c0bad42addc5c769e2cdc801b42852e2b8b750d898c3
+  size_bytes: 834
+content_digest: sha256:825f2274a7495b67e3e40d5cdf4f590de7fbfd1e39de85de79ad911003610f5f
+content_inputs:
+  bundles:
+    bundle:qms-records:1.0.0: sha256:0fdb28ec5e9c4a558249ec4261abc9a1b12dbe487ed3b3e00d3c82a2fa899f61
+  scds:
+    scd:project:document-control: sha256:35fb06f1a0705948778edde131138c2cae4ddc7dd5f037e9b69428055d248c32
+validation:
+  validation_date: '2026-10-01T09:00:00Z'
+  validator_version: 0.7.0rc6
+  passed: true
+  errors: 0
+  warnings: 0
+components:
+  meta_bundles: []
+  imported_bundles: []
+  total_scds: 1
+approval:
+  approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  approved_at: '2026-10-01T09:00:00Z'
+  approval_notes: First approved version
+release_notes: First approved version
+distribution:
+  repository: medtech-context
+  branch: main
+  tag: domain/qms-records-v1.0.0
+  immutable: true
+  authoritative: true

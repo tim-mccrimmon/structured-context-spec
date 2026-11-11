@@ -18,7 +18,7 @@ from scs_tools.view import Source, build_view, render_html
 
 REPO = Path(__file__).resolve().parents[3]
 SCHEMA = REPO / "schema"
-EXAMPLE = REPO / "examples" / "two-tier-governance"
+EXAMPLE = Path(__file__).resolve().parent / "fixtures" / "two-tier-governance"
 DOMAIN = EXAMPLE / "org" / "bundles" / "domain-bundle.yaml"
 PROJECT = EXAMPLE / "infusion-pump-fw" / "bundles" / "project-bundle.yaml"
 AUTHOR = ["--author", "Test Author", "--email", "test@structuredcontext.dev"]
