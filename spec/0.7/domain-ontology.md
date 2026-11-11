@@ -171,7 +171,7 @@ The validator says so when an SCD relationship targets a `concept:` id.
 ## 4. Ontology Models
 
 A Domain Ontology is authored once per **type of business** (a market/industry vertical),
-not once per company. So far there are three:
+not once per company. So far there are four:
 
 - **SDLC** — the original "concerns" list (architecture, security, testing, …), for
   software development businesses.
@@ -184,6 +184,9 @@ not once per company. So far there are three:
   not a compliance mapping, so it carries relationships but no `satisfies`. Reference manifest:
   `schema/domain/examples/merchant-cash-advance-domain.yaml`; customer-neutral skeleton SCDs and
   concept bundles: `examples/merchant-cash-advance/`.
+- **Personal** — one person's context rather than an organization's. It has one fixed
+  concept, boundaries (the person's prohibitions); the agent defines the person's other
+  concepts with them (see `agent-interface.md`).
 
 The first step in adopting SCS is choosing your business's ontology, not writing one from a
 blank page: **use an existing model if one fits your market, or create a new one by

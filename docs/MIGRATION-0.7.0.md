@@ -148,9 +148,9 @@ list every change.
   `<bundle-name>-v<version>.yaml` and `<bundle-name>-v<version>-MANIFEST.yaml`, beside the bundle.
   The working bundle stays at `DRAFT`; the snapshot carries the released version.
 - **The approver is a person**, `--approved-by "Name <email>"`. A plain email or `role:` value
-  is refused (`VERSION_APPROVER_INVALID`). It is never taken from git configuration. In human
-  mode, `bundle version` prompts for it; with `--json`, a missing approver is
-  `VERSION_APPROVER_REQUIRED`.
+  is refused (`VERSION_APPROVER_INVALID`). It is never taken from git configuration, and
+  `bundle version` does not prompt for it: a missing approver is `VERSION_APPROVER_REQUIRED`
+  in every mode.
 - **Guards that `--no-validate` does not skip.** Every import must be pinned to a released
   version (`VERSION_IMPORT_NOT_PINNED`). A pinned import must match its version
   (`CONTENT_DIGEST_MISMATCH`) and have a 0.7 tag (`VERSION_TAG_MISSING`). A placeholder
