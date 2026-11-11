@@ -262,7 +262,7 @@ RFCs are appropriate for:
 ### Staying Informed
 
 - Watch the repository for updates
-- Check the CHANGELOG for version history
+- Check the release notes (`RELEASE-NOTES-*.md`) for version history
 - Review closed issues and PRs for context
 
 ---

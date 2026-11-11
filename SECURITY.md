@@ -17,7 +17,7 @@ If you discover a security vulnerability in the Structured Context Specification
 ## Supported Versions
 
 SCS is currently in active development (v0.x). Security updates will be applied to:
-- Current version (v0.3.0)
+- The latest release
 - Previous minor version (if applicable)
 
 Once we reach v1.0, we will maintain security updates for all minor versions of the current major release.

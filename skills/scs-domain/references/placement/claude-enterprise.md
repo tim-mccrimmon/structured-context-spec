@@ -35,8 +35,8 @@ What the docs say about how these combine:
 - **Organization.** Paste the artifact into **Organization instructions**. This field is
   limited to 3,000 characters, and changes can take up to an hour to apply "across Claude
   products" ([Set organization instructions](https://support.claude.com/en/articles/14546867-set-organization-preferences)).
-  Many Domain artifacts will be longer than that. For example, the two-tier example's Domain
-  artifact is about 3,300 bytes. If yours does not fit, render a compact form that keeps the
+  Many Domain artifacts will be longer than that. For example, the MedTech example's Domain
+  artifact (`examples/medtech-cdmo/`) is about 4,000 bytes. If yours does not fit, render a compact form that keeps the
   identity header, the identity rule, and every prohibition and directive with its id. Do not
   drop rules silently. If the result still does not fit, the Domain bundle may be larger than
   this placement can carry. That is a decision for the bundle's owner, not for the rendering.
