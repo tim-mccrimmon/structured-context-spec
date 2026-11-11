@@ -90,10 +90,10 @@ def test_new_project_works_from_inside_a_workspace(tmp_path: Path, monkeypatch):
 
 
 def test_title_is_the_display_name_and_ids_keep_the_name(tmp_path: Path, monkeypatch):
-    repo = new_domain(tmp_path, "nextern", "--title", "NexTern")
+    repo = new_domain(tmp_path, "medtech", "--title", "MedTech")
     assert new_project(repo, "timekeeping", monkeypatch, "--title", "Time Keeping").exit_code == 0
     for workspace, name, title in [
-        ("domain", "nextern", "NexTern"),
+        ("domain", "medtech", "MedTech"),
         ("projects/timekeeping", "timekeeping", "Time Keeping"),
     ]:
         root = repo / workspace

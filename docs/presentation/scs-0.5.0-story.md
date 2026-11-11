@@ -411,7 +411,7 @@ instead. Good evidence for why one shared list does not work.
 - All three manifests are in this repo (`schema/domain/examples/`): `software-development-domain.yaml`,
   `medical-device-cdmo-domain.yaml` and `merchant-cash-advance-domain.yaml` (ISS-039; validates clean,
   16 concepts, 15 relationships, no `satisfies`). It comes from a working draft in the engagement repo
-  (`everest/docs/ontology.md`, `status: draft`, 2026-09-23), so recheck the concept list if that
+  (`status: draft`, 2026-09-23), so recheck the concept list if that
   document changes before release. The spec text now describes three models (`rfcs/RFC-0001` is left as
   the accepted record). Customer-neutral skeleton SCDs and concept bundles ship in `examples/merchant-cash-advance/`; the engagement's own skeletons do not.
 - MCA was derived from a client engagement. Confirm the client is comfortable with it being published

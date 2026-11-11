@@ -12,12 +12,11 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-82 issues: open 19 · proposed 1 · deferred 3 · done 59.
+82 issues: open 18 · proposed 1 · deferred 4 · done 59.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
-| 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
 | 0.7.x | ISS-040 | Docs and validator message do not say that concept relationships belong in the ontology | open | low | S | no | once |
 | 0.8 | ISS-064 | Audience of SCD items | open | high | L | yes | strong |
 | 0.8 | ISS-065 | Placement facts | open | high | L | yes | strong |
@@ -25,6 +24,7 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 | 0.8 (proposed) | ISS-060 | Item-level SCD edits | open | medium | M | no | strong |
 | 0.8 (decide after the WP-13 rc6 rerun) | ISS-063 | Skills: assessment pass | open | medium | L | no | once |
 | 0.8 | ISS-066 | Duplicate rules within a bundle, and its size | open | medium | M | no | strong |
+| 0.8 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | deferred | medium | M | no | expected |
 | 0.8 | ISS-074 | Rename the approver fields to "released by" | open | medium | M | yes | strong |
 | 0.8 | ISS-075 | Project records the Domain version it was reviewed against | open | medium | M | yes | once |
 | 0.8 | ISS-076 | Starter outline from the ontology | open | medium | M | no | once |
@@ -444,7 +444,7 @@ migration (concern → concept rename, flat `concerns[]` → flat `ontology.conc
 keep migration guide-only.
 **Decided (RFC-0001, "Migration tooling"):** guide-only for 0.5.0, no automated `scs migrate`
 helper — Tim is the only consumer of 0.3 content today, so manual migration is cheap. Revisit
-if a third party (e.g. Nextern) has real 0.3 content to migrate. `docs/MIGRATION-0.5.0.md`
+if a third party has real 0.3 content to migrate. `docs/MIGRATION-0.5.0.md`
 (ISS-016) offers two one-line `sed`/`git mv` commands for the purely mechanical renames as a
 convenience, not a supported tool — the actual ontology-structure step can't be mechanically
 derived from a flat list regardless of tooling.
@@ -477,7 +477,7 @@ committed — confirming the pattern below was already wanted, just never landed
 committed by accident once merged to `main` — matches house convention in sibling repos
 (`.claude/` is gitignored wholesale in Kahuna; `.envrc` is gitignored for direnv-scoped
 GitHub tokens in
-`nextern-2h26` and `claude-enterprise`). This repo has no `.envrc` today either; the entry
+a client engagement repo and `claude-enterprise`). This repo has no `.envrc` today either; the entry
 is precautionary, not fixing a leak.
 
 ---
@@ -1231,8 +1231,8 @@ personal and a CDMO Domain with the engine; they need their own git history for 
 generate them in CI or check them in and version them in CI.
 
 ### ISS-071 - Install matrix: Cursor, Codex, GitHub Copilot
-**Status:** open
-**Target:** 0.7.0 · **Priority:** medium · **Effort:** M · **Spec:** no · **Evidence:** expected
+**Status:** deferred (2026-11-11): the skills have not been tried in these clients yet; moved to 0.8
+**Target:** 0.8 · **Priority:** medium · **Effort:** M · **Spec:** no · **Evidence:** expected
 `docs/install-matrix.md` records Claude Code and Claude (claude.ai); the other three clients are
 not yet tried.
 

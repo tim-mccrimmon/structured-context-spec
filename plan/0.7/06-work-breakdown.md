@@ -428,7 +428,7 @@ Dropped 2026-10-29 by Tim. WP-13 is judged on its own friction log.
 ### WP-13 Acceptance (ISS-055)
 - **Depends**: WP-11rc, WP-10b (rc2), WP-01b (D-50). Two tests on the Omarchy box, through Claude Code with
   the skills only (D-80): a personal Domain, `boat-context` with Project `docs-server`
-  (`personal` ontology), and an organization Domain, `nextern-context` with Project
+  (`personal` ontology), and an organization Domain, `cdmo-context` with Project
   `timekeeping` (`cdmo` ontology). Tim approves the versions in both. Runbook:
   `scs-0.7-runbook.md` on the Omarchy share.
 - **Accept**: transcripts archived; each repo archived as a `git bundle` including tags. Pass

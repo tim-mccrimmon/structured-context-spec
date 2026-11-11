@@ -110,7 +110,7 @@ _WORKSPACE_OPTIONS = [
     click.option(
         "--title",
         default=None,
-        help="Display name, written as people write it (e.g. 'NexTern' for nextern); used in "
+        help="Display name, written as people write it (e.g. 'MedTech' for medtech); used in "
         "titles and descriptions. Default: the name",
     ),
     click.option("--author", default=None, help="Author name for provenance"),

@@ -8,6 +8,7 @@ ISS that tracks them, so the marker has to be removed when the underlying issue 
 
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 
@@ -383,10 +384,22 @@ def test_every_mca_concept_is_described():
         assert concept.get("description", "").strip(), concept["id"]
 
 
+# Client names the reference content must not contain, as truncated SHA-256 digests of the
+# lowercase name so the names themselves are not published here.
+CLIENT_NAME_DIGESTS = frozenset(
+    ["042b12d660722399", "61e0625d5fb48107", "b614ab83edd0f6df", "54c5b3dd459d5ef7"]
+)
+
+
+def _client_names(text: str) -> list[str]:
+    words = set(re.findall(r"[a-z0-9]+", text.lower()))
+    return sorted(
+        w for w in words if hashlib.sha256(w.encode()).hexdigest()[:16] in CLIENT_NAME_DIGESTS
+    )
+
+
 def test_mca_manifest_is_client_neutral():
-    text = MCA_MANIFEST.read_text().lower()
-    for term in ("everest", "whetstone", "alpine", "nextern"):
-        assert term not in text, term
+    assert not _client_names(MCA_MANIFEST.read_text())
 
 
 # ------------------------------------------- MCA generic skeleton example (ISS-039)
@@ -436,7 +449,6 @@ def test_mca_example_is_client_neutral():
         if not path.is_file():
             continue
         text = path.read_text()
-        for term in ("everest", "whetstone", "alpine", "nextern"):
-            assert term not in text.lower(), (path.name, term)
+        assert not _client_names(text), path.name
         for title in ("Company AI Use Policy", "Departmental Context", "Company Overview"):
             assert title not in text, (path.name, title)

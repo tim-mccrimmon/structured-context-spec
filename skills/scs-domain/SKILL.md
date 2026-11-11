@@ -116,7 +116,7 @@ Make sure the user knows there are three separate things:
 
 Propose a Domain name (for example `acme-cdmo`, `jdoe`); `scs new domain <name>` creates the
 repository `<name>-context/`, so pass the name without `-context`. Propose a display name too,
-the name as people write it (for example `NexTern` for `nextern`): it goes in the titles and
+the name as people write it (for example `MedTech` for `medtech`): it goes in the titles and
 descriptions, and changing it later takes a new version. Ask which directory it goes in; do not
 assume the current directory. Ask for the author's name and email, and say what they are for:
 they are recorded as `created_by` in the provenance of what is created, and as the author of
