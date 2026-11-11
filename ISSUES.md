@@ -12,12 +12,11 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-82 issues: open 21 · proposed 1 · deferred 3 · done 57.
+82 issues: open 20 · proposed 1 · deferred 3 · done 58.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
-| 0.7.0 | ISS-023 | `docs/` documentation website: migrate to concept terminology | open | medium | M | no | strong |
 | 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
 | 0.7.0 | ISS-082 | Guidance: an external approval cites the version and content digest | open | medium | S | yes | strong |
 | 0.7.x | ISS-040 | Docs and validator message do not say that concept relationships belong in the ontology | open | low | S | no | once |
@@ -521,7 +520,12 @@ in `test_regression_050.py` (`KNOWN_INVALID_BUNDLES`) is removed. Both regressio
 pass fully clean (147 + 79, zero xfail).
 
 ### ISS-023 — `docs/` documentation website: migrate to concept terminology
-**Status:** open (deferred, scoped out of ISS-004 by Tim 2026-09-22)
+**Status:** done (2026-11-11): rewritten for 0.7: the site home, overview, quick start (skills
+first, then the engine), FAQ, glossary, bundle lifecycle, SCD guide, and validation guide.
+`docs/concern-docs/` is `docs/concept-docs/`: one page per SDLC ontology concept with the
+engine's template SCDs and owner role, and the brief templates kept as optional worksheets
+without the 0.2 AI-mapping fields; `med-adherence-examples` removed. mkdocs nav covers every
+page, and links outside `docs/` go to GitHub so they work on the site
 **Target:** 0.7.0 · **Priority:** medium · **Effort:** M · **Spec:** no · **Evidence:** strong
 A separate tree from `spec/` - the mkdocs-built site (`mkdocs.yml`, `docs_dir: docs`).
 45 files, ~9,300 lines, 15 referencing `concern`. Has its own **"Concern Docs" nav section**

@@ -15,22 +15,38 @@ theme:
 
 nav:
   - Overview: README.md
+  - SCS on One Page: scs-overview.md
+  - What to Gather: what-to-gather.md
   - Quick Start: quick-start-guide.md
-  - SCD Guide: scd-guide.md
-  - Validation: validation-guide.md
-  - Concern Docs:
-    - Architecture: concern-docs/architecture/README.md
-    - Business Context: concern-docs/business-context/README.md
-    - Compliance & Governance: concern-docs/compliance-governance/README.md
-    - Data Provenance: concern-docs/data-provenance/README.md
-    - Security: concern-docs/security/README.md
-    - Safety & Risk: concern-docs/safety-risk/README.md
-    - Testing & Validation: concern-docs/testing-validation/README.md
-    - Performance & Reliability: concern-docs/performance-reliability/README.md
-    - Deployment & Operations: concern-docs/deployment-operations/README.md
-    - Ethics & AI Accountability: concern-docs/ethics-ai-accountability/README.md
-    - Usability & Accessibility: concern-docs/usability-accessibility/README.md
-  - Examples:
-    - Medical Device CDMO: concern-docs/med-adherence-examples/GETTING_STARTED.md
   - FAQ: FAQ.md
-  - Migration (0.3): MIGRATION-0.3.md
+  - Guides:
+    - Understanding SCDs: scd-guide.md
+    - Bundle Lifecycle: bundle-lifecycle.md
+    - Validation: validation-guide.md
+    - Install Matrix: install-matrix.md
+  - Concept Guides:
+    - Overview: concept-docs/README.md
+    - Architecture: concept-docs/architecture/README.md
+    - Business Context: concept-docs/business-context/README.md
+    - Compliance & Governance: concept-docs/compliance-governance/README.md
+    - Data Provenance: concept-docs/data-provenance/README.md
+    - Security: concept-docs/security/README.md
+    - Safety & Risk: concept-docs/safety-risk/README.md
+    - Testing & Validation: concept-docs/testing-validation/README.md
+    - Performance & Reliability: concept-docs/performance-reliability/README.md
+    - Deployment & Operations: concept-docs/deployment-operations/README.md
+    - Ethics & AI Accountability: concept-docs/ethics-ai-accountability/README.md
+    - Usability & Accessibility: concept-docs/usability-accessibility/README.md
+  - Placement:
+    - Overview: placement/README.md
+    - Claude Code: placement/claude-code.md
+    - Claude Enterprise: placement/claude-enterprise.md
+    - ChatGPT Enterprise: placement/chatgpt-enterprise.md
+    - Cursor: placement/cursor.md
+    - GitHub Copilot: placement/github-copilot.md
+  - Migration:
+    - "0.7.0": MIGRATION-0.7.0.md
+    - "0.6.0": MIGRATION-0.6.0.md
+    - "0.5.0": MIGRATION-0.5.0.md
+    - "0.3": MIGRATION-0.3.md
+  - Resources: resources.md

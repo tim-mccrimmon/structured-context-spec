@@ -22,7 +22,7 @@ The feedback loop between steps 2 and 3 is where the real value emerges: domain 
 **GitHub Repository**
 https://github.com/tim-mccrimmon/structured-context-spec
 
-The complete SCS specification (v0.3), JSON schemas, validation tooling, examples, and templates. Open source under the Apache 2.0 license.
+The complete SCS specification (0.7), JSON schemas, validation tooling, examples, and templates. Open source under the Apache 2.0 license.
 
 **Website**
 https://structuredcontext.dev
@@ -34,7 +34,7 @@ replaces with Agent Skills.
 
 ## Agent Skills
 
-SCS 0.7 ships four Agent Skills in [`skills/`](../skills/README.md): `scs-domain`,
+SCS 0.7 ships four Agent Skills in [`skills/`](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/skills/README.md): `scs-domain`,
 `scs-project`, `scs-validate`, and `scs-explain`. They let an AI assistant set up, maintain,
 version, and compile your context through the SCS engine,
 confirming each change with you first. They replace the earlier SCS Vibe and SCS Team plugins,
@@ -50,7 +50,7 @@ git clone https://github.com/tim-mccrimmon/structured-context-spec.git
 cd structured-context-spec
 
 # Explore the spec
-ls spec/0.3/
+ls spec/0.7/
 
 # Try the Agent Skills in Claude Code (see skills/README.md)
 cp -R skills/scs-* ~/.claude/skills/

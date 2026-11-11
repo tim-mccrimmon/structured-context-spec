@@ -1,753 +1,128 @@
-# Bundle Lifecycle and Workflow
+# Bundle Lifecycle
 
-**Version**: 0.6
-**Last Updated**: 2026-10-19
+**Version**: 0.7
 
-> **SCS 0.6.0:** An organization's Domain bundle and each Project bundle are independent and
-> versioned separately; Standards bundles are replaced by citations; versioned bundles are
-> compiled into runtime artifacts. See [Bundle Hierarchy](#bundle-hierarchy) and
-> [Compiling for Runtime](#compiling-for-runtime). Other sections describe the general workflow
-> and still apply.
+How a Domain or Project bundle goes from a first draft to a released, compiled version, and
+how it changes after that. The normative rules are in
+[Bundle Format](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/spec/0.7/bundle-format.md) §5 and §8.
 
 ---
 
-## Overview
+## The repository
 
-This document describes the complete lifecycle of SCD Bundles within a project, from initial concept through development and change management. It explains how teams work with bundles, when they are created, how they evolve, and how they function as versioned contracts that govern the entire development process.
+One **Domain repository** (a git repository) holds one Domain and its Projects:
 
----
+```
+acme-context/
+├── AGENTS.md, CLAUDE.md            # how an assistant works in this repository
+├── .github/workflows/              # CI: scs-validate --strict
+├── domain/                         # the Domain workspace
+│   ├── bundles/domain-bundle.yaml  # bundle:acme: imports meta + its concept bundles
+│   ├── bundles/concepts/*.yaml     # one per concept, each with an owner role
+│   ├── context/project/*.yaml      # the SCDs
+│   ├── intake.yaml                 # answers, owners, approvers, sources, review findings
+│   ├── sources/                    # source documents (kept local, not committed)
+│   └── dist/                       # compiled artifacts and review packages
+└── projects/
+    └── portal/                     # a Project workspace, the same shape
+```
 
-## Table of Contents
-
-1. [Core Concepts](#core-concepts)
-2. [Project Initiation](#project-initiation)
-3. [Content Creation Phase](#content-creation-phase)
-4. [Review and Validation](#review-and-validation)
-5. [Versioning and Locking](#versioning-and-locking)
-6. [Bundle Hierarchy](#bundle-hierarchy)
-7. [Compiling for Runtime](#compiling-for-runtime)
-8. [Development Phase](#development-phase)
-9. [Change Management](#change-management)
-10. [Automation Opportunities](#automation-opportunities)
-11. [Best Practices](#best-practices)
-
----
-
-## Core Concepts
-
-### The Bundle as Contract
-
-A **versioned bundle** is not just documentation—it is a **complete contract** that contains everything needed to:
-
-- **Build** the system (architecture, tech stack, component models)
-- **Test** the system (test criteria, performance requirements)
-- **Manage** the system (operational requirements, monitoring)
-- **Govern** the system (decision frameworks, approval processes)
-- **Comply** with regulations (standards mappings, evidence)
-
-### Context-First Development
-
-SCS follows a **context-first approach**:
-
-1. Define and lock the complete context (bundles)
-2. Build the system to that contract
-3. Changes require new versioned contracts
-
-This ensures that all stakeholders—humans, AI assistants, and governance agents—operate from the same authoritative source of truth.
-
-### Bundle States
-
-Bundles exist in two primary states:
-
-- **DRAFT Bundle**: Working state, evolving, not yet committed
-- **VERSIONED Bundle**: Locked, immutable contract
+Each workspace is versioned and compiled on its own. A Project does not import its Domain;
+at runtime both artifacts apply, Domain first.
 
 ---
 
-## Project Initiation
+## 1. Draft
 
-### Starting Point
+A new workspace is **DRAFT**: every bundle has `version: "DRAFT"`, and nothing is approved.
 
-Every project begins with:
-- A **concept** or problem to solve
-- Defined **goals** and objectives
-- Initial **scope** understanding
+1. **Profile and sources.** Who the context is for, the Ontology Model, and the source
+   documents. Answers go into `intake.yaml`.
+2. **Draft every SCD in one pass**, from the sources outward, recording where each rule came
+   from (`derived_from`). The ontology's templates are a coverage check: keep the ones that
+   apply, retire the rest (`scs bundle remove-scd`), and add concepts the templates lack
+   (`scs add bundle <name> --new`).
+3. **Consolidate.** Merge items that say the same thing in different sections, and move
+   reference material (document lists, administration, names where a role is enough) out of
+   the compiled lists into `summary`.
 
-### Team Formation
+Validation is loose while DRAFT: templates with TODOs warn, they do not fail. Commit as you
+go with `scs commit`.
 
-Assemble a **domain team** structure:
+## 2. Owners and review
 
-- **Architecture Team** (typically 1 person + AI assistant)
-- **Security Team** (typically 1 person + AI assistant)
-- **Governance Team** (typically 1 person + AI assistant)
-- **Performance Team** (typically 1 person + AI assistant)
-- Additional domain teams as needed (compliance, operations, testing, etc.)
+Each concept bundle names the role accountable for it (`owner: quality`), and the intake
+record names the person who holds the role (`scs intake set owners`). Owners are the primary
+reviewers.
 
-**Key characteristic**: Each domain team consists of a subject matter expert paired with an AI assistant. The human provides domain expertise; the AI assistant helps structure context and generate SCDs.
+`scs view <bundle> --allow-draft` writes an HTML **review package**: every prohibition,
+rule, and fact by section, with its owner and its source. Owners review it; each finding and
+the decision on it is recorded (`scs intake record-finding`). Fix, regenerate, and repeat
+until a round produces no changes.
 
-### Domain Team Responsibilities
+## 3. Release
 
-Each domain team is responsible for:
-- Gathering relevant information for their domain
-- Creating SCDs that capture domain-specific context
-- Managing their domain bundle
-- Reviewing and validating their contributions
-- Committing to versioned bundles
+`scs bundle release` releases a workspace in one step, with one approver:
 
----
+1. Each concept bundle that is new or changed gets a version (`--concept NAME=VERSION`).
+2. The root bundle's imports are pinned to those versions (`bundle:security:1.0.0`).
+3. The root bundle gets its version.
 
-## Content Creation Phase
+Every version is:
 
-### Gathering Materials
+- a **git tag**, `<workspace>/<bundle-name>-v<version>` (`domain/acme-v1.0.0`), on a commit
+  made by the engine;
+- a **snapshot** of the root bundle (`bundles/acme-v1.0.0.yaml`) and a **manifest**
+  (`bundles/acme-v1.0.0-MANIFEST.yaml`) recording the approver, the validation result, the
+  digest of every bundle and SCD, and the **content digest** of the whole tree.
 
-Each domain team gathers or creates materials describing their domain:
+A release needs every section's owner role held, an approver given as `Name <email>` (never
+taken from git config), and no placeholder provenance. The dry run (`--dry-run`) performs the
+whole release on a scratch copy and lists everything it would do. If a step fails, every
+completed step is undone.
 
-**Architecture Team:**
-- System context and boundaries
-- Technology stack decisions
-- Component models and interactions
-- Deployment models
-- Integration patterns
+A released version is never overwritten. The tag, the snapshot, and the digest stay as they
+are; a change means a new version.
 
-**Security Team:**
-- Threat models
-- Security controls
-- Authentication and authorization approaches
-- Encryption requirements
-- Security policies
-
-**Governance Team:**
-- Decision frameworks
-- Approval processes
-- Roles and responsibilities
-- Risk management approaches
-
-**Performance Team:**
-- Performance requirements
-- Load expectations
-- Scalability requirements
-- Performance testing criteria
-
-**Compliance Team:**
-- Applicable standards (HIPAA, SOC2, GDPR, etc.)
-- Regulatory requirements
-- Audit requirements
-- Evidence collection approaches
-
-### Creating DRAFT SCDs
-
-As each domain team develops their understanding, they create **DRAFT SCDs**:
-
-1. **Human + AI Collaboration**:
-   - Human provides domain expertise and content
-   - AI assistant structures it according to SCS specification
-   - AI ensures schema compliance and proper formatting
-
-2. **SCD Creation**:
-   - Each SCD captures a specific aspect of the domain
-   - Example: Architecture domain might create:
-     - `scd:project:system-context`
-     - `scd:project:tech-stack`
-     - `scd:project:component-model`
-     - `scd:project:deployment-model`
-
-3. **DRAFT Domain Bundle**:
-   - Each domain team maintains a DRAFT bundle
-   - Lists all SCDs for their domain
-   - Evolves as understanding develops
-
-**DRAFT Status**: SCDs and bundles marked as DRAFT are works in progress. They can be modified, refined, and iterated upon.
-
-### Validation During DRAFT Phase
-
-Even during the DRAFT phase, validation is valuable:
-
-- **Syntax validation**: Ensure YAML/JSON is well-formed
-- **Schema validation**: Verify SCDs conform to tier schemas
-- **Semantic validation**: Check ID patterns, versioning, provenance
-- **Warnings vs. Errors**: DRAFT validation may be more lenient, producing warnings rather than hard failures for incomplete sections
-
-**Tool Support**: The `scs-validate` CLI tool can validate DRAFT SCDs and bundles to catch issues early.
-
----
-
-## Review and Validation
-
-### Checkpoint Process
-
-When domain teams believe their bundles are ready, a **checkpoint** is triggered:
-
-#### 1. Completeness Review
-
-Each domain team reviews their bundle for:
-- All required aspects covered
-- All SCDs present and complete
-- Relationships properly defined
-- Provenance documented
-- Cross-references validated
-
-#### 2. Validation
-
-Run comprehensive validation:
+## 4. Compile
 
 ```bash
-# Validate domain bundle
-scs-validate --bundle bundles/architecture-bundle.yaml --strict
-
-# Check for completeness, orphaned references, circular dependencies
+scs compile bundles/domain-bundle.yaml --version 1.0.0
 ```
 
-#### 3. Cross-Domain Review
+compiles the released version from its tag, not from the working copy, into
+`dist/<name>-<version>.yaml`: an identification rule, prohibitions, the meta rules,
+directives, then facts. The artifact carries the content digest as `source_digest`, so it
+can be matched to its approved version. The same source always produces the same bytes.
+See [Runtime Artifact](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/spec/0.7/runtime-artifact.md).
 
-Domain teams review each other's bundles:
-- Architecture reviews Security's infrastructure assumptions
-- Security reviews Architecture's threat surface
-- Governance reviews decision points across all domains
-- Compliance reviews standards mappings
+`scs stack <outer> ... <inner>` previews artifacts loaded together, for example a Domain and
+a Project. Where the artifact goes next is the owner's decision; see
+[Placement](placement/README.md).
 
-#### 4. Analysis and Review Tools
+## 5. Change after release
 
-**Viewer/Editor/VersionLocker Tool** (separate product):
-- Rich UI for bundle visualization
-- Relationship graph visualization
-- Gap analysis (unsatisfied standards, missing relationships)
-- Collaboration features for team review
-- Approval workflows
-- Version locking mechanism
+After a release the working copy is DRAFT again. To change it:
 
-**CLI Validator** (open source):
-- Fast feedback during development
-- CI/CD integration
-- Automated validation checks
+1. Edit, add, or retire SCDs, and commit. `scs status` shows what changed since the last
+   version; `scs bundle diff` shows what changed since a version, or between two.
+2. Review the changes with the owners (`scs view`, as before).
+3. Release a new version. Only the concept bundles that changed need new versions; the rest
+   stay pinned where they are.
+
+Versions are semantic versions (`1.0.0`). SCS does not say which part to increase; one
+workable convention is a patch for wording that changes no behavior, a minor version for a new
+or tightened rule, and a major version for a restructuring.
+
+Formal approval in a quality system stays in that system. Its approval record should cite
+the version and the content digest, so anyone can check which content was approved.
 
 ---
 
-## Versioning and Locking
-
-### The Versioning Decision
-
-When the team agrees that the bundle is complete and ready, they commit to **versioning**.
-
-### What Gets Locked
-
-When a bundle is versioned and locked:
-
-1. **The bundle manifest** is locked (immutable)
-2. **All SCDs referenced in that bundle** are versioned and locked
-3. **All imported bundles** are locked at their specific versions
-4. **The entire context set** becomes an immutable contract
-
-### Versioning Structure
-
-#### Concept Bundle Versioning
-
-```yaml
-id: bundle:architecture
-type: concept
-version: "1.0.0"
-title: "Architecture"
-description: "Architectural context for Project X"
-imports: []  # Concept bundles are leaves
-scds:
-  - scd:project:system-context
-  - scd:project:tech-stack
-  - scd:project:integration-map
-  - scd:project:component-model
-provenance:
-  created_by: "alice@company.com"
-  created_at: "2026-10-01T10:00:00Z"
-  version_approved_by: "architecture-lead@company.com"
-  version_approved_at: "2026-10-10T14:00:00Z"
-```
-
-#### Project Bundle Versioning
-
-```yaml
-id: bundle:project-x
-type: project
-version: "1.0.0"
-title: "Project X Governance"
-description: "Governance for Project X"
-imports:
-  - bundle:architecture:1.0.0
-  - bundle:security:1.0.0
-  - bundle:testing-validation:1.0.0
-scds: []  # All SCDs are in imported concept bundles
-provenance:
-  created_by: "project-lead@company.com"
-  created_at: "2026-10-01T14:00:00Z"
-  version_approved_by: "project-lead@company.com"
-  version_approved_at: "2026-10-12T09:00:00Z"
-```
-
-A Project bundle does not import the organization's Domain bundle, the meta bundle, or a
-standards bundle. The Domain bundle is versioned on its own schedule by the people who own
-organization-wide governance.
-
-### Immutability
-
-Once versioned:
-- **No modifications allowed** to that version
-- Bundle serves as the authoritative contract
-- All stakeholders operate from this locked context
-- Changes require creating a new version (see [Change Management](#change-management))
-
----
-
-## Bundle Hierarchy
-
-### Domain and Project Bundles
-
-SCS has two governance bundles, each the root of its own tree. A project is governed by
-both: it inherits the Domain bundle's rules and adds its own.
-
-```
-Domain bundle (type: domain)            organization-wide; applies to all work
-  ├─ bundle:meta:0.6.0                  published with the SCS specification
-  ├─ bundle:ai-use (concept)
-  │   └─ scd:project:ai-review
-  └─ bundle:design-controls (concept)
-      ├─ scd:project:design-review
-      └─ scd:project:design-change-control
-
-Project bundle (type: project)          one project
-  ├─ bundle:architecture (concept)
-  │   └─ scd:project:system-context
-  └─ bundle:security (concept)
-      └─ scd:project:threat-model
-```
-
-- The **Domain bundle** (also called the organization or Global bundle) starts from an
-  industry ontology model and holds the organization's own rules. It imports the published
-  meta bundle and its concept bundles, and contains no SCDs of its own.
-- A **Project bundle** imports its concept bundles directly (or lists project SCDs directly).
-  It does not import the Domain bundle.
-- Neither tree contains standards text. SCDs and concepts cite standards with `std:`
-  references (`spec/0.6/citations.md`).
-
-At runtime both apply. The rules in the Domain bundle apply to every project; the Project
-bundle adds the rules for one project.
-
-### Teams Own Concept Bundles
-
-- The **architecture team** owns `bundle:architecture`, the **security team**
-  `bundle:security`, and so on.
-- Each concept bundle can be versioned independently during iterations.
-- Organization-wide concept bundles belong to the Domain bundle's owners (for example,
-  quality or compliance); project concept bundles belong to the project team.
-
-### File Organization
-
-`scs new domain <name>` and `scs new project <name>` create these layouts:
-
-```
-acme/                                   # Domain workspace
-├── bundles/
-│   ├── domain-bundle.yaml
-│   └── concepts/
-├── context/project/                    # SCDs
-└── domain/domain-manifest.yaml         # Domain Ontology
-
-project-x/                              # Project workspace
-├── bundles/
-│   ├── project-bundle.yaml
-│   └── concepts/
-├── context/project/
-└── domain/domain-manifest.yaml
-```
-
----
-
-## Compiling for Runtime
-
-A versioned Domain or Project bundle is compiled into a **runtime artifact**: one file holding
-the bundle's prohibitions and directives as rules with stable ids, its facts, a version, and a
-self-identification rule
-(`spec/0.6/runtime-artifact.md`).
-
-```bash
-scs compile bundles/domain-bundle.yaml -o compiled/global.yaml
-scs compile bundles/project-bundle.yaml -o compiled/projects/project-x.yaml
-```
-
-Only each SCD's `content.prohibitions`, `content.directives`, and `content.facts` are
-compiled. The artifact carries no timestamps or
-authors, so the same versioned bundle always yields the same bytes and hash; a runtime can
-record that hash as evidence of which governance was applied. Use `--allow-draft` to compile a
-DRAFT bundle for testing; its version becomes `DRAFT+<digest>`.
-
-How a runtime stores, selects, and injects artifacts is outside SCS.
-
----
-
-## Development Phase
-
-### Starting Development
-
-Development **begins only after** the project bundle is versioned and locked.
-
-**Why?** Because the bundle is the complete contract. It contains everything needed to build, test, manage, govern, and comply.
-
-### How the Bundle is Used
-
-#### By AI Assistants
-
-AI coding assistants consume the versioned bundle as context:
-- Generate code that conforms to the architecture
-- Apply security controls as specified
-- Follow governance decisions
-- Meet performance requirements
-- Satisfy compliance obligations
-
-Example:
-```
-AI Assistant loads: bundle:project-x:1.0.0
-  → Understands complete system context
-  → Generates code aligned with tech stack
-  → Applies security controls from bundle
-  → Meets performance criteria from bundle
-```
-
-#### By Developers
-
-Human developers reference the bundle:
-- Understand system architecture
-- Know what standards apply
-- Follow governance processes
-- Implement required security controls
-- Build to the contract
-
-#### By Governance Agents
-
-Autonomic governance agents validate against the bundle:
-- Check code compliance with architecture
-- Verify security controls are implemented
-- Validate standards satisfaction
-- Generate compliance reports
-- Identify gaps
-
-#### By Compliance Auditors
-
-Auditors review the bundle as evidence:
-- See complete context and rationale
-- Trace requirements to implementations
-- Verify standards mappings
-- Review provenance and decisions
-- Assess risk management
-
-### Bundle as Source of Truth
-
-During development, the **versioned bundle is the authoritative source of truth**:
-- Architectural decisions
-- Technology choices
-- Security requirements
-- Performance criteria
-- Compliance obligations
-- Testing requirements
-- Operational needs
-
----
-
-## Change Management
-
-### When Changes Are Needed
-
-During development, changes may be needed due to:
-- Discovered technical constraints
-- New requirements
-- Standards updates
-- Security vulnerabilities
-- Performance issues
-- Regulatory changes
-
-### SDLC Rules Apply
-
-Changes to the context require going through the full process:
-
-1. **Change Request**:
-   - Document the needed change
-   - Identify impacted domains
-   - Assess impact on existing contract
-
-2. **Domain Team Review**:
-   - Relevant domain teams evaluate the change
-   - Update DRAFT SCDs as needed
-   - Update DRAFT domain bundles
-
-3. **Validation**:
-   - Validate updated domain bundles
-   - Check for breaking changes
-   - Assess downstream impacts
-
-4. **Cross-Domain Review**:
-   - Review impact across all domains
-   - Ensure consistency maintained
-
-5. **Version Increment**:
-   - Create new version of affected domain bundles
-   - Update project bundle with new imports
-   - Version and lock the new project bundle
-
-6. **Transition**:
-   - Development transitions to new bundle version
-   - Old version remains for reference
-   - Git tags track bundle versions
-
-### Versioning Strategy
-
-**Semantic Versioning** applies to bundles:
-
-- **Major (2.0.0)**: Breaking changes, significant restructuring
-- **Minor (1.1.0)**: Additive changes, new SCDs, expanded context
-- **Patch (1.0.1)**: Corrections, clarifications, non-breaking fixes
-
-**Example Change Flow**:
-
-```
-Initial: bundle:project-x:1.0.0
-  ├─ bundle:architecture:1.0.0
-  └─ bundle:security:1.0.0
-
-Change Request: Add new component to architecture
-
-Updated DRAFT: bundle:architecture (DRAFT)
-  → Add scd:project:new-component
-
-Validated & Versioned: bundle:architecture:1.1.0
-
-New Project Bundle: bundle:project-x:1.1.0
-  ├─ bundle:architecture:1.1.0  ← updated
-  └─ bundle:security:1.0.0      ← unchanged
-```
-
----
-
-## Automation Opportunities
-
-While the process may sound time-consuming, **most of it can be automated**:
-
-### Automated SCD Generation
-
-- AI assistants generate DRAFT SCDs from conversations and documents
-- Templates and schemas guide structure
-- Provenance tracking is automated
-
-### Automated Validation
-
-```bash
-# Pre-commit hooks
-git commit → automatic validation → pass/fail
-
-# CI/CD pipelines
-PR opened → validate all bundles → report results → block merge if failed
-
-# Continuous validation
-File changed → re-validate → notify team
-```
-
-### Automated Review Workflows
-
-- Viewer/Editor tools automate review workflows
-- Assign reviewers by domain
-- Track approval status
-- Generate review reports
-- Identify gaps and inconsistencies
-
-### Automated Version Management
-
-- Semantic version bumping based on change analysis
-- Automated git tagging of bundle versions
-- Automatic provenance updates
-- Bundle diff generation
-
-### Automated Governance
-
-- Autonomic agents continuously validate compliance
-- Detect gaps in real-time
-- Generate audit reports automatically
-- Monitor for standards changes
-- Alert on violations
-
-### Integration with Development Tools
-
-- IDE plugins consume bundle context
-- AI coding assistants auto-load relevant bundles
-- Code review tools validate against bundle contracts
-- CI/CD enforces bundle compliance
-
----
-
-## Best Practices
-
-### 1. Start with Domain Teams
-
-Form domain teams early and let each own their context:
-- Clear ownership improves quality
-- Parallel work accelerates timeline
-- Domain expertise is captured properly
-
-### 2. Iterate in DRAFT Mode
-
-Don't rush to version:
-- Spend adequate time in DRAFT mode
-- Validate early and often
-- Cross-review between domains
-- Refine until confident
-
-### 3. Make Versioning Meaningful
-
-Version when you have a true contract:
-- Complete enough to build against
-- Reviewed and validated
-- Team consensus achieved
-- Ready to commit
-
-### 4. Automate Validation
-
-Integrate validation into workflows:
-- Pre-commit hooks catch issues early
-- CI/CD blocks invalid bundles
-- Continuous feedback loops
-- Fast failure = fast fixes
-
-### 5. Use Tools Effectively
-
-Leverage both CLI and rich tools:
-- **CLI validator**: Fast feedback, automation, CI/CD
-- **Viewer/Editor**: Rich review, analysis, collaboration
-- Different tools for different needs
-
-### 6. Document Rationale
-
-Always complete provenance:
-- Why was this SCD created?
-- What problem does it solve?
-- Who requested it?
-- What changed in this version?
-
-Rationale is invaluable for:
-- Future team members
-- Auditors
-- Change impact analysis
-- Historical understanding
-
-### 7. Keep Bundles Focused
-
-Domain bundles should be cohesive:
-- Architecture focuses on architecture
-- Security focuses on security
-- Avoid mixing concerns
-- Clear boundaries improve clarity
-
-### 8. Version Thoughtfully
-
-Not every change needs a version:
-- DRAFT mode allows iteration
-- Version when contract-ready
-- Semantic versioning communicates impact
-- Major versions signal breaking changes
-
-### 9. Maintain History
-
-Keep old bundle versions:
-- Git tags for each bundle version
-- Archived bundles for reference
-- Audit trail of changes
-- Learning from evolution
-
-### 10. Train Teams
-
-Ensure everyone understands:
-- Bundle lifecycle
-- Their role in the process
-- How to use tools
-- Why context matters
-- How AI consumes bundles
-
----
-
-## Timeline Example
-
-Here's a realistic timeline for a medium-complexity project:
-
-### Week 1: Initiation
-- Day 1-2: Form domain teams, define scope
-- Day 3-5: Gather initial materials and content
-
-### Week 2-3: Content Creation (DRAFT)
-- Domain teams work in parallel
-- Create DRAFT SCDs
-- Build DRAFT domain bundles
-- Iterate and refine
-- Continuous validation
-
-### Week 4: Review and Validation
-- Day 1-2: Domain team self-review
-- Day 3-4: Cross-domain review
-- Day 5: Validation and gap analysis
-
-### Week 5: Refinement
-- Address gaps identified
-- Update DRAFT bundles
-- Re-validate
-
-### Week 6: Versioning
-- Final reviews
-- Version domain bundles
-- Compose project bundle
-- Lock and commit
-
-### Week 7+: Development Begins
-- Build against versioned bundle
-- AI assistants use bundle context
-- Governance agents validate
-- Development proceeds
-
-**With Automation**: Timeline can compress significantly:
-- AI-assisted SCD generation
-- Automated validation and review routing
-- Parallel workflows
-- Continuous feedback
-
----
-
-## Summary
-
-The bundle lifecycle follows a clear progression:
-
-```
-Concept → Team Formation → Content Creation (DRAFT) →
-Review & Validation → Versioning & Locking → Development →
-Change Management (repeat as needed)
-```
-
-**Key Principles:**
-1. **Context-first**: Define complete context before building
-2. **Team-owned**: Domain teams own their context
-3. **Contract-based**: Versioned bundles are immutable contracts
-4. **Automation-friendly**: Most steps can be automated
-5. **SDLC-aligned**: Change management follows standard practices
-
-**The Result:**
-- Clear, complete context for all stakeholders
-- Humans and AI work from the same source of truth
-- Governance and compliance built in from the start
-- Traceable decisions and rationale
-- Reduced risk and increased confidence
-
----
-
-## Related Documentation
-
-- [Bundle Format Specification](../spec/0.3/bundle-format.md) - Technical bundle structure
-- [Validation Guide](validation-guide.md) - How to validate bundles
-- [SCS Overview](../spec/0.3/overview.md) - Core SCS concepts
-- [Quick Start Guide](quick-start-guide.md) - Creating your first SCD
-
----
-
-## Questions?
-
-- Open an [issue](https://github.com/tim-mccrimmon/scs-spec/issues)
-- Start a [discussion](https://github.com/tim-mccrimmon/scs-spec/discussions)
-- See the [FAQ](FAQ.md)
+## Related
+
+- [Quick Start](quick-start-guide.md)
+- [Validation](validation-guide.md)
+- [Bundle Format](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/spec/0.7/bundle-format.md)
+- [Governance & Compliance](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/spec/0.7/governance-and-compliance.md)
+- [Example repository](https://github.com/tim-mccrimmon/structured-context-spec/tree/main/examples/medtech-cdmo)

@@ -1,240 +1,116 @@
-
-# Structured Context Specification — FAQ (Version 0.3)
-
-Medium‑length, complete (but not deep‑dive) answers.
-Expanded set: ~20 questions.
+# Structured Context Specification: FAQ (0.7)
 
 ---
 
-## 1. What is "context" in AI-assisted development?
+## What is "context" for an AI assistant?
 
-Context is the information an AI system uses to understand what you are asking it to do and the environment in which it must operate.
-For humans, context lives in shared mental models, documents, architecture, conversations, and experience. For an LLM, context only exists in the text it is given in the moment.
-If essential intent, constraints, and boundaries are missing, the model improvises—leading to drift, rework, and misalignment.
+The information the assistant uses to understand what it is asked to do and the environment it
+works in. For a person, context lives in experience, documents, and conversations. For a
+language model, it exists only in the text it is given. When the rules, boundaries, and facts
+that matter are missing, the model fills the gap with plausible guesses.
 
----
+## What is structured context?
 
-## 2. What is Structured Context?
+Context an organization or a person stands behind: rules, boundaries, and facts, authored
+deliberately, reviewed by the people accountable for them, and changed only by a new version.
+That separates it from retrieved context, which changes with every query. SCS gives it a
+format (SCDs and bundles), a review and versioning process, and a compiled form an AI service
+can be given.
 
-Structured Context (SCS) is a compact, standardized, machine-readable representation of the essential environment in which development occurs.
-It encodes intent, constraints, architecture boundaries, domain rules, and organizational expectations into a form that fits inside an LLM's context window.
-SCS ensures that humans and AI share the same foundational understanding before any code is generated.
+## What problems does SCS solve?
 
----
+- Governance that lives in PDFs and procedures the assistant never sees
+- Rules that differ from one chat, tool, or team to the next
+- No record of which rules were in force when a piece of work was done
+- Rules that nobody owns, so nobody reviews or updates them
+- Context that is too long, repetitive, or vague to change what an assistant does
 
-## 3. Why do we need Structured Context?
+## What is an SCD?
 
-Modern AI-assisted development fails not because the models are inadequate, but because **the environment they operate in is undefined**.
-Teams rely on implicit context—tribal knowledge, scattered documents, personal assumptions—that AI cannot access.
-SCS makes this environment explicit, structured, and shareable. As a result, AI and humans behave consistently, and development becomes predictable rather than improvisational.
+A Structured Context Document: one YAML file about one topic, holding **prohibitions**
+(things the assistant must never do, with no conditions), **directives** (rules), and
+**facts** (what the assistant should know). Each carries provenance, and may cite the
+standard it traces to (`std:iso-13485:2016#7.3.9`). Only those three lists are compiled; the
+rest of the SCD is for reviewers. See [Understanding SCDs](scd-guide.md).
 
----
+## What is a bundle?
 
-## 4. What problems does SCS solve?
+A manifest that groups SCDs. A **Domain** bundle holds the governance for all of an
+organization's or a person's work; a **Project** bundle holds one project's own rules. A
+Domain's rules are grouped into **concept** bundles (security, risk management, client work,
+...), each with an owner. The **meta** bundle, published with the spec, tells the assistant
+how Domain and Project rules combine and how to treat citations.
 
-SCS addresses key failure modes in AI-assisted development:
+## Does a Project import its Domain?
 
-- Misaligned or inconsistent AI output
-- Requirements and architectural drift
-- Rework caused by unclear constraints
-- Conflicting interpretations across tools and developers
-- Lack of traceability or governable context
-- Inability to automate compliance or architectural checks
+No. Domain and Project bundles are versioned and compiled separately, and either can exist
+without the other. At runtime both apply, Domain first. A Project can add rules; it cannot
+override the Domain's prohibitions.
 
-By defining the environment up front, SCS stabilizes downstream work.
+## Do I write the YAML myself?
 
----
+You can, but most people use the Agent Skills: an AI assistant drafts the SCDs from your
+documents and answers, shows you each change, and runs the engine to validate, version, and
+compile. See the [Quick Start](quick-start-guide.md).
 
-## 5. What do we expect SCS to achieve?
+## What is an ontology, and which one do I pick?
 
-SCS is designed to produce:
+An Ontology Model is the starting set of concepts and template SCDs for a type of business:
+`sdlc` (software development, the default), `cdmo` (medical-device contract manufacturing),
+`mca` (merchant cash advance), and `personal` (one person). Pick the nearest one, keep what
+applies, retire the rest, and add your own concepts.
 
-- Reliable AI-assisted Build Phase behavior
-- Clear alignment between humans and AI
-- Reduced rework and fewer corrections
-- Stronger architectural and compliance consistency
-- Portable organizational knowledge
-- A foundation for future autonomic governance
+## How are standards and regulations handled?
 
-SCS does not solve every development challenge, but it eliminates the biggest source of unpredictability: missing or inconsistent context.
+By citation only. A rule cites `std:<standard>[:<edition>][#<clause>]`, for regulations as
+well (`std:21-cfr-820`, `std:eu-ai-act-2024-1689`). Standard text is never copied into SCS,
+and the compiled artifact tells the assistant not to present wording from memory as the text
+of a cited standard. See [Citations](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/spec/0.7/citations.md).
 
----
+## How does versioning work?
 
-## 6. Is Structured Context the application?
+Each workspace is DRAFT until it is released. A release versions every changed concept
+bundle and then the Domain or Project bundle. Each version is a git tag, on a commit with a
+snapshot and a manifest naming the approver and the content digest (a SHA-256 of the
+content). A version is never overwritten; a change means a new version. The compiled artifact
+carries the digest as `source_digest`, so anyone can check which approved version an AI
+service was given. See [Bundle Lifecycle](bundle-lifecycle.md).
 
-No.
-SCS is not the application—it is the **environment** that governs how the application is built.
-The application includes code, architecture, runtime behavior, and infrastructure.
-SCS simply defines the intent, rules, boundaries, and constraints that guide development.
+## Who reviews and approves the context?
 
----
+Each section (concept bundle) names an owner role, such as `quality` or `regulatory`, and the
+intake record names the person who holds it. Owners review the draft through an HTML review
+package (`scs view`). The person who releases a version is recorded as its approver. Formal
+approval in a quality system stays there: the approval record cites the version and digest.
 
-## 7. How is SCS different from requirements documents or architecture diagrams?
+## How big is the compiled artifact?
 
-Traditional documentation is written for humans—often verbose, ambiguous, and scattered across many tools.
-SCS is a **minimal, structured, versioned contract** that LLMs can interpret consistently.
-It distills what matters most into a machine-readable form, without replacing richer human-readable documentation.
+Small by design: prohibitions, rules, and facts, with no commentary. A Domain drafted from a
+policy and a standards list is typically around a hundred lines. Consolidation before review
+merges duplicates and moves reference material out of the rules.
 
----
+## How does the artifact reach an AI service?
 
-## 8. Why are SCDs inflexible?
+That is the owner's decision; SCS ends at the compiled artifact and does not place it. The
+non-normative [placement guide](placement/README.md) describes what common services (Claude,
+Claude Code, Cursor, Copilot, and others) can load and their size limits.
 
-SCDs are intentionally inflexible because they function as contractual elements of the project's environment.
-Each SCD defines exactly one concept—business rule, architectural constraint, domain definition—and must remain stable once versioned.
-This rigidity prevents silent drift and ensures humans and AI always operate from the same authoritative definition.
+## Can SCS work with RAG?
 
----
+Yes. Retrieval supplies documents relevant to a query; SCS supplies the rules that apply to
+every query. A runtime can deliver both.
 
-## 9. What is an SCD?
+## What does SCS not do?
 
-An **SCD (Structured Context Document)** is the atomic unit of structured context.
-Each SCD is written in YAML or JSON and expresses one essential idea: a definition, rule, constraint, requirement, boundary, or domain concept.
-Hundreds of SCDs across multiple categories build the operating environment for the project.
-
----
-
-## 10. What are Meta, Standard, and Project SCDs?
-
-**Meta SCDs** define how SCS itself works—schemas, rules, semantics.
-**Standard SCDs** encode organizational or domain best practices (e.g., security, UX, compliance).
-**Project SCDs** express system-specific rules and intent.
-Together, they allow organizations to build reusable libraries while customizing context for each project.
-
----
-
-## 11. What is a Bundle?
-
-A **Bundle** is a versioned manifest of versioned SCDs.
-Bundles assemble SCDs into a complete operating environment used by AI tools during the Build Phase.
-
-**The 4 Bundle Types:**
-
-1. **Project Bundle** (type: `project`)
-   Top-level orchestrator that imports all other bundles. Contains imports only, no SCDs directly.
-
-2. **Meta Bundle** (type: `meta`)
-   Provides SCS foundational vocabulary and semantic structure. Imported from the SCS specification.
-
-3. **Standards Bundle** (type: `standards`)
-   Captures compliance and regulatory requirements. May import other standards bundles.
-
-4. **Domain Bundle** (type: `domain`)
-   Organizes project-tier SCDs by concern area. Projects require 11 prescribed domain bundles (minimum).
-
-Every project uses all 4 bundle types to express everything needed for consistent AI-assisted development.
-
----
-
-## 12. What are Domain Bundles and why are they important?
-
-**Domain Bundles** organize project-tier SCDs by concern area, with patterns derived from established frameworks such as TOGAF, Zachman, FEAF, ISO/IEC 25010, and NIST RMF.
-
-**The 11 Prescribed Domains:**
-
-1. Architecture
-2. Security
-3. Performance & Reliability
-4. Usability & Accessibility
-5. Compliance & Governance
-6. Data & Provenance
-7. Testing & Validation
-8. Deployment & Operations
-9. Safety & Risk
-10. Ethics & AI Accountability
-11. Business Context
-
-Every production project must include all 11 domain bundles (minimum) to ensure comprehensive coverage of all major concern areas. Instead of inventing new categories, SCS mirrors well-known enterprise frameworks—ensuring completeness and credibility.
-
----
-
-## 13. How does SCS fit inside an LLM context window?
-
-Structured Context is intentionally compact—typically 25–35% of the model's window.
-This leaves room for task instructions, code, debugging, and conversation.
-Compact, structured data is far more salient to LLMs than large narrative documents, resulting in more stable and reliable behavior.
-
----
-
-## 14. What is the difference between Task Context and Project Context?
-
-**Task Context** is the immediate instruction (e.g., "Create a new API endpoint").
-**Project Context** is the durable environment (intent, constraints, definitions, boundaries) that governs how tasks must be completed.
-AI failures almost always stem from missing **Project Context**, not unclear instructions.
-SCS provides the missing project environment.
-
----
-
-## 15. How does SCS make the Build Phase reliable?
-
-When a project bundle is loaded into an IDE or AI agent:
-
-- The model knows the constraints
-- The model applies domain and architectural rules
-- Output becomes consistent across sessions and developers
-- Rework decreases significantly
-
-The reference implementation demonstrated a dramatic improvement:
-**With a bundle: stable, aligned behavior. Without a bundle: drift and inconsistency.**
-
----
-
-## 17. Does SCS replace Agile, Scrum, XP, or DevOps?
-
-Not at all.
-SCS operates **upstream** of all methodologies. It defines the environment in which those methods run.
-Teams continue using Agile ceremonies, DevOps pipelines, CI/CD, and testing practices—but with far clearer boundaries and constraints.
-
----
-
-## 18. Can SCS work with RAG or documentation retrieval?
-
-Yes, but RAG cannot substitute for SCS.
-RAG retrieves unstructured information—useful for reference but not for governance or consistent application of constraints.
-SCS provides the authoritative project environment, while RAG supplements it with supporting materials.
-
----
-
-## 19. How does versioning work in SCS?
-
-Each SCD and Bundle has an explicit version.
-Once versioned, an SCD becomes part of the project contract and should not change except through deliberate version increments.
-Versioning enables reproducibility, traceability, and stable Build Phase behavior.
-
----
-
-## 20. Is Structured Context required for autonomic governance?
-
-Yes.
-Autonomic (future AI-driven) governance requires an explicit, machine-readable environment.
-Without structured context, AI systems cannot validate architectural choices, enforce compliance, or detect drift.
-SCS provides the substrate that future governance tools will rely upon.
-
----
-
-## 21. Does SCS make development slower?
-
-No—SCS shifts work **upstream**, reducing far more downstream rework, drift, and correction cycles.
-Teams report smoother Build Phases, fewer misunderstandings, more consistent AI behavior, and faster onboarding.
-The time saved over the life of a project is significant.
-
----
-
-## 22. What does SCS *not* do?
-
-SCS does **not**:
-
-- Build the system
-- Replace engineering practice
-- Replace architecture documentation
-- Specify implementation details
-- Replace your backlog or roadmap
-- Dictate process or methodology
-
-SCS defines **the environment**, not the implementation.
+- It is not a prompt framework, a RAG system, or an agent runtime.
+- It does not place artifacts in AI services or transform them for a vendor.
+- It does not provide multi-user approval workflows or a hosted registry.
+- It does not select or stream context at request time. That is a runtime's job, built on
+  the artifacts SCS produces.
 
 ---
 
 ## Version
 
-Version **0.3** — Technical accuracy updates for launch
-Updated: 2025-12-09
+This FAQ describes SCS 0.7.0. Normative definitions are in
+[Terminology](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/spec/0.7/terminology.md).

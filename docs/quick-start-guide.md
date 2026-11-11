@@ -1,435 +1,172 @@
+# SCS Quick Start (0.7)
 
-# Structured Context (SCS) — Quick Start Guide (Version 0.3)
-*Get from zero to your first working SCS bundle in 30 minutes.*
+From nothing to a released, compiled Domain: the context that governs all of an
+organization's or a person's AI-assisted work. There are two ways to do it:
 
----
+- **With the Agent Skills** (most people): an AI assistant drafts the context from your
+  documents and answers, and you confirm each change.
+- **With the engine directly**: the same steps as `scs` commands.
 
-## **What You'll Build**
-
-By the end of this guide, you will have:
-
-1. Created your first **SCD (Structured Context Document)**
-2. Built a minimal **Domain Bundle**
-3. Created a **Project Bundle** that imports it
-4. Validated your bundle structure
-5. Seen how AI behaves differently with structured context loaded
-
-**Time Required:** 30 minutes
-**Prerequisites:** Basic YAML knowledge, familiarity with software development concepts
+Either way the result is a **Domain repository**: a git repository with the Domain workspace
+in `domain/` and, later, one workspace per Project in `projects/<name>/`.
 
 ---
 
-## **Step 1: Understand the Core Concepts (5 minutes)**
+## Before you start
 
-Before diving in, understand these three building blocks:
+- Python 3.11 or later, and git.
+- Your source material: policies, procedures, a standards list, and the people who own each
+  area. [What to Gather](what-to-gather.md) lists what helps.
+- The SCS tools:
 
-### **SCD (Structured Context Document)**
-A single, atomic definition of one essential thing:
-- A rule
-- A boundary
-- A constraint
-- A domain concept
+  ```bash
+  pip install "scs-tools==0.7.0"        # installs scs and scs-validate
+  ```
 
-### **Bundle**
-A versioned manifest that assembles SCDs into an operating environment.
-
-**The 4 Bundle Types:**
-1. **Project Bundle** — top-level orchestrator (imports all other bundles)
-2. **Meta Bundle** — SCS foundation vocabulary (from specification)
-3. **Standards Bundle** — compliance/regulatory requirements
-4. **Domain Bundle** — organized by concern area (you'll create one of these)
-
-### **The 11 Prescribed Domains**
-Every production project needs all 11 domain bundles:
-- Architecture
-- Business Context
-- Compliance & Governance
-- Data & Provenance
-- Deployment & Operations
-- Ethics & AI Accountability
-- Performance & Reliability
-- Safety & Risk
-- Security
-- Testing & Validation
-- Usability & Accessibility
-
-**For this quick start, we'll create just the Business Context domain to keep it simple.**
+  Until 0.7.0 is on PyPI, see [`tools/cli/README.md`](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/tools/cli/README.md) for the release
+  candidate. The skills can also install the tools for you.
 
 ---
 
-## **Step 2: Create Your First SCD (5 minutes)**
+## Path 1: with the Agent Skills
 
-Let's build a simple task management system and create our first SCD.
+1. **Install the skills.** In Claude Code, copy them into your skills directory:
 
-**Create:** `scd/project/business-context/actor-user.yaml`
+   ```bash
+   git clone https://github.com/tim-mccrimmon/structured-context-spec.git
+   cp -R structured-context-spec/skills/scs-* ~/.claude/skills/
+   ```
 
-```yaml
-id: scd:business-context:actor-user
-version: "0.1.0"
-domain: business-context
-type: actor
-provenance:
-  author: "Your Name"
-  date: "2025-12-09"
-  rationale: "Define the primary user of the task management system"
+   For Claude (claude.ai) and other clients, see [`skills/README.md`](https://github.com/tim-mccrimmon/structured-context-spec/blob/main/skills/README.md)
+   and the [install matrix](install-matrix.md).
 
-title: "User Actor Definition"
+2. **Start the Domain.** In a new session, in the directory where the repository should go,
+   ask: *"Set up our SCS Domain."* `scs-domain` takes it from there:
 
-definition:
-  name: "User"
-  description: "Individual who creates, manages, and completes tasks"
+   | Stage | What happens |
+   |---|---|
+   | Profile | Who the context is for, the industry ontology, and the source documents |
+   | Draft | Every SCD drafted in one pass from your sources, each rule traced to where it came from, then consolidated |
+   | Owners and review package | You confirm who owns each section; the assistant writes an HTML review package for them |
+   | Review | Findings and your decisions, round by round, until it settles |
+   | Release | You name who releases; the version is tagged and compiled |
 
-responsibilities:
-  - "Create new tasks with title and description"
-  - "Mark tasks as complete or incomplete"
-  - "View their task list"
-  - "Delete tasks they own"
+   You can stop at any point. The next session starts from `scs status` and picks up where
+   you left off.
 
-constraints:
-  - "Users can only view and modify their own tasks"
-  - "Users must be authenticated to access any functionality"
+3. **Add a Project** once the Domain has a released version: in a new session, ask
+   *"Add a Project for <name>."* `scs-project` works the same way and reviews the Project
+   against the Domain's rules.
 
-relationships:
-  owns: ["Task"]
-```
-
-**What makes this a good SCD?**
-- ✓ Atomic (defines exactly one concept: the User actor)
-- ✓ Machine-readable (YAML structure)
-- ✓ Minimal (only essential information)
-- ✓ Versioned (0.1.0)
-- ✓ Traceable (includes provenance)
+4. **Ask questions any time.** `scs-explain` answers "where are we?", "where did this rule
+   come from?", or "what does this message mean?". `scs-validate` runs the validator and
+   explains the results.
 
 ---
 
-## **Step 3: Create a Second SCD (5 minutes)**
+## Path 2: with the engine
 
-Let's add a boundary constraint to define what the system is and isn't.
+The engine's commands are what the skills run. Every command that changes files takes
+`--dry-run`, and `--json` for machine mode.
 
-**Create:** `scd/project/architecture/boundary-system-scope.yaml`
+### 1. Create the repository
 
-```yaml
-id: scd:architecture:boundary-system-scope
-version: "0.1.0"
-domain: architecture
-type: boundary
-provenance:
-  author: "Your Name"
-  date: "2025-12-09"
-  rationale: "Define clear system boundaries to prevent scope creep"
-
-title: "System Scope Boundary"
-
-boundary:
-  inside:
-    - "Task creation and management"
-    - "User authentication"
-    - "Task completion tracking"
-
-  outside:
-    - "Team collaboration features"
-    - "Task assignment to others"
-    - "Calendar integration"
-    - "Notifications or reminders"
-    - "File attachments"
-
-architectural_implications:
-  - "System operates as single-user application"
-  - "No real-time sync required"
-  - "No complex permission model needed"
-  - "Local-first data storage acceptable"
-```
-
----
-
-## **Step 4: Create Domain Bundles (5 minutes)**
-
-Now organize your SCDs into domain bundles.
-
-**Create:** `bundles/business-context.yaml`
-
-```yaml
-id: bundle:business-context
-type: domain
-version: "0.1.0"
-description: "Business context for task management system"
-
-provenance:
-  author: "Your Name"
-  date: "2025-12-09"
-
-scds:
-  - id: scd:business-context:actor-user
-    version: "0.1.0"
-```
-
-**Create:** `bundles/architecture.yaml`
-
-```yaml
-id: bundle:architecture
-type: domain
-version: "0.1.0"
-description: "Architectural boundaries and constraints"
-
-provenance:
-  author: "Your Name"
-  date: "2025-12-09"
-
-scds:
-  - id: scd:architecture:boundary-system-scope
-    version: "0.1.0"
-```
-
-**Note:** In a real project, you'd create all 11 domain bundles. For this quick start, we're keeping it minimal.
-
----
-
-## **Step 5: Create the Project Bundle (5 minutes)**
-
-The Project Bundle is the top-level orchestrator that imports all other bundles.
-
-**Create:** `project-bundle.yaml`
-
-```yaml
-id: bundle:task-manager
-type: project
-version: "0.1.0"
-description: "Task management system - minimal quick start example"
-
-provenance:
-  author: "Your Name"
-  date: "2025-12-09"
-  purpose: "Quick start demonstration of SCS structure"
-
-# In a real project, you'd import meta and standards bundles
-# For this quick start, we're focusing on domain bundles only
-
-imports:
-  # Domain bundles
-  - id: bundle:business-context
-    version: "0.1.0"
-  - id: bundle:architecture
-    version: "0.1.0"
-
-# Project bundles contain imports only, no SCDs directly
-scds: []
-
-metadata:
-  system_name: "Personal Task Manager"
-  system_identity: "Single-user task tracking application"
-  target_users: ["Individual users managing personal tasks"]
-```
-
----
-
-## **Step 6: Validate Your Bundle (3 minutes)**
-
-**Manual validation checklist:**
-
-✓ Every SCD has a unique `id`
-✓ Every SCD has a `version`
-✓ Every SCD declares one of the 11 canonical `domain` values
-✓ Every Bundle references SCDs with matching `id` and `version`
-✓ Project Bundle uses `type: project`
-✓ Domain Bundles use `type: domain`
-✓ Project Bundle contains imports only (empty `scds` array)
-✓ Domain Bundles contain SCDs only (no `imports`)
-
-**Using SCS-CLI (when available):**
 ```bash
-scs-cli validate project-bundle.yaml
-scs-cli explain bundle:task-manager:0.1.0
+scs new domain acme --ontology cdmo --title "Acme Medical" \
+    --author "Jane Doe" --email jane@acme-medical.com
+cd acme-context/domain
+scs status
 ```
 
----
+The ontology (`sdlc`, `cdmo`, `mca`, or `personal`) supplies the concept bundles and
+template SCDs. A `personal` Domain gets only boundaries; define its other concepts with
+`scs add bundle <name> --new`.
 
-## **Step 7: Use Your Bundle with AI (5 minutes)**
+### 2. Fill in the SCDs you need, retire the rest
 
-Now comes the payoff. Load your bundle into an AI coding assistant and see the difference.
+Each template in `context/project/` says what goes in it. Write the content as
+`prohibitions`, `directives`, or `facts`:
 
-### **Without the bundle:**
-
-**Prompt:** "Create a Task model for our task management system"
-
-**AI might generate:**
-```python
-class Task:
-    def __init__(self, title, description, assignee, team_id, priority, tags):
-        self.title = title
-        self.description = description
-        self.assignee = assignee  # ❌ Not in scope!
-        self.team_id = team_id    # ❌ Not in scope!
-        self.priority = priority
-        self.tags = tags
-        self.attachments = []     # ❌ Not in scope!
+```yaml
+content:
+  summary: "Design changes follow the QMS design change procedure."
+  directives:
+    - id: DOC-001
+      directive: "Design changes require documented review and approval before implementation."
+      cites:
+        - std:iso-13485:2016#7.3.9
 ```
 
-The AI invented features outside your boundaries.
+Edit the files, or write them through the validator:
 
----
-
-### **With the bundle loaded:**
-
-**Instructions for your AI assistant:**
-```
-Load the following structured context as the authoritative
-environment for this project:
-
-[Paste your project-bundle.yaml and all imported bundles]
-
-Now, create a Task model for our task management system.
+```bash
+scs scd write context/project/document-control.yaml --from-file draft.yaml
+scs bundle remove-scd scd:project:supplier-assessment scd:project:vendor-tier-approval
 ```
 
-**AI will generate:**
-```python
-class Task:
-    """
-    Task owned by a User. Per system scope boundary, this is
-    single-user only with no team features or attachments.
-    """
-    def __init__(self, title, description, owner_id):
-        self.title = title
-        self.description = description
-        self.owner_id = owner_id  # References User actor
-        self.completed = False
+[Understanding SCDs](scd-guide.md) covers how to write rules that work.
 
-    def mark_complete(self):
-        self.completed = True
+### 3. Name the owners and approvers
 
-    def mark_incomplete(self):
-        self.completed = False
+Each concept bundle names an owner role (`owner: quality`). Record who holds each role, and
+who approves versions:
+
+```bash
+scs intake set owners '{role: quality, person: Jane Doe <jane@acme-medical.com>, title: VP Quality}'
+scs intake set approvers '{person: Jane Doe <jane@acme-medical.com>, role: VP Quality}'
+scs commit -m "Draft the Domain" --author "Jane Doe <jane@acme-medical.com>"
 ```
 
-**Notice the difference:**
-- ✓ Respects the system boundary (no teams, assignments, attachments)
-- ✓ References the User actor from your SCD
-- ✓ Includes only in-scope functionality
-- ✓ Adds relevant comment showing it understands the constraints
+### 4. Validate and review
+
+```bash
+scs bundle validate                                  # this workspace
+(cd .. && scs-validate --strict)                     # every workspace, as CI runs it
+scs view bundles/domain-bundle.yaml --allow-draft    # an HTML review package in dist/
+```
+
+Send the review package to the section owners. Fix what they find, and repeat.
+
+### 5. Release and compile
+
+```bash
+scs bundle release --version 1.0.0 --concept company=1.0.0 --concept prohibited=1.0.0 ... \
+    --approved-by "Jane Doe <jane@acme-medical.com>" --dry-run
+```
+
+Run it without `--concept` first to see which concept bundles need a version, then without
+`--dry-run`. Each version is a git tag (`domain/acme-v1.0.0`) on a commit with a snapshot
+and a manifest recording the approver and the content digest. Then compile:
+
+```bash
+scs compile bundles/domain-bundle.yaml --version 1.0.0    # dist/acme-1.0.0.yaml
+```
+
+The compiled artifact is a short YAML file: prohibitions first, then rules, then facts, with
+the content digest as `source_digest`. [Placement](placement/README.md) describes how
+common AI services can be given it. That step is yours; SCS does not place artifacts.
+
+### 6. Add a Project
+
+```bash
+cd ..
+scs new project portal --author "Jane Doe" --email jane@acme-medical.com
+cd projects/portal
+```
+
+The Project has its own templates and bundle and is released and compiled the same way. It
+does not import the Domain; at runtime both artifacts apply, Domain first.
 
 ---
 
-## **What You've Learned**
+## See it finished
 
-You now understand:
+[`examples/medtech-cdmo/`](https://github.com/tim-mccrimmon/structured-context-spec/tree/main/examples/medtech-cdmo) is a complete Domain repository with
+one Project, built by these commands, and [`examples/personal/`](https://github.com/tim-mccrimmon/structured-context-spec/tree/main/examples/personal) is a
+personal Domain.
 
-1. **SCDs** are atomic, versioned definitions of essential concepts
-2. **Domain Bundles** organize SCDs by concern area
-3. **Project Bundles** orchestrate the complete environment by importing domain bundles
-4. **Bundles create alignment** between human intent and AI behavior
-5. **Structured context prevents drift** and keeps AI working within boundaries
+## Next
 
----
-
-## **Next Steps**
-
-### **Expand Your Quick Start Project:**
-
-1. Add more SCDs to your existing domain bundles:
-   - `scd:business-context:entity-task` (define what a Task is)
-   - `scd:security:auth-requirement` (how users authenticate)
-   - `scd:data-provenance:task-schema` (task data structure)
-
-2. Create the remaining 9 domain bundles:
-   - Compliance & Governance
-   - Data & Provenance
-   - Deployment & Operations
-   - Ethics & AI Accountability
-   - Performance & Reliability
-   - Safety & Risk
-   - Security
-   - Testing & Validation
-   - Usability & Accessibility
-
-3. Add Meta and Standards bundles (imported from SCS specification)
-
-4. Version your bundle to 1.0.0 when ready for use
-
-### **Explore the Reference Implementation:**
-
-See a complete, production-ready example:
-- `reference-implementation-guide-v0.3.md` in the boilerplate docs
-- Full medication adherence system with all 11 domain bundles
-- A/B comparisons of AI behavior with and without bundles
-
-### **Learn the Full Lifecycle:**
-
-Read `cedm-overview-v0.2.md` to understand:
-- **Intent Phase** — capturing essential system truth
-- **Validation Phase** — ensuring correctness and coherence
-- **Versioning Phase** — freezing the contract
-- **Build Phase** — developing with AI in the governed environment
-
-### **Deepen Your Understanding:**
-
-- **For the big picture:** Read `scs-cedm-story-v0.3.md` (7 chapters, comprehensive)
-- **For messaging:** Review `messaging-guide-v0.3.md` (canonical terminology)
-- **For specific questions:** Check `FAQ-v0.3.md` (20+ common questions)
-- **For executives:** Share `scs-exec-overview-v0.3.md` with leadership
-
----
-
-## **Common Mistakes to Avoid**
-
-### **❌ Making SCDs too large**
-Each SCD should define exactly one concept. If you're describing multiple things, split into multiple SCDs.
-
-### **❌ Skipping domain assignment**
-Every SCD must declare one of the 11 canonical domains.
-
-### **❌ Mixing content in bundles**
-- Project Bundles: imports only, no SCDs
-- Domain Bundles: SCDs only, no imports
-- Standards Bundle: either imports OR SCDs (not both)
-
-### **❌ Adding implementation details**
-SCDs define the environment, not the implementation. "Users must authenticate" ✓ vs. "Use JWT tokens with RS256 encryption" ❌
-
-### **❌ Versioning too early**
-Use 0.x versions while developing. Only move to 1.0.0+ when you're ready to freeze the contract.
-
----
-
-## **Getting Help**
-
-- **Specification:** Read the full SCS specification for detailed rules
-- **Examples:** Explore the reference implementation repository
-- **Community:** [Add community links when available]
-- **Issues:** [Add GitHub issues link when available]
-
----
-
-## **What Makes This Different?**
-
-Traditional approaches:
-- **Long prompts** → Ephemeral, inconsistent, not versioned
-- **Documentation** → Verbose, scattered, not machine-readable
-- **RAG retrieval** → Surfaces information but doesn't constrain behavior
-- **Requirements docs** → Written for humans, AI can't apply consistently
-
-**SCS provides:**
-- Compact, structured, versioned contracts
-- Machine-readable constraints
-- Atomic, governable definitions
-- Shared baseline for humans and AI
-- Foundation for autonomic governance
-
----
-
-## **You're Ready!**
-
-You've just created your first structured context environment. You've seen how:
-- Small, atomic SCDs compose into powerful contracts
-- Domain organization keeps context manageable
-- AI behavior stabilizes when operating in a structured environment
-- Boundaries prevent drift before it happens
-
-This is the foundation of **AI-native, context-driven software development**.
-
-Welcome to the future of building software with AI.
-
----
-
-Version **0.3**
-Created: 2025-12-09
-Updated: 2025-12-09
-
+- [Bundle Lifecycle](bundle-lifecycle.md): versions, pins, changes after release
+- [Validation](validation-guide.md): what each check means
+- [FAQ](FAQ.md)

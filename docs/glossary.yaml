@@ -1,183 +1,164 @@
+# SCS 0.7 glossary: short definitions. The normative ones are in spec/0.7/terminology.md.
+version: 0.7.0
 terms:
   context:
     label: Context
-    short: The information humans or AI rely on to understand what a system is and
-      how it must operate.
-    medium: Context is the information humans or AI use to understand system behavior,
-      constraints, boundaries, and intent. For AI, context exists only in the text
-      within its context window.
-  project_context:
-    label: Project Context
-    short: The durable environment of constraints, intent, rules, and boundaries governing
-      all work.
-    medium: Project Context is the long-lived environment of intent, constraints,
-      definitions, and boundaries that govern how a system must be built. It shapes
-      all developer and AI behavior.
-  task_context:
-    label: Task Context
-    short: The immediate instruction for a specific action.
-    medium: Task Context defines a specific instruction—such as generating a function
-      or writing a test. It does not describe the broader environment or constraints
-      of the system.
-  operating_environment:
-    label: Operating Environment (AI Development)
-    short: The explicit rules and constraints an AI must follow.
-    medium: The operating environment is the structured set of rules, boundaries,
-      and constraints that guide AI during development tasks. SCS formalizes this
-      environment.
-  constraint:
-    label: Constraint
-    short: A non-negotiable rule governing system behavior.
-    medium: Constraints define rules that must be respected during development—security
-      rules, data handling limits, architectural decisions, compliance requirements,
-      and more.
-  boundary:
-    label: Boundary
-    short: Defines what is inside vs. outside the system's scope.
-    medium: A boundary clarifies what the solution controls and what it does not.
-      Boundaries prevent drift and anchor architectural and domain reasoning.
-  shared_baseline:
-    label: Shared Baseline
-    short: A unified understanding that all contributors operate from.
-    medium: A shared baseline ensures humans and AI agents start from the same authoritative
-      understanding of system rules, constraints, and intent.
-  alignment:
-    label: Alignment
-    short: Human and AI contributors producing coherent, consistent work.
-    medium: Alignment occurs when AI and humans interpret and apply the same constraints,
-      rules, and boundaries—reducing rework and drift.
-  drift:
-    label: Context Drift
-    short: Unintended divergence between intended and actual output.
-    medium: Context Drift occurs when development output deviates from declared intent,
-      rules, or architecture due to missing, outdated, or inconsistent context.
-  salience:
-    label: Salience
-    short: The model's ability to recognize and prioritize key information.
-    medium: Salience determines how effectively an AI system identifies and applies
-      important constraints. SCS increases salience by providing compact, structured
-      context.
-  compactness_principle:
-    label: Compactness Principle
-    short: Smaller structured context yields better AI performance.
-    medium: LLMs perform best when essential context is concise, structured, and highly
-      salient. SCS is intentionally compact to fit comfortably within context windows.
+    short: >-
+      The information an AI assistant uses to understand its task and the environment
+      it works in.
+    medium: >-
+      For a language model, context exists only in the text it is given. When the rules,
+      boundaries, and facts that matter are missing, it fills the gap with plausible guesses.
   structured_context:
-    label: Structured Context (SCS)
-    short: A minimal, machine-readable baseline for alignment.
-    medium: SCS is a standardized, compact representation of a project's essential
-      intent, constraints, boundaries, and architecture. It defines the environment—not
-      the implementation.
-  contract:
-    label: SCS Contract
-    short: The authoritative versioned environment governing development.
-    medium: The SCS Contract is the versioned bundle of SCDs that defines all rules,
-      constraints, and boundaries. It serves as the governing environment for all
-      development work.
-  governed_context:
-    label: Governed Context
-    short: Context that has been validated and versioned.
-    medium: Governed Context is fully validated and versioned SCS. It prevents drift,
-      stabilizes Build Phase behavior, and enables governance.
+    label: Structured Context
+    short: >-
+      Context an organization or person stands behind, authored deliberately and changed
+      only by a new version.
+    medium: >-
+      Rules, boundaries, and facts, reviewed by the people accountable for them and
+      versioned. Distinct from retrieved context, which changes with every query.
   scd:
     label: SCD (Structured Context Document)
-    short: An atomic definition of a single essential element.
-    medium: An SCD expresses exactly one idea—a rule, boundary, constraint, interface,
-      domain concept, or architectural requirement. SCDs compose into Bundles.
-  meta_scd:
-    label: Meta SCD
-    short: Defines the rules of SCS itself.
-    medium: Meta SCDs specify schemas, required fields, semantics, and validation
-      rules that govern the SCS format.
-  standard_scd:
-    label: Standard SCD
-    short: Reusable organizational or domain best-practice constraints.
-    medium: Standard SCDs formalize proven patterns, industry rules, compliance requirements,
-      and enterprise architecture principles.
-  project_scd:
-    label: Project SCD
-    short: A system-specific rule or definition.
-    medium: Project SCDs express the unique constraints, definitions, and boundaries
-      of a particular system.
+    short: >-
+      One YAML file about one topic, holding prohibitions, directives, and facts.
+    medium: >-
+      Only those three lists are compiled; the rest of the SCD (summary, provenance,
+      derived_from) is for reviewers. Ids are scd:<tier>:<name>.
+  prohibition:
+    label: Prohibition
+    short: >-
+      Something the assistant must never do, use, or recommend, with no conditions.
+    medium: >-
+      A noun-phrase subject, compiled as "Prohibited: <subject>." with an optional approved
+      alternative. Compiled first. A Project cannot lift a Domain prohibition.
+  directive:
+    label: Directive
+    short: >-
+      One instruction the assistant follows when it meets a case.
+  fact:
+    label: Fact
+    short: >-
+      One short, checkable statement the assistant needs to answer or act correctly.
+  citation:
+    label: Standard Citation
+    short: >-
+      A reference to a standard or regulation, std:<standard>[:<edition>][#<clause>].
+    medium: >-
+      Citations carry no text from the standard and are never resolved against a
+      document. Laws and regulations use std: too (std:21-cfr-820).
   bundle:
     label: Bundle
-    short: A versioned manifest of SCDs.
-    medium: A Bundle assembles SCDs into a coherent operating environment. Bundles
-      are validated, versioned, and loaded into AI tools during Build.
-  bundle_types:
-    label: Bundle Types
-    short: The four types of bundles in SCS.
-    medium: SCS defines four bundle types—Project (top-level orchestrator), Meta
-      (SCS foundation), Standards (compliance), and Domain (concern areas). Each
-      type has specific rules about what it can contain and import.
+    short: >-
+      A manifest that groups SCDs, or imports other bundles.
+    medium: >-
+      Four types, Domain, Project, Concept, and Meta. Standards bundles are deprecated
+      (0.6.0); standards are cited instead.
+  domain:
+    label: Domain
+    short: >-
+      The owner of a body of work, an organization or one person, and the governance that
+      applies across all of it.
+    medium: >-
+      Often called Global. Carried in a Domain bundle, which imports the meta bundle and
+      its concept bundles and contains no SCDs directly.
   project_bundle:
     label: Project Bundle
-    short: The top-level orchestrator bundle for a system.
-    medium: The Project Bundle imports all required bundles (meta, standards, and
-      domain bundles) to form the complete operating environment. It contains imports
-      only, no SCDs directly. Cardinality is 1 per project.
+    short: >-
+      One project's own rules.
+    medium: >-
+      Lists SCDs directly or imports concept bundles. It never imports the Domain; the two
+      are versioned and compiled separately, and at runtime both apply, Domain first.
+  concept:
+    label: Concept
+    short: >-
+      A named category of domain knowledge, such as security or risk management.
+    medium: >-
+      Each concept is realized as a concept bundle with an owner role. Concepts belong to
+      one Domain Ontology and are not shared across domains. Replaces "concern" (0.3 and
+      earlier).
+  domain_ontology:
+    label: Domain Ontology
+    short: >-
+      A domain's concepts, with an optional taxonomy and relationships, in its domain
+      manifest.
+  ontology_model:
+    label: Ontology Model
+    short: >-
+      The starting concepts and template SCDs for a type of business.
+    medium: >-
+      sdlc (software development, the default), cdmo (medical-device CDMO), mca (merchant
+      cash advance), and personal.
   meta_bundle:
     label: Meta Bundle
-    short: Foundational SCS vocabulary and structure.
-    medium: The Meta Bundle provides the semantic foundation and structural rules
-      of SCS itself. It contains meta-tier SCDs and is imported from the SCS specification.
-      Cardinality is 1 per project.
-  standards_bundle:
-    label: Standards Bundle
-    short: Compliance and regulatory requirements.
-    medium: The Standards Bundle captures compliance frameworks and regulatory requirements.
-      It may import other standards bundles (e.g., HIPAA, SOC2) or contain standards-tier
-      SCDs directly. Cardinality is 1 per project.
-  domain_bundle:
-    label: Domain Bundle
-    short: Organizes project-tier SCDs by concern area.
-    medium: Domain Bundles organize project-tier SCDs by concern area (architecture,
-      security, performance, etc.) using patterns derived from enterprise frameworks
-      like TOGAF, Zachman, FEAF, ISO/IEC 25010, and NIST RMF. Every project requires
-      11 prescribed domain bundles (minimum). Domain bundles contain SCDs only, no
-      imports.
-  prescribed_domains:
-    label: Prescribed Domains
-    short: The 11 required domain bundles.
-    medium: SCS prescribes 11 domain bundles for production projects—Architecture,
-      Security, Performance & Reliability, Usability & Accessibility, Compliance
-      & Governance, Data & Provenance, Testing & Validation, Deployment & Operations,
-      Safety & Risk, Ethics & AI Accountability, and Business Context.
-  autonomic_governance:
-    label: Autonomic Governance
-    short: Future automated constraint checking.
-    medium: Autonomic Governance is a future capability where AI verifies constraints,
-      detects drift, and enforces compliance using structured context.
-  governance_boundary:
-    label: Governance Boundary
-    short: Zone where constraints must be enforced.
-    medium: A governance boundary defines areas—such as data access or dependency
-      rules—where enforcement is required.
-  ai_alignment:
-    label: AI Alignment
-    short: AI working from the same context as the team.
-    medium: AI alignment ensures all agents consume and respect the versioned project
-      bundle, preventing hallucinations and rule violations.
-  context_window_efficiency:
-    label: Context Window Efficiency
-    short: Keeping context compact enough for effective reasoning.
-    medium: Efficiency ensures context fits comfortably alongside prompts, code, and
-      conversation within an LLM context window.
-  bundle_loader:
-    label: Bundle Loader
-    short: Component that injects bundles into AI systems.
-    medium: The Bundle Loader ensures AI agents receive the correct versioned context
-      before generating or modifying code.
-  scs_cli:
-    label: SCS-CLI
-    short: The tool for creating and validating SCS artifacts.
-    medium: SCS-CLI provides commands to create, inspect, diff, validate, and explain
-      SCDs and Bundles.
-  reference_implementation:
-    label: Reference Implementation
-    short: A complete example system built from SCS.
-    medium: The reference implementation demonstrates how SCDs and Bundles translate
-      into predictable Build Phase behavior.
-
-version: 0.2
-updated: 2025-12-09
+    short: >-
+      Universal SCS vocabulary, published with the spec and pinned by Domain bundles.
+    medium: >-
+      Its rules tell the assistant how Domain and Project rules combine and how to treat
+      citations.
+  domain_repository:
+    label: Domain Repository
+    short: >-
+      The git repository holding one Domain workspace (domain/) and its Project workspaces
+      (projects/<name>/).
+  workspace:
+    label: Workspace
+    short: >-
+      A directory with a .scs/config file; domain or a Project's directory.
+  intake_record:
+    label: Intake Record
+    short: >-
+      A workspace's intake.yaml, holding the answers, owners, approvers, source documents,
+      and review findings its context was drafted from. Never compiled.
+  section_owner:
+    label: Section Owner
+    short: >-
+      The role accountable for a section (a concept bundle), who reviews and approves it.
+    medium: >-
+      The bundle names the role (owner, quality); the intake record names the person who
+      holds it. A section cannot be versioned until its role is held.
+  review_package:
+    label: Review Package
+    short: >-
+      An HTML page of every prohibition, rule, and fact by section, with owners and sources,
+      written by scs view for reviewers.
+  draft:
+    label: DRAFT
+    short: >-
+      The working state of a bundle, before review and release. Mutable; not approved.
+  version:
+    label: Version
+    short: >-
+      A released, immutable state of a bundle, recorded as a git tag with an approver and a
+      content digest.
+    medium: >-
+      The tag is <workspace>/<bundle-name>-v<version>. A version is never overwritten; a
+      change means a new version.
+  content_digest:
+    label: Content Digest
+    short: >-
+      A SHA-256 over a version's content tree, recorded in its manifest.
+    medium: >-
+      The compiled artifact carries it as source_digest, so an artifact can be matched to
+      the approved version it came from.
+  runtime_artifact:
+    label: Runtime Artifact
+    short: >-
+      The compiled form of a version, a short YAML file of rules and facts that an AI
+      service can be given.
+    medium: >-
+      Produced by scs compile. The same source always produces the same bytes.
+  placement:
+    label: Placement
+    short: >-
+      Putting a compiled artifact where an AI service reads it.
+    medium: >-
+      The owner's decision, outside SCS. docs/placement/ describes common services.
+  agent_skills:
+    label: Agent Skills
+    short: >-
+      scs-domain, scs-project, scs-validate, and scs-explain, which let an AI assistant
+      operate SCS for a user through the engine.
+  engine:
+    label: Engine
+    short: >-
+      The SCS tools, scs (scs-tools) and scs-validate (scs-validator).
