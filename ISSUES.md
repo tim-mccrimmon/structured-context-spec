@@ -12,12 +12,11 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-82 issues: open 22 · in-progress 1 · proposed 1 · deferred 3 · done 55.
+82 issues: open 22 · proposed 1 · deferred 3 · done 56.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
-| 0.7.0 | ISS-055 | Acceptance test: real Domains through the skills (WP-13) | in-progress | high | M | no | strong |
 | 0.7.0 | ISS-023 | `docs/` documentation website: migrate to concept terminology | open | medium | M | no | strong |
 | 0.7.0 | ISS-070 | Examples rebuilt as Domain repositories | open | medium | M | no | strong |
 | 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
@@ -1045,12 +1044,14 @@ RFC 0002 section 2, layer 3. A stdio adapter over the engine. Lowest priority; s
 is demand.
 
 ### ISS-055 - Acceptance test: real Domains through the skills (WP-13)
-**Status:** in-progress: redefined by D-80 (2026-10-29) as two real scenarios through Claude
-Code with the skills; the 0.6 baseline run was dropped. Test 1 (personal) done 2026-10-30;
-Test 2 (CDMO) passed on rc2 2026-11-04 and on rc5 2026-11-09 (Domain and Project, each in its
-own session; its findings became ISS-056 to ISS-067). Rerun on rc6 next: kit 0.7.0rc6-1 and
-the rc6 skills are installed on the test machine (2026-11-09). Close after the rc6 rerun
-passes.
+**Status:** done (2026-11-11): redefined by D-80 (2026-10-29) as two real scenarios through
+Claude Code with the skills; the 0.6 baseline run was dropped. Test 1 (personal) done
+2026-10-30. Test 2 (CDMO) passed on rc2 (2026-11-04) and rc5 (2026-11-09, Domain and Project;
+findings became ISS-056 to ISS-067), then reran the Domain on rc6, rc6-2 and rc6-3
+(2026-11-10 to 2026-11-11). The rc6-3 Domain ran start to release with no friction rows: 18
+SCDs from IT-001, D209021, the website and the intake; 52 compiled items (8
+prohibitions, 25 directives, 19 facts), 14.1K, down from 62 items and 15.9K on rc6-2.
+Consolidation ran before the draft package, and review added the no-fabrication rule.
 **Target:** 0.7.0 · **Priority:** high · **Effort:** M · **Spec:** no · **Evidence:** strong
 RFC 0002 appendix. Onboard Omarchy (one Domain repository, two Projects) entirely through a chat
 client using the skills, with no direct CLI use and no reading of the spec, and record every
