@@ -15,6 +15,7 @@ recipe's date, so the same engine produces the same bytes.
 """
 
 import argparse
+import difflib
 import os
 import shutil
 import subprocess
@@ -199,6 +200,11 @@ def main() -> int:
                 if differ:
                     stale.append(example.name)
                     print(f"{example.name}: differs from a rebuild:", *differ, sep="\n  ")
+                    for f in differ:
+                        old = have.get(f, b"").decode(errors="replace").splitlines()
+                        new = built.get(f, b"").decode(errors="replace").splitlines()
+                        diff = difflib.unified_diff(old, new, f"checked-in/{f}", f"rebuilt/{f}")
+                        print(*list(diff)[:40], sep="\n")
                 else:
                     print(f"{example.name}: current")
             else:
