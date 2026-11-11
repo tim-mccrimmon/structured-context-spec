@@ -73,10 +73,14 @@ it never merges or drops a rule. See
 Four skills in the open Agent Skills format, in [`skills/`](skills/README.md), operate SCS
 through the tools. `scs-domain` and `scs-project` each take one workspace from setup through
 source documents and intake to a draft of every rule in one pass, a draft review package,
-advisory review until the rules settle, and then, at release, section owners, the person who
-releases it, a version, and a compiled artifact; they resume or update it from `scs status`.
+advisory review until the rules settle, and a version and a compiled artifact. Section owners
+are settled before the draft review package, so it names each section's owner; the person who
+releases is asked at release. They resume or update a workspace from `scs status`.
 Drafting is written for the assistant as reader: each directive says what the assistant does
-when it meets the case, and the sources are swept for uncovered clauses before review settles; `scs-validate` checks and fixes, and `scs-explain`
+when it meets the case; before review, items that repeat across sections are merged and reference
+material moves to the uncompiled `summary`, and the sources are swept for uncovered clauses
+before review settles. In a regulated workspace, review checks for a rule against presenting
+invented content as fact. `scs-validate` checks and fixes, and `scs-explain`
 answers questions. They share one set of rules: write only through the engine, show a dry run
 and get an explicit yes before every change and commit, never choose an approver, and stay
 inside the Domain repository. One yes may cover a batch of writes once every change in it is
@@ -117,7 +121,19 @@ records them as the approver (`--approved-by`, `version_approved_by`). That is n
 organization's formal approval: where context is certified, that happens afterwards in the
 organization's own review or quality system, outside SCS. The review package and the skills
 say "released by", and the package states that certification is not part of it. The field
-names are unchanged in 0.7.
+names are unchanged in 0.7. An approval record in the organization's own system SHOULD cite
+the version and its content digest, which the compiled artifact carries as `source_digest`
+([`spec/0.7/governance-and-compliance.md`](spec/0.7/governance-and-compliance.md) §8); after a
+release, the skills say what to cite.
+
+### Examples and documentation
+
+[`examples/`](examples/README.md) holds two Domain repositories built through the engine: a
+fictional medical-device CDMO with one Project, and a personal Domain, each released and
+compiled. `examples/build.py` rebuilds them from a recipe, and CI checks they are current. The
+documentation site ([`docs/`](docs/README.md)) is rewritten for 0.7: a quick start with the
+skills or the engine, an FAQ, a glossary, and guides to SCDs, the bundle lifecycle, and
+validation; `docs/concern-docs/` is now `docs/concept-docs/`.
 
 ### Placement guidance (provisional)
 
@@ -133,10 +149,15 @@ outside SCS, and this guidance is expected to change in 0.8.
 - **Ontologies.** `--ontology personal` is new, for one person's context; `sdlc`, `cdmo`, and
   `mca` scaffold their full concept set for the workspace kind.
 - **Removed.** `scs init`, `scs new --type`, and `scs bundle version --force` / `--no-git`.
+- **Reproducible builds.** When `SOURCE_DATE_EPOCH` is set, every timestamp the engine writes
+  uses it, so a scripted build produces the same bytes.
+- **Validator messages.** An SCD relationship to a `concept:` id now says that concept links
+  belong in the domain manifest's ontology.
 - **Exit codes.** 0 success, 1 errors, 2 warnings under `--strict`, 3 usage error, 4 file
   error, 5 internal error.
 - **Removed.** The `scs-vibe` and `scs-team` plugins; the Agent Skills in `skills/` replace
-  them.
+  them. The examples `two-tier-governance`, `med-adherence`, and `chai-standards-bundle`
+  (still at the `v0.6.0` tag).
 
 ## Testing the release candidate
 
@@ -158,13 +179,14 @@ The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI
   D-51) run against a simulated user; pacing (at most three questions per message) is held to
   4 of 5 runs, not 5 of 5. On rc6 every assertion passed, pacing included, in the six
   scenarios the rc6 changes touched, after fixes and reruns; the other seven were last run on
-  rc5. Acceptance with a real user (WP-13) passed on rc5 and is rerun on rc6.
+  rc5. Acceptance with a real user (WP-13) passed on rc5, and again on rc6 with the skill
+  changes since (2026-11-11); the approval-record guidance has not been run.
 - **Install matrix.** Claude Code and Claude are recorded; Cursor, Codex, and GitHub Copilot
-  are not yet tried.
+  are not yet tried (planned for 0.8).
 - **Generated CI.** The workflow `scs new domain` writes installs `scs-validator` 0.7.x from
   PyPI, so it fails until 0.7.0 is published there.
-- **`BUNDLE_SCD_UNRESOLVED`** stays a warning; whether it should be an error is open.
-- **Examples** have not yet been rebuilt as Domain repositories.
+- **`BUNDLE_SCD_UNRESOLVED`** stays a warning (decided): a bundle that lists a missing SCD
+  fails `--strict`, a release, and `scs compile`, while a draft still validates.
 
 ## Governance
 

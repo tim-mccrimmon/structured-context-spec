@@ -25,6 +25,7 @@ ORDER = [
     "WP-10b.md",  # Status, commits, source documents (rc2)
     "D-92.md",  # Section owners (rc4)
     "rc6.md",  # One-command release, batch confirmation (rc6)
+    "after-rc6.md",  # Examples, docs, guidance (after rc6)
     "housekeeping.md",
     "ISS-042-045.md",
 ]
