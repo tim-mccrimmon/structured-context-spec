@@ -216,7 +216,8 @@ person who releases it and the version numbers come from the user. Then compile 
 on placement, as [references/compiling.md](references/compiling.md) describes.
 
 Finish with `scs status --workspace domain`, and tell the user what they have: the version, its
-tag, the compiled artifact. Their Projects can start now, each in a new session with the
+tag, the compiled artifact, and, if they approve governance in their own system (a QMS), what
+the approval record should cite ([references/versioning.md](references/versioning.md) §6). Their Projects can start now, each in a new session with the
 scs-project skill.
 
 ## 9. Update

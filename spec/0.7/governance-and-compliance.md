@@ -240,6 +240,15 @@ it on their behalf:
 7. **Compile and place.** The version is compiled into a runtime artifact. Where the owner
    places it is their decision, outside SCS ([overview.md](overview.md) §1.1).
 
+**External approval.** An organization that approves governance content in its own system
+of record, such as a quality management system, keeps that approval there. The approval record
+SHOULD cite the version and its content digest (`content_digest` in the version manifest),
+not the version number alone: a version number is a label, and the digest identifies the exact
+content. The compiled artifact carries the same digest as `source_digest`, and the review
+package of a released version shows it on its cover, so whoever deploys or audits an artifact
+can confirm it is the content that was approved. Checking deployed artifacts against approval
+records is outside SCS ([overview.md](overview.md) §1.1).
+
 Teams that want multi-person review can use pull requests on their own infrastructure. SCS
 does not define a review or approval workflow beyond recording the approver.
 

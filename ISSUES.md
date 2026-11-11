@@ -12,13 +12,12 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-82 issues: open 20 · proposed 1 · deferred 3 · done 58.
+82 issues: open 19 · proposed 1 · deferred 3 · done 59.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
 | 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.7.0 | ISS-071 | Install matrix: Cursor, Codex, GitHub Copilot | open | medium | M | no | expected |
-| 0.7.0 | ISS-082 | Guidance: an external approval cites the version and content digest | open | medium | S | yes | strong |
 | 0.7.x | ISS-040 | Docs and validator message do not say that concept relationships belong in the ontology | open | low | S | no | once |
 | 0.8 | ISS-064 | Audience of SCD items | open | high | L | yes | strong |
 | 0.8 | ISS-065 | Placement facts | open | high | L | yes | strong |
@@ -1309,7 +1308,10 @@ exited 2 with eight warnings. The rc6 order (template triage in one batch while 
 it more likely.
 
 ### ISS-082 - Guidance: an external approval cites the version and content digest
-**Status:** open
+**Status:** done (2026-11-11): `governance-and-compliance.md` §8 "External approval" (an
+approval record SHOULD cite the version and content digest; deployed-artifact checks are outside
+SCS); `references/versioning.md` §6 says what to cite (id, version, tag, digest, the released
+version's review package), and step 8 of scs-domain and scs-project points to it
 **Target:** 0.7.0 · **Priority:** medium · **Effort:** S · **Spec:** yes · **Evidence:** strong
 Replaces ISS-068. A regulated organization approves governance content in its own system of
 record (a QMS), and a runtime such as SCP checks what is deployed against that approval. A

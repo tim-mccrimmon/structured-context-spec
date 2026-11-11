@@ -100,3 +100,19 @@ Refusals you may see: `VERSION_EXISTS` (versions are never overwritten; choose a
 `VERSION_OWNER_UNMAPPED` (the section has no owner role, or no one holds it: settle it as the
 people step in [intake.md](intake.md) describes), `GIT_REQUIRED`.
 `--no-validate` skips content validation only, and is used only if the user asks for it.
+
+## 6. What to cite in an approval record
+
+When the organization approves its governance in its own system of record (a quality
+management system, a document control system), tell the user what that approval record should
+cite, from the real run's envelope and manifest:
+
+- the bundle id and version (`bundle:acme 1.0.0`) and its tag (`domain/acme-v1.0.0`);
+- the content digest (`content_digest` in `<bundle-name>-v<version>-MANIFEST.yaml`);
+- the review package of the released version, `scs view <bundle file> --version <v>`, whose
+  cover shows the same digest, if they want it attached.
+
+The compiled artifact carries the same digest as `source_digest`, so anyone can match a
+deployed artifact to the approved content. A version number alone is a label; the digest
+identifies the content. Do not offer to record the external approval in SCS: it stays in the
+organization's system. For a personal Domain, skip this unless the user asks.

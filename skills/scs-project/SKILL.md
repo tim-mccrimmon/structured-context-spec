@@ -213,7 +213,8 @@ compile it and advise on placement, as [references/compiling.md](references/comp
 describes: the Project's artifact is loaded with the Domain's, so preview the two with
 `scs stack`.
 
-Finish with `scs status --workspace <name>`, and tell the user what they have, and any
+Finish with `scs status --workspace <name>`, and tell the user what they have, what an external
+approval record should cite ([references/versioning.md](references/versioning.md) §6), and any
 questions recorded for the Domain owner.
 
 ## 9. Update
