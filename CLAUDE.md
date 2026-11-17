@@ -13,8 +13,8 @@ This is the **spec repo**, not the product. SCS defines the format (SCDs, bundle
 relationships). SCP (Supervisory Control Plane) is the commercial runtime product built on top
 of SCS — it lives in a separate private repo.
 
-**Current spec version**: 0.6.0 (released). 0.7.0 is in development on branch `0.7-dev`:
-RFC 0002 (agent-mediated SCS), tracked as ISS-042 – ISS-055 in `ISSUES.md`.
+**Current spec version**: 0.7.0 (released 2026-11-17): RFC 0002 (agent-mediated SCS). Next: 0.8
+(see `ISSUES.md`).
 **License**: Apache 2.0
 **Website**: https://structuredcontext.dev
 **Registry/product**: SCP (separate repo: `SCP-2`)
@@ -191,6 +191,6 @@ Don't add SCP product details to spec documents. Don't add SCS spec format detai
 
 ---
 
-**Last Updated**: 2026-10-25
-**Current Version**: SCS 0.6.0 (released); 0.7.0 in development
+**Last Updated**: 2026-11-17
+**Current Version**: SCS 0.7.0 (released)
 **Global product context**: see `~/.claude/CLAUDE.md`

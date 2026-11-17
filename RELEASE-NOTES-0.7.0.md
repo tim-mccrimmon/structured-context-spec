@@ -1,6 +1,6 @@
 # SCS 0.7.0 Release Notes
 
-**Status:** release candidate `0.7.0rc6`, not yet released &nbsp;|&nbsp; **Previous stable:** 0.6.0
+**Status:** released 2026-11-17 &nbsp;|&nbsp; **Previous stable:** 0.6.0
 
 ---
 
@@ -159,17 +159,13 @@ outside SCS, and this guidance is expected to change in 0.8.
   them. The examples `two-tier-governance`, `med-adherence`, and `chai-standards-bundle`
   (still at the `v0.6.0` tag).
 
-## Testing the release candidate
-
-`0.7.0rc6` is published to TestPyPI only:
+## Installing
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc6"
+pip install "scs-tools==0.7.0"          # installs scs and scs-validate
 ```
 
-The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI. Claude
-(claude.ai) cannot reach TestPyPI; there, use the skill ZIPs with the wheels bundled
+Claude (claude.ai) can install from PyPI; the skill ZIPs can also bundle the wheels
 (`python skills/package.py --wheels <dir>`). Results per client are recorded in
 [`docs/install-matrix.md`](docs/install-matrix.md).
 
@@ -183,8 +179,6 @@ The `--extra-index-url` supplies dependencies such as click and PyYAML from PyPI
   changes since (2026-11-11); the approval-record guidance has not been run.
 - **Install matrix.** Claude Code and Claude are recorded; Cursor, Codex, and GitHub Copilot
   are not yet tried (planned for 0.8).
-- **Generated CI.** The workflow `scs new domain` writes installs `scs-validator` 0.7.x from
-  PyPI, so it fails until 0.7.0 is published there.
 - **`BUNDLE_SCD_UNRESOLVED`** stays a warning (decided): a bundle that lists a missing SCD
   fails `--strict`, a release, and `scs compile`, while a draft still validates.
 

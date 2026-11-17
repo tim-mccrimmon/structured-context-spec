@@ -34,13 +34,8 @@ gives both `scs` and `scs-validate`.
 pip install "scs-tools==0.7.0"
 ```
 
-Pin the version: the `scs-tools` 0.1.0 already on PyPI is an old pre-0.6 release. Until 0.7.0
-is published, the release candidate is on TestPyPI:
-
-```bash
-pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ "scs-tools==0.7.0rc6"
-```
+Pin the version: releases before 0.7.0 (including the old `scs-tools` 0.1.0) use earlier
+formats.
 
 ### From source
 

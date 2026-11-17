@@ -8,7 +8,7 @@ small, validated bundle. Once a person approves a version, it doesn't change. Wh
 vendor or runtime needs (a `CLAUDE.md`, an `AGENTS.md`, a system prompt, a gateway policy) is
 a rendering of that bundle, and can always be traced back to the version it came from.
 
-![Version](https://img.shields.io/badge/version-0.6.0-blue)
+![Version](https://img.shields.io/badge/version-0.7.0-blue)
 ![License](https://img.shields.io/badge/license-Apache_2.0-green)
 ![Status](https://img.shields.io/badge/status-active_development-orange)
 
@@ -78,10 +78,6 @@ cd domain
 scs compile bundles/domain-bundle.yaml --allow-draft
 ```
 
-Until 0.7.0 is on PyPI, the release candidate is on TestPyPI; see
-[RELEASE-NOTES-0.7.0.md](RELEASE-NOTES-0.7.0.md#testing-the-release-candidate). Don't install an
-unpinned `scs-tools` from PyPI: the package there is an old 0.1.0 release.
-
 To release a version, version each concept bundle you use, pin it in the Domain bundle, then
 version the Domain bundle, each with a named approver (`--approved-by "Name <email>"`). The
 [CLI documentation](tools/cli/README.md) walks through it, and the
@@ -95,12 +91,12 @@ version the Domain bundle, each with a named approver (`--approved-by "Name <ema
 
 ## Where SCS Is Heading
 
-SCS 0.6.0 still expects you to learn the format. The next releases aim to remove that
-requirement: you describe your organization or project to an AI assistant, and it builds,
-validates, and versions the bundles with you, asking for your approval at each step.
+SCS 0.7.0 removes the requirement to learn the format: you describe your organization or
+project to an AI assistant, and it builds, validates, and versions the bundles with you, asking
+for your approval at each step.
 
-- **[RFC 0002: Agent-Mediated SCS](rfcs/RFC-0002-agent-mediated-scs.md)** (accepted, planned
-  for 0.7.0). An agent interface to the full lifecycle through Agent Skills and an optional
+- **[RFC 0002: Agent-Mediated SCS](rfcs/RFC-0002-agent-mediated-scs.md)** (implemented in
+  0.7.0). An agent interface to the full lifecycle through Agent Skills and an optional
   MCP server; an adaptive intake for individuals and organizations; one repository per Domain;
   content digests that make versioned bundles verifiably immutable; and an advisory review in
   which the agent raises problems and the human decides.
@@ -134,7 +130,7 @@ Feedback is welcome in Discussions and Issues.
 
 ```
 structured-context-spec/
-├── spec/0.6/          # Normative spec (current draft)
+├── spec/0.7/          # Normative spec (current)
 ├── schema/            # JSON Schemas
 ├── meta/              # The published meta bundle (bundle:meta:0.6.0)
 ├── tools/             # scs CLI and scs-validate
@@ -158,7 +154,7 @@ removed in 0.7.
 
 ## Contributing
 
-SCS is at 0.6 (draft), actively evolving, and open to contribution.
+SCS is at 0.7, actively evolving, and open to contribution.
 
 - **Discussions:** use cases, boundary arguments, counterexamples that break the model
 - **Issues:** schema problems, unclear terminology, missing examples
