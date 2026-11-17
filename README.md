@@ -65,8 +65,10 @@ what form you render it into, is up to you.
 ## Quick Start
 
 ```bash
-# Python 3.11 or later, and git
-pip install "scs-tools==0.7.0"          # installs scs and scs-validate
+# Python 3.11 or later, and git; installs scs and scs-validate from the GitHub release
+pip install \
+  https://github.com/tim-mccrimmon/structured-context-spec/releases/download/v0.7.1/scs_validator-0.7.1-py3-none-any.whl \
+  https://github.com/tim-mccrimmon/structured-context-spec/releases/download/v0.7.1/scs_tools-0.7.1-py3-none-any.whl
 
 scs new domain acme-health --author "Jane Doe" --email jane@acme-health.org
 cd acme-health-context
@@ -82,6 +84,9 @@ To release a version, version each concept bundle you use, pin it in the Domain 
 version the Domain bundle, each with a named approver (`--approved-by "Name <email>"`). The
 [CLI documentation](tools/cli/README.md) walks through it, and the
 [Agent Skills](skills/README.md) let an assistant do it with you.
+
+SCS is released on GitHub, not PyPI. The `scs-tools` package on PyPI is an old, unrelated release; don't install it. Each [release](https://github.com/tim-mccrimmon/structured-context-spec/releases)
+lists its wheels and checksums.
 
 - [CLI documentation](tools/cli/README.md)
 - [Migrating to 0.7.0](docs/MIGRATION-0.7.0.md)

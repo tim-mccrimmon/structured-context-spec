@@ -162,10 +162,11 @@ outside SCS, and this guidance is expected to change in 0.8.
 ## Installing
 
 ```bash
-pip install "scs-tools==0.7.0"          # installs scs and scs-validate
+U=https://github.com/tim-mccrimmon/structured-context-spec/releases/download/v0.7.0
+pip install $U/scs_validator-0.7.0-py3-none-any.whl $U/scs_tools-0.7.0-py3-none-any.whl
 ```
 
-Claude (claude.ai) can install from PyPI; the skill ZIPs can also bundle the wheels
+SCS is released on GitHub, not PyPI (0.7.1 updates the tools and docs to match). The skill ZIPs can also bundle the wheels
 (`python skills/package.py --wheels <dir>`). Results per client are recorded in
 [`docs/install-matrix.md`](docs/install-matrix.md).
 

@@ -155,7 +155,9 @@ def test_install_plan_installs_nothing_and_pins_the_version(capsys):
     module = engine()
     assert module.install_plan([]) == 0
     plans = json.loads(capsys.readouterr().out)["plans"]
-    assert "scs-tools==" in plans[0]["command"] or "scs-tools==" in plans[1]["command"]
+    released = [p for p in plans if p["source"] in ("GitHub release", "GitHub tag")]
+    assert len(released) == 2
+    assert all(f"v{module.RELEASE}" in p["command"] for p in released)
 
 
 def test_install_plan_recommends_bundled_wheels(tmp_path: Path, monkeypatch, capsys):
@@ -170,13 +172,17 @@ def test_install_plan_recommends_bundled_wheels(tmp_path: Path, monkeypatch, cap
     assert all("may be a pre-release" in p["note"] for p in out["plans"][1:])
 
 
-def test_install_plan_recommends_pypi_without_wheels(monkeypatch, capsys):
+def test_install_plan_recommends_github_release_without_wheels(monkeypatch, capsys):
     module = engine()
     monkeypatch.setattr(module, "bundled_wheels", lambda: [])
     assert module.install_plan([]) == 0
     out = json.loads(capsys.readouterr().out)
-    assert out["recommended"] == "PyPI"
+    assert out["recommended"] == "GitHub release"
     assert out["plans"][0]["recommended"] is True
+    command = out["plans"][0]["command"]
+    assert f"/releases/download/v{module.RELEASE}/scs_validator-{module.RELEASE}-" in command
+    assert f"/releases/download/v{module.RELEASE}/scs_tools-{module.RELEASE}-" in command
+    assert not any("pypi" in p["source"].lower() for p in out["plans"])
 
 
 def test_check_is_not_ok_without_git(monkeypatch, capsys):

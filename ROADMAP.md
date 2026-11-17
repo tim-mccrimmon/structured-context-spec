@@ -76,11 +76,9 @@ Non-normative docs on where Domain and Project artifacts typically go for common
 
 ### 8. Release engineering
 
-- Publish `scs-tools` and `scs-validator` to PyPI at 0.7.0. PyPI currently holds `scs-tools`
-  0.1.0 and no `scs-validator`, so `pip install` from PyPI does not give a working toolchain.
-  Skills running in hosted chat sandboxes depend on a working `pip install` (RFC 0002,
-  Unresolved Question 3). This revisits the publish deferred in ISS-014.
-- GitHub releases for each tag, starting with `v0.6.0`.
+- Releases are published as GitHub releases with the wheels attached (from 0.7.0), not on
+  PyPI (ISS-014, decided 2026-11-17). The `release` workflow builds and attaches them when a
+  `v*` tag is pushed.
 
 ### 9. MCP server (ISS-054)
 

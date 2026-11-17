@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: clients
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:clients
   type: concept
@@ -17,7 +17,7 @@ content_inputs:
     scd:project:clients: sha256:28b62547bbf8ccb4b96202adf357c664a892337e1596a2228b8fde3f11ffbb38
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

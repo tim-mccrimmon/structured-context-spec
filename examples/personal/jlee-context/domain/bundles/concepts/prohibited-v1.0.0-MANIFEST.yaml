@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: prohibited
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:prohibited
   type: concept
@@ -17,7 +17,7 @@ content_inputs:
     scd:project:prohibited: sha256:3f4a8d5465e2d150b9d2737c5daf14c059105c000b0e4da3bc3fd1049ba5549f
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

@@ -1,0 +1,56 @@
+name: release
+
+# Builds scs-validator and scs-tools from a version tag, smoke-tests the wheels, and attaches
+# them, with their sdists and SHA256SUMS, to the GitHub release for that tag (created if it
+# does not exist). SCS is released on GitHub, not PyPI (ISS-014). Runs when a `v*` tag is
+# pushed, or by hand for an existing tag.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build and attach (e.g. v0.7.1)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build both packages
+        run: |
+          pip install build
+          python -m build --outdir dist tools/scd-validator
+          python -m build --outdir dist tools/cli
+      - name: Both packages carry the tag's version
+        run: |
+          ls dist
+          test "$(ls dist/*.whl | sed -E 's/.*-([^-]+)-py3-none-any\.whl/\1/' | sort -u)" = "${TAG#v}"
+      - name: Install the wheels in a clean environment and check the version
+        run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/pip install dist/*.whl
+          /tmp/smoke/bin/scs --version | grep -F "${TAG#v}"
+          /tmp/smoke/bin/scs-validate --version | grep -F "${TAG#v}"
+          cd "$(mktemp -d)"
+          /tmp/smoke/bin/scs new domain smoke --author CI --email ci@structuredcontext.dev --no-interactive
+          cd smoke-context && /tmp/smoke/bin/scs-validate --strict
+      - name: Attach to the GitHub release
+        run: |
+          (cd dist && sha256sum * > SHA256SUMS)
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --verify-tag \
+            --title "SCS ${TAG#v}" --notes "See RELEASE-NOTES and spec/CHANGELOG.md at this tag."
+          gh release upload "$TAG" dist/* --clobber

@@ -80,6 +80,10 @@ def test_new_domain_then_project_validates_strictly_at_the_repository_root(
     assert checkout["with"]["fetch-depth"] == 0
     assert checkout["with"]["fetch-tags"] is True
     assert steps[-1]["run"] == "scs-validate --strict"
+    # SCS is released on GitHub, not PyPI (ISS-014): CI installs the matching release wheel.
+    install = steps[-2]["run"]
+    assert "github.com/tim-mccrimmon/structured-context-spec/releases/download/v" in install
+    assert install.startswith('pip install "scs-validator @ https://') and ".whl" in install
 
 
 def test_new_project_works_from_inside_a_workspace(tmp_path: Path, monkeypatch):

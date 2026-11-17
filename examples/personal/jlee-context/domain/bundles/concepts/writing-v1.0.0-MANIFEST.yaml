@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: writing
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:writing
   type: concept
@@ -17,7 +17,7 @@ content_inputs:
     scd:project:writing: sha256:c763f6a08fd29d3250139ef6ae922b196ea013594656220616b251deaf304b2e
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

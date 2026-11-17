@@ -23,7 +23,8 @@ from pathlib import Path
 
 MINIMUM_TOOLS_VERSION = "0.7.0"
 PACKAGE = "scs-tools"
-RELEASE = "0.7.0"
+RELEASE = "0.7.1"
+RELEASES = "https://github.com/tim-mccrimmon/structured-context-spec/releases/download"
 WHEEL_RE = re.compile(r"(scs_(?:tools|validator)-[0-9][^-]*-py3-none-any\.whl)$")
 HERE = Path(__file__).resolve().parent
 
@@ -140,9 +141,14 @@ def install_plan(wheels: list[str]) -> int:
     staged = [str(p) for p in map(Path, wheels)] or [str(p) for p in bundled_wheels()]
     plans = [
         {
-            "source": "PyPI",
-            "command": f"python3 -m venv {venv} && {pip} install '{PACKAGE}=={RELEASE}'",
-            "note": "Pin the version: an unpinned install gets the old scs-tools 0.1.0.",
+            "source": "GitHub release",
+            "command": (
+                f"python3 -m venv {venv} && {pip} install "
+                f"{RELEASES}/v{RELEASE}/scs_validator-{RELEASE}-py3-none-any.whl "
+                f"{RELEASES}/v{RELEASE}/scs_tools-{RELEASE}-py3-none-any.whl"
+            ),
+            "note": "SCS is not published to PyPI; the scs-tools there is an old, unrelated "
+            "release.",
         },
         {
             "source": "GitHub tag",
@@ -168,7 +174,7 @@ def install_plan(wheels: list[str]) -> int:
                 "source": "bundled or uploaded wheels",
                 "command": f"python3 -m venv {venv} && {pip} install " + " ".join(staged),
                 "note": "Dependencies (click, pyyaml, jinja2, jsonschema, colorama, tabulate, "
-                "semver) still come from PyPI. Uploaded wheels must first be staged under "
+                "semver) come from PyPI. Uploaded wheels must first be staged under "
                 "their standard names (stage-wheels).",
             },
         )
@@ -181,7 +187,7 @@ def install_plan(wheels: list[str]) -> int:
         "after": f"Put {venv}/bin on PATH, then run `scs_engine.py check` again.",
         "rule": "Recommend the plan marked recommended. "
         "Show the user the command and where the package comes from "
-        "(pypi.org/project/scs-tools, github.com/tim-mccrimmon/structured-context-spec). "
+        "(github.com/tim-mccrimmon/structured-context-spec/releases). "
         "Install only after the user agrees, or let the user run it.",
     }
     if not has_git():
