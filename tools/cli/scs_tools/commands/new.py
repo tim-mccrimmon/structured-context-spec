@@ -60,6 +60,9 @@ PERSONAL_CONCEPTS = ["prohibited"]
 # A workspace name becomes a directory, a bundle id (`bundle:<name>`), and a tag prefix.
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
+# SCS releases are published as GitHub release assets, not on PyPI.
+RELEASES_URL = "https://github.com/tim-mccrimmon/structured-context-spec/releases/download"
+
 
 def _template_model(concept: str, ontology: str) -> str:
     """Template directory for a concept: `common` for the Domain-wide concepts."""
@@ -459,13 +462,16 @@ def _create_repository_files(repo: Path, name: str) -> None:
     """AGENTS.md and its CLAUDE.md pointer (D-31), the CI workflow, .gitignore (D-59),
     .gitattributes, and projects/."""
     templates = get_template_path() / "repository"
-    major, minor = SCS_VERSION.split(".")[:2]
+    tools_version = _scs_tools_version()
+    release = SCS_VERSION if tools_version == "unknown" else tools_version
     variables = {
         "repo_name": repo.name,
         "domain_name": name,
-        "tools_version": _scs_tools_version(),
-        # Repository mode and the 0.7 checks start with the validator for this spec version.
-        "validator_requirement": f"scs-validator>={SCS_VERSION},<{major}.{int(minor) + 1}",
+        "tools_version": tools_version,
+        # SCS is released on GitHub, not PyPI: CI installs the validator wheel released with
+        # these tools (both packages share one version).
+        "validator_requirement": f"scs-validator @ {RELEASES_URL}/v{release}/"
+        f"scs_validator-{release}-py3-none-any.whl",
     }
     copy_template(templates / "AGENTS.md", repo / "AGENTS.md", variables)
     copy_template(templates / "CLAUDE.md", repo / "CLAUDE.md", variables)

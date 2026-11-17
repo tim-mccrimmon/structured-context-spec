@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: verification-validation
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:verification-validation
   type: concept
@@ -17,7 +17,7 @@ content_inputs:
     scd:project:acceptance-criteria: sha256:4c16792a53c269b7e52c8cce2e3d35fe871ad37b55f8321d1304da28dcf693c7
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

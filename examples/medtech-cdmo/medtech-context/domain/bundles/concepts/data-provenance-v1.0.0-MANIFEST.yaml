@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: data-provenance
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:data-provenance
   type: concept
@@ -18,7 +18,7 @@ content_inputs:
     scd:project:data-classification: sha256:b5d29761e6782bdcdafe1675f1016eaa70db68ae6de54fd25182b63b1353c01c
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

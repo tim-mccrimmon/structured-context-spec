@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: system-architecture
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:system-architecture
   type: concept
@@ -17,7 +17,7 @@ content_inputs:
     scd:project:architecture-constraints: sha256:e0564aac5ce342fc7c60e77ed650fe140ce1e62ef952fab52f26d9e094edfdd2
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

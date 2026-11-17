@@ -12,11 +12,10 @@ from those lines by `python scripts/issues_scorecard.py`, and CI checks it is cu
 
 ## Scorecard
 
-82 issues: open 17 · proposed 1 · deferred 4 · done 60.
+82 issues: open 16 · proposed 1 · deferred 4 · done 61.
 
 | Target | Issue | Title | Status | Priority | Effort | Spec | Evidence |
 |---|---|---|---|---|---|---|---|
-| 0.7.0 | ISS-014 | Published, pinned releases | open | high | S | no | strong |
 | 0.8 | ISS-064 | Audience of SCD items | open | high | L | yes | strong |
 | 0.8 | ISS-065 | Placement facts | open | high | L | yes | strong |
 | 0.8 | ISS-077 | Starter Domains per ontology | open | high | L | yes | expected |
@@ -367,11 +366,18 @@ non-editable wheel install smoke test. First GitHub run 2026-09-24: all four job
 (packaging) and ISS-036 (lint and types) for how it got there.
 
 ### ISS-014 — Published, pinned releases
-**Status:** open (reopened 2026-11-09 for 0.7.0; deferred post-0.5.0 on 2026-09-27, below)
+**Status:** done (2026-11-17): released on GitHub, not PyPI (decided; see below)
 Reopened because the CI workflow `scs new domain` generates installs `scs-validator` 0.7.x from
 PyPI and fails until 0.7.0 is published there. Also open: PyPI ownership of `scs-tools` (an old
 0.1.0 exists) and `scs-validator`, and trusted publishing (`publish.yml`) not yet configured.
 **Target:** 0.7.0 · **Priority:** high · **Effort:** S · **Spec:** no · **Evidence:** strong
+**Decided 2026-11-17 (Tim):** SCS is released as GitHub releases with the wheels, sdists and
+`SHA256SUMS` attached, not on PyPI. v0.7.0 was released that way; 0.7.1 points every install
+path at the release: the README and CLI README, the skills' install plan (GitHub release wheels
+after bundled wheels), and the CI workflow `scs new domain` generates (installs the
+`scs-validator` wheel from the release matching the tools version). `publish.yml` is replaced by
+`release.yml`, which builds, smoke-tests and attaches the packages when a `v*` tag is pushed.
+The `scs-tools` 0.1.0 on PyPI stays; the docs say not to install it.
 Publish `scs-tools` and `scs-validator` (PyPI or equivalent) with versioned releases, so
 downstream builds can pin a fixed version. Verify current PyPI state first.
 **Why deferred:** Tim's own use is via editable installs from this checkout, which needs no

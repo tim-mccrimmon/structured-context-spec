@@ -30,12 +30,17 @@ both.
 Requires Python 3.11 or later and git. `scs-tools` depends on `scs-validator`, so one install
 gives both `scs` and `scs-validate`.
 
+Install both wheels from the
+[GitHub release](https://github.com/tim-mccrimmon/structured-context-spec/releases) in one
+command:
+
 ```bash
-pip install "scs-tools==0.7.0"
+pip install \
+  https://github.com/tim-mccrimmon/structured-context-spec/releases/download/v0.7.1/scs_validator-0.7.1-py3-none-any.whl \
+  https://github.com/tim-mccrimmon/structured-context-spec/releases/download/v0.7.1/scs_tools-0.7.1-py3-none-any.whl
 ```
 
-Pin the version: releases before 0.7.0 (including the old `scs-tools` 0.1.0) use earlier
-formats.
+SCS is released on GitHub, not PyPI. The `scs-tools` package on PyPI is an old, unrelated release; don't install it.
 
 ### From source
 
@@ -268,8 +273,8 @@ On failure, the run rolls back and `changes` lists what remains (normally nothin
 ## CI
 
 `scs new domain` writes `.github/workflows/scs-validate.yml`, which runs `scs-validate --strict`
-at the repository root on every push and pull request. It installs `scs-validator` from PyPI, so
-it works once 0.7.0 is published.
+at the repository root on every push and pull request. It installs the `scs-validator` wheel from
+the GitHub release that matches the `scs-tools` version that created the repository.
 
 ## Resources
 

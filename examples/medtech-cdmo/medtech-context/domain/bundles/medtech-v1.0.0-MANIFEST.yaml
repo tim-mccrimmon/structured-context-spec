@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: medtech
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:medtech
   type: domain
@@ -31,7 +31,7 @@ content_inputs:
     scd:project:regulatory-applicability: sha256:a6f0344abf0e2b1dde9f0ac78d91d27a69ccaf656096cbe0adb00e2b065f7b2f
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

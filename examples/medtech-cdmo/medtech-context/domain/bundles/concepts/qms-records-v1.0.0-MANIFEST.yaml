@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: qms-records
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:qms-records
   type: concept
@@ -17,7 +17,7 @@ content_inputs:
     scd:project:document-control: sha256:35fb06f1a0705948778edde131138c2cae4ddc7dd5f037e9b69428055d248c32
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0

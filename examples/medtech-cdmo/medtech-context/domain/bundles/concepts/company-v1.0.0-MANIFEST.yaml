@@ -2,7 +2,7 @@ version: 1.0.0
 release_date: '2026-10-01T09:00:00Z'
 status: validated
 project: company
-tools_version: 0.7.0
+tools_version: 0.7.1
 bundle:
   id: bundle:company
   type: concept
@@ -17,7 +17,7 @@ content_inputs:
     scd:project:company-profile: sha256:7d2bebb0ad120d7babeaae7330237e3de4e4e689c5d42d68dbc0fd4e2541cbdb
 validation:
   validation_date: '2026-10-01T09:00:00Z'
-  validator_version: 0.7.0
+  validator_version: 0.7.1
   passed: true
   errors: 0
   warnings: 0
