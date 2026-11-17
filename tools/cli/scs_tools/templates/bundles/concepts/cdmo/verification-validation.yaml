@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Verification & Validation Concept Bundle"
 description: "Computer-system validation for a medical-device CDMO program: the validation approach (GAMP category; IQ/OQ/PQ), requirements (URS) traceability, quantitative acceptance criteria, and qualification protocols and evidence."
+owner: engineering
 
 imports: []
 
@@ -13,6 +14,6 @@ scds:
   - scd:project:qualification-protocols
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Verification & Validation concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"
+  rationale: "Verification & Validation concept bundle for {{ display_name }}, from the Medical-Device CDMO ontology"

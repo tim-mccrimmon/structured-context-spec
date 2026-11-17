@@ -1,0 +1,27 @@
+id: scd:project:document-control
+type: project
+title: "Document Control"
+version: "DRAFT"
+description: "How design changes, design reviews, and controlled documents are handled"
+concept: concept:qms-records
+content:
+  summary: "Design changes and design reviews follow the QMS procedures; controlled documents live in the eQMS."
+  directives:
+    - id: DOC-001
+      directive: "Design changes require documented review and approval before implementation."
+      cites:
+        - std:iso-13485:2016#7.3.9
+    - id: DOC-002
+      directive: "Do not describe a design change as approved unless the approval record is identified."
+    - id: DOC-003
+      directive: "A design review record must identify the design under review, the participants, and the date of the review."
+      cites:
+        - std:iso-13485:2016#7.3.5
+  facts:
+    - id: DOC-F01
+      fact: "Controlled documents and design history files are kept in the electronic quality management system, not in shared drives or source repositories."
+relationships: []
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Design control rules from the QMS procedures"

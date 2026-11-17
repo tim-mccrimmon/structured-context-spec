@@ -1,0 +1,29 @@
+domain:
+  id: domain:medical-device-cdmo
+  name: Medical-Device CDMO
+  version: 0.1.0
+  description: 'Domain Ontology for Infusion Pump Firmware: the medical-device cdmo
+    concepts its structured context is organized around'
+  author: Dana Reyes
+  ontology:
+    concepts:
+    - id: concept:system-architecture
+      name: System Architecture
+      description: Target system design and configuration, integration topology, and
+        target data/system boundaries for a CDMO program.
+      relationships: []
+    - id: concept:verification-validation
+      name: Verification & Validation
+      description: 'Computer-system validation: the validation approach (GAMP category;
+        IQ/OQ/PQ) and requirements (URS) for a CDMO program.'
+      relationships:
+      - type: depends-on
+        target: concept:system-architecture
+      satisfies:
+      - std:iec-62304:2006-a1
+      - std:21-cfr-11
+  schemas:
+    meta:
+      content_schema: ../../scd/meta-scd-content-schema.json
+    project:
+      content_schema: ../../scd/project-scd-content-schema.json

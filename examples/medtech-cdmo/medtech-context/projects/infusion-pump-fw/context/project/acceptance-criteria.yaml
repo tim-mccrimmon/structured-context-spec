@@ -1,0 +1,20 @@
+id: scd:project:acceptance-criteria
+type: project
+title: "Acceptance Criteria"
+version: "DRAFT"
+description: "When a firmware build may be released"
+concept: concept:verification-validation
+content:
+  summary: "Firmware builds are released only through the release procedure."
+  directives:
+    - id: REL-001
+      directive: "A firmware build is releasable only after unit, integration, and system verification have passed and the results are recorded."
+      cites:
+        - std:iec-62304:2006-a1#5.8
+    - id: REL-002
+      directive: "Generated code must not be merged without review by a firmware engineer."
+relationships: []
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Release gates from the software development plan"

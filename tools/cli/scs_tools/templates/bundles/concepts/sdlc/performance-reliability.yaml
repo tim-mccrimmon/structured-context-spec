@@ -2,7 +2,8 @@ id: bundle:performance-reliability
 type: concept
 version: "DRAFT"
 title: "Performance & Reliability Concept Bundle"
-description: "Performance requirements, reliability targets, and resilience patterns for {{ project_name }}"
+description: "Performance requirements, reliability targets, and resilience patterns for {{ display_name }}"
+owner: engineering
 
 imports: []
 
@@ -13,6 +14,6 @@ scds:
   - scd:project:scalability
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Performance & Reliability concept bundle for {{ project_name }}"
+  rationale: "Performance & Reliability concept bundle for {{ display_name }}"

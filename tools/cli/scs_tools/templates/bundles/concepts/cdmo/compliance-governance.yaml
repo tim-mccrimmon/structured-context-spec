@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Compliance & Governance Concept Bundle"
 description: "Regulatory and QMS governance for a medical-device CDMO: which regulations bind the work, the AI deployment-tier and autonomy rules, electronic-records controls, and hard prohibitions on AI use."
+owner: regulatory
 
 imports: []
 
@@ -14,6 +15,6 @@ scds:
   - scd:project:prohibited-uses
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Compliance & Governance concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"
+  rationale: "Compliance & Governance concept bundle for {{ display_name }}, from the Medical-Device CDMO ontology"

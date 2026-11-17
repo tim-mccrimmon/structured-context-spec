@@ -2,7 +2,8 @@ id: bundle:prohibited
 type: concept
 version: "DRAFT"
 title: "Prohibited Tools and Practices"
-description: "Tools and practices forbidden in all of {{ project_name }}'s work"
+description: "Tools and practices forbidden in all of {{ display_name }}'s work"
+owner: {{ 'owner' if ontology == 'personal' else 'ai-governance' }}
 
 imports: []
 
@@ -10,6 +11,6 @@ scds:
   - scd:project:prohibited
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Prohibited Tools and Practices concept bundle for {{ project_name }}"
+  rationale: "Prohibited Tools and Practices concept bundle for {{ display_name }}"

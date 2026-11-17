@@ -2,18 +2,29 @@
 Bundle command - manage SCS bundles
 """
 
-import hashlib
-import subprocess
-from datetime import datetime, timezone
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version as pkg_version
 from pathlib import Path
+from typing import Optional, Tuple
 
 import click
 import yaml
+from scs_validator.envelope import relative
+from scs_validator.intake import normalize
+from scs_validator.names import is_snapshot
 
+from scs_tools import maintain
+from scs_tools.machine import (
+    EXIT_FILE,
+    EXIT_USAGE,
+    CommandError,
+    Envelope,
+    Output,
+    machine_command,
+)
+from scs_tools.release import release_bundle
 from scs_tools.utils.files import get_template_path
-from scs_tools.utils.project_types import ONTOLOGY_MODELS, PROJECT_TYPES
+from scs_tools.utils.project_types import ONTOLOGY_MODELS
+from scs_tools.versioning import version_bundle
+from scs_tools.workspace import find_workspace, repository_root, select_workspace
 
 
 @click.group()
@@ -46,6 +57,26 @@ def _root_bundle(base_path: Path) -> Path:
     return found[0]
 
 
+def _base(workspace: Optional[str]) -> Tuple[Path, Optional[Path], Path]:
+    """The directory list and info read from, the workspace it is in, and the path base."""
+    if workspace:
+        base = select_workspace(workspace)
+        return base, base, repository_root(base) or base
+    cwd = Path.cwd()
+    found = find_workspace(cwd.resolve())
+    return cwd, found, (repository_root(found) or found) if found else cwd
+
+
+def _read(path: Path, shown: str) -> dict:
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (yaml.YAMLError, OSError, UnicodeDecodeError) as e:
+        raise CommandError(
+            "FILE_UNREADABLE", f"{shown} could not be read: {e}", exit_code=EXIT_FILE, path=shown
+        )
+    return normalize(data) if isinstance(data, dict) else {}
+
+
 @bundle.command()
 @click.option(
     "--available",
@@ -53,7 +84,13 @@ def _root_bundle(base_path: Path) -> Path:
     is_flag=True,
     help="List all available bundle templates",
 )
-def list(available):
+@click.option(
+    "--workspace",
+    default=None,
+    help="Workspace: domain or a Project name (default: the current directory)",
+)
+@machine_command("bundle list")
+def list(envelope: Envelope, out: Output, available: bool, workspace: Optional[str]) -> None:
     """
     List bundles in the current project or available templates
 
@@ -61,69 +98,94 @@ def list(available):
     Examples:
         scs bundle list           # List bundles in current project
         scs bundle list --available  # List all available templates
+        scs bundle list --workspace domain --json
     """
     if available:
+        envelope.result = {
+            "available": {
+                model: [*model_config["concepts"]]
+                for model, model_config in ONTOLOGY_MODELS.items()
+            }
+        }
         for model, model_config in ONTOLOGY_MODELS.items():
-            click.echo(f"Available concept bundles - ontology model '{model}':\n")
+            out.echo(f"Available concept bundles - ontology model '{model}':\n")
             for concept_name in model_config["concepts"]:
-                click.echo(f"  • {concept_name}")
-            click.echo()
+                out.echo(f"  • {concept_name}")
+            if not model_config["concepts"]:
+                out.echo("  (none shipped: concepts are defined with the user)")
+            out.echo()
 
-        click.echo("Domain bundles: create one with 'scs new domain <name> [--ontology ...]'.\n")
-
-        click.echo("Project types and their bundles (sdlc ontology only):\n")
-        for ptype, config in PROJECT_TYPES.items():
-            click.echo(f"  {ptype}:")
-            click.echo(f"    Description: {config['description']}")
-            if config.get("minimal"):
-                click.echo("    Concept bundles: 3 (architecture, security, deployment-operations)")
-            else:
-                click.echo("    Concept bundles: all 11")
+        out.echo("Domain bundles: create one with 'scs new domain <name> [--ontology ...]'.")
         return
 
-    # List bundles in current project
-    base_path = Path.cwd()
+    base_path, _, root = _base(workspace)
     bundles_dir = base_path / "bundles"
 
     if not bundles_dir.exists():
-        click.echo(
-            "Error: No bundles directory found. Not an SCS project?\n"
-            "Run 'scs init' to initialize or 'scs bundle list --available' to see templates.",
-            err=True,
+        raise CommandError(
+            "WORKSPACE_NOT_FOUND",
+            "No bundles directory found. Not an SCS project? Run 'scs new domain' to create "
+            "one or 'scs bundle list --available' to see templates.",
         )
-        raise click.Abort()
 
-    click.echo("Root bundle:\n")
+    found = []
+    out.echo("Root bundle:\n")
 
     for bundle_file in ROOT_BUNDLE_FILES:
         bundle_path = bundles_dir / bundle_file
         if bundle_path.exists():
-            with open(bundle_path, "r") as f:
-                data = yaml.safe_load(f)
-                bundle_id = data.get("id", "unknown")
-                bundle_type = data.get("type", "unknown")
-                version = data.get("version", "unknown")
-                click.echo(f"  • {bundle_file}")
-                click.echo(f"    ID: {bundle_id}")
-                click.echo(f"    Type: {bundle_type}")
-                click.echo(f"    Version: {version}\n")
+            shown = relative(bundle_path, root)
+            data = _read(bundle_path, shown)
+            entry = {
+                "path": shown,
+                "kind": "root",
+                "id": data.get("id"),
+                "type": data.get("type"),
+                "version": data.get("version"),
+            }
+            found.append(entry)
+            out.echo(f"  • {bundle_file}")
+            out.echo(f"    ID: {data.get('id', 'unknown')}")
+            out.echo(f"    Type: {data.get('type', 'unknown')}")
+            out.echo(f"    Version: {data.get('version', 'unknown')}\n")
 
     # Check for concept bundles
     concepts_dir = bundles_dir / "concepts"
     if concepts_dir.exists():
-        click.echo("Concept bundles:\n")
-        for bundle_file in sorted(concepts_dir.glob("*.yaml")):
-            with open(bundle_file, "r") as f:
-                data = yaml.safe_load(f) or {}
-            click.echo(f"  • {bundle_file.name}")
-            click.echo(f"    ID: {data.get('id', 'unknown')}")
-            click.echo(f"    Version: {data.get('version', 'unknown')}")
-            click.echo(f"    SCDs: {len(data.get('scds') or [])}\n")
+        out.echo("Concept bundles:\n")
+        for concept_file in sorted(concepts_dir.glob("*.yaml")):
+            if is_snapshot(concept_file) or concept_file.name.endswith("-MANIFEST.yaml"):
+                continue
+            shown = relative(concept_file, root)
+            data = _read(concept_file, shown)
+            scds = data.get("scds") or []
+            found.append(
+                {
+                    "path": shown,
+                    "kind": "concept",
+                    "id": data.get("id"),
+                    "type": data.get("type"),
+                    "version": data.get("version"),
+                    "scds": len(scds),
+                }
+            )
+            out.echo(f"  • {concept_file.name}")
+            out.echo(f"    ID: {data.get('id', 'unknown')}")
+            out.echo(f"    Version: {data.get('version', 'unknown')}")
+            out.echo(f"    SCDs: {len(scds)}\n")
+
+    envelope.result = {"bundles": found}
 
 
 @bundle.command()
 @click.argument("bundle_name")
-def info(bundle_name):
+@click.option(
+    "--workspace",
+    default=None,
+    help="Workspace: domain or a Project name (default: the current directory)",
+)
+@machine_command("bundle info")
+def info(envelope: Envelope, out: Output, bundle_name: str, workspace: Optional[str]) -> None:
     """
     Show detailed information about a bundle
 
@@ -134,9 +196,9 @@ def info(bundle_name):
     Examples:
         scs bundle info architecture         # Show architecture bundle details
         scs bundle info security             # Show security bundle details
-        scs bundle info compliance-governance # Show compliance details
+        scs bundle info security --json      # The whole bundle, in the envelope's result
     """
-    base_path = Path.cwd()
+    base_path, _, root = _base(workspace)
 
     # Try to find bundle in project first
     bundle_locations = [
@@ -150,6 +212,7 @@ def info(bundle_name):
             bundle_path = loc
             break
 
+    source = "workspace"
     # If not found in project, check the concept bundle templates - prefer the current
     # workspace's own ontology model (if any), then fall back to searching every model.
     if not bundle_path:
@@ -166,58 +229,60 @@ def info(bundle_name):
                 break
         if template_path:
             bundle_path = template_path
-            click.echo("(Showing template bundle, not in current project)\n")
+            source = "template"
+            out.echo("(Showing template bundle, not in current project)\n")
         else:
-            click.echo(
-                f"Error: Bundle '{bundle_name}' not found in project or templates.",
-                err=True,
+            raise CommandError(
+                "BUNDLE_NOT_FOUND", f"Bundle '{bundle_name}' not found in project or templates."
             )
-            raise click.Abort()
 
     # Load and display bundle info
-    with open(bundle_path, "r") as f:
-        data = yaml.safe_load(f)
+    shown = bundle_name if source == "template" else relative(bundle_path, root)
+    data = _read(bundle_path, shown)
+    envelope.result = {"source": source, "bundle": data}
+    if source == "workspace":
+        envelope.result["path"] = shown
 
-    click.echo(f"Bundle: {bundle_name}\n")
-    click.echo(f"ID: {data.get('id', 'N/A')}")
-    click.echo(f"Type: {data.get('type', 'N/A')}")
-    click.echo(f"Version: {data.get('version', 'N/A')}")
-    click.echo(f"Title: {data.get('title', 'N/A')}")
-    click.echo(f"Description: {data.get('description', 'N/A')}")
+    out.echo(f"Bundle: {bundle_name}\n")
+    out.echo(f"ID: {data.get('id', 'N/A')}")
+    out.echo(f"Type: {data.get('type', 'N/A')}")
+    out.echo(f"Version: {data.get('version', 'N/A')}")
+    out.echo(f"Title: {data.get('title', 'N/A')}")
+    out.echo(f"Description: {data.get('description', 'N/A')}")
 
     if "domain" in data:
-        click.echo(f"Domain: {data['domain']}")
+        out.echo(f"Domain: {data['domain']}")
 
     if "concerns" in data:
-        click.echo("\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
+        out.echo("\nConcerns (legacy 0.3 field - migrate to ontology.concepts):")
         for concern in data["concerns"]:
-            click.echo(f"  • {concern}")
+            out.echo(f"  • {concern}")
 
     if "ontology" in data:
         concepts = data["ontology"].get("concepts", [])
-        click.echo(f"\nOntology concepts ({len(concepts)}):")
+        out.echo(f"\nOntology concepts ({len(concepts)}):")
         for concept in concepts:
-            click.echo(f"  • {concept.get('id', 'unknown')}")
+            out.echo(f"  • {concept.get('id', 'unknown')}")
 
     if "scds" in data:
         scds = data["scds"]
-        click.echo(f"\nSCDs ({len(scds)}):")
+        out.echo(f"\nSCDs ({len(scds)}):")
         for scd in scds:
-            click.echo(f"  • {scd}")
+            out.echo(f"  • {scd}")
 
     if "imports" in data:
         imports = data["imports"]
-        click.echo(f"\nImports ({len(imports)}):")
+        out.echo(f"\nImports ({len(imports)}):")
         for imp in imports:
-            click.echo(f"  • {imp}")
+            out.echo(f"  • {imp}")
 
     if "provenance" in data:
         prov = data["provenance"]
-        click.echo("\nProvenance:")
-        click.echo(f"  Created by: {prov.get('created_by', 'N/A')}")
-        click.echo(f"  Created at: {prov.get('created_at', 'N/A')}")
+        out.echo("\nProvenance:")
+        out.echo(f"  Created by: {prov.get('created_by', 'N/A')}")
+        out.echo(f"  Created at: {prov.get('created_at', 'N/A')}")
         if "rationale" in prov:
-            click.echo(f"  Rationale: {prov['rationale']}")
+            out.echo(f"  Rationale: {prov['rationale']}")
 
 
 @bundle.command()
@@ -245,9 +310,10 @@ def validate():
 @click.option(
     "--bundle",
     "-b",
-    type=click.Path(exists=True),
+    "bundle_file",
+    type=click.Path(dir_okay=False, path_type=Path),
     default=None,
-    help="Path to bundle file to version (default: the workspace's domain or project bundle)",
+    help="Bundle file to version (default: the workspace's domain or project bundle)",
 )
 @click.option(
     "--version",
@@ -258,445 +324,265 @@ def validate():
 )
 @click.option(
     "--approved-by",
-    help="Approver email (default: git config user.email)",
+    help="The approver, Name <email> (required; never taken from git config)",
 )
-@click.option(
-    "--notes",
-    help="Version notes/release notes",
-)
-@click.option(
-    "--no-git",
-    is_flag=True,
-    help="Skip git commit and tag creation",
-)
+@click.option("--notes", help="Version notes")
 @click.option(
     "--no-validate",
     is_flag=True,
-    help="Skip validation check (not recommended)",
+    help="Skip content validation (integrity checks still run; recorded in the manifest)",
 )
-@click.option(
-    "--force",
-    "-f",
-    is_flag=True,
-    help="Overwrite existing versioned bundle if it exists",
-)
-def version(bundle, version_number, approved_by, notes, no_git, no_validate, force):
-    """
-    Create a versioned, immutable snapshot of a validated bundle
-
-    This command automates Phase 3 (Version) of the SCS workflow by:
-    1. Validating the bundle (unless --no-validate)
-    2. Creating a versioned snapshot with approval metadata
-    3. Generating SHA-256 checksum
-    4. Creating a version manifest
-    5. Creating git commit and tag (unless --no-git)
-
-    \b
-    Examples:
-        # Basic usage (interactive prompts for missing info)
-        scs bundle version --version 1.0.0
-
-        # With approver and notes
-        scs bundle version --version 1.0.0 \
-            --approved-by "jane@example.com" --notes "Initial release"
-
-        # Version a specific bundle
-        scs bundle version --bundle bundles/concepts/security.yaml --version 2.1.0
-
-        # Skip git operations (manual git workflow)
-        scs bundle version --version 1.0.0 --no-git
-    """
-    click.echo("=== SCS Bundle Versioning ===\n")
-
-    bundle_path = Path(bundle) if bundle else _root_bundle(Path.cwd())
-    if not bundle_path.exists():
-        click.echo(f"Error: Bundle file not found: {bundle}", err=True)
-        raise click.Abort()
-
-    # Validate version number format (basic semantic versioning check)
-    version_parts = version_number.split(".")
-    if len(version_parts) != 3 or not all(part.isdigit() for part in version_parts):
-        click.echo(
-            f"Error: Invalid version number '{version_number}'. "
-            "Must be semantic version (e.g., 1.0.0)",
-            err=True,
-        )
-        raise click.Abort()
-
-    # Get approver email
-    if not approved_by:
-        try:
-            approved_by = subprocess.check_output(
-                ["git", "config", "user.email"],
-                stderr=subprocess.DEVNULL,
-                text=True,
-            ).strip()
-        except subprocess.CalledProcessError:
-            approved_by = None
-
-        if not approved_by:
-            approved_by = click.prompt("Approver email", type=str)
-
-    # Get version notes if not provided
-    if not notes:
-        notes = click.prompt(
-            "Version notes (or press Enter for default)",
-            default=f"Version {version_number} release",
-            show_default=True,
-        )
-
-    click.echo()
-
-    # Step 1: Validate bundle (unless skipped)
-    if not no_validate:
-        click.echo("Step 1/5: Validating bundle...")
-        validation_result = _validate_bundle(bundle_path)
-        if not validation_result["passed"]:
-            click.echo(
-                f"\n✗ Validation failed with {validation_result['errors']} error(s).",
-                err=True,
-            )
-            click.echo("Fix validation errors before versioning.", err=True)
-            click.echo("Or use --no-validate to skip (not recommended).", err=True)
-            raise click.Abort()
-        click.echo(
-            f"  ✓ Validation passed "
-            f"({validation_result['errors']} errors, {validation_result['warnings']} warnings)\n"
-        )
-    else:
-        click.echo("Step 1/5: Skipping validation (--no-validate)\n")
-
-    # Step 2: Create versioned bundle
-    click.echo("Step 2/5: Creating versioned bundle snapshot...")
-    versioned_bundle_path = _create_versioned_bundle(
-        bundle_path, version_number, approved_by, notes, force
-    )
-    click.echo(f"  ✓ Created: {versioned_bundle_path}\n")
-
-    # Step 3: Generate checksum
-    click.echo("Step 3/5: Generating SHA-256 checksum...")
-    checksum, file_size = _generate_checksum(versioned_bundle_path)
-    click.echo(f"  ✓ SHA-256: {checksum}\n")
-
-    # Step 4: Create version manifest
-    click.echo("Step 4/5: Creating version manifest...")
-    manifest_path = _create_version_manifest(
-        bundle_path,
-        versioned_bundle_path,
-        version_number,
-        approved_by,
-        notes,
-        checksum,
-        file_size,
-        validation_result if not no_validate else None,
-    )
-    click.echo(f"  ✓ Created: {manifest_path}\n")
-
-    # Step 5: Git commit and tag
-    if not no_git:
-        click.echo("Step 5/5: Creating git commit and tag...")
-        _create_git_version(
-            versioned_bundle_path,
-            manifest_path,
-            version_number,
-            checksum,
-            validation_result if not no_validate else None,
-        )
-        click.echo(f"  ✓ Committed and tagged: v{version_number}\n")
-    else:
-        click.echo("Step 5/5: Skipping git operations (--no-git)\n")
-
-    # Summary
-    click.echo("=" * 60)
-    click.echo("✓ Bundle versioning complete!")
-    click.echo("=" * 60)
-    click.echo(f"Version: {version_number}")
-    click.echo(f"Bundle: {versioned_bundle_path}")
-    click.echo(f"Manifest: {manifest_path}")
-    click.echo(f"Checksum: {checksum}")
-    if not no_git:
-        click.echo(f"Git Tag: v{version_number}")
-    click.echo()
-    click.echo("Next steps:")
-    click.echo("  • Review the versioned bundle and manifest")
-    if not no_git:
-        click.echo("  • Push to remote: git push origin main && git push origin v{version_number}")
-    click.echo("  • Proceed to Phase 4 (Build) - Configure development environments")
-    click.echo()
-
-
-def _validate_bundle(bundle_path):
-    """Run validation on the bundle and return results.
-
-    Runs the validator as ``python -m scs_validator`` with this interpreter, so it works whether or
-    not the ``scs``/``scs-validate`` scripts are on PATH. Schema lookup is the validator's own
-    (``--schema-dir``, ``SCS_SCHEMA_DIR``, then discovery).
-    """
-    import re
-    import sys
-
-    try:
-        result = subprocess.run(
-            [sys.executable, "-m", "scs_validator", "--bundle", str(bundle_path), "--no-color"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-
-        # The summary block reads "  N errors" / "  M warnings"
-        error_match = re.search(r"^\s*(\d+) errors?", result.stdout, re.M)
-        warning_match = re.search(r"^\s*(\d+) warnings?", result.stdout, re.M)
-        errors = int(error_match.group(1)) if error_match else (0 if result.returncode == 0 else 1)
-        warnings = int(warning_match.group(1)) if warning_match else 0
-
-        if result.returncode != 0 and result.stderr.strip():
-            click.echo(f"  {result.stderr.strip()}", err=True)
-
-        return {"passed": result.returncode == 0, "errors": errors, "warnings": warnings}
-
-    except Exception as e:
-        click.echo(f"  Warning: Could not run validation: {e}")
-        return {"passed": False, "errors": 1, "warnings": 0}
-
-
-def _validator_version():
-    """Return the installed scs-validator package version, or "unknown" if it can't be read.
-
-    `_validate_bundle` runs the validator as a subprocess of this same interpreter (see above),
-    so if that call produced a real result, scs-validator is installed in this environment and
-    this lookup should succeed. Read from package metadata rather than hardcoding a version
-    string, which goes stale the moment either package is re-versioned.
-    """
-    try:
-        return pkg_version("scs-validator")
-    except PackageNotFoundError:
-        return "unknown"
-
-
-def _create_versioned_bundle(bundle_path, version_number, approved_by, notes, force):
-    """Create versioned bundle with approval metadata."""
-    # Load original bundle
-    with open(bundle_path, "r") as f:
-        bundle_data = yaml.safe_load(f)
-
-    # Get current timestamp
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    # The snapshot is the released bundle: it carries the released version (not DRAFT), which is
-    # what the approval fields below attest to and what `bundle:<name>:<version>` imports pin.
-    bundle_data["version"] = version_number
-
-    # Add approval metadata to provenance. Field names match the schema's
-    # required version_approved_by/version_approved_at (RFC-0001, Provenance
-    # and approval) - this command is exactly what's meant to populate them.
-    if "provenance" not in bundle_data:
-        bundle_data["provenance"] = {}
-
-    bundle_data["provenance"]["version_approved_by"] = approved_by
-    bundle_data["provenance"]["version_approved_at"] = timestamp
-    bundle_data["provenance"]["approval_status"] = "validated"
-    bundle_data["provenance"]["validation_passed"] = True
-    bundle_data["provenance"]["validation_date"] = timestamp
-    bundle_data["provenance"]["version_notes"] = notes
-
-    # Create versioned filename
-    bundle_dir = bundle_path.parent
-    bundle_name = bundle_path.stem  # e.g., "project-bundle"
-    versioned_filename = f"{bundle_name}-v{version_number}.yaml"
-    versioned_path = bundle_dir / versioned_filename
-
-    # Check if file exists
-    if versioned_path.exists() and not force:
-        click.echo(
-            f"Error: Versioned bundle already exists: {versioned_path}",
-            err=True,
-        )
-        click.echo("Use --force to overwrite", err=True)
-        raise click.Abort()
-
-    # Write versioned bundle
-    with open(versioned_path, "w") as f:
-        yaml.dump(bundle_data, f, default_flow_style=False, sort_keys=False)
-
-    return versioned_path
-
-
-def _generate_checksum(file_path):
-    """Generate SHA-256 checksum of file."""
-    sha256_hash = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-
-    checksum = sha256_hash.hexdigest()
-    file_size = file_path.stat().st_size
-
-    return checksum, file_size
-
-
-def _create_version_manifest(
-    original_bundle_path,
-    versioned_bundle_path,
+@click.option("--dry-run", is_flag=True, help="Report what would be written; write nothing")
+@machine_command("bundle version")
+def version(
+    envelope: Envelope,
+    out: Output,
+    bundle_file,
     version_number,
     approved_by,
     notes,
-    checksum,
-    file_size,
-    validation_result,
+    no_validate,
+    dry_run,
 ):
-    """Create version manifest file."""
-    # Load bundle to get metadata
-    with open(original_bundle_path, "r") as f:
-        bundle_data = yaml.safe_load(f)
+    """
+    Release a bundle as a version: a snapshot, a manifest, a commit, and a tag
 
-    bundle_id = bundle_data.get("id", "unknown")
-    bundle_type = bundle_data.get("type", "project")
-    imports = bundle_data.get("imports", [])
+    The version is the git tag <workspace>/<bundle-name>-v<version> on a commit holding the
+    whole workspace except dist/. The commit's author is the approver; its committer and the
+    tag's tagger are scs-tools. Every import must be pinned to a released version that still
+    matches its tag. A version is never overwritten; make a new one instead.
 
-    # Get project name from bundle ID
-    project_name = bundle_id.replace("bundle:", "")
-
-    # Count SCDs in project
-    context_dir = original_bundle_path.parent.parent / "context" / "project"
-    scd_count = 0
-    if context_dir.exists():
-        scd_count = len([f for f in context_dir.iterdir() if f.suffix == ".yaml"])
-
-    meta_bundles = [imp for imp in imports if imp.split(":")[1:2] == ["meta"]]
-    imported_bundles = [imp for imp in imports if imp not in meta_bundles]
-
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    manifest = {
-        "version": version_number,
-        "release_date": timestamp,
-        "status": "validated",
-        "project": project_name,
-        "bundle": {
-            "id": bundle_id,
-            "type": bundle_type,
-            "file": versioned_bundle_path.name,
-            "sha256": checksum,
-            "size_bytes": file_size,
-        },
-    }
-
-    if validation_result:
-        manifest["validation"] = {
-            "validator_version": _validator_version(),
-            "validation_date": timestamp,
-            "passed": validation_result["passed"],
-            "errors": validation_result["errors"],
-            "warnings": validation_result["warnings"],
-            "scd_count": scd_count,
-            "import_count": len(imports),
-        }
-
-    manifest["components"] = {
-        "meta_bundles": meta_bundles,
-        "imported_bundles": imported_bundles,
-        "total_scds": scd_count,
-    }
-
-    manifest["approval"] = {
-        "approved_by": approved_by,
-        "approved_at": timestamp,
-        "approval_notes": notes,
-    }
-
-    manifest["phases"] = {
-        "phase_1_intent": "completed",
-        "phase_2_validate": "completed",
-        "phase_3_version": "completed",
-        "phase_4_build": "pending",
-    }
-
-    manifest["release_notes"] = notes
-
-    manifest["distribution"] = {
-        "repository": project_name,
-        "branch": "main",
-        "tag": f"v{version_number}",
-        "immutable": True,
-        "authoritative": True,
-    }
-
-    # Write manifest
-    manifest_filename = f"VERSION-{version_number}-MANIFEST.yaml"
-    manifest_path = versioned_bundle_path.parent / manifest_filename
-
-    with open(manifest_path, "w") as f:
-        yaml.dump(manifest, f, default_flow_style=False, sort_keys=False)
-
-    return manifest_path
+    \b
+    Examples:
+        scs bundle version --bundle bundles/concepts/security.yaml --version 1.0.0 \\
+            --approved-by "Jane Doe <jane@acme.com>"
+        scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme.com>" --dry-run
+    """
+    if bundle_file is None:
+        found = [Path.cwd() / "bundles" / name for name in ROOT_BUNDLE_FILES]
+        found = [path for path in found if path.exists()]
+        if len(found) != 1:
+            raise CommandError(
+                "NO_INPUT",
+                "Pass the bundle to version with --bundle (no single root bundle here)",
+                exit_code=EXIT_USAGE,
+            )
+        bundle_file = found[0]
+    version_bundle(
+        envelope, out, bundle_file, version_number, approved_by, notes, no_validate, dry_run
+    )
 
 
-def _create_git_version(
-    versioned_bundle_path, manifest_path, version_number, checksum, validation_result
+@bundle.command()
+@click.option(
+    "--bundle",
+    "-b",
+    "bundle_file",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Root bundle to release (default: the workspace's domain or project bundle)",
+)
+@click.option(
+    "--workspace",
+    default=None,
+    help="Workspace: domain or a Project name (default: the current one)",
+)
+@click.option("--version", "-v", "version_number", required=True, help="The root's new version")
+@click.option(
+    "--concept",
+    "concepts",
+    multiple=True,
+    metavar="NAME=VERSION",
+    help="A concept bundle's new version; repeat for each changed concept bundle",
+)
+@click.option(
+    "--approved-by",
+    help="The approver, Name <email> (required; never taken from git config)",
+)
+@click.option("--notes", help="Version notes, used for every version in the release")
+@click.option(
+    "--no-validate",
+    is_flag=True,
+    help="Skip content validation (integrity checks still run; recorded in the manifests)",
+)
+@click.option("--dry-run", is_flag=True, help="Report what would be written; write nothing")
+@machine_command("bundle release")
+def release(
+    envelope: Envelope,
+    out: Output,
+    bundle_file,
+    workspace,
+    version_number,
+    concepts,
+    approved_by,
+    notes,
+    no_validate,
+    dry_run,
 ):
-    """Create git commit and tag for the version."""
-    try:
-        # Check if git is available and we're in a repo
-        subprocess.run(
-            ["git", "rev-parse", "--git-dir"],
-            check=True,
-            capture_output=True,
-        )
+    """
+    Release a root bundle with the concept bundles it needs, in one command
 
-        # Stage files
-        subprocess.run(
-            ["git", "add", str(versioned_bundle_path), str(manifest_path)],
-            check=True,
-        )
+    Versions each concept bundle that is unpinned or changed since its pinned version, pins it
+    in the root, then versions the root: the cascade of 'scs bundle version' and 'scs bundle
+    pin' steps, with one approver. Each changed concept bundle needs --concept NAME=VERSION;
+    run without them to see which do. The dry run performs the whole release on a scratch copy
+    and lists every snapshot, manifest, pin, commit, and tag. If a step fails, every completed
+    step is undone.
 
-        # Create commit message
-        validation_summary = ""
-        if validation_result:
-            validation_summary = f"""
-Phase 2 (Validate) Results:
-- {validation_result.get('errors', 0)} validation errors
-- {validation_result.get('warnings', 0)} warnings
-"""
+    \b
+    Examples:
+        scs bundle release --version 1.0.0 --concept security=1.0.0 \\
+            --concept privacy=1.1.0 --approved-by "Jane Doe <jane@acme.com>" --dry-run
+    """
+    release_bundle(
+        envelope,
+        out,
+        bundle_file,
+        workspace,
+        version_number,
+        concepts,
+        approved_by,
+        notes,
+        no_validate,
+        dry_run,
+    )
 
-        commit_message = f"""Release v{version_number} - Phase 3 (Version) Complete
 
-Created immutable versioned snapshot of validated SCD bundle.
-{validation_summary}
-Deliverables:
-- Versioned bundle: {versioned_bundle_path.name}
-- Version manifest: {manifest_path.name}
-- SHA-256 checksum: {checksum}
+def _edit_options(default: str):
+    def decorate(f):
+        for option in reversed(
+            [
+                click.option(
+                    "--bundle",
+                    "-b",
+                    "bundle_file",
+                    type=click.Path(dir_okay=False, path_type=Path),
+                    default=None,
+                    help=f"The bundle to change (default: {default})",
+                ),
+                click.option(
+                    "--workspace",
+                    default=None,
+                    help="Workspace: domain or a Project name (default: the current one)",
+                ),
+                click.option("--dry-run", is_flag=True, help="Report the change; write nothing"),
+            ]
+        ):
+            f = option(f)
+        return f
 
-This bundle is now the authoritative source of truth.
-"""
+    return decorate
 
-        # Create commit
-        subprocess.run(
-            ["git", "commit", "-m", commit_message],
-            check=True,
-            capture_output=True,
-        )
 
-        # Create annotated tag
-        tag_message = f"""SCD Bundle v{version_number}
+def _done(out: Output, envelope: Envelope, dry_run: bool) -> None:
+    verb = "Would change" if dry_run else "Changed"
+    if not envelope.changes:
+        out.echo("Nothing to change")
+    for change in envelope.changes:
+        out.echo(f"{verb}: {change.action} {change.path}")
 
-Validation Status: {'✓ PASSED' if validation_result and validation_result['passed'] else '✗ FAILED'}
-Bundle Checksum (SHA-256): {checksum}
 
-Phase Completion:
-✓ Phase 1: Intent - SCDs generated
-✓ Phase 2: Validate - Bundle validated
-✓ Phase 3: Version - Immutable snapshot created
+@bundle.command("pin")
+@click.argument("name")
+@click.option("--version", "-v", "version_number", required=True, help="A released version")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle pin")
+def pin(envelope, out, name, version_number, bundle_file, workspace, dry_run):
+    """
+    Pin an import to a released version
 
-Ready for Phase 4 (Build) - development environment configuration.
-"""
+    Changes the one import of bundle:NAME in the bundle to bundle:NAME:VERSION. The version
+    must already be released (scs bundle version).
 
-        subprocess.run(
-            ["git", "tag", "-a", f"v{version_number}", "-m", tag_message],
-            check=True,
-        )
+    \b
+    Examples:
+        scs bundle pin security --version 1.0.0
+        scs bundle pin bundle:security --version 1.1.0 --bundle bundles/project-bundle.yaml
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.pin(envelope, ws, bundle_file, name, version_number, dry_run)
+    _done(out, envelope, dry_run)
 
-    except subprocess.CalledProcessError as e:
-        click.echo(f"  Warning: Git operation failed: {e}", err=True)
-        click.echo("  Files were created but not committed to git", err=True)
-        raise click.Abort()
+
+@bundle.command("set-owner")
+@click.argument("role")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle set-owner")
+def set_owner(envelope, out, role, bundle_file, workspace, dry_run):
+    """
+    Name the role accountable for a section (D-92)
+
+    Sets the bundle's owner to ROLE: the role accountable for this section, who reviews and
+    approves it, such as quality or regulatory. Owners go on concept bundles and on a Project
+    bundle that lists SCDs directly. Map the role to a person with 'scs intake set owners'.
+    The owner is part of the bundle, so changing it on a released bundle needs a new version.
+
+    \b
+    Examples:
+        scs bundle set-owner quality --bundle bundles/concepts/qms-records.yaml
+        scs intake set owners '{role: quality, person: Jane Doe <jane@acme.org>, title: VP Quality}'
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.set_owner(envelope, ws, bundle_file, role, dry_run)
+    _done(out, envelope, dry_run)
+
+
+@bundle.command("add-import")
+@click.argument("ref")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle add-import")
+def add_import(envelope, out, ref, bundle_file, workspace, dry_run):
+    """
+    Add an import to a Domain or Project bundle
+
+    REF is bundle:NAME (unpinned, the working concept) or bundle:NAME:VERSION. It must resolve
+    in the workspace.
+
+    \b
+    Examples:
+        scs bundle add-import security
+        scs bundle add-import bundle:security:1.0.0
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.add_import(envelope, ws, bundle_file, ref, dry_run)
+    _done(out, envelope, dry_run)
+
+
+@bundle.command("add-scd")
+@click.argument("scd_id")
+@_edit_options("the workspace's root bundle")
+@machine_command("bundle add-scd")
+def add_scd(envelope, out, scd_id, bundle_file, workspace, dry_run):
+    """
+    List an existing SCD in a bundle
+
+    \b
+    Examples:
+        scs bundle add-scd scd:project:release-gates --bundle bundles/concepts/security.yaml
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.add_scd(envelope, ws, bundle_file, scd_id, dry_run)
+    _done(out, envelope, dry_run)
+
+
+@bundle.command("remove-scd")
+@click.argument("scd_ids", nargs=-1, required=True)
+@_edit_options("the bundle that lists them")
+@machine_command("bundle remove-scd")
+def remove_scd(envelope, out, scd_ids, bundle_file, workspace, dry_run):
+    """
+    Retire SCDs: remove them from their bundles
+
+    The SCD file is deleted when no other bundle lists it; released versions keep it at their
+    tags. A concept bundle left with no SCDs is removed too, with the imports of it and its
+    ontology manifest entry. Several SCDs are retired as one change, so one dry run shows
+    everything that goes.
+
+    \b
+    Examples:
+        scs bundle remove-scd scd:project:tefca-participation
+        scs bundle remove-scd scd:project:threat-model scd:project:pen-testing --dry-run
+    """
+    ws = maintain.open_workspace(workspace, bundle_file)
+    maintain.remove_scd(envelope, ws, bundle_file, [*scd_ids], dry_run)
+    _done(out, envelope, dry_run)

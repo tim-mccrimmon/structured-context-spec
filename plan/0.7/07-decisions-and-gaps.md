@@ -1,0 +1,187 @@
+# 7. Decisions and gaps
+
+Every item here is the maintainer's call. "Rec." is the drafting recommendation, not a decision.
+**Blocks** names the work packages that cannot start until the item is decided; this column is
+the single source for each WP's decision dependencies in section 6. "RFC" means the outcome
+amends RFC 0002. The Decision column records outcomes; **Decided** entries are final.
+
+Two batches, so engine work can start before the rest is settled: **WP-01a** (sections A to D)
+and **WP-01b** (section E, except D-27, which WP-11a settles).
+
+Sources: `survey/*.md`, `review/plan-review-1.md`, `review/plan-review-2.md`.
+
+## A. Integrity model and versioning (WP-01a)
+
+The integrity model (D-39, D-40, D-53, D-54) was decided by the maintainer on 2026-10-25 after
+review 2. Summary: **the git tag is the record of a version.** It points at a commit holding the
+whole workspace; verification reads the tagged content and the tagged manifest, and working-tree
+copies must match them. Section 5 states the model in full.
+
+| ID | Question | Rec. | Blocks | Decision |
+|---|---|---|---|---|
+| D-39 | Where does trust in a version come from, and what does validation verify? | The tag. Verification set: (1) every version tag in the repository: the digest recomputed from the tagged content equals the `content_digest` in the tagged manifest, and each pinned import's manifest at that commit equals the import's own tagged manifest; (2) for versions still in use (pinned by a working bundle, or the latest version of a bundle whose working file exists), the working manifest and snapshot equal their tagged copies by git blob id (`MANIFEST_ALTERED`); (3) every pinned import of a working bundle matches its tagged content (drift, `CONTENT_DIGEST_MISMATCH`). A version tag without a manifest at the tag is an error; so is a manifest carrying `content_digest` with no qualified tag (`VERSION_TAG_MISSING`), and repository mode on a shallow clone (`GIT_HISTORY_INCOMPLETE`). Signing is out of 0.7; the spec states that protecting tags on the remote is the adopter's job. RFC (Validation Rules). | WP-14 | **Decided** 2026-10-25: tag is the record; signing out of 0.7. Check 2 narrowed to versions in use (review 3, decided 2026-10-25). |
+| D-40 | What does a version commit contain? | Everything under the workspace directory except `dist/`, including deletions, listed in the dry run. "Rebuild from its tag" holds by construction. Consequence: uncommitted edits elsewhere in the same workspace go into the commit; the dry run shows them. Implementation: `git commit --only -- <workspace>/ ':!<workspace>/dist/'`, so nothing staged elsewhere enters; files ignored by `.gitignore` are not added; `bundle version` refuses with `VERSION_INPUT_UNTRACKED` if any digest or compiler input is ignored or untracked. | WP-14 | **Decided** 2026-10-25: whole workspace except `dist/`. |
+| D-53 | What may `--no-validate` skip? | Content validation only (schemas, rules). Integrity checks always run: pinned imports match their tags. The manifest records `validation_passed: false`. | WP-14 | **Decided** 2026-10-25: content only. |
+| D-54 | Pre-0.7 versions under strict CI | Migration versions each bundle once under 0.7. Versions without a workspace-qualified tag are history: not verified, not reported. Strict CI is green once each bundle has a 0.7 version. RFC (Validation Rules, Migration Guide). | WP-14 | **Decided** 2026-10-25: re-version once. |
+| D-52 | What does the working bundle file hold after `bundle version`? | `DRAFT`, as built. The released copy is the snapshot, and the record is the tag. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-01 | UQ5: version per bundle or per workspace? | Per bundle. Already in ISS-043 code, ISS-045 code, and spec §7.6. Cost: a cascade of `bundle version` calls (D-44). | WP-03, WP-06, WP-14 || **Decided** 2026-10-25: per bundle. |
+| D-02 | Manifest file name, given `/` in `<workspace>/` tags | `<bundle-name>-v<version>-MANIFEST.yaml` in the bundle's directory; location supplies the workspace. RFC (§9 wording). | WP-04, WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-03 | Which name is `<workspace>`? | `domain` or the directory name under `projects/`; `.scs/config name` must match (validator, `CONFIG_NAME_MISMATCH`). | WP-03, WP-04, WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-04 | Every workspace already has `domain/` for the ontology manifest, so the layout yields `domain/domain/` | Move it to `ontology/domain-manifest.yaml`; the 0.6 location is still read, with `ONTOLOGY_LEGACY_LOCATION` (info). RFC (§9 layout). | WP-03, WP-04 || **Decided** 2026-10-25: move to `ontology/`. |
+| D-05 | RFC shows `context/`; as-built is `context/project/` | Keep `context/project/` for 0.7; amend the diagram. RFC. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-06 | `.scs/config` keys and meaning of `scs_version` | RFC keys (`bundle_type`, `name`, `ontology`, `scs_version` = spec version) plus `tools_version`; old keys still read. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-38 | Does `bundle version --no-git` survive? | Removed. A version is a tag. Missing git fails with `GIT_REQUIRED`. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-41 | Where does `bundle diff --from` get old content? Defaults? | From the tagged commit. No prior version: diff from empty (everything added). A bundle whose only versions are pre-0.7: diff from its stem-named snapshot, with `DIFF_LEGACY_BASELINE` (info). Explicit `--from` with no tag: `DIFF_VERSION_NOT_FOUND`. | WP-08 || **Decided** 2026-10-25: as recommended. |
+| D-43 | Snapshot file name | `<bundle-dir>/<bundle-name>-v<version>.yaml`, beside the manifest; stem-named 0.6 snapshots still resolve. Snapshots are indexed by (id, version), not as working documents. | WP-04, WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-55 | Git identity for version commits (sandboxes usually have none) | Author = the `--approved-by` person; committer = fixed `scs-tools <noreply@scs.invalid>`; both passed with `git -c`, never read from the environment. Commit and tag listed in `changes`. Tag details in D-58. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-57 | How is a released version compiled? (review 3) | `scs compile BUNDLE --version V` compiles the snapshot for V after the D-39 checks for that version, with `source_digest`. Without `--version`, it compiles the working DRAFT and needs `--allow-draft`. | WP-14 | **Decided** 2026-10-25: `compile --version V`. |
+| D-58 | Tag type and git settings (review 3) | Annotated tag; tagger is the fixed `scs-tools <noreply@scs.invalid>` identity. The engine overrides `commit.gpgsign`, `tag.gpgSign`, `core.hooksPath` (no hooks), and `core.autocrlf` with `git -c` for its commit and tag. | WP-14 | **Decided** 2026-10-25: annotated, fixed tagger, settings overridden. |
+| D-59 | Are `sources/` documents committed? (review 3) | No by default: the scaffold `.gitignore` ignores `sources/`; `derived_from` still names the document; the user may opt in to tracking. Keeps source documents local (RFC §8). Rebuild is unaffected; the compiler never reads `sources/`. | WP-03 | **Decided** 2026-10-25: ignored by default. |
+
+## B. Lifecycle integrity (WP-01a)
+
+| ID | Question | Rec. | Blocks | Decision |
+|---|---|---|---|---|
+| D-14 | Root versions while imports are DRAFT or unpinned | Refuse: `VERSION_IMPORT_NOT_PINNED`. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-15 | `--force` can rewrite a released version | Remove `--force` from `bundle version`; failed runs roll back (WP-06). `VERSION_EXISTS`. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-16 | Compile skips verification when any bundle is DRAFT | Always run D-39 checks for the compiled tree. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-17 | Unpinned import resolves to a versioned snapshot | Unpinned refs resolve to working files; pinned refs to snapshots. | WP-14, WP-08 || **Decided** 2026-10-25: as recommended. |
+| D-18 | Versioned bundle with no manifest | Under D-39, a workspace-qualified version tag without a manifest at the tag is an error; a working manifest missing while its tag has one is `MANIFEST_ALTERED`. No `source_digest` without a verified digest. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-19 | Editing an SCD under a pinned concept fails validation until re-versioned | Keep. The diagnostic names the changed files and the bundles to version again, bottom-up; the version skill runs the cascade. Snapshotting SCDs is a 0.8 question. | WP-14, WP-10 || **Decided** 2026-10-25: as recommended. |
+| D-44 | Does one approver confirmation cover a cascade? | Yes. Before the single confirmation, the skill shows a cascade plan listing every snapshot, manifest, pin, commit, and tag (all determined by names and versions). It then runs each step's `--dry-run` and stops if a result differs from the plan. RFC (§6.1/§6.2 reading). | WP-10 || **Decided** 2026-10-25: as recommended. |
+
+## C. Interface contract (WP-01a)
+
+| ID | Question | Rec. | Blocks | Decision |
+|---|---|---|---|---|
+| D-07 | Who writes `intake.yaml` and review findings? | Engine: `scs intake set`, `scs intake record-finding`, with `--dry-run`. RFC. | WP-07 || **Decided** 2026-10-25: as recommended. |
+| D-08 | Edit, retire, re-scope SCDs and pin imports | Option 1 (rec.): engine commands `scs scd write PATH --from-file -` (stdin, so nothing is written outside the repo), `scs bundle add-scd`, `scs bundle remove-scd`, `scs bundle add-import`, `scs bundle pin`. Retire = `remove-scd`; diff reports it as removed. RFC (§1, §7 drop "retired"). Option 2: skills edit SCD files directly, shown and confirmed; retire = removal from `scds`; MCP cannot edit content in 0.7. RFC (§1, §2, §7). | WP-05, WP-06, WP-10 || **Decided** 2026-10-25: option 1, engine commands. |
+| D-09 | Git effects in `changes` | `{"action": "git-init|git-commit|git-tag", "ref": ...}`; a `git-commit` entry carries `paths: [{path, status: A|M|D}]` for everything it commits, while `create`/`modify`/`delete` list only files the run itself wrote. On `ok: false`, `changes` lists what remains after rollback (normally empty). RFC. | WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-10 | Diagnostic code registry | Codes with severity (`error`, `warning`, `info`) and meaning. Each WP adds its codes as a fragment `schema/diagnostics/codes.d/WP-nn.yaml`; WP-04's build step merges them into `codes.yaml`. CI fails on an unregistered code. `info` never changes the exit code, under `--strict` either. | WP-04, WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-11 | Compile output target | `dist/<bundle-name>-<version>.yaml` in every mode; `--stdout` in human mode only; with `--json`, `result` holds the path and `source_digest`. | WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-12 | Exit codes | Map to RFC codes; click usage errors become 3; file errors 4. | WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-13 | Author, email, approver | `--approved-by` required in every mode. Machine mode requires `--author` for `new`/`add`. Git identity only as a `suggestion`. | WP-06 || **Decided** 2026-10-25: as recommended. |
+| D-33 | Reserved directories and names | Workspace root only; names matched on the bundle id's name part and the file stem; refused at `scs add` and `scs new` (`RESERVED_BUNDLE_NAME`) and by the validator. | WP-03, WP-04, WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-37 | `bundle version` and `compile` shell out to the validator | Call it in-process through a structured API. | WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-42 | Workspace selection and envelope path base | `--workspace <domain|name>`, else the nearest `.scs/config` above cwd; at repo root without it, `WORKSPACE_REQUIRED`. Paths are POSIX, relative to the repo root. | WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-45 | Minimum engine version for skills | `scs --version --json`; each skill's `compatibility` names a minimum `tools_version`, compared per D-56. | WP-05, WP-10 || **Decided** 2026-10-25: as recommended. |
+| D-47 | `content_inputs` in manifests; `scs_runtime: "0.7"` | Keep both; §3.5 stability applies to 0.7 artifacts from here on. RFC (Schema Changes). | WP-04, WP-05 || **Decided** 2026-10-25: as recommended. |
+| D-49 | How a manifest's format is recognized | By its tag form, not a field value: a manifest whose version has a workspace-qualified tag is a 0.7 manifest and must carry `content_digest` and `tools_version`. Checked by WP-14's check module, since it needs tags; WP-04's schema keeps both fields optional. | WP-14 || **Decided** 2026-10-25: as recommended. |
+| D-56 | Version comparison | PEP 440, with a pre-release counted as meeting its base version (`0.7.0rc1` meets a minimum of `0.7.0`). | WP-05, WP-10 || **Decided** 2026-10-25: as recommended. |
+
+## D. Intake and provenance (WP-01a)
+
+| ID | Question | Rec. | Blocks | Decision |
+|---|---|---|---|---|
+| D-20 | Unresolved `derived_from` under strict | Warning; exit 2 under `--strict`. RFC (wording). | WP-07 || **Decided** 2026-10-25: as recommended. |
+| D-28 | UQ4: personal data; what counts as a person | Role-only attribution allowed in `intake.yaml` only, written `role:<name>`. A person identifier is `Name <email>`. The manifest's `approval.approved_by` must be a person identifier; the schema rejects `role:` and empty values. | WP-07, WP-04 || **Decided** 2026-10-25: as recommended. |
+| D-29 | UQ6: provenance granularity | Item-level `derived_from` only. | WP-07 || **Decided** 2026-10-25: as recommended. |
+| D-30 | UQ7: intake for pre-0.7 workspaces | Optional; the intake skill offers to reconstruct one. | WP-07, WP-10 || **Decided** 2026-10-25: as recommended. |
+| D-32 | Link from a version to the review record | `intake.yaml` is in the version commit (D-40), so the tag already holds the record in force at approval. No separate `intake_digest`. | none || **Decided** 2026-10-25: as recommended. |
+| D-34 | Intake schema shapes | Designed in WP-07; approval is milestone M-07. | WP-07 || **Decided** 2026-10-25: as recommended. **M-07 approved** 2026-10-26: `schema/intake/intake-schema.json` as of `e5da021`. |
+| D-35 | Intake schema location | `schema/intake/intake-schema.json`. RFC. | WP-07 || **Decided** 2026-10-25: as recommended. |
+| D-36 | Manifest schema; `approved_by` path | `schema/manifest/version-manifest-schema.json`; RFC means `approval.approved_by`. RFC (wording). | WP-04 || **Decided** 2026-10-25: as recommended. |
+
+## E. Skills, spec, docs (WP-01b)
+
+| ID | Question | Rec. | Blocks | Decision |
+|---|---|---|---|---|
+| D-21 | Meta bundle version for 0.7 | Keep `bundle:meta:0.6.0` unless meta content changes. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-22 | Spec home for agent-interface rules | New `spec/0.7/agent-interface.md`; layout in `bundle-format.md`. | WP-02a || **Decided** 2026-10-25: as recommended. |
+| D-23 | Personal profile and ontologies | Personal ignores ontology unless one is given; `ontology: none` supported. | WP-03 || **Decided** 2026-10-25: as recommended. **Superseded** 2026-10-26 by D-61 and D-62: Personal is an ontology; no `--profile personal`, no `ontology: none`. |
+| D-24 | Placement guide | `docs/placement/<service>.md` with `checked:` dates and sources, for Claude Enterprise, Claude Code, Cursor, GitHub Copilot, ChatGPT Enterprise. Skills ship a copy and state its `checked:` date when advising. | WP-09 || **Decided** 2026-10-25: as recommended. |
+| D-25 | UQ1: where skills live | `skills/` in this repo, versioned with the spec. | WP-10 || **Decided** 2026-10-25: as recommended. |
+| D-26 | UQ2: legacy plugins | Removed in 0.7 (`plugins/` deleted); the Agent Skills replace them. | WP-10 || **Decided** 2026-10-25: deprecated in 0.7, removed in 0.8. **Amended** 2026-10-29 by Tim: 0.7 replaces them entirely, so removed in 0.7. |
+| D-27 | UQ3: installing in chat sandboxes | Fallback order recorded now: PyPI; GitHub tag; a wheel bundled with the skill. The choice per client is an output of WP-11a, not part of WP-01b. | WP-10 (via WP-11a) | |
+| D-31 | UQ8: agent instructions file | `AGENTS.md` plus a `CLAUDE.md` pointer. | WP-03 || **Decided** 2026-10-25: as recommended. |
+| D-50 | Target chat clients | WP-11a: Claude.ai, Claude Code, Cursor, Codex, GitHub Copilot. WP-13 runs in Claude.ai. | WP-11a, WP-13 || **Decided** 2026-10-25: as recommended. |
+| D-51 | Skill behavior test harness | Claude Agent SDK with the skills loaded from `skills/`, model pinned in the harness config (`claude-sonnet-5-5` at the start; changes recorded). Each scripted conversation runs 5 times with a filesystem snapshot per turn. MUST assertions pass in 5 of 5 runs, SHOULD assertions in 4 of 5. | WP-10 || **Decided** 2026-10-25: as recommended. |
+
+## F. Housekeeping (no decision needed; fold into the named WP)
+
+- Validator `__version__` hardcoded to 0.6.0 (WP-00).
+- ISS-048 text and ROADMAP WS2 do not mention the reserved names (WP-01a).
+- Rules added under `rules/v0.6.0/`; no 0.7 rule set (WP-04).
+- Rule YAML declares severities and modes no code reads (WP-04).
+- mypy not run on scs-tools (WP-05).
+- `spec/`, `docs/`, `rfcs/` changes trigger no CI (WP-11rc).
+- CONTRIBUTING.md describes feature branches; practice is `0.x-dev` (WP-15).
+- RFC links point at `spec/0.6/` (WP-02a).
+- `scs-validator` URL in its pyproject differs from the repo (WP-11rc).
+
+## G. Ontologies, templates, and provenance (2026-10-26)
+
+Decided by the maintainer in a design conversation on 2026-10-26, while WP-03 was being built.
+The goal is to simplify: fewer scaffold modes and flags, with the agent and the user deciding
+what a workspace needs instead of the scaffold guessing. D-68 to D-74 were the open items those
+decisions depended on, all decided the same day.
+
+| ID | Question | Rec. | Blocks | Decision |
+|---|---|---|---|---|
+| D-60 | What does "Domain" name? | The global tier only: the Domain workspace, bundle, and repository. `sdlc`, `cdmo`, `mca`, and `personal` are ontologies. | none | **Decided** 2026-10-26: as recommended. The ontology manifest keeps its 0.6 naming in 0.7 (D-73). |
+| D-61 | Is "personal" a profile or an ontology? | An ontology, alongside `sdlc`, `cdmo`, and `mca`, with more added as needed. `--profile personal` and `ontology: none` are removed. Supersedes D-23. RFC (§4, §9, Implementation Notes, Migration Guide). | WP-03, WP-07 | **Decided** 2026-10-26: as recommended. |
+| D-62 | What does the personal ontology contain? | One fixed concept, boundaries (the `prohibited` concept bundle). Every other concept is personal, so it is defined with the user in conversation, not shipped. Personal means one person. RFC (§4, §9). | WP-03, WP-07, WP-10 | **Decided** 2026-10-26: as recommended. |
+| D-63 | What is identity? | Provenance only: a person identifier, `Name <email>`, used in provenance fields. Not a concept, not an SCD, not compiled. The same in all of a person's Domains. The intake `owner` field narrows to this. RFC (§4, §5). | WP-03, WP-07 | **Decided** 2026-10-26: as recommended. |
+| D-64 | What selects the scaffold's templates? | The ontology and the workspace kind (Domain or Project), nothing else. The `--type` variants (`healthcare`, `fintech`, `saas`, `government`, `minimal`, `standard`) are removed. Each ontology ships one Domain set and one Project set; the agent and the user remove what does not apply, through engine commands. The Domain/Project split stays. RFC (§9, Implementation Notes). | WP-03, WP-06, WP-10 | **Decided** 2026-10-26: as recommended. |
+| D-65 | A person's Domains share nothing; is duplication between them a problem? | No. Each Domain stays self-contained and rebuildable from its own tags. A hierarchy across Domains comes from where the user places the artifacts (the client loads them in layers), and `scs stack` checks such a stack (D-67). | none | **Decided** 2026-10-26: as recommended. |
+| D-66 | When does provenance have to be right? | At validation and versioning, which are the only times it is read. The scaffold need not be final; inconsistencies are corrected then, by the tool with the user. A value that was never true (a placeholder) is corrected; a true value is never overwritten (`created_by` is not the approver). RFC (§5). | WP-06, WP-14 | **Decided** 2026-10-26: as recommended. |
+| D-67 | How does a user test layered context? | `scs stack ARTIFACT...`: a read-only preview of an ordered stack of compiled artifacts, with exact checks in the engine and a `layer-conflict` kind in the advisory review. Whether a client loads the layers is the client's behaviour, described in the placement guide. RFC (§1, §12, §13). | WP-02b (spec), WP-16 | **Decided** 2026-10-26: RFC 0002 §13. In 0.7 (Tim, 2026-10-28). |
+| D-68 | How is a concept with no shipped template created? | Needed for D-62. An engine command that creates a concept bundle, its first SCD, and the ontology manifest entry, with `--dry-run`, for example `scs add bundle NAME --new`. | WP-06, WP-10 | **Decided** 2026-10-26: as recommended. |
+| D-69 | What does removing an SCD clean up? | Needed for D-64. When `scs bundle remove-scd` leaves a concept bundle with no SCDs, the same run removes the concept bundle, the root bundle's import of it, and its ontology manifest entry, all listed in `changes`. | WP-06 | **Decided** 2026-10-26: as recommended. |
+| D-70 | How are unused (empty) SCDs made visible? | Needed for D-64. Today `scs-validate --strict` passes a scaffold of empty SCDs, and only `scs compile` warns. A warning would make every fresh scaffold fail `--strict`, which WP-03's acceptance requires to pass. Rec.: an `info` diagnostic in validation (`SCD_EMPTY`: an SCD with no prohibitions, directives, or facts, the compiler's test), and `bundle version` lists empty SCDs in its dry run so they are removed or kept knowingly. `info` is enough because the agent reads every diagnostic in the envelope. The validator check is a check module (WP-04's registry). The 0.6 stub detection is retired: it is opt-in, skips DRAFT SCDs, has no tests, and guesses from heuristics; its rule blocks (`scd-rules.yaml`, `completeness-rules.yaml`), `_detect_stubs`, and `COMPLETENESS_STUB_SCD` are removed, with a migration note. | WP-14 | **Decided** 2026-10-26: as recommended, including retiring stub detection. |
+| D-71 | What flags provenance to correct (D-66)? | Placeholders only, since a true value is never corrected (D-66) and `created_by` may truly name a team or organization (`scs-maintainers` in the meta bundle; team addresses in the examples). The validator warns on a placeholder `created_by` (`PROVENANCE_PLACEHOLDER`): an empty name, `developer`, or an address at `example.com`, `example.org`, `example.net`, or a `.example` or `.invalid` domain; any other value passes. `bundle version` refuses to version a bundle whose SCDs or manifest carry one (`VERSION_PROVENANCE_PLACEHOLDER`). The scaffold stops inventing values: interactive mode offers git `user.name` and `user.email` as prompt defaults (a suggestion, D-13); non-interactive and machine mode require `--author` and `--email` (`NO_INPUT`). Rejected: warning on every value that is not `Name <email>`, which fails `--strict` on 0.6 repositories, the examples, and the meta bundle, and flags true values. | WP-03, WP-06, WP-14 | **Decided** 2026-10-26: placeholders only, as above. |
+| D-72 | What does a Project under the personal ontology get? | The same fixed concept as a personal Domain, boundaries (Project-specific prohibitions), and nothing else; other concepts are defined with the user. A Project's ontology is chosen independently of its Domain's (`--ontology`, default `sdlc`), so a personal Domain can hold industry-ontology Projects; this applies only to a Project created with `--ontology personal`. | WP-03 | **Decided** 2026-10-26: as recommended (built in WP-03). |
+| D-73 | The ontology manifest still says "domain" (`domain-manifest.yaml`, the `domain:` key, `scs validate --domain`, RFC 0001's "Domain Ontology"). | Keep for 0.7; a rename is a schema change for a later RFC. Scope if done: the manifest file name, the schema and its `domain:` key, the three reference ontologies, `scs validate --domain` (kept as an alias), RFC 0001 terminology, and reading the old name for compatibility. | none | **Decided** 2026-10-26: keep for 0.7. |
+| D-74 | Which ontology does `scs new project` use when `--ontology` is not given? | Today `sdlc`, whatever the Domain's ontology, so `scs new project groceries` in a personal Domain scaffolds a full SDLC Project. Rec.: inherit the Domain's ontology (its `.scs/config` `ontology`) unless `--ontology` is given; `--ontology` still selects any ontology, so a personal Domain can hold an `sdlc` Project. Raised by D-72. | WP-06 | **Decided** 2026-10-26: inherit the Domain's ontology. |
+| D-75 | What does `scs bundle remove-scd` do with the SCD file? | Deletes it when no other working bundle in the workspace lists it, listed in `changes` as `delete`; versions keep it at their tags. Otherwise only the bundle's `scds` entry is removed. Retiring an SCD is still removing it from its bundle (RFC §7). | WP-06 | **Decided** 2026-10-26: as recommended. |
+| D-76 | Does `scs add bundle NAME --new` (D-68) also import the new concept? | Yes: the same run adds `bundle:NAME` (unpinned) to the workspace's root bundle's imports, listed in `changes`, so one command leaves the workspace consistent. Mirrors D-69. | WP-06 | **Decided** 2026-10-26: as recommended. |
+| D-77 | How does `scs intake set` take values? | `scs intake set FIELD VALUE`, VALUE parsed as YAML (`-` reads stdin). For an id-keyed list (`answers` and `source_documents` by `id`, `approvers` by `person`) a single object is upserted: it replaces the entry with the same key or is appended. A list, or any other field, replaces the value. The record is validated before writing; `review_findings` is written only by `record-finding`. | WP-07 | **Decided** 2026-10-26: as recommended. |
+| D-78 | How are approvers written in `intake.yaml`? | `{person, role}`: `person` is a person identifier (`Name <email>`) or `role:<name>` (D-28), `role` an optional job title. Every person field in the record uses the identifier form. RFC §4 example amended to match. | WP-07 | **Decided** 2026-10-26: as recommended. |
+| D-79 | Where does the release candidate go? | TestPyPI, plus skill ZIPs with the wheels bundled for Claude (claude.ai), which cannot reach TestPyPI. Nothing goes to PyPI until 0.7.0 itself; WP-11rc's install check runs against TestPyPI. `.github/workflows/publish.yml` uploads to either index by trusted publishing. | WP-11rc | **Decided** 2026-10-28 by Tim: keep 0.7 off PyPI for now. |
+| D-80 | How is 0.7 accepted (WP-13)? | Two real scenarios on the Omarchy box through Claude Code with the skills only: a personal Domain (`boat-context`, Project `docs-server`, `personal` ontology, built up from conversation) and an organization Domain (`cdmo-context`, Project `timekeeping`, `cdmo` ontology, trimmed down). Tim approves the versions. No 0.6 baseline (WP-13a dropped); WP-13 passes with no unresolved blocker in its own friction log. | WP-13 | **Decided** 2026-10-29 by Tim. |
+
+## H. Skills by workspace and stage (rc2, 2026-11-02)
+
+From the first run of WP-13 Test 2 (CDMO), stopped after review. Evidence: the friction log and
+transcript of that run, kept out of this repository because they contain client material. The
+run's one blocker: no step told the user to provide documents or where to put them. The
+intake also asked every question in one message, assumed the Project's ontology, never asked
+who the people were, and set up the Domain and the Project in one session. Project work started
+on an unreleased Domain without a warning, and the agent kept the process status in Claude Code
+memory and committed with plain `git`. Drafting and review went well, and they become the
+procedures underneath the new skills.
+
+| ID | Question | Rec. | Blocks | RFC | Decision |
+|---|---|---|---|---|---|
+| D-81 | How are the skills organized? | Four skills, by workspace and stage: `scs-domain` (init or update, chosen from `scs status`), `scs-project` (init or update), `scs-validate` (a Domain, or a Domain plus one Project), `scs-explain`. Each runs as its own session with a clear start and end: an init ends with a released version; an update starts from what changed and ends with a new version. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-82 | What happens to `scs-intake`, `scs-draft`, `scs-review`, `scs-version`, `scs-compile`? | Their procedures become shared reference files, synced by `skills/sync.py` into `scs-domain` and `scs-project` like `scs_engine.py`; they stop being installable on their own. Users get one way in per workspace. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-83 | Where does process state live? | In the repository, derived on demand by a new read-only command, `scs status [--workspace]` (machine mode): intake fields filled per profile, documents in `sources/` and whether recorded, template placeholders left, open and deferred findings, version (`DRAFT` or last tag, changes since), whether `dist/` matches the version, and for a Project the Domain's latest released version. No stored progress field. Client memory is a convenience only; when it disagrees with the repository, the repository wins. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-84 | How are intake and draft changes committed? | A new engine command, `scs commit --workspace <ws> --message <m> --author "Name <email>"`, with `--dry-run` listing the files and message. It commits only that workspace's paths, with the author the user names (rule 5 applies). Skills never run `git` directly. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-85 | How does a session start? | With a welcome: the stages ahead and roughly how long each takes; what to have ready (documents, the people who hold the answers); that rough answers are fine; and how to stop and pick up again (everything is in the repository; run the same skill again). A resumed or update session reads `scs status` first and says what is done and what is open. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-86 | How do source documents get in? (Test 2 blocker) | `scs new domain` and `scs new project` create `sources/` with a short README in each workspace (still gitignored, D-59). Before any profile question, the skill asks what documents the user already has, gives the exact `sources/` path, and waits until they are there; it records each with `scs intake set source_documents`, reads it, and proposes answers from it. A document shared by the Domain and a Project lives once in `domain/sources/` and the Project records it by a path relative to its workspace. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-87 | Who are the people? | The Domain asks for leadership and key roles (CEO, CTO, CISO, Head of Quality, or "nobody"); the Project asks for the team (project manager, product manager, lead architect, security, QA, test). The agent proposes people from the documents and asks the user to confirm and fill gaps before drafting. In 0.7 they are recorded as intake answers; roles as fields wait for the 0.8 roles RFC. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-88 | How are questions paced? | One at a time, or in small related groups, after proposing answers from the documents. The Project's ontology is always asked, with the reason (QMS software or not), never assumed. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-89 | How does a Project depend on its Domain? | One way only. `scs-domain` reads only `domain/`. `scs-project` init stops when the repository has a Domain with no released version. Project review and validation load the Domain's latest released version and judge the two together; a finding against a Domain rule is recorded in the Project as a question for the Domain owner, never as a Domain change in a Project session. Project update and validate report when the Domain has a newer version than the one last reviewed. | WP-10b | | **Decided** 2026-11-02 by Tim. |
+| D-90 | Does a Project record the Domain version it was reviewed against? | Yes, as a reference (`bundle:<domain>@<version>`) in the Project manifest, not an import. A schema change, so RFC: in the 0.8 roles RFC, or fast-tracked. Until then `scs status` compares against the Domain's latest tag, and the review records the version it used in the finding. | | RFC | Open. |
+| D-91 | Smaller fixes from Test 2 | `scs new project` makes its commit like `scs new domain`; the `sdlc` scaffold drops healthcare templates (`hipaa-compliance`, `tefca-participation`, `chai-adherence`) to an industry layer; the drafting procedure writes a scope limit ("not in the first release") as a fact or directive, never a prohibition. | WP-10b | | **Decided** 2026-11-02 by Tim: all three. |
+| D-92 | Who is accountable for each section? | Every concept bundle, and a Project bundle that lists SCDs directly, names an owner role (`owner: quality`): the person accountable for that section, who reviews and approves it. The role is part of the bundle, so it is in the content digest and changing it needs a new version. The workspace's `intake.yaml` maps each role to a person (`owners`: role, person, title), outside the digest, so a change of person needs no new version. The ontology templates give each concept a default role; the intake can rename or merge roles, and a personal Domain uses one role, `owner`. A working bundle with no owner, or whose role is not mapped, is info in validation (a fresh scaffold passes `--strict`) and an error at `scs bundle version`; the latest released version of a section whose role no one holds now is a warning, so `--strict` catches a released section without an accountable person. Set with `scs bundle set-owner` and `scs intake set owners`; the people step of both skills asks for them. Partly supersedes D-87 (roles as fields). | WP-13 | | **Decided** 2026-11-07 by Tim: in 0.7.0, without an RFC. Amended 2026-11-08 by Tim: an owner's person is a name, the email optional (the rc4 harness showed an email request per owner breaking pacing); whoever releases a version is always `Name <email>`. |
+
+Observations from the same run, not decided: review checks only whether rules are too loose,
+never whether they block the work (an `over-restriction` finding, and how to measure it); a
+strict check that every compiled item has `derived_from`; rendering a bundle as a docs site for
+reviewers who do not read YAML.
+
+## RFC amendments implied
+
+Applied to RFC 0002 on 2026-10-25 as one amendment covering WP-01a and WP-01b: §1 (D-08), §3
+(D-09, D-12, D-42), §4 (D-07, D-28, D-35), §6 (D-44), §7 (D-08, D-41), §9 (D-01, D-02, D-03,
+D-04, D-05, D-15, D-38, D-40, D-52, D-55, D-57, D-58, D-59), §11 (D-16, D-39, D-53, D-57),
+Schema Changes (D-28, D-36, D-47, D-49), Validation Rules (D-03, D-20, D-36, D-39, D-54),
+Unresolved Questions (D-01, D-25, D-26, D-27, D-28, D-29, D-30, D-31), Implementation Notes,
+and Migration Guide (D-04, D-54). §2 is unchanged (D-08 option 2 was not chosen).
+
+Applied to RFC 0002 on 2026-10-26: §1, §12, §13, Validation Rules, Implementation Notes (D-67);
+Motivation, Guide-level Explanation, §4, §5, §9, Implementation Notes, Migration Guide, and
+Unresolved Questions (D-61 to D-64, D-66, D-68 to D-73).
+
+Applied to RFC 0002 on 2026-10-26: §4 example approvers (D-78), and its IEC 62304 citation corrected to the citations.md form (`std:iec-62304:2006-a1`).

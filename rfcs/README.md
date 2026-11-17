@@ -136,7 +136,7 @@ Be open to revising your proposal based on community input. The best RFCs evolve
 
 ## Questions?
 
-- Review the [GOVERNANCE.md](../GOVERNANCE.md) for the full RFC process
+- Review [CONTRIBUTING.md](../CONTRIBUTING.md) for how to contribute
 - Open a GitHub Discussion if you're unsure whether to write an RFC
 - Look at accepted RFCs as examples (once some exist)
 

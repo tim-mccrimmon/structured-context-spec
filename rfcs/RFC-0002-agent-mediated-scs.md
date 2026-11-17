@@ -5,6 +5,26 @@
 - **Tracking Issue**: `ISSUES.md` ISS-042 – ISS-055
 - **Author(s)**: Tim McCrimmon (@tim-mccrimmon)
 - **Status**: Accepted (2026-10-25; comment period waived by the maintainer)
+- **Amended**: 2026-10-25: workspaces reserve directory and bundle names for a later release
+  (section 9). 2026-10-25: build plan decisions (`plan/0.7/07-decisions-and-gaps.md`): engine
+  commands for maintenance, git effects in the envelope, intake writers, layout corrections,
+  whole-workspace version commits, the tag as the record of a version, and resolved questions
+  (sections 1, 3, 4, 6, 7, 9, 11, Schema Changes, Validation Rules, Unresolved Questions,
+  Migration Guide). 2026-10-26: layered context: `scs stack` previews and checks an ordered
+  stack of compiled artifacts, and the advisory review covers conflicts between layers
+  (sections 1, 12, 13, Validation Rules, Implementation Notes). 2026-10-26: ontologies,
+  templates, and identity (`plan/0.7/07-decisions-and-gaps.md` D-60 to D-73): `personal` is an
+  ontology, identity is provenance only, templates are chosen by ontology and workspace kind,
+  provenance is corrected at validation and versioning (Motivation, Guide-level Explanation,
+  sections 4, 5, 9, Implementation Notes, Migration Guide, Unresolved Questions). 2026-10-26:
+  empty SCDs are reported as `SCD_EMPTY` (info) and listed before versioning; stub detection is
+  removed (plan D-70; Validation Rules, Unresolved Questions). 2026-10-26: only placeholder
+  provenance is reported, versioning refuses it, and `scs new` stops inventing an author (plan
+  D-71; section 5, Validation Rules, Unresolved Questions). 2026-10-26: a `personal` Project
+  gets boundaries only (plan D-72; Unresolved Questions); a Project inherits the Domain's
+  ontology unless `--ontology` is given (plan D-74). 2026-10-26: one engine command creates a
+  concept with no template, removing a concept's last SCD removes the concept, and the ontology
+  manifest keeps its name for 0.7 (plan D-68, D-69, D-73; Unresolved Questions)
 - **Target**: SCS 0.7.0 (additive; no breaking changes to SCDs or bundles)
 
 ---
@@ -110,8 +130,8 @@ independence is right for compilation, but nothing ties a Project to its Domain,
 Project without one is possible, which leaves an individual developer's projects with no
 common rules at all. A Domain is the capacity someone works in, not the person: the same
 developer works under a personal Domain on their own projects and under their company's
-Domain on company work. For a single developer, the personal Domain may hold only their name,
-the fact that the work is personal, and a few rules they want everywhere.
+Domain on company work. For a single developer, the personal Domain may hold only a few rules
+they want everywhere.
 
 **Domain and Project context are placed differently.** The reason to keep Domain and Project
 context apart at all is that AI services read them from different places. Claude Enterprise,
@@ -152,9 +172,9 @@ A solo developer:
 >
 > **User:** No.
 >
-> **Agent:** Then I'll set one up first, in a new repo, `jdoe-context`: your name, the fact
-> that this is personal work, and any rules you want on every project. Anything you never
-> want an AI tool to do, on any of your work?
+> **Agent:** Then I'll set one up first, in a new repo, `jdoe-context`, with the personal
+> ontology: the rules you want on every project. Anything you never want an AI tool to do, on
+> any of your work?
 >
 > **User:** Never commit secrets or API keys.
 >
@@ -264,7 +284,9 @@ recorded, so the record shows the question was raised and who answered it.
 
 SCS covers one person working in one Domain repository at a time: creating, maintaining,
 validating, versioning, and compiling bundles. It stops at the versioned bundle and its
-compiled artifact. Placing artifacts, review by several people, approval workflows, shared
+compiled artifact. It can also show what several compiled artifacts look like together, the
+way an AI client loads them in layers, and point out where they conflict; it reads those
+artifacts and changes nothing. Placing artifacts, review by several people, approval workflows, shared
 registries, hosting, and runtime serving of context are outside SCS. If a user asks for
 those, the agent says they are outside what SCS does.
 
@@ -280,10 +302,10 @@ The agent interface MUST be limited to these operations on a local Domain reposi
 | Area | Operations |
 |---|---|
 | Create | Intake; create the Domain repository; scaffold Domain and Project workspaces; draft SCDs from conversation or source documents |
-| Maintain | Add, edit, retire, and re-scope SCDs; add concept bundles; explain existing context in plain language |
+| Maintain | Add, edit, retire, and re-scope SCDs; add concept bundles; explain existing context in plain language. Each write is an engine command: `scs scd write` (content on stdin), `scs bundle add-scd`, `remove-scd`, `add-import`, `pin`. Retiring an SCD is removing it from its bundle. |
 | Validate | Run the validator; explain results; propose fixes |
 | Version | Pin imports; version bundles; record approver and notes |
-| Compile | Produce the runtime artifact defined in [runtime-artifact.md](../spec/0.6/runtime-artifact.md) |
+| Compile | Produce the runtime artifact defined in [runtime-artifact.md](../spec/0.7/runtime-artifact.md); preview and check a stack of compiled artifacts (section 13) |
 
 SCS's output ends at a validated, versioned bundle and its compiled artifact. Placing
 artifacts where AI services read them (section 10), multi-user review, approval workflows,
@@ -328,36 +350,50 @@ Every `scs` command an agent uses MUST accept `--json`. In machine mode a comman
   such as `git config user.email` MAY be offered as suggestions in the result, never applied.
 - MUST write a single JSON object to stdout, and nothing else to stdout.
 - MUST keep the existing exit codes (`0` ok, `1` errors, `2` warnings in strict mode, `3` bad
-  arguments, `4` file error, `5` internal error).
+  arguments or no input, `4` file error (missing, unreadable, or unwritable file), `5` internal
+  error).
+
+Workspace-scoped commands take `--workspace <domain|name>`. Without it, the workspace is the
+nearest `.scs/config` above the current directory; at the repository root without it, the
+command fails with `WORKSPACE_REQUIRED`.
 
 Result envelope:
 
 ```json
 {
   "scs_version": "0.7.0",
+  "tools_version": "0.7.0",
   "command": "bundle version",
   "ok": false,
   "exit_code": 1,
-  "changes": [
-    {"action": "create", "path": "bundles/concepts/design-controls-v1.0.0-MANIFEST.yaml"}
-  ],
+  "changes": [],
   "diagnostics": [
     {
       "severity": "error",
       "code": "VERSION_APPROVER_REQUIRED",
       "message": "An approver is required to version a bundle.",
-      "path": "bundles/concepts/design-controls.yaml",
-      "suggestion": {"approved_by": "jane@medtech-cdmo.example"}
+      "path": "domain/bundles/concepts/design-controls.yaml",
+      "suggestion": {"approved_by": "Jane Doe <jane@medtech-cdmo.example>"}
     }
   ],
   "result": {}
 }
 ```
 
-`changes` lists every file the command created, modified, or deleted. A command run with
-`--dry-run` MUST return the same `changes` without writing, so the agent can show the user
-what will happen before it happens. `scs-validate --output json` already exists; its report
-SHOULD be carried in `result` unchanged, with its findings mapped into `diagnostics`.
+`scs_version` is the spec version; `tools_version` is the engine package version. Paths are
+POSIX, relative to the Domain repository root. `diagnostics[].severity` is `error`, `warning`,
+or `info`; `info` never changes the exit code. Every `code` is registered in
+`schema/diagnostics/codes.yaml`.
+
+`changes` lists every effect of the command. File effects are `create`, `modify`, and `delete`,
+each with a `path`, and list only files the command itself wrote. Git effects are `git-init`,
+`git-commit`, and `git-tag`, each with a `ref`; a `git-commit` entry also carries
+`paths: [{path, status}]` (status `A`, `M`, or `D`) for everything the commit contains,
+including edits made earlier and committed with it (section 9). On `ok: false`, `changes`
+lists what remains after rollback, normally nothing. A command run with `--dry-run` MUST return
+the same `changes` the real run would, and change nothing, so the agent can show the user what
+will happen before it happens. `scs-validate --output json` already exists; its report SHOULD
+be carried in `result` unchanged, with its findings mapped into `diagnostics`.
 
 ### 4. Intake
 
@@ -378,18 +414,21 @@ be built before any Project workspace in it.
 | `domain` | The existing Domain repository to work in, or `new` |
 | `workspace` | `domain`, or the name of a Project (new or existing) |
 | `regulated` | yes/no; if yes, which frameworks |
-| `ontology` | `sdlc`, `cdmo`, `mca`, or none (proposed from the above, confirmed by the user) |
+| `ontology` | `sdlc`, `cdmo`, `mca`, or `personal` (proposed from the above, confirmed by the user) |
 
-**Personal Domain profile** (`audience: individual`, `workspace: domain`)
+**Personal Domain profile** (`audience: individual`, `workspace: domain`, usually with the
+`personal` ontology)
 
 | Field | Purpose |
 |---|---|
-| `owner` | The developer's name and contact, and the capacity the Domain covers (for example, personal use only) |
+| `owner` | The developer's person identifier, `Name <email>`. Provenance only (section 5): it attributes the workspace's records and is never compiled |
 | `boundaries` | What no AI tool should do on any of their work; the source of personal prohibitions |
 | `practices` | Habits they want applied everywhere (languages, testing, commit style) |
 
-A personal Domain is deliberately small. It MAY consist of only the owner fact and a few
-prohibitions.
+A personal Domain is deliberately small. It MAY consist of only a few prohibitions. The
+`personal` ontology has one fixed concept, boundaries; everything else in a person's context is
+particular to them, so the agent defines those concepts with the user rather than starting from
+templates (section 9).
 
 **Organization profile** (`audience: organization`, or `regulated: yes`)
 
@@ -414,7 +453,16 @@ prohibitions.
 workspace they apply to (`domain/intake.yaml`, `projects/<name>/intake.yaml`), so
 the intake can be resumed, revisited when circumstances change, and audited. The record is
 not an SCD and is not compiled. It is validated against a new schema,
-`schema/intake.schema.json`.
+`schema/intake/intake-schema.json`. The engine commands `scs intake set` and
+`scs intake record-finding` (both with `--dry-run`) are its only writers; the agent does not
+edit the file directly. `scs intake set FIELD VALUE` sets one field; an object given for `answers`,
+`source_documents`, or `approvers` replaces the entry with the same `id` (`person` for
+approvers) or is appended.
+
+People in the record are identified as `Name <email>`. For a repository that will be shared
+publicly, the record MAY use role-only attribution instead, written `role:<name>` (for example
+`role:quality-manager`). Role-only attribution is allowed in `intake.yaml` only; a version
+manifest's approver is always a person.
 
 ```yaml
 intake_version: "1.0"
@@ -428,18 +476,17 @@ organization:
   products: [catheters, implantable leads]
 certifications:
   - std:iso-13485:2016
-  - std:iec-62304:2006+A1:2015
+  - std:iec-62304:2006-a1
   - std:21-cfr-820
   - std:iso-14971:2019
 approvers:
-  - name: Jane Doe
+  - person: Jane Doe <jane@medtech-cdmo.example>
     role: Quality Manager
-    email: jane@medtech-cdmo.example
 answers:
   - id: q-boundaries-1
     question: "Is there anything AI tools must never do with design history files?"
     answer: "Never edit a released DHF record; drafts only."
-    answered_by: jane@medtech-cdmo.example
+    answered_by: Jane Doe <jane@medtech-cdmo.example>
     answered_at: 2026-10-20T14:12:00Z
 source_documents:
   - id: doc-qm
@@ -453,7 +500,7 @@ review_findings:
     cites: [std:21-cfr-820]
     decision: changed
     rationale: "Changed to draft-for-approval."
-    decided_by: jane@medtech-cdmo.example
+    decided_by: Jane Doe <jane@medtech-cdmo.example>
     decided_at: 2026-10-20T14:40:00Z
 ```
 
@@ -478,6 +525,19 @@ content:
         - source: doc-qm
           locator: "section 4.2.5"
 ```
+
+**Identity.** A person's identity in SCS is provenance only: a person identifier,
+`Name <email>`, in provenance fields (`provenance.created_by`, `approval.approved_by`, and the
+intake record). It is not a concept or an SCD, and it is never compiled. `approval.approved_by`
+MUST be a person identifier; `created_by` MAY instead name a team or organization.
+
+**When provenance must be right.** Provenance is read at validation and versioning, so that is
+where it MUST be correct. A scaffold or draft need not be final; the tools report placeholder
+provenance, and the agent corrects it with the user before a version is made. The tools MUST NOT
+invent provenance: `scs new` offers the git identity only as a suggestion and otherwise requires
+`--author` and `--email`. A
+value that was never true, such as a placeholder, is corrected; a true value is never replaced
+(the person who created an SCD is not necessarily the person who approves a version).
 
 The name `derived_from` avoids colliding with the existing SCD-level `provenance` object
 (`created_by`, `created_at`, `rationale`), which records who created the SCD. `derived_from`
@@ -504,22 +564,32 @@ A conforming agent interface:
    where the artifact belongs for their AI service, using the placement guide (section 10),
    and leave placing it to the user.
 
+Versioning a root bundle usually means versioning its concept bundles first, bottom-up,
+re-pinning as each is versioned. One confirmation MAY cover that cascade (items 1 and 2) if,
+before asking, the agent shows a cascade plan listing every snapshot, manifest, pin, commit,
+and tag, and the confirmation names the approver. The agent then runs each step's `--dry-run`
+and stops if a result differs from the plan.
+
 ### 7. Change summary
 
 A new command, `scs bundle diff <bundle> [--from <version>] [--to <version|working>]`, MUST
 produce a deterministic summary of what changed between two versions of a bundle, or between
-a version and the working tree: SCDs added, removed, or retired; prohibitions, directives,
-and facts added, removed, or changed; citations added or removed; imports re-pinned. With
-`--json` it returns the structured diff. The agent uses it to show the user what they are
-approving. Because it is deterministic, the summary of a change does not depend on the
-model.
+a version and the working tree: SCDs added or removed (a retired SCD is a removed one);
+prohibitions, directives, and facts added, removed, or changed; citations added or removed;
+imports re-pinned. With `--json` it returns the structured diff. The agent uses it to show the
+user what they are approving. Because it is deterministic, the summary of a change does not
+depend on the model.
+
+The content of a version is read from its tag (section 11). By default `--from` is the latest
+version and `--to` is `working`. A bundle with no version diffs from empty, so everything is
+added. A `--from` version with no tag is an error (`DIFF_VERSION_NOT_FOUND`).
 
 ### 8. Drafting from source documents
 
 When the user provides source documents, the agent MAY draft SCD items from them. Each item
 drafted from a document MUST carry a `derived_from` entry naming the document, and SHOULD carry
 a locator. The agent MUST NOT copy standard text into SCDs; citations remain `std:`
-references (see [citations.md](../spec/0.6/citations.md)). Source documents stay in the
+references (see [citations.md](../spec/0.7/citations.md)). Source documents stay in the
 user's workspace; the interface MUST NOT send them anywhere other than the user's own AI
 client.
 
@@ -548,27 +618,58 @@ Layout, building on what `scs new` scaffolds in 0.6.0:
 ```
 medtech-cdmo-context/
 ├── AGENTS.md                      # agent instructions: purpose and boundaries of this repo
+├── CLAUDE.md                      # pointer to AGENTS.md
+├── .gitignore                     # ignores sources/ by default
+├── .gitattributes                 # * text eol=lf
 ├── .github/workflows/scs-validate.yml
 ├── domain/
-│   ├── .scs/config                # workspace marker (bundle_type, name, ontology, scs_version)
+│   ├── .scs/config                # workspace marker (bundle_type, name, ontology, scs_version, tools_version)
 │   ├── intake.yaml                # intake record (section 4)
+│   ├── ontology/
+│   │   └── domain-manifest.yaml   # ontology manifest (0.6: domain/domain-manifest.yaml)
 │   ├── bundles/
 │   │   ├── domain-bundle.yaml
 │   │   └── concepts/
-│   ├── context/                   # SCDs
+│   ├── context/
+│   │   └── project/               # SCDs
 │   ├── sources/                   # optional source documents (section 8)
 │   └── dist/                      # compiled artifacts
 └── projects/
     └── infusion-pump-fw/
         ├── .scs/config
         ├── intake.yaml
+        ├── ontology/
         ├── bundles/
         │   ├── project-bundle.yaml
         │   └── concepts/
         ├── context/
+        │   └── project/
         ├── sources/
         └── dist/
 ```
+
+A workspace's name is `domain` for the Domain workspace and the directory name under
+`projects/` for a Project; the `name` in its `.scs/config` MUST match. The ontology manifest
+moves from `domain/domain-manifest.yaml` to `ontology/domain-manifest.yaml`, since a Domain
+workspace already lives in `domain/`; the 0.6 location is still read, with an info diagnostic.
+`scs new domain` initializes git and makes an initial commit.
+
+**Templates.** The scaffold chooses concept bundles and SCD templates by two things only: the
+ontology (`sdlc`, `cdmo`, `mca`, `personal`, and others added later) and the workspace kind
+(Domain or Project). Each ontology provides one set for a Domain workspace and one for a Project
+workspace; there are no further variants by user type. The scaffold cannot know which of them a
+user needs, so it supplies the set and the agent removes, with the user, what does not apply,
+through engine commands (section 1). The `personal` ontology supplies only its fixed concept,
+boundaries; the agent creates the user's other concepts with the user.
+
+**Source documents.** The scaffold's `.gitignore` ignores `sources/`, so source documents stay
+local (section 8) unless the user chooses to track them. `derived_from` still names the
+document. The compiler never reads `sources/`, so ignoring it does not affect rebuilding a
+version.
+
+**Reserved directories.** `plan/`, `test-plan/`, and `qa/` are reserved in every workspace
+for use by a later release. 0.7 defines no content for them, the scaffold does not create
+them, and the validator and compiler do not read them.
 
 **Agent instructions.** The scaffold MUST generate an agent instructions file stating that the
 repository manages SCS context for one named Domain and its Projects, that work in it is
@@ -578,20 +679,46 @@ SHOULD confine its changes to that workspace. `AGENTS.md` is the default; the sc
 also generate a client-specific file (for example `CLAUDE.md`) that points to it, for clients
 that read only their own file.
 
-**Versioning.** Bundle versions MUST be recorded as git tags in the Domain repository. Because
-several workspaces, and their concept bundles, are versioned in one repository, tags MUST be
-qualified by workspace and bundle name: `<workspace>/<bundle-name>-v<version>`, where
-`<workspace>` is `domain` or the Project name (for example `domain/company-v1.0.0`,
-`infusion-pump-fw/design-controls-v1.0.0`). Version manifests MUST be named the same way, so
-no two bundles share a manifest file (ISS-043).
+**Versioning.** Each bundle is versioned on its own. Bundle versions MUST be recorded as git
+tags in the Domain repository. Because several workspaces, and their concept bundles, are
+versioned in one repository, tags MUST be qualified by workspace and bundle name:
+`<workspace>/<bundle-name>-v<version>`, where `<workspace>` is `domain` or the Project name
+(for example `domain/company-v1.0.0`, `infusion-pump-fw/design-controls-v1.0.0`). Version
+manifests MUST be named `<bundle-name>-v<version>-MANIFEST.yaml`, and snapshots
+`<bundle-name>-v<version>.yaml`, in the bundle's directory; the location supplies the
+workspace, so no two bundles share a manifest file (ISS-043). The bundle names `plan`,
+`test-plan`, and `qa` are reserved for a later release, so its tags cannot collide with a
+bundle's.
+
+`scs bundle version`:
+
+- commits everything under the workspace directory except `dist/`, including deletions, and
+  nothing outside it, then creates an annotated tag on that commit. Edits made earlier in the
+  same workspace are committed with the version; the dry run lists them. Because the tagged
+  commit holds every compiler input, any version can be rebuilt from its tag;
+- refuses if a file the digest or the compiler reads is ignored or untracked
+  (`VERSION_INPUT_UNTRACKED`), or if git is not available (`GIT_REQUIRED`). There is no
+  `--no-git` and no `--force`; an existing version is never rewritten (`VERSION_EXISTS`);
+- refuses if an import is unpinned or `DRAFT` (`VERSION_IMPORT_NOT_PINNED`);
+- records the approver as the commit's author. The committer and the tagger are the fixed
+  identity `scs-tools <noreply@scs.invalid>`. Neither identity is read from the environment,
+  and the engine overrides the user's commit and tag signing, hooks, and line-ending settings
+  for its own commit and tag;
+- on failure at any step, undoes what that run wrote, leaving the working tree, index, and refs
+  as they were.
+
+The working bundle file stays `DRAFT` after versioning; the released copy is the snapshot.
 
 **Compiled output.** `scs compile` SHOULD write to the workspace's `dist/` directory, named
-`<bundle-name>-<version>.yaml`. Whether `dist/` is committed is the user's choice; every
-artifact can be rebuilt from its tag.
+`<bundle-name>-<version>.yaml`. `scs compile BUNDLE --version V` compiles the released version
+V; without `--version`, it compiles the working `DRAFT` and requires `--allow-draft`. Whether
+`dist/` is committed is the user's choice; every artifact can be rebuilt from its tag.
 
 **CI.** The scaffold SHOULD generate a CI workflow that validates the Domain workspace and every
-Project workspace with `scs-validate --strict` on every push. GitHub Actions is the default;
-the workflow is a convenience, not a requirement of conformance.
+Project workspace with `scs-validate --strict` on every push. Validation reads tags (section
+11), so the workflow MUST fetch full history and tags (for GitHub Actions, `fetch-depth: 0`).
+GitHub Actions is the default; the workflow is a convenience, not a requirement of
+conformance.
 
 ### 10. Placement
 
@@ -610,7 +737,7 @@ current documentation when written or updated, since these conventions change. S
 use it to advise the user after compiling.
 
 Every compiled artifact already identifies its bundle and version, and carries a
-self-identification rule (see [runtime-artifact.md](../spec/0.6/runtime-artifact.md) §3), so
+self-identification rule (see [runtime-artifact.md](../spec/0.7/runtime-artifact.md) §3), so
 a user or an agent can always tell which version is in place. With section 11 it also carries
 the source digest, so a rendering can be checked against the exact content it came from. The
 placement guide SHOULD recommend that renderings keep the bundle id, version, and digest.
@@ -618,6 +745,13 @@ placement guide SHOULD recommend that renderings keep the bundle id, version, an
 ### 11. Verifiable immutability
 
 A versioned bundle MUST be verifiably unchanged after it is versioned.
+
+**The tag is the record.** A version of a bundle is its tag,
+`<workspace>/<bundle-name>-v<version>`, on a commit that holds the whole workspace except
+`dist/` (section 9). The version manifest at that tag records the approver, the validation
+result, and the `content_digest`. Verification reads the tagged content and the tagged
+manifest, never only the working tree, so editing a manifest in place cannot vouch for changed
+content.
 
 **Content digest.** `scs bundle version` MUST compute a `content_digest` over the bundle's
 full resolved content and record it in the version manifest:
@@ -628,27 +762,52 @@ full resolved content and record it in the version manifest:
 
 Each file is parsed and serialized canonically before hashing: JSON with sorted keys, no
 insignificant whitespace, and non-ASCII characters unescaped, as
-[runtime-artifact.md](../spec/0.6/runtime-artifact.md) §3.6 does for artifacts. Inputs are
+[runtime-artifact.md](../spec/0.7/runtime-artifact.md) §3.6 does for artifacts. Inputs are
 hashed in a fixed order (the manifest, then SCDs by id, then imports by id). The digest is
 SHA-256, written `sha256:<hex>`. Because files are parsed first, edits to comments or
 formatting do not change the digest; edits to content do.
 
-**Verification.**
+**Verification.** Run at the root of a Domain repository, `scs-validate` MUST make three
+checks, each an error in every mode:
 
-- `scs-validate`, given a versioned bundle, MUST recompute the digest and report a mismatch as
-  an error in every mode. The diagnostic SHOULD name the files whose content changed.
-- `scs compile` MUST verify the digest before compiling a versioned bundle, and MUST refuse on
-  a mismatch. There is no override; a changed bundle needs a new version.
+1. **Every version tag.** The digest recomputed from the tagged content equals the tagged
+   manifest's `content_digest`, and each pinned import's manifest at that commit equals the
+   import's own tagged manifest. A workspace-qualified tag with no manifest at the tag
+   (`VERSION_MANIFEST_MISSING`), and a manifest carrying `content_digest` with no qualified tag
+   (`VERSION_TAG_MISSING`), are errors.
+2. **Working copies of versions in use.** For each version pinned by a working bundle, and the
+   latest version of each bundle whose working file exists, the working manifest and snapshot
+   equal their tagged copies, compared by git blob id (`MANIFEST_ALTERED`). Versions of a
+   removed bundle are history, still covered by check 1.
+3. **Drift.** Each pinned import of a working bundle matches its tagged content
+   (`CONTENT_DIGEST_MISMATCH`). The diagnostic SHOULD name the files whose content changed and
+   the bundles to version again.
+
+Because all three read tags, repository mode on a shallow clone is an error
+(`GIT_HISTORY_INCOMPLETE`). `scs-validate --verify-version <tag>` checks one version on
+request.
+
+- `scs compile` MUST run these checks for the tree it compiles, including when the root is
+  `DRAFT`, and MUST refuse on a failure. There is no override; a changed bundle needs a new
+  version. `scs compile --version V` compiles V's tagged snapshot.
 - `scs bundle version` MUST record `validation_passed` and `approval_status` from what actually
-  happened. Under `--no-validate` it records `validation_passed: false`.
+  happened. `--no-validate` skips content validation (schemas and rules) only; the integrity
+  checks above always run, and the manifest records `validation_passed: false`.
+
+**Boundary.** Git allows anyone with write access to delete and recreate a tag. These checks
+detect change that was not recorded as a new version; they do not defend against someone who
+rewrites both the content and the tag. Signed tags are out of scope for 0.7. Protecting
+version tags on the shared remote (for example with tag protection rules) is the adopter's
+responsibility.
 
 **In the artifact.** The compiled artifact gains a `source_digest` field holding the root
 bundle's `content_digest`. It is derived from content, so it does not conflict with the
 stability rules in `runtime-artifact.md` §3.5. A `DRAFT` compile has no `content_digest` and
 omits the field; its `DRAFT+<digest>` version already distinguishes drafts.
 
-**Git tags** remain the way versions are found, not the guarantee. The digest is what a reader
-checks.
+Compiling at a checkout of a version's tag, with the `tools_version` its manifest records,
+gives an artifact with the same `source_digest` and the same content as the original, apart
+from the fields `runtime-artifact.md` §3.5 declares variable.
 
 ### 12. Advisory review
 
@@ -663,6 +822,7 @@ categories:
 | `missing-protection` | No prohibition or directive covering something the intake says is present (PHI, payment data, safety-class C software) |
 | `technical-risk` | A rule that weakens security, auditability, or traceability (disabling logging, sharing credentials) |
 | `ethical-risk` | A rule that could cause harm, deception, or unfair treatment of people |
+| `layer-conflict` | A rule that contradicts a rule in another layer of the stack the user loads it with (section 13) |
 
 Rules for findings:
 
@@ -681,9 +841,65 @@ In this RFC the review is driven by the agent's own judgment, guided by the skil
 proposes *review profiles*: declarative, citable checks per framework (for example CHAI, HIPAA,
 ISO 13485) that make the review consistent across clients and auditable in its own right.
 
+### 13. Layered context
+
+Domain and Project bundles are independent: neither imports the other, and each compiles to
+its own artifact (section 9). AI clients, however, often load several artifacts at once, in
+layers. A developer with several Domains might place one artifact where every session reads it,
+an area's Domain artifact where sessions in that area read it, and a Project artifact in the
+project's repository; the client loads all three, outermost first. Each artifact validates on
+its own, but nothing in SCS so far shows what a session receives when they are combined, or
+whether they disagree.
+
+A **stack** is an ordered list of compiled artifacts, outermost layer first. SCS does not know
+where artifacts are placed (section 10), so the user or the agent supplies the stack.
+
+`scs stack ARTIFACT...` reads the artifacts in the order given and reports:
+
+- each layer: its bundle `id`, `type`, `version`, and `source_digest` when present;
+- the combined context: every rule and fact of every layer, in stack order, each with its
+  identifier and the layer it came from;
+- the findings of the checks below, as diagnostics.
+
+The command:
+
+- MUST only read. It MUST NOT write, compile, or place anything, and it MAY read artifacts from
+  any path, since the layers of a stack usually come from different Domain repositories.
+- MUST accept only runtime artifacts as defined in
+  [runtime-artifact.md](../spec/0.7/runtime-artifact.md); any other input is an error
+  (`STACK_ARTIFACT_INVALID`).
+- MUST NOT merge, reorder, or drop rules. SCS defines no precedence between layers: a rule in an
+  inner layer does not override one in an outer layer. How a client weighs layers is the
+  client's behaviour, outside SCS.
+- MUST support machine mode (section 3). Its `changes` is always empty.
+
+The engine checks a stack for what can be decided exactly:
+
+| Code | Severity | Condition |
+|---|---|---|
+| `STACK_BUNDLE_REPEATED` | error | The same bundle `id` appears in two layers, for example two versions of one bundle |
+| `STACK_PROHIBITION_DIRECTED` | warning | A directive in one layer contains, ignoring case, the `subject` of a prohibition in another layer (taken from the rule text `Prohibited: <subject>.`, runtime-artifact §2.3) |
+| `STACK_RULE_DUPLICATE` | info | Two layers carry a rule or fact with identical text, for example the meta bundle's rules in two Domain artifacts |
+| `STACK_LAYER_DRAFT` | info | A layer is a DRAFT artifact (`version` of the form `DRAFT+<digest>`) |
+
+`STACK_PROHIBITION_DIRECTED` is a textual match: it finds candidates and can miss
+contradictions phrased differently. Whether two rules actually contradict is a judgment, which
+the agent makes in the advisory review (section 12) under the kind `layer-conflict`, with the
+same rules as any other finding. The user's decision is recorded in the `intake.yaml` of the
+workspace the user is working in.
+
+Whether a client actually loads the layers of a stack, and in what order, is the client's
+behaviour. SCS does not test it; the placement guide (section 10) SHOULD describe how each
+service loads layered context.
+
 ### Schema Changes
 
-- New `schema/intake.schema.json` for the intake record (section 4).
+- New `schema/intake/intake-schema.json` for the intake record (section 4).
+- New `schema/manifest/version-manifest-schema.json` for version manifests.
+  `approval.approved_by` MUST be a person identifier, `Name <email>`; the schema rejects empty
+  and `role:` values.
+- New `schema/cli/envelope-schema.json` for the machine-mode envelope (section 3), and the
+  diagnostic code registry `schema/diagnostics/codes.yaml`.
 - Optional `derived_from` array on items in `content.prohibitions`, `content.directives`, and
   `content.facts`. Each entry has exactly one of `intake` (an answer id) or `source` (a
   document id), plus an optional `locator` string.
@@ -703,29 +919,51 @@ derived_from:
     additionalProperties: false
 ```
 
-- New required `content_digest` field (`^sha256:[0-9a-f]{64}$`) in version manifests written
-  by 0.7 tools (section 11).
+- New `content_digest` field (`^sha256:[0-9a-f]{64}$`) in version manifests written by 0.7
+  tools (section 11), with `content_inputs` listing the files and imports it covers, and
+  `tools_version`. A manifest is recognized as 0.7 by its workspace-qualified tag, not by a
+  field value: such a manifest MUST carry `content_digest` and `tools_version`. The schema
+  keeps both optional so pre-0.7 manifests still validate; the requirement is checked with the
+  tags (section 11).
 - New `source_digest` field in the runtime artifact schema (`schema/runtime/`), present for
   versioned bundles and absent for `DRAFT` compiles (section 11). Added in `runtime-artifact.md`
-  §3.1.
+  §3.1. Artifacts compiled by 0.7 tools carry `scs_runtime: "0.7"`; the §3.5 stability rules
+  apply to them from 0.7 on.
 
 No bundle manifest fields change. The Domain repository layout (section 9) is a convention the
 tools create and check, not a schema.
 
 ### Validation Rules
 
-- `intake.yaml`, when present, MUST validate against `intake.schema.json`.
+- `intake.yaml`, when present, MUST validate against `intake-schema.json`.
 - A `derived_from.intake` id MUST resolve to an `answers[].id` in the workspace's `intake.yaml`;
-  a `derived_from.source` id MUST resolve to a `source_documents[].id`. Unresolved ids are
-  warnings in loose mode and errors in strict mode.
-- A version manifest MUST have a non-empty `approved_by`.
+  a `derived_from.source` id MUST resolve to a `source_documents[].id`. An unresolved id is a
+  warning (`DERIVED_FROM_UNRESOLVED`), so it fails under `--strict` with exit code 2.
+- A version manifest MUST have an `approval.approved_by` that is a person identifier
+  (`Name <email>`).
 - `scs compile` MUST NOT emit `derived_from`.
-- A versioned bundle's recomputed content digest MUST match the `content_digest` in its version
-  manifest; a mismatch is an error in every mode. A version manifest with no `content_digest`
-  (written before 0.7) produces a warning that the bundle cannot be verified.
+- The three checks in section 11 MUST pass; a failure is an error in every mode.
+- A version without a workspace-qualified tag (made before 0.7) is history: it is neither
+  verified nor reported. Strict CI is green once each bundle has a 0.7 version (Migration
+  Guide).
+- A workspace's `.scs/config` `name` MUST match its workspace name (`CONFIG_NAME_MISMATCH`).
 - Run at the root of a Domain repository, the validator SHOULD validate the Domain workspace
-  and every Project workspace, and report a Domain repository with no `domain/` workspace, or
-  with more than one, as an error.
+  and every Project workspace, and report a Domain repository with no workspace whose
+  `.scs/config` `bundle_type` is `domain`, or with more than one, as an error.
+- The validator MUST NOT report a workspace's reserved directories (`plan/`, `test-plan/`,
+  `qa/`) as errors or warnings in any mode, and MUST NOT validate their content.
+- A bundle named `plan`, `test-plan`, or `qa` is an error.
+- An SCD with no `prohibitions`, `directives`, or `facts` contributes nothing to a compiled
+  artifact. The validator MUST report it as `SCD_EMPTY` (info), so a fresh scaffold still passes
+  `--strict`, and `scs bundle version --dry-run` MUST list the bundle's empty SCDs, so they are
+  removed or kept knowingly before a release. The 0.6 stub detection (`COMPLETENESS_STUB_SCD`)
+  is removed.
+- A placeholder `created_by` (an empty name, `developer`, or an address at `example.com`,
+  `example.org`, `example.net`, or a `.example` or `.invalid` domain) is a warning
+  (`PROVENANCE_PLACEHOLDER`), and `scs bundle version` MUST refuse to version over one
+  (`VERSION_PROVENANCE_PLACEHOLDER`). Any other `created_by` value passes.
+- `scs stack` MUST report the checks of section 13 with the codes and severities given there.
+  Under `--strict`, its warnings give exit code 2.
 
 ---
 
@@ -820,28 +1058,41 @@ produced that way will vary in quality, and the variation will reflect on the st
 
 ## Unresolved Questions
 
-1. **Where the skills live.** In this repo (for example `agent/skills/`), versioned with the
-   spec, or in a separate repo with its own release cadence? Versioning with the spec is
-   simpler; a separate repo lets skills improve between spec releases.
-2. **What happens to `scs-vibe` and `scs-team`.** Retire them once the skills ship, or keep
-   them as Claude Code-specific wrappers?
+1. **Where the skills live.** *Resolved 2026-10-25:* `skills/` in this repository, versioned
+   with the spec.
+2. **What happens to `scs-vibe` and `scs-team`.** *Resolved 2026-10-25:* deprecated in 0.7,
+   removed in 0.8.
 3. **Installation inside chat clients.** Whether code-execution sandboxes in hosted chat
-   clients can reliably install `scs-tools` from PyPI needs testing per client. If not, the
-   skill may need to bundle a self-contained engine.
-4. **Personal data in the intake record.** `intake.yaml` holds names and emails of approvers
-   and respondents. Should the record support role-only attribution for repositories that will
-   be shared publicly?
-5. **Workspace-level versioning.** Section 9 requires workspace- and name-qualified tags and
-   manifests, which fixes ISS-043 per bundle. Alternatively, a workspace could be versioned in
-   one command with one manifest. The second fits agent use better. Decide before the engine
-   work.
-6. **Provenance granularity.** Is item-level `derived_from` enough, or do organizations need
-   it on whole SCDs as well, for example as a field on the existing SCD-level `provenance`
-   object?
-7. **Intake for existing workspaces.** How should the agent onboard a workspace built before
-   0.7 that has no `intake.yaml`? Reconstruct one by asking, or leave it absent?
-8. **Name of the agent instructions file.** `AGENTS.md` plus a pointer file per client, or
-   one file per client with the same content?
+   clients can reliably install `scs-tools` from PyPI needs testing per client. Fallback order:
+   PyPI, then a GitHub tag, then a wheel bundled with the skill. The choice per client is
+   settled by testing in Claude.ai, Claude Code, Cursor, Codex, and GitHub Copilot before
+   release. Open.
+4. **Personal data in the intake record.** *Resolved 2026-10-25:* role-only attribution
+   (`role:<name>`) is allowed in `intake.yaml` only; approvers in version manifests are always
+   people (section 4).
+5. **Workspace-level versioning.** *Resolved 2026-10-25:* per bundle, with workspace- and
+   name-qualified tags and manifests (section 9). Versioning several bundles is a cascade
+   covered by one confirmation (section 6).
+6. **Provenance granularity.** *Resolved 2026-10-25:* item-level `derived_from` only.
+7. **Intake for existing workspaces.** *Resolved 2026-10-25:* the intake record stays optional;
+   the intake skill offers to reconstruct one by asking.
+8. **Name of the agent instructions file.** *Resolved 2026-10-25:* `AGENTS.md` plus a
+   `CLAUDE.md` that points to it.
+9. **Creating a concept with no template.** The `personal` ontology's concepts are defined with
+   the user, so the engine needs a command that creates a concept bundle, its first SCD, and its
+   ontology manifest entry. Resolved: one engine command does all three (plan D-68).
+10. **Removing what the scaffold supplied.** When removing an SCD leaves its concept bundle
+    empty, the same command should remove the concept bundle, the root bundle's import, and the
+    manifest entry. Resolved as stated (plan D-69).
+11. **Reporting provenance to correct.** Resolved: placeholders only (section 5, Validation
+    Rules; plan D-71). Unused SCDs are resolved too (Validation Rules; plan D-70).
+12. **Projects under the `personal` ontology.** Resolved: the same fixed concept, boundaries,
+    and nothing else (plan D-72).
+13. **The ontology manifest's naming.** It still uses "domain" (`domain-manifest.yaml`, the
+    `domain:` key), while "Domain" now names only the global tier. Kept for 0.7; a rename needs
+    its own RFC. Resolved: kept for 0.7 (plan D-73).
+14. **A Project's default ontology.** Resolved: without `--ontology`, `scs new project` uses the
+    Domain's ontology; `--ontology` selects any ontology (plan D-74).
 
 ---
 
@@ -866,25 +1117,30 @@ produced that way will vary in quality, and the variation will reflect on the st
 Proposed order. Each step is usable on its own.
 
 1. **Harden the lifecycle.** Fix ISS-042, ISS-043 (with workspace- and name-qualified tags and
-   manifests), and ISS-044. Remove the silent `git config` approver default from
-   `scs bundle version`. Fix ISS-045: `content_digest` in version manifests, verification in
-   `scs-validate` and `scs compile`, `source_digest` in the artifact, and truthful
-   `validation_passed`.
+   manifests), and ISS-044. Remove the silent `git config` approver default, `--force`, and
+   `--no-git` from `scs bundle version`. Fix ISS-045: `content_digest` in version manifests,
+   whole-workspace version commits and annotated tags (section 9), the three tag-based checks
+   in `scs-validate` and `scs compile` (section 11), `compile --version`, `source_digest` in
+   the artifact, and truthful `validation_passed`.
 2. **Domain repositories.** `scs new domain` creates the repository with `domain/`,
    `projects/`, `AGENTS.md`, and the CI workflow; `scs new project` adds a workspace under
-   `projects/` of an existing Domain repository; a `personal` Domain profile that scaffolds only
-   the `company` (owner facts) and `prohibited` concept bundles; repository-level validation;
-   compile output to `dist/`.
-3. **Machine mode.** `--json` and `--dry-run` across `new`, `add`, `bundle`, `validate`, and
-   `compile`; the result envelope; no prompts in machine mode.
-4. **Intake schema and `derived_from`.** `intake.schema.json`, the `derived_from` field,
-   validator rules, and `scripts/sync_schemas.py`.
+   `projects/` of an existing Domain repository; templates chosen by ontology and workspace kind
+   only, including the `personal` ontology (boundaries only); repository-level validation
+   that tolerates the reserved plan directories and rejects the reserved bundle names; compile
+   output to `dist/`.
+3. **Machine mode.** `--json` and `--dry-run` across `new`, `add`, `scd`, `bundle`, `intake`,
+   `validate`, and `compile`; the result envelope and its schema; the diagnostic code registry;
+   no prompts in machine mode.
+4. **Intake schema and `derived_from`.** `intake-schema.json`, `scs intake`, the
+   `derived_from` field, validator rules, and `scripts/sync_schemas.py`.
 5. **Skills.** Intake, draft, review, validate, version, compile, and explain, including
    placement advice from the guide.
 6. **`scs bundle diff`.**
 7. **Placement guide.** Docs for the most widely used AI services, checked against each
    service's current documentation.
 8. **MCP server.** Local stdio adapter over the engine, once there is demand.
+9. **Layered context.** `scs stack` with its exact checks (section 13), the `layer-conflict`
+   review kind in the review skill, and load-order notes in the placement guide.
 
 **Acceptance test:** onboard Omarchy entirely through a chat client using the skills, with no
 direct CLI use and no reading of the spec: one Domain repository holding the Domain and two
@@ -899,15 +1155,18 @@ optional.
 - **Layout.** Workspaces created by 0.6.0 tools move into a Domain repository: the Domain
   workspace under `domain/`, each Project under `projects/<name>/`. A Project with no Domain
   needs one; an individual developer creates a personal Domain
-  (`scs new domain --profile personal`). Git history can be carried over with `git filter-repo`
+  (`scs new domain NAME --ontology personal`). Git history can be carried over with `git filter-repo`
   or a similar tool, or the move can start a fresh history.
-- **Tags.** Existing tags of the form `v<version>` keep working; new versions use
+- **Tags.** Existing tags of the form `v<version>` stay in history; new versions use
   `<workspace>/<bundle-name>-v<version>`.
 - **`scs bundle version`** no longer takes the approver from `git config`; pass
-  `--approved-by` explicitly.
-- **Versions made before 0.7** have no `content_digest` and validate with a warning that they
-  cannot be verified. To make one verifiable, version it again at a new version number with
-  0.7 tools; an existing version is not rewritten.
+  `--approved-by` explicitly. `--force` and `--no-git` are removed.
+- **Ontology manifest.** Move `domain/domain-manifest.yaml` to `ontology/domain-manifest.yaml`.
+  The old location is still read, with an info diagnostic.
+- **Versions made before 0.7** have no workspace-qualified tag and no `content_digest`. They
+  are history: not verified and not reported. After moving into the layout, version each
+  bundle once with 0.7 tools, at a new version number, bottom-up; strict CI is green once
+  every bundle has a 0.7 version. An existing version is not rewritten.
 
 ### Related RFCs
 
@@ -916,5 +1175,5 @@ optional.
 - RFC 0003: Review Profiles (stub). Declarative, citable checks that structure the advisory
   review in section 12.
 - Related issues: ISS-014, ISS-027, ISS-042, ISS-043, ISS-044, ISS-045.
-- Related spec: [bundle-format.md](../spec/0.6/bundle-format.md) (Domain and Project
-  independence; §7.3 immutability), [runtime-artifact.md](../spec/0.6/runtime-artifact.md).
+- Related spec: [bundle-format.md](../spec/0.7/bundle-format.md) (Domain and Project
+  independence; §7.3 immutability), [runtime-artifact.md](../spec/0.7/runtime-artifact.md).

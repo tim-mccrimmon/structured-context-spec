@@ -1,5 +1,4 @@
 # Skeleton SCD from the Medical-Device CDMO ontology (concept: risk-management).
-# Profile: Project only.
 # Write the facts an AI agent should know in `facts`; only that list is
 # compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
 id: scd:project:risk-register
@@ -9,7 +8,7 @@ version: "DRAFT"
 description: "The program's identified risks, ratings, and controls"
 concept: concept:risk-management
 content:
-  summary: "TODO - in a sentence or two, risk register at {{ project_name }}"
+  summary: "TODO - in a sentence or two, risk register at {{ display_name }}"
   facts: []
   # Examples:
   # - id: RR-001
@@ -17,6 +16,6 @@ content:
   register: "TODO - where the register is kept and who owns it"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Risk Register skeleton from the Medical-Device CDMO ontology"

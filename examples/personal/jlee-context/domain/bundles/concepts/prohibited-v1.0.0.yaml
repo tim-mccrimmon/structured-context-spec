@@ -1,0 +1,19 @@
+id: bundle:prohibited
+type: concept
+version: 1.0.0
+title: Prohibited Tools and Practices
+description: Tools and practices forbidden in all of Jordan Lee's work
+owner: owner
+imports: []
+scds:
+- scd:project:prohibited
+provenance:
+  created_by: Jordan Lee <jordan@jlee-data.test>
+  created_at: '2026-10-01T09:00:00+00:00'
+  rationale: Prohibited Tools and Practices concept bundle for Jordan Lee
+  version_approved_by: Jordan Lee <jordan@jlee-data.test>
+  version_approved_at: '2026-10-01T09:00:00Z'
+  approval_status: validated
+  validation_passed: true
+  validation_date: '2026-10-01T09:00:00Z'
+  version_notes: First version

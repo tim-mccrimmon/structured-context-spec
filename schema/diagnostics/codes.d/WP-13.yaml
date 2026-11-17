@@ -1,0 +1,7 @@
+# Diagnostic codes added by the WP-13 rc2 triage (rc3).
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  WORKSPACE_TITLE_INVALID:
+    severity: error
+    meaning: The display name given to scs new --title is empty, or contains a double quote or a backslash; exit code 3.

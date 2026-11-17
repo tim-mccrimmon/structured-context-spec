@@ -26,7 +26,11 @@ class Parser:
             ValidationError: If file cannot be loaded or parsed
         """
         if not file_path.exists():
-            raise ValidationError(f"File not found: {file_path}", file_path=str(file_path))
+            raise ValidationError(
+                f"File not found: {file_path}",
+                file_path=str(file_path),
+                code="PARSE_FILE_NOT_FOUND",
+            )
 
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -47,7 +51,9 @@ class Parser:
         except ValidationError:
             raise
         except Exception as e:
-            raise ValidationError(f"Failed to load file: {e}", file_path=str(file_path))
+            raise ValidationError(
+                f"Failed to load file: {e}", file_path=str(file_path), code="PARSE_FILE_UNREADABLE"
+            )
 
     @staticmethod
     def load_bundle(file_path: Path) -> Dict[str, Any]:
@@ -115,7 +121,9 @@ class Parser:
             data = yaml.safe_load(content)
             if not isinstance(data, dict):
                 raise ValidationError(
-                    "YAML content must be an object/dictionary", file_path=str(file_path)
+                    "YAML content must be an object/dictionary",
+                    file_path=str(file_path),
+                    code="PARSE_NOT_AN_OBJECT",
                 )
             return data
         except yaml.YAMLError as e:
@@ -128,7 +136,7 @@ class Parser:
                     f"Invalid YAML syntax at line {mark.line + 1}, "
                     f"column {mark.column + 1}: {problem}"
                 )
-            raise ValidationError(error_msg, file_path=str(file_path))
+            raise ValidationError(error_msg, file_path=str(file_path), code="PARSE_YAML_SYNTAX")
 
     @staticmethod
     def _parse_json(content: str, file_path: Path) -> Dict[str, Any]:
@@ -147,12 +155,17 @@ class Parser:
         try:
             data = json.loads(content)
             if not isinstance(data, dict):
-                raise ValidationError("JSON content must be an object", file_path=str(file_path))
+                raise ValidationError(
+                    "JSON content must be an object",
+                    file_path=str(file_path),
+                    code="PARSE_NOT_AN_OBJECT",
+                )
             return data
         except json.JSONDecodeError as e:
             raise ValidationError(
                 f"Invalid JSON syntax at line {e.lineno}, column {e.colno}: {e.msg}",
                 file_path=str(file_path),
+                code="PARSE_JSON_SYNTAX",
             )
 
     @staticmethod
@@ -169,7 +182,7 @@ class Parser:
             ValidationError: If schema cannot be loaded
         """
         if not schema_path.exists():
-            raise ValidationError(f"Schema file not found: {schema_path}")
+            raise ValidationError(f"Schema file not found: {schema_path}", code="SCHEMA_NOT_FOUND")
 
         try:
             with open(schema_path, "r", encoding="utf-8") as f:
@@ -179,6 +192,9 @@ class Parser:
             raise ValidationError(
                 f"Invalid JSON schema at line {e.lineno}, column {e.colno}: {e.msg}",
                 file_path=str(schema_path),
+                code="SCHEMA_LOAD_FAILED",
             )
         except Exception as e:
-            raise ValidationError(f"Failed to load schema: {e}", file_path=str(schema_path))
+            raise ValidationError(
+                f"Failed to load schema: {e}", file_path=str(schema_path), code="SCHEMA_LOAD_FAILED"
+            )

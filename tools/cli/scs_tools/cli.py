@@ -2,60 +2,88 @@
 SCS CLI - Command-line interface for Structured Context Specification tools
 """
 
+import importlib
+import pkgutil
+import sys
+
 import click
+from scs_validator.envelope import Envelope, MachineMode
 
-from scs_tools import __version__
-from scs_tools.commands.add import add
-from scs_tools.commands.bundle import bundle
-from scs_tools.commands.compile import compile
-from scs_tools.commands.init import init
-from scs_tools.commands.new import new
-from scs_tools.commands.validate import validate
+from scs_tools import __version__, commands
 
 
-@click.group()
-@click.version_option(version=__version__, prog_name="scs")
-def cli():
+class SCSGroup(MachineMode, click.Group):
+    tools_version = __version__
+
+
+@click.group(cls=SCSGroup, invoke_without_command=True)
+@click.option("--version", "show_version", is_flag=True, help="Show the version and exit.")
+@click.option(
+    "--json",
+    "json_mode",
+    is_flag=True,
+    help="With --version: write a JSON result envelope (RFC 0002 section 3)",
+)
+@click.pass_context
+def cli(ctx, show_version, json_mode):
     """
     SCS Tools - CLI for Structured Context Specification
 
-    Scaffold and manage SCS-compliant projects with proper bundle structure,
-    domain organization, and compliance templates.
-
-    SCS (Structured Context Documents) are YAML files that capture essential
-    project context, organized into domain bundles for validation and versioning.
+    Create, version, and compile an organization's or a person's context in a
+    Domain repository: one Domain workspace (governance for all work) and one
+    workspace per Project.
 
     \b
     Quick Start:
-        scs new project my-app              # Create a new project interactively
-        cd my-app
-        scs bundle validate                 # Validate the project bundle
-        scs validate context/project/*.yaml # Validate SCDs
-        scs bundle version --version 1.0.0  # Create versioned snapshot
+        scs new domain acme                 # Create the Domain repository acme-context/
+        cd acme-context
+        scs new project portal              # Add a Project workspace
+        scs-validate --strict               # Validate every workspace
+        cd domain
+        scs bundle version --version 1.0.0 --approved-by "Jane Doe <jane@acme.com>"
+        scs compile bundles/domain-bundle.yaml --version 1.0.0
 
     \b
     Common Workflow:
-        1. Create or initialize project     → scs new project / scs init
-        2. Add domains as needed            → scs add bundle [domain]
-        3. Edit SCDs in context/project/    → (manual editing)
-        4. Validate before versioning       → scs bundle validate / scs validate
-           (also: scs validate --domain <manifest>, --checkpoint <record>)
-        5. Create immutable version         → scs bundle version
-        6. Compile for runtime delivery     → scs compile <bundle> -o <artifact>
+        1. Create the repository and Projects → scs new domain / scs new project
+        2. Add concepts as needed             → scs add bundle <concept> [--new]
+        3. Write SCDs and the intake record   → scs scd write / scs intake set
+        4. Commit, and check where things are → scs commit / scs status
+        5. Validate                           → scs-validate / scs bundle validate
+        6. Release a version                  → scs bundle version
+        7. Compile for runtime delivery       → scs compile <bundle> --version <v>
+        8. Preview artifacts loaded together  → scs stack <outer> ... <inner>
+        9. Write a review package             → scs view <bundle> --version <v>
 
+    Commands that change files take --dry-run and --json (machine mode).
     For detailed help on any command, use: scs [command] --help
-    Documentation: https://github.com/SCS-Labs/scs-cli
     """
-    pass
+    if show_version:
+        from scs_validator.envelope import SCS_VERSION
+
+        if json_mode:
+            envelope = Envelope("--version", __version__)
+            envelope.result = {"scs_version": SCS_VERSION, "tools_version": __version__}
+            click.echo(envelope.dumps())
+        else:
+            click.echo(f"scs, version {__version__}")
+        sys.exit(0)
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
 
-# Register commands
-cli.add_command(new)
-cli.add_command(init)
-cli.add_command(add)
-cli.add_command(bundle)
-cli.add_command(validate)
-cli.add_command(compile)
+def _discover() -> None:
+    """Register every command in scs_tools.commands: each module defines a click command or
+    group named like the module (`scd.py` defines `scd`), so adding a command needs no edit
+    here."""
+    for info in sorted(pkgutil.iter_modules(commands.__path__), key=lambda m: m.name):
+        module = importlib.import_module(f"{commands.__name__}.{info.name}")
+        command = getattr(module, info.name, None)
+        if isinstance(command, click.Command):
+            cli.add_command(command)
+
+
+_discover()
 
 
 if __name__ == "__main__":

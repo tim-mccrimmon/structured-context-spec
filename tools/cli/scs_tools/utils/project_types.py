@@ -1,8 +1,12 @@
 """Project type configurations for SCS 0.5.0"""
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
-PROJECT_TYPES = {
+# Healthcare templates in the sdlc ontology. They are an industry layer, not part of every
+# software workspace, so the scaffold leaves them out (D-91); `scs add scd <name>` adds one.
+SDLC_INDUSTRY_SCDS = ["hipaa-compliance", "chai-adherence", "tefca-participation"]
+
+PROJECT_TYPES: Dict[str, Dict[str, Any]] = {
     "healthcare": {
         "description": "Healthcare application (HIPAA, CHAI, TEFCA)",
         "compliance_bundles": [
@@ -469,12 +473,12 @@ CDMO_DOMAIN_CONCEPT_SCDS: Dict[str, List[str]] = {
     "ai-accountability": CDMO_CONCEPT_SCDS["ai-accountability"],
 }
 
-# Ontology models a project can be scaffolded against. "sdlc" is the default and the only
-# one PROJECT_TYPES variants (healthcare/fintech/saas/government/minimal) apply to - they're
-# all software-development-flavored. "mca" has one shape: all 16 concepts, no variants yet.
+# Ontology models a workspace can be scaffolded against. The scaffold's templates are chosen by
+# the ontology and the workspace kind (Domain or Project) only (D-64); "sdlc" is the default.
+# PROJECT_TYPES remain only for 0.6 workspaces made with the removed `scs init --type`.
 ONTOLOGY_MODELS = {
     "sdlc": {
-        "description": "Software Development (default) - supports --type variants",
+        "description": "Software Development (default)",
         "domain": "software-development",
         "domain_name": "Software Development",
         "concepts": SOFTWARE_DEVELOPMENT_CONCEPTS,
@@ -482,8 +486,7 @@ ONTOLOGY_MODELS = {
         "relationships": {},
     },
     "mca": {
-        "description": "Merchant Cash Advance / business funding - all 16 concepts, no --type"
-        " variants",
+        "description": "Merchant Cash Advance / business funding - all 16 concepts",
         "domain": "merchant-cash-advance",
         "domain_name": "Merchant Cash Advance",
         "concepts": MCA_CONCEPTS,
@@ -491,7 +494,7 @@ ONTOLOGY_MODELS = {
         "relationships": MCA_CONCEPT_RELATIONSHIPS,
     },
     "cdmo": {
-        "description": "Medical-Device CDMO - all 12 concepts, no --type variants",
+        "description": "Medical-Device CDMO - all 12 concepts",
         "domain": "medical-device-cdmo",
         "domain_name": "Medical-Device CDMO",
         "concepts": CDMO_CONCEPTS,
@@ -500,6 +503,18 @@ ONTOLOGY_MODELS = {
         "satisfies": CDMO_CONCEPT_SATISFIES,
         "scds": CDMO_CONCEPT_SCDS,
         "domain_scds": CDMO_DOMAIN_CONCEPT_SCDS,
+    },
+    # The personal ontology (D-61, D-62): one person's context. Its only fixed concept is
+    # boundaries (the prohibited concept bundle, added by `scs new`); every other concept is
+    # particular to the person and is defined with them, so none is shipped.
+    "personal": {
+        "description": "Personal - one person's context; boundaries only, other concepts are"
+        " defined with the user",
+        "domain": "personal",
+        "domain_name": "Personal",
+        "concepts": [],
+        "concept_info": {},
+        "relationships": {},
     },
 }
 

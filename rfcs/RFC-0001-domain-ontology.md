@@ -62,14 +62,14 @@ Its structure maps directly onto the chapters of a conventional product plan —
 security, testing, deployment, and so on — because that is the business it was modeled on.
 Two subsequent engagements broke that assumption in different ways:
 
-- **Medical-device CDMO (Nextern).** The SDLC concern list didn't fit a regulated contract
+- **Medical-device CDMO.** The SDLC concern list didn't fit a regulated contract
   manufacturer's work at all — risk management, design controls, supplier qualification,
   and CAPA aren't SDLC concepts, and forcing them into that shape lost the regulatory
   framework mapping that matters most in this market. This is what prompted renaming
   "concern" to "Domain Ontology" in the first place — the fix wasn't a new concern list, it
   was recognizing that *domain* means "the type of market the business is in," and each
   market needs its own conceptual model.
-- **Business Funding (Everest).** A third, distinct ontology, not yet modeled — this market
+- **Business Funding.** A third, distinct ontology, not yet modeled — this market
   has no obvious existing regulatory framework to align to, unlike CDMO's alignment with
   ISO 13485 / IEC 62304 / 21 CFR 820.
 
@@ -286,9 +286,9 @@ or agreed to the content. This RFC adds an explicit approval to bundle provenanc
 
 ```yaml
 provenance:
-  created_by: jane@nextern.com
+  created_by: jane@medtech-cdmo.test
   created_at: "2026-09-20T00:00:00Z"
-  version_approved_by: sam@nextern.com          # NEW — required
+  version_approved_by: sam@medtech-cdmo.test          # NEW — required
   version_approved_at: "2026-09-21T00:00:00Z"   # NEW — required
   rationale: "Added ISO 14971 clause mapping for risk-management concept"
 ```
@@ -409,7 +409,7 @@ any AI actor, not just chat" reframe lands with a weaker foundation.
   is deferred — additive-safe, no concrete case needs it yet.
 - **Migration tooling**: guide-only for 0.5.0. No automated `scs migrate` helper — you're
   the only consumer of 0.3 content today, so manual migration is cheap. Revisit if a third
-  party (e.g. Nextern) has real 0.3 content to migrate.
+  party has real 0.3 content to migrate.
 - **`concept` on SCDs**: optional, as originally drafted — matches the RFC's
   permissive-by-default philosophy elsewhere (completeness checking is opt-in too).
   Tightening to required later is a safe direction; loosening later would not be.

@@ -6,12 +6,13 @@ name: tools-ci
 
 on:
   push:
-    branches: [main, 0.6-dev]
+    branches: [main, 0.7-dev]
     paths:
       - "tools/**"
       - "schema/**"
       - "meta/**"
       - "examples/**"
+      - "skills/**"
       - ".github/workflows/tools-ci.yml"
   pull_request:
     paths:
@@ -19,6 +20,7 @@ on:
       - "schema/**"
       - "meta/**"
       - "examples/**"
+      - "skills/**"
       - ".github/workflows/tools-ci.yml"
 
 jobs:
@@ -44,6 +46,8 @@ jobs:
       - name: scs-tools tests
         working-directory: tools/cli
         run: python -m pytest tests
+      - name: Examples are current (rebuilt with the engine, ISS-070)
+        run: python examples/build.py --check
 
   lint:
     # ruff (E, F, W, I), black and mypy, configured in each package's pyproject.toml (ISS-036)
@@ -67,6 +71,9 @@ jobs:
       - name: mypy (scs-validator)
         working-directory: tools/scd-validator
         run: mypy src
+      - name: mypy (scs-tools)
+        working-directory: tools/cli
+        run: mypy scs_tools
 
   wheel-smoke:
     # Installs the built wheels (not editable) into a clean environment and uses them away from the
@@ -82,27 +89,37 @@ jobs:
         run: |
           pip wheel --no-deps -w dist ./tools/scd-validator ./tools/cli
           pip install dist/*.whl
-      - name: Scaffold, validate and version outside the source tree
+      - name: Scaffold, validate and version a Domain repository outside the source tree
         run: |
           cd "$(mktemp -d)"
-          scs new project smoke --type healthcare --author CI --email ci@example.com --no-interactive
-          cd smoke
+          scs new domain smoke --author CI --email ci@structuredcontext.dev --no-interactive
+          cd smoke-context
+          scs new project app --author CI --email ci@structuredcontext.dev --no-interactive
+          python - <<'PY'
+          import json, subprocess
+          status = json.loads(subprocess.run(["scs", "status", "--json"], capture_output=True, text=True, check=True).stdout)
+          for ws in status["result"]["workspaces"]:
+              for role in ws["owners"]["unmapped_roles"]:
+                  subprocess.run(["scs", "intake", "set", "owners", f"{{role: {role}, person: CI <ci@structuredcontext.dev>}}", "--workspace", ws["workspace"]], check=True)
+          PY
+          scs-validate --strict
+          cd domain
           scs bundle validate
-          scs validate --domain domain/domain-manifest.yaml
+          scs validate --domain ontology/domain-manifest.yaml
           for f in context/project/*.yaml; do scs-validate "$f" > /dev/null; done
-          git init -q .
-          git config user.email ci@example.com
-          git config user.name CI
-          git add -A
-          git commit -q -m init
+          cd ../projects/app
+          scs bundle validate
+          scs validate --domain ontology/domain-manifest.yaml
           scs bundle version --bundle bundles/concepts/security.yaml --version 0.1.0 \
-            --approved-by ci@example.com --notes "ci smoke"
+            --approved-by "CI <ci@structuredcontext.dev>" --notes "ci smoke"
           scs-validate --bundle bundles/concepts/security-v0.1.0.yaml
-      - name: Scaffold and validate the mca ontology model outside the source tree
+          cd ../..
+          scs-validate --strict
+          scs-validate --verify-version app/security-v0.1.0
+      - name: Scaffold and validate the mca ontology outside the source tree
         run: |
           cd "$(mktemp -d)"
-          scs new project smoke-mca --ontology mca --author CI --email ci@example.com --no-interactive
-          cd smoke-mca
-          scs bundle validate
-          scs validate --domain domain/domain-manifest.yaml
-          for f in context/project/*.yaml; do scs-validate "$f" > /dev/null; done
+          scs new domain smoke-mca --ontology mca --author CI --email ci@structuredcontext.dev --no-interactive
+          cd smoke-mca-context
+          scs new project app --ontology mca --author CI --email ci@structuredcontext.dev --no-interactive
+          scs-validate --strict

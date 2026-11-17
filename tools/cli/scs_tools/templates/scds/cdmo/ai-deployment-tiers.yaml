@@ -1,5 +1,4 @@
 # Skeleton SCD from the Medical-Device CDMO ontology (concept: compliance-governance).
-# Profile: Project only.
 # Write the rules an AI agent must follow in `directives`; only that list is
 # compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
 id: scd:project:ai-deployment-tiers
@@ -9,7 +8,7 @@ version: "DRAFT"
 description: "Which AI tools may handle which classes of data"
 concept: concept:compliance-governance
 content:
-  summary: "TODO - in a sentence or two, ai deployment tiers at {{ project_name }}"
+  summary: "TODO - in a sentence or two, ai deployment tiers at {{ display_name }}"
   directives: []
   # Examples:
   # - id: ADT-001
@@ -18,6 +17,6 @@ content:
   tier_owner: "TODO - who approves a tool into a tier"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "AI Deployment Tiers skeleton from the Medical-Device CDMO ontology"

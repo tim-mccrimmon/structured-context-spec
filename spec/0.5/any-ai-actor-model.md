@@ -107,7 +107,7 @@ content:
       requires_approval: true
 
 provenance:
-  created_by: jane@nextern.com
+  created_by: jane@medtech-cdmo.test
   created_at: "2026-09-22T00:00:00Z"
 ```
 

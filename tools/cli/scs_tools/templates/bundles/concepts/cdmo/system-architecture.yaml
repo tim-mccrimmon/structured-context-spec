@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "System Architecture Concept Bundle"
 description: "Solution architecture for a medical-device CDMO program: target system design and configuration, integration topology, target data/ object model, and the architectural constraints an assistant must not drift from. Solution-level, not source code."
+owner: it
 
 imports: []
 
@@ -13,6 +14,6 @@ scds:
   - scd:project:architecture-constraints
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "System Architecture concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"
+  rationale: "System Architecture concept bundle for {{ display_name }}, from the Medical-Device CDMO ontology"

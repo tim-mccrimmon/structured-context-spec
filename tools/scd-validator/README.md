@@ -271,12 +271,12 @@ See the main [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution guideline
 ## Documentation
 
 - [Validator Overview](VALIDATOR_OVERVIEW.md) - Technical design document
-- [Validation Workflow](../../docs/validation-workflow.md) - Complete validation guide
-- [SCS Specification](../../spec/0.3/) - Core specification
+- [Validation Guide](../../docs/validation-guide.md) - What is checked, and what the results mean
+- [SCS Specification](../../spec/0.7/) - Core specification
 
 ## License
 
-Apache License 2.0 - See [LICENSE.md](../../LICENSE.md)
+Apache License 2.0 - See [LICENSE](../../LICENSE)
 
 ## Questions?
 

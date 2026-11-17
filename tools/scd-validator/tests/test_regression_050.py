@@ -8,6 +8,7 @@ ISS that tracks them, so the marker has to be removed when the underlying issue 
 
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 
@@ -26,9 +27,6 @@ BUNDLE_TYPES = {"project", "meta", "standards", "concept", "domain"}
 # Kinds the examples must cover. Meta is published with the spec rather than shipped as an
 # example, and standards is deprecated in 0.6.0.
 EXAMPLE_BUNDLE_TYPES = {"project", "concept", "domain"}
-
-# third-party model output kept as evidence of cross-model testing; not a validity target
-EXCLUDED_DIRS = {"llm-portability"}
 
 
 def run(*args: str, schema: bool = True):
@@ -53,11 +51,7 @@ def _doc_id(path: Path) -> str:
 
 
 def _example_files() -> list[Path]:
-    return [
-        p
-        for p in sorted(EXAMPLES.rglob("*.yaml"))
-        if not (EXCLUDED_DIRS & set(p.relative_to(EXAMPLES).parts))
-    ]
+    return sorted(EXAMPLES.rglob("*.yaml"))
 
 
 def _example_bundles() -> list[Path]:
@@ -144,7 +138,8 @@ def test_cdmo_ontology_satisfies_citations_are_clean():
 
 def test_strict_mode_turns_warnings_into_exit_code_2():
     # The CHAI example is a standards bundle, deprecated in 0.6.0 (a warning).
-    result = run("--bundle", str(EXAMPLES / "chai-standards-bundle" / "bundle.yaml"), "--strict")
+    chai = Path(__file__).parent / "fixtures" / "chai-standards-bundle" / "bundle.yaml"
+    result = run("--bundle", str(chai), "--strict")
     assert result.exit_code == 2
 
 
@@ -389,10 +384,22 @@ def test_every_mca_concept_is_described():
         assert concept.get("description", "").strip(), concept["id"]
 
 
+# Client names the reference content must not contain, as truncated SHA-256 digests of the
+# lowercase name so the names themselves are not published here.
+CLIENT_NAME_DIGESTS = frozenset(
+    ["042b12d660722399", "61e0625d5fb48107", "b614ab83edd0f6df", "54c5b3dd459d5ef7"]
+)
+
+
+def _client_names(text: str) -> list[str]:
+    words = set(re.findall(r"[a-z0-9]+", text.lower()))
+    return sorted(
+        w for w in words if hashlib.sha256(w.encode()).hexdigest()[:16] in CLIENT_NAME_DIGESTS
+    )
+
+
 def test_mca_manifest_is_client_neutral():
-    text = MCA_MANIFEST.read_text().lower()
-    for term in ("everest", "whetstone", "alpine", "nextern"):
-        assert term not in text, term
+    assert not _client_names(MCA_MANIFEST.read_text())
 
 
 # ------------------------------------------- MCA generic skeleton example (ISS-039)
@@ -442,7 +449,22 @@ def test_mca_example_is_client_neutral():
         if not path.is_file():
             continue
         text = path.read_text()
-        for term in ("everest", "whetstone", "alpine", "nextern"):
-            assert term not in text.lower(), (path.name, term)
+        assert not _client_names(text), path.name
         for title in ("Company AI Use Policy", "Departmental Context", "Company Overview"):
             assert title not in text, (path.name, title)
+
+
+def test_concept_relationship_target_points_to_the_ontology(tmp_path: Path):
+    """ISS-040: an SCD relationship to a concept: id says where concept links belong."""
+    scd = tmp_path / "t.yaml"
+    scd.write_text(
+        "id: scd:project:t\ntype: project\ntitle: T\nversion: DRAFT\ndescription: d\n"
+        "content:\n  directives:\n    - id: T-1\n      directive: Do it.\n"
+        "relationships:\n  - type: depends-on\n    target: concept:security\n"
+        "provenance:\n  created_by: A B <a@b.test>\n  created_at: '2026-10-01T09:00:00Z'\n"
+        "  rationale: test\n"
+    )
+    result = run(str(scd))
+    assert result.exit_code == 1
+    assert "concepts[].relationships" in result.output
+    assert "domain-ontology.md §3.3" in result.output

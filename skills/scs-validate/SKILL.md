@@ -1,0 +1,97 @@
+---
+name: scs-validate
+description: Validates a Structured Context (SCS) Domain repository with the SCS validator and explains the results in plain language. Covers schemas, rules, intake records, provenance, and the integrity of versioned bundles (tags, manifests, digests), then proposes fixes. Use when the user asks whether their SCS context is valid, when a validation or CI check fails, or after any change to SCDs or bundles.
+license: Apache-2.0
+compatibility: Needs Python 3.11+, git, and the SCS tools (scs-tools 0.7.0 or later); scripts/scs_engine.py checks and plans the install.
+metadata:
+  scs-spec: "0.7.0"
+  scs-minimum-tools-version: "0.7.0"
+---
+
+# SCS Validate
+
+You run the validator, explain what it found, and propose fixes. The validator is the only
+judge of validity; never decide it yourself.
+
+## Rules for every SCS skill
+
+1. Call the engine only through `scripts/scs_engine.py run scs ...` (or `run scs-validate ...`).
+   Never edit workspace files directly, and never reimplement validation, versioning, or
+   compiling.
+2. Before any write, run the command with `--dry-run`, show the user the planned `changes`
+   (each path, and any git commit or tag) in plain language, and get an explicit yes. Then run
+   it for real. A request to make a change is not the yes: show the dry run first, even when
+   the user has said what to write. Describe only what the engine reports; do not add details
+   it does not state. One yes may cover a batch of writes, such as a set of answers or a group
+   of SCDs, if you first show every change in it; if a dry run then differs from what you
+   showed, stop and ask again. A commit, a version, or a tag is never part of a batch; each
+   gets its own yes (rule 9), or is covered by a release's one yes for its whole cascade.
+3. Report success only when the envelope says `"ok": true`. Otherwise say what failed, using
+   the diagnostics.
+4. Never pass `--force`, `--no-validate`, or `--allow-draft` unless the user asked for that
+   behaviour in this conversation.
+5. Never choose who releases a version (the engine's approver, `--approved-by`), take one
+   from git config or the environment without asking, or record yourself or the model as one.
+   It is a person the user names: `Name <email>`.
+6. Write nothing outside the Domain repository, including temporary files; pass content to
+   the engine on stdin. Source documents go nowhere but this conversation.
+7. Placing artifacts in AI services, multi-person review or approval workflows, hosted or
+   shared registries, and runtime serving are outside SCS. If asked, say so plainly, and do
+   not run anything for it, not even a compile or a dry run, unless the user asks for that
+   step on its own.
+8. When the user is working on one workspace (`domain` or one Project), change no other. A
+   Project session never changes `domain/`.
+9. Commit only with `scs commit`, never `git commit`, with the author the user names. A commit
+   is a write: show its dry run and get a yes, as in rule 2, even when the user asked for the
+   commit. Versions are committed by `scs bundle release` or `scs bundle version`.
+10. Where the work stands comes from `scs status`, run at the start of every session and before
+    each stage, not from memory, notes, or an earlier conversation.
+11. Ask at most three questions in one message. A request to confirm a set of proposed answers
+    counts as one; a person's name, email, and role count as one.
+12. There are four SCS skills: scs-domain, scs-project, scs-validate, and scs-explain. They may
+    not all be installed. Before sending the user to one, check that it is available; if it is
+    not, say what it does and that it can be added (see the SCS repository's
+    `skills/README.md`).
+
+## Run it
+
+At the repository root, so every workspace and every version tag is checked: the Domain and
+each Project. Run `scs status` there too, so you can tell the user which workspace each finding
+belongs to and where that workspace stands:
+
+```
+scripts/scs_engine.py check
+scripts/scs_engine.py run scs status
+scripts/scs_engine.py run scs-validate --strict
+```
+
+`--strict` makes warnings fail (exit code 2), as CI does. Exit codes: `0` valid, `1` errors,
+`2` warnings under `--strict`, `3` bad arguments, `4` file error, `5` internal error.
+
+To check one bundle: `scs-validate --bundle <file> --strict`. To check one version:
+`scs-validate --verify-version <workspace>/<bundle>-v<version>`.
+
+## Explain before fixing
+
+When validation fails, your next message names each error first, in plain language: what is
+wrong, in which file, and why it matters. Only then propose fixes. Group repeated findings,
+but do not drop any. `info` findings (such as `SCD_EMPTY`) never fail validation; mention them
+briefly.
+
+Common findings, by code (see [references/diagnostics.md](references/diagnostics.md)):
+
+- `CONTENT_DIGEST_MISMATCH`, `MANIFEST_ALTERED`: a versioned bundle changed after it was
+  versioned. The fix is a new version, bottom-up, re-pinning each in the next, made in a
+  session with scs-domain or scs-project; never edit the manifest or tag.
+- `GIT_HISTORY_INCOMPLETE`: a shallow clone. Fetch full history and tags.
+- `PROVENANCE_PLACEHOLDER`: a placeholder `created_by`. Correct it with the user.
+- `DERIVED_FROM_UNRESOLVED`: an item names an intake answer or document that is not recorded.
+- `WORKSPACE_FILE_UNREADABLE`: a YAML file could not be read and was skipped. Offer to fix or
+  delete it.
+
+## Fixing
+
+Each fix is a write: run the engine command with `--dry-run`, show the change, and confirm.
+Fix only the workspace the user is working on; a finding in the Domain, found from a Project
+session, goes to the Domain owner (scs-domain). Validate again afterwards and report the new
+result, not the expected one. Commit the fix with `scs commit`.

@@ -1,0 +1,18 @@
+{
+  "id": "scd:project:gamma",
+  "type": "project",
+  "title": "Gamma",
+  "version": "1.0.0",
+  "description": "Records",
+  "content": {
+    "summary": "Records",
+    "prohibitions": [
+      {"id": "G-001", "kind": "practice", "subject": "editing a released record"}
+    ]
+  },
+  "provenance": {
+    "created_by": "Jane Doe <jane@example.com>",
+    "created_at": "2026-10-19T00:00:00Z",
+    "rationale": "test vector"
+  }
+}

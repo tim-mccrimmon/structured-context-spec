@@ -1,0 +1,3 @@
+# Check files out with LF line endings on every platform, so a working copy compares cleanly
+# with the copy at a version tag (SCS 0.7, D-39).
+* text eol=lf

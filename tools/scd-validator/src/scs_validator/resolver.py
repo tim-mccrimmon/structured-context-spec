@@ -18,6 +18,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
 
+from .names import RESERVED_DIRS, is_snapshot
+
 PACKAGED_META = Path(__file__).resolve().parent / "meta"
 BUNDLE_REF = re.compile(r"^bundle:(?P<name>[a-zA-Z0-9._-]+)(?::(?P<version>\d+\.\d+\.\d+))?$")
 LAYOUT_DIRS = {"bundles", "domains", "concepts"}
@@ -58,6 +60,7 @@ class BundleTree:
     scds: List[ResolvedSCD] = field(default_factory=list)
     unresolved_scds: List[Tuple[str, str]] = field(default_factory=list)
     cycles: List[List[str]] = field(default_factory=list)
+    index: Optional["Index"] = None
 
     @property
     def unresolved_imports(self) -> List[ImportEdge]:
@@ -86,9 +89,24 @@ def _yaml_files(root: Path) -> Iterable[Path]:
     for path in sorted(root.rglob("*")):
         if path.suffix not in (".yaml", ".yml") or not path.is_file():
             continue
-        if any(part in SKIP_DIRS for part in path.relative_to(root).parts):
+        parts = path.relative_to(root).parts
+        if any(part in SKIP_DIRS for part in parts):
+            continue
+        # Reserved directories at the root of a workspace are not read (RFC 0002 §9).
+        if len(parts) > 1 and parts[0] in RESERVED_DIRS:
             continue
         yield path
+
+
+def unreadable_reason(error: Exception) -> str:
+    """A one-line reason a YAML file could not be read, with the line for a parse error."""
+    if isinstance(error, yaml.MarkedYAMLError):
+        mark = error.problem_mark or error.context_mark
+        problem = error.problem or error.context or "invalid YAML"
+        return f"line {mark.line + 1}: {problem}" if mark else problem
+    if isinstance(error, UnicodeDecodeError):
+        return "not UTF-8 text"
+    return getattr(error, "strerror", None) or str(error)
 
 
 class Index:
@@ -97,6 +115,7 @@ class Index:
     def __init__(self, roots: Iterable[Path]):
         self.bundles: Dict[str, List[ResolvedBundle]] = {}
         self.scds: Dict[str, List[Tuple[Path, Dict[str, Any]]]] = {}
+        self.unreadable: List[Tuple[Path, str]] = []  # YAML files skipped, with the reason
         for root in roots:
             if root.is_dir():
                 self._scan(root)
@@ -105,7 +124,8 @@ class Index:
         for path in _yaml_files(root):
             try:
                 data = yaml.safe_load(path.read_text(encoding="utf-8"))
-            except (yaml.YAMLError, OSError, UnicodeDecodeError):
+            except (yaml.YAMLError, OSError, UnicodeDecodeError) as e:
+                self.unreadable.append((path, unreadable_reason(e)))
                 continue
             if not isinstance(data, dict) or not isinstance(data.get("id"), str):
                 continue
@@ -124,7 +144,12 @@ class Index:
                 self.scds.setdefault(doc_id, []).append((path, data))
 
     def find_bundle(self, ref: str) -> Tuple[Optional[ResolvedBundle], bool]:
-        """Return (bundle, version_mismatch) for an import reference."""
+        """Return (bundle, version_mismatch) for an import reference.
+
+        An unpinned reference resolves to the working bundle file, not a versioned snapshot; a
+        pinned one to the snapshot of that version (D-17). A bundle with no working file (0.6
+        layouts that keep only snapshots) resolves an unpinned reference to its first file.
+        """
         parsed = parse_bundle_ref(ref)
         if not parsed:
             return None, False
@@ -132,12 +157,14 @@ class Index:
         candidates = self.bundles.get(bundle_id, [])
         if not candidates:
             return None, False
+        working = [c for c in candidates if not is_snapshot(c.path)]
         if version is None:
-            return candidates[0], False
-        for c in candidates:
-            if c.version == version:
-                return c, False
-        return candidates[0], True
+            return (working or candidates)[0], False
+        matching = [c for c in candidates if c.version == version]
+        if matching:
+            snapshots = [c for c in matching if is_snapshot(c.path)]
+            return (snapshots or matching)[0], False
+        return (working or candidates)[0], True
 
 
 def resolve(
@@ -167,7 +194,7 @@ def resolve(
         data=data,
         path=bundle_path,
     )
-    tree = BundleTree(root=root, project_root=project_root)
+    tree = BundleTree(root=root, project_root=project_root, index=index)
     seen_scds: Dict[str, bool] = {}
 
     def visit(bundle: ResolvedBundle, stack: List[str]) -> None:

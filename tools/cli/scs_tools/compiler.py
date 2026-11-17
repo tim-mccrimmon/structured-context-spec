@@ -1,4 +1,4 @@
-"""Compile a Domain or Project bundle into a runtime artifact (spec/0.6/runtime-artifact.md).
+"""Compile a Domain or Project bundle into a runtime artifact (spec/0.7/runtime-artifact.md).
 
 The artifact holds prohibitions and directives as rules, and facts, in a fixed order, with no
 volatile content, so identical source always produces identical bytes.
@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-RUNTIME_FORMAT = "0.6"
+RUNTIME_FORMAT = "0.7"
 COMPILABLE_TYPES = ("domain", "project")
 
 
@@ -23,6 +23,7 @@ class CompileResult:
     artifact: Optional[Dict[str, Any]] = None
     errors: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
+    unreadable: List[str] = field(default_factory=list)  # YAML files the resolver skipped
 
 
 def _canonical_json(data: Any) -> str:
@@ -50,6 +51,14 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
     """Compile a resolved bundle tree (`scs_validator.resolver.BundleTree`)."""
     result = CompileResult()
     root = tree.root
+    for path, reason in tree.index.unreadable if tree.index is not None else []:
+        try:
+            shown = path.relative_to(tree.project_root).as_posix()
+        except ValueError:
+            shown = str(path)
+        result.unreadable.append(
+            f"{shown} could not be read as YAML ({reason}) and was skipped; fix it or delete it"
+        )
 
     if root.type not in COMPILABLE_TYPES:
         result.errors.append(
@@ -69,6 +78,30 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
         result.errors.append(
             "DRAFT bundles cannot be compiled without --allow-draft: " + ", ".join(drafts)
         )
+    if result.errors:
+        return result
+
+    # Every versioned bundle in the tree must still match what was versioned, whatever the
+    # root's state, and no flag overrides it (D-16). The root's digest goes into the artifact
+    # only when it was verified against its manifest (D-18).
+    from scs_validator.digest import content_digest, tree_index, verify_tree
+
+    source_digest = None
+    for check in verify_tree(tree):
+        if check.status == "mismatch":
+            changes = ", ".join(check.changes) or "unknown"
+            result.errors.append(
+                f"{check.bundle.id} version {check.bundle.version} has changed since it was "
+                f"versioned (its content no longer matches {check.manifest}); changed: "
+                f"{changes}. A changed bundle needs a new version."
+            )
+        elif check.status == "unrecorded":
+            result.warnings.append(
+                f"{check.bundle.id} version {check.bundle.version} cannot be verified: "
+                f"{check.manifest} has no content_digest (written before SCS 0.7)."
+            )
+        elif check.bundle is root and not drafts:
+            source_digest = content_digest(root, tree_index(tree)).digest
     if result.errors:
         return result
 
@@ -153,10 +186,10 @@ def compile_tree(tree: Any, allow_draft: bool = False, include_cites: bool = Tru
         "id": root.id,
         "type": root.type,
         "version": version,
-        "title": title,
-        "sources": sources,
-        "rules": [identity, *rules],
     }
+    if source_digest:
+        result.artifact["source_digest"] = source_digest
+    result.artifact.update({"title": title, "sources": sources, "rules": [identity, *rules]})
     if facts:
         result.artifact["facts"] = facts
     return result

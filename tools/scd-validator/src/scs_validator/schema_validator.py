@@ -1,5 +1,6 @@
 """Schema validation module for SCDs."""
 
+import re
 from pathlib import Path
 from typing import Any, Dict
 
@@ -37,7 +38,11 @@ class SchemaValidator:
         # Extract SCD ID and tier
         scd_id = scd.get("id")
         if not scd_id:
-            result.add_error(ValidationError("Missing required field 'id'", file_path=file_path))
+            result.add_error(
+                ValidationError(
+                    "Missing required field 'id'", file_path=file_path, code="SCD_ID_MISSING"
+                )
+            )
             return result
 
         # Get tier from ID
@@ -48,6 +53,7 @@ class SchemaValidator:
                     f"Invalid SCD ID format: '{scd_id}'. Expected format: scd:<tier>:<name>",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_ID_INVALID",
                 )
             )
             return result
@@ -67,11 +73,18 @@ class SchemaValidator:
             if errors:
                 for error in errors:
                     error_msg = self._format_schema_error(error)
-                    result.add_error(ValidationError(error_msg, scd_id=scd_id, file_path=file_path))
+                    result.add_error(
+                        ValidationError(
+                            error_msg, scd_id=scd_id, file_path=file_path, code="SCHEMA_SCD_INVALID"
+                        )
+                    )
         except Exception as e:
             result.add_error(
                 ValidationError(
-                    f"Schema validation failed: {e}", scd_id=scd_id, file_path=file_path
+                    f"Schema validation failed: {e}",
+                    scd_id=scd_id,
+                    file_path=file_path,
+                    code="SCHEMA_VALIDATION_FAILED",
                 )
             )
 
@@ -110,10 +123,18 @@ class SchemaValidator:
             if errors:
                 for error in errors:
                     error_msg = self._format_schema_error(error)
-                    result.add_error(ValidationError(error_msg, file_path=file_path))
+                    result.add_error(
+                        ValidationError(
+                            error_msg, file_path=file_path, code="SCHEMA_BUNDLE_INVALID"
+                        )
+                    )
         except Exception as e:
             result.add_error(
-                ValidationError(f"Bundle schema validation failed: {e}", file_path=file_path)
+                ValidationError(
+                    f"Bundle schema validation failed: {e}",
+                    file_path=file_path,
+                    code="SCHEMA_VALIDATION_FAILED",
+                )
             )
 
         if result.passed:
@@ -149,11 +170,17 @@ class SchemaValidator:
             if errors:
                 for error in errors:
                     error_msg = self._format_schema_error(error)
-                    result.add_error(ValidationError(error_msg, file_path=file_path))
+                    result.add_error(
+                        ValidationError(
+                            error_msg, file_path=file_path, code="SCHEMA_DOMAIN_MANIFEST_INVALID"
+                        )
+                    )
         except Exception as e:
             result.add_error(
                 ValidationError(
-                    f"Domain manifest schema validation failed: {e}", file_path=file_path
+                    f"Domain manifest schema validation failed: {e}",
+                    file_path=file_path,
+                    code="SCHEMA_VALIDATION_FAILED",
                 )
             )
 
@@ -184,9 +211,11 @@ class SchemaValidator:
             self._schema_cache[cache_key] = schema
             return schema
         except FileNotFoundError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e), code="SCHEMA_NOT_FOUND")
         except Exception as e:
-            raise ValidationError(f"Failed to load domain manifest schema: {e}")
+            raise ValidationError(
+                f"Failed to load domain manifest schema: {e}", code="SCHEMA_LOAD_FAILED"
+            )
 
     def validate_checkpoint_record(
         self, record: Dict[str, Any], file_path: str | None = None
@@ -215,11 +244,17 @@ class SchemaValidator:
             if errors:
                 for error in errors:
                     error_msg = self._format_schema_error(error)
-                    result.add_error(ValidationError(error_msg, file_path=file_path))
+                    result.add_error(
+                        ValidationError(
+                            error_msg, file_path=file_path, code="SCHEMA_CHECKPOINT_RECORD_INVALID"
+                        )
+                    )
         except Exception as e:
             result.add_error(
                 ValidationError(
-                    f"Checkpoint record schema validation failed: {e}", file_path=file_path
+                    f"Checkpoint record schema validation failed: {e}",
+                    file_path=file_path,
+                    code="SCHEMA_VALIDATION_FAILED",
                 )
             )
 
@@ -252,9 +287,11 @@ class SchemaValidator:
             self._schema_cache[cache_key] = schema
             return schema
         except FileNotFoundError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e), code="SCHEMA_NOT_FOUND")
         except Exception as e:
-            raise ValidationError(f"Failed to load checkpoint record schema: {e}")
+            raise ValidationError(
+                f"Failed to load checkpoint record schema: {e}", code="SCHEMA_LOAD_FAILED"
+            )
 
     def _load_schema(self, tier: str) -> Dict[str, Any]:
         """Load schema for a specific tier (with caching).
@@ -277,9 +314,11 @@ class SchemaValidator:
             self._schema_cache[tier] = schema
             return schema
         except FileNotFoundError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e), code="SCHEMA_NOT_FOUND")
         except Exception as e:
-            raise ValidationError(f"Failed to load schema for tier '{tier}': {e}")
+            raise ValidationError(
+                f"Failed to load schema for tier '{tier}': {e}", code="SCHEMA_LOAD_FAILED"
+            )
 
     def _load_bundle_schema(self) -> Dict[str, Any]:
         """Load bundle schema (with caching).
@@ -302,9 +341,9 @@ class SchemaValidator:
             self._schema_cache[cache_key] = schema
             return schema
         except FileNotFoundError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e), code="SCHEMA_NOT_FOUND")
         except Exception as e:
-            raise ValidationError(f"Failed to load bundle schema: {e}")
+            raise ValidationError(f"Failed to load bundle schema: {e}", code="SCHEMA_LOAD_FAILED")
 
     @staticmethod
     def _format_schema_error(error: jsonschema.ValidationError) -> str:
@@ -324,6 +363,19 @@ class SchemaValidator:
             missing_field = error.message.split("'")[1] if "'" in error.message else "unknown"
             return f"Missing required field: '{missing_field}'"
         elif error.validator == "pattern":
+            target = error.instance
+            if (
+                isinstance(target, str)
+                and target.startswith("concept:")
+                and re.fullmatch(r"relationships\.\d+\.target", path)
+            ):
+                # ISS-040: concept-to-concept links belong in the Domain Ontology
+                return (
+                    f"Field '{path}' is '{target}', but an SCD relationship targets an SCD "
+                    "(scd:...) or a citation (std:...). Declare a link between concepts in the "
+                    "domain manifest's ontology (concepts[].relationships), and the SCD's own "
+                    "concept with its 'concept' field (domain-ontology.md §3.3)"
+                )
             return f"Field '{path}' does not match required pattern: {error.message}"
         elif error.validator == "type":
             return f"Field '{path}' has incorrect type: {error.message}"

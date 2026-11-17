@@ -4,10 +4,11 @@ version: DRAFT
 title: Servicing & Collections Concept Bundle
 description: Daily or twice-monthly ACH debiting, NSF and returns, delinquency, restructuring, and confession-of-judgment
   posture.
+owner: operations
 imports: []
 scds:
 - scd:project:servicing-collections
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: 'Concept bundle for the MCA reference ontology: Servicing & Collections.'

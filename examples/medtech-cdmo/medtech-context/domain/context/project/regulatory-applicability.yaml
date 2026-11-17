@@ -1,0 +1,22 @@
+id: scd:project:regulatory-applicability
+type: project
+title: "Regulatory Applicability"
+version: "DRAFT"
+description: "The regulations and standards MedTech CDMO's quality system answers to"
+concept: concept:compliance-governance
+content:
+  summary: "The quality system is certified to ISO 13485 and operates under the FDA QMSR."
+  facts:
+    - id: RA-001
+      fact: "MedTech CDMO's quality management system is certified to ISO 13485:2016."
+      cites:
+        - std:iso-13485:2016
+    - id: RA-002
+      fact: "The quality management system operates under 21 CFR Part 820 (QMSR)."
+      cites:
+        - std:21-cfr-820
+relationships: []
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Certifications from the intake"

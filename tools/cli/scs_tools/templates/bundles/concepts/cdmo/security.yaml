@@ -3,6 +3,7 @@ type: concept
 version: "DRAFT"
 title: "Security Concept Bundle"
 description: "Security context for a medical-device CDMO: access-control model, the boundaries an assistant may touch in validated/QMS systems, and data-loss-prevention controls at the AI boundary."
+owner: security
 
 imports: []
 
@@ -12,6 +13,6 @@ scds:
   - scd:project:data-loss-prevention
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Security concept bundle for {{ project_name }}, from the Medical-Device CDMO ontology"
+  rationale: "Security concept bundle for {{ display_name }}, from the Medical-Device CDMO ontology"

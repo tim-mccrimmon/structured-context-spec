@@ -1,0 +1,100 @@
+# SCS 0.7.0 Plan
+
+- **Status**: Rev 5 (2026-10-26). Decisions recorded (section 7) except D-27, which WP-11a
+  settles. RFC 0002 amended for WP-01a, WP-01b, and section 7 G.
+- **Source of design**: `rfcs/RFC-0002-agent-mediated-scs.md` (accepted 2026-10-25)
+- **Backlog**: `ISSUES.md` ISS-042 to ISS-055; workstreams in `ROADMAP.md`
+
+RFC 0002 says what 0.7.0 is and why. This plan says how it gets built: the system as it
+stands, the target, the work packages, and how each is accepted. It is retrofitted from the RFC
+and the code on `0.7-dev`, then reviewed and approved before any build work is handed to
+agents. Test plan, QA plan, and the SCDs that govern the build agents derive from it.
+
+## Contents
+
+| # | Section | What it fixes |
+|---|---|---|
+| 1 | [System context](01-system-context.md) | What SCS 0.7 is, its boundary, actors, and what is out of scope |
+| 2 | [Component model](02-component-model.md) | Engine, validator, compiler, schemas, skills, MCP: responsibilities and boundaries |
+| 3 | [Data model](03-data-model.md) | Schemas and files: SCDs, bundles, manifests, intake record, runtime artifact, digests |
+| 4 | [Interfaces](04-interfaces.md) | CLI machine mode, result envelope, skill-to-engine contract, validator output |
+| 5 | [Lifecycle](05-lifecycle.md) | Bundle and workspace states, transitions, and the guards on each |
+| 6 | [Work breakdown](06-work-breakdown.md) | Work packages, dependencies, critical path, acceptance criteria |
+| 7 | [Decisions and gaps](07-decisions-and-gaps.md) | RFC gaps, RFC vs code conflicts, open questions to decide before build |
+
+Derived, after approval: `test-plan/`, `qa/`, `context/` (build-agent SCDs).
+
+Working material: `survey/` holds the as-built surveys the plan was drafted from; `review/`
+holds the QA reviews of the plan and their disposition.
+
+## Baseline rules
+
+- The plan changes before the code does. A work package that needs a design change stops and
+  raises it against the relevant section.
+- Each work package names the plan sections it implements and the acceptance criteria it must
+  meet.
+- RFC 0002 remains the authority on intent. Where this plan and the RFC disagree, section 7
+  records it and the maintainer decides.
+
+## Build progress
+
+Updated 2026-10-26. Branch `0.7-dev`; CI green on every commit below.
+
+| WP | State | Commit |
+|---|---|---|
+| WP-01a, WP-01b | Done: decisions recorded, RFC 0002 amended (D-27 waits for WP-11a) | `938483d` |
+| WP-00 | Done: validator version from package metadata, digest test vectors | `99ee08c` |
+| WP-04 | Done: check registry, repository mode, diagnostic codes, report schema | `3e7c7a4` |
+| WP-05 | Done: `--json` envelope, exit codes 0-5, `--dry-run`, `scd write`, `compile` to `dist/` | `476e542` |
+| WP-03 | Done: `new domain` creates the Domain repository (AGENTS.md, CI, initial commit), `new project` inside it, `ontology/`, D-06 config keys; templates by ontology and kind (D-64), `personal` ontology with boundaries only (D-61, D-62, D-72), `created_by` as `Name <email>` | `3d36d97` |
+| WP-14 | Done: tag-based versioning, D-39 checks, `--verify-version`, `compile --version`, D-17 resolution, D-70 `SCD_EMPTY`, D-71 `PROVENANCE_PLACEHOLDER` | `2bb34c0` |
+| WP-06 | Done: author and approver rules (D-13, D-71), D-74 ontology inheritance, `--dry-run` on `new`, `bundle pin`/`add-import`/`add-scd`/`remove-scd`, `add bundle --new` (D-68, D-75, D-76), full rollback | `0e16628` |
+| WP-07 | Done, M-07 approved 2026-10-26: `schema/intake/intake-schema.json`, `scs intake set`/`record-finding` (D-77, D-78), `derived_from` in SCD items, `DERIVED_FROM_UNRESOLVED`, intake checks per workspace | `e5da021` |
+| Housekeeping | Done 2026-10-28: `scs init` removed; `WORKSPACE_FILE_UNREADABLE` from validate and compile; unread rule-YAML severities removed; old dog-food and llm-portability bundles deleted; CLI README rewritten (`docs/migration.d/housekeeping.md`) | |
+| WP-08 | Done 2026-10-28: `scs bundle diff` over the resolved tree (SCDs, items with changed fields, citations, imports), D-41 baselines, `DIFF_VERSION_NOT_FOUND`, `DIFF_LEGACY_BASELINE` | |
+| WP-09 | Done 2026-10-28, provisional: `docs/placement/` for the five D-24 services; ChatGPT Help Center claims marked unconfirmed (403 on fetch); expected to change in 0.8 | |
+| WP-02a | Done 2026-10-28: Domain repositories (bundle-format §8), version verification (§7.7-§7.8), scope (overview §1.1), terminology, governance §8-§9; `spec/0.7/rfc-0002-trace.md` (10 statements pending for `agent-interface.md` in WP-02b); new overview opening | |
+| WP-02b | Done 2026-10-28: `spec/0.7/agent-interface.md` (scope, layers, machine mode, intake, provenance, confirmation, diff, drafting, advisory review); `derived_from` in core-model §4.1 and the tier docs; validation rules in bundle-format §9.7-§9.9; stacks in runtime-artifact §5; trace covers every RFC 0002 section | |
+| WP-16 | Done 2026-10-28 (D-67 in 0.7): `scs stack` (read-only, machine mode, the four checks, `STACK_ARTIFACT_INVALID`); placement pages already describe layered loading (WP-09), README gains "Previewing a stack" | |
+| WP-11a | In progress 2026-10-28: `0.7.0rc0` of both packages on TestPyPI (throwaway branch `testpypi/0.7.0rc0`); `docs/install-matrix.md` has Claude Code (local, auto mode) and Claude.ai rows; Claude.ai cannot reach TestPyPI, so the release candidate goes to PyPI or as a bundled wheel; Cursor, Codex, Copilot deferred (Tim, later) | |
+| WP-10 | Done 2026-10-28: seven skills in `skills/` (Agent Skills format, `agentskills validate` passes), shared `scs_engine.py` (version check, install plan in D-27 order, wheel staging, `run`), `skills/sync.py`, `tests/test_skills.py`; legacy plugins removed 2026-10-29 (D-26 amended). D-51 harness in `tools/skill-harness/`: 8 scenarios × 5 runs on `claude-sonnet-5-5`, every MUST and SHOULD assertion passes (i 4 of 5), $5.69; report in `tools/skill-harness/results/`. Fixes from the harness: rules 2, 6, 7 tightened; dry-run digest noted as provisional in scs-version. Assertion b is scored on what is left outside the repository (Tim, 2026-10-28) | |
+| WP-11rc | In progress 2026-10-28 (D-79: TestPyPI, not PyPI): both packages at `0.7.0rc1`, validator pinned `>=0.7.0rc1,<0.8`, stale `tools/cli/setup.py` removed, validator URLs fixed; `publish.yml` (manual, trusted publishing), `docs-ci.yml` (links, migration guide, skill copies); `docs/MIGRATION-0.7.0.md` assembled by `scripts/assemble_migration.py`; `RELEASE-NOTES-0.7.0.md`; READMEs install `scs-tools==0.7.0`; `skills/package.py` builds skill ZIPs with bundled wheels. rc1 on TestPyPI 2026-10-28 and installs with the documented command. Claude Code (local) row re-run against rc1: passes. Claude.ai row re-run with the bundled wheels: passes (three skill fixes noted in the matrix, note 7) | |
+| WP-13a | Dropped 2026-10-29 by Tim (D-80) | |
+| WP-13 | Test 1 (personal) run 2026-10-30, fixes in `7833c21`. Test 2 (CDMO) run on rc1 2026-11-02, stopped after review: one blocker (no step for source documents) and the findings that became section 7 H. Test 2 on rc2 passed 2026-11-04 (Domain and Project in one session; 11 friction rows, no blocker). Triage 2026-11-05: rc3 fixes `9e04a5c` (`scs new --title`, display name), `efc871d` (engine check needs git, platform install command), `6da3714` (author name and email wording), `ffb7c10` (optional website question, dated copies in `sources/`), `f84abe5` (new session when the other skill already ran); starter outline moved to 0.8; D-90 to the 0.8 roles RFC. `0.7.0rc3` on TestPyPI (`99db997`), harness not rerun. Added 2026-11-07: D-92 section owners (`1c122cf`, `8fc2a03`) and `scs view` review packages (`f852111`, `c7e8056`, `1f3285f`); `0.7.0rc4` on TestPyPI (`3f50b07`), harness not rerun; kit 0.7.0rc4-1 on the Omarchy share. Added 2026-11-08: "released by" wording in the review package and skills (`5c874b1`); D-92 amended, owners by name with the email optional (`bd7da56`); harness assertion u, every assertion passes (`75cc8d9`, `tools/skill-harness/results/2026-11-08-rc5.md`); `0.7.0rc5` on TestPyPI (`395da74`); kit 0.7.0rc5-1 on the Omarchy share. rc3 and rc4 were not run. WP-13 reruns on rc5, Domain and Project in separate sessions (runbook `scs-0.7-runbook-rc5.md`) | |
+| WP-10b | Done 2026-11-02 (D-81 to D-89, D-91): engine `scs status`, `scs commit`, `sources/` (`0542473`); skills `scs-domain`, `scs-project`, `scs-validate`, `scs-explain` (`67abb20`); harness assertions n to t (`9c3b107`), every MUST 5 of 5, p made a SHOULD (`abbb821`, `tools/skill-harness/results/2026-11-02-rc2.md`); `remove-scd` takes several SCDs as one change (`9f8ac2a`). `0.7.0rc2` on TestPyPI (`bf78e69`); kit on the Omarchy share. D-90 open (RFC) | |
+
+Known gaps carried forward:
+
+- The Claude Code sandbox refuses writes to `.git/config` and `.git/hooks`, so `scs new` (git
+  init) fails for a user with the sandbox on. Found by the D-51 harness; needs a line in the
+  install matrix or the intake skill.
+- `scs-validate --strict` with no arguments inside a Project workspace gives `NO_INPUT`, and
+  `scs-validate .` gives `PARSE_FILE_UNREADABLE`; agents in the harness tripped over both before
+  finding the right call.
+- A dry run's `content_digest` never equals the real run's, because the snapshot carries the
+  approval time. The scs-version skill now says so; the engine could mark it provisional.
+- Open: should `BUNDLE_SCD_UNRESOLVED` be an error? It is a warning so that ontology templates
+  and reference domains (`examples/medical-device-cdmo/`) can list SCD slots not yet written;
+  `scs compile` already refuses them. Making it an error fails those examples.
+- The generated CI workflow installs `scs-validator>=0.7.0,<0.8` from PyPI; that works once
+  0.7.0 is published to PyPI (D-27, D-79); rc-generated repositories fail that CI step until then.
+- The 0.5 presentation docs still show `scs new project --type`.
+- The exit-2 (`--strict` warnings) machine-mode test fakes the validator report. A placeholder
+  `created_by` (`PROVENANCE_PLACEHOLDER`) is now a real warning-only input in bundle and
+  repository mode; the test could use it.
+- `scs compile` writes to `dist/`, which is untracked by default and shows in `git status`; the
+  generated `.gitignore` leaves the choice to the user.
+- The examples' `created_by` values use `.example` domains and now warn as
+  `PROVENANCE_PLACEHOLDER`; they are fictional organizations and are left as they are.
+- Validator messages for drift (`CONTENT_DIGEST_MISMATCH` from bundle validation) print
+  absolute paths in human output; machine mode normalizes them to the repository root.
+
+Working notes:
+
+- Change sets per WP: code, tests, `schema/diagnostics/codes.d/WP-NN.yaml` (then
+  `python tools/scd-validator/scripts/build_codes.py`), and `docs/migration.d/WP-NN.md`.
+- Before committing: both test suites; `ruff check`; `black --check` run from inside each
+  package directory (never from `tools/`, which falls back to 88 columns); `mypy src` and
+  `mypy scs_tools`; `build_codes.py --check`; `sync_schemas.py --check`.
+- Dev environment: a venv with `pip install -e "tools/scd-validator[dev]" -e tools/cli pytest
+  jsonschema`.

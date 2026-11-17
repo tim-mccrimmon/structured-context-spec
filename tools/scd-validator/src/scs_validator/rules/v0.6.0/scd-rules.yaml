@@ -145,25 +145,6 @@ validation_modes:
     level_5_bundle: "error"
     level_6_completeness: "error"
 
-# Stub Detection Rules (for completeness validation)
-stub_detection:
-  enabled: true
-  description: "Detect placeholder/stub SCDs"
-  indicators:
-    - check: "short_description"
-      threshold: 50  # Characters
-      weight: 1
-    - check: "minimal_content"
-      threshold: 2  # Fields
-      weight: 1
-    - check: "generic_title"
-      patterns: ["tbd", "todo", "placeholder", "stub"]
-      weight: 2
-    - check: "no_relationships"
-      weight: 1
-  stub_threshold: 2  # If weight sum >= 2, likely stub
-  severity: "warning"
-
 # Additional Semantic Rules
 semantic_rules:
   - rule: "unique_id_in_scope"

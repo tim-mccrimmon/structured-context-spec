@@ -1,0 +1,10 @@
+# Diagnostic codes added by WP-08 (scs bundle diff, RFC 0002 section 7, D-41).
+# Merged into ../codes.yaml by tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  DIFF_VERSION_NOT_FOUND:
+    severity: error
+    meaning: scs bundle diff was given a --from or --to version that has no tag (D-41).
+  DIFF_LEGACY_BASELINE:
+    severity: info
+    meaning: The bundle has no SCS 0.7 version, so scs bundle diff compares with its pre-0.7 snapshot, which records the bundle file only; SCDs in both are listed as not compared (D-41).

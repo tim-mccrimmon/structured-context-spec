@@ -2,7 +2,8 @@ id: bundle:safety-risk
 type: concept
 version: "DRAFT"
 title: "Safety & Risk Concept Bundle"
-description: "Risk identification and management, safety concerns for {{ project_name }}"
+description: "Risk identification and management, safety concerns for {{ display_name }}"
+owner: quality
 
 imports: []
 
@@ -11,6 +12,6 @@ scds:
   - scd:project:safety-checklist
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Safety & Risk concept bundle for {{ project_name }}"
+  rationale: "Safety & Risk concept bundle for {{ display_name }}"

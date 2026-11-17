@@ -1,0 +1,53 @@
+domain:
+  id: domain:medical-device-cdmo
+  name: Medical-Device CDMO
+  version: 0.1.0
+  description: 'Domain Ontology for MedTech CDMO: the medical-device cdmo concepts
+    its structured context is organized around'
+  author: Dana Reyes
+  ontology:
+    concepts:
+    - id: concept:company
+      name: Company
+      description: Facts about the organization that every agent should know
+    - id: concept:prohibited
+      name: Prohibited Tools and Practices
+      description: Tools and practices forbidden, without exception, in all of the
+        organization's work
+    - id: concept:compliance-governance
+      name: Compliance & Governance
+      description: Which regulations bind the work, AI deployment-tier and autonomy
+        rules, and the overall QMS governance framework.
+      satisfies:
+      - std:iso-13485:2016
+      - std:21-cfr-820
+    - id: concept:qms-records
+      name: QMS Records
+      description: Document hierarchy and control rules, record-retention rules, and
+        CAPA triggers.
+      relationships:
+      - type: relates-to
+        target: concept:compliance-governance
+      satisfies:
+      - std:iso-13485:2016#4.2
+    - id: concept:data-provenance
+      name: Data & Provenance
+      description: Classification scheme, source-to-target lineage, ALCOA+ integrity,
+        and RAG source-precedence rules.
+      relationships:
+      - type: relates-to
+        target: concept:qms-records
+      satisfies:
+      - std:21-cfr-11
+    - id: concept:ai-accountability
+      name: AI Accountability
+      description: Human decision authority and sign-off gates, and the non-decision
+        principle for automated controls.
+      relationships:
+      - type: depends-on
+        target: concept:compliance-governance
+  schemas:
+    meta:
+      content_schema: ../../scd/meta-scd-content-schema.json
+    project:
+      content_schema: ../../scd/project-scd-content-schema.json

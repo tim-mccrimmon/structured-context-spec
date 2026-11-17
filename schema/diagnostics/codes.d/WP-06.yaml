@@ -1,0 +1,20 @@
+# Diagnostic codes added by WP-06 (machine mode for new and bundle version; the engine's
+# maintenance commands, D-08). Merged into ../codes.yaml by
+# tools/scd-validator/scripts/build_codes.py.
+
+codes:
+  IMPORT_NOT_FOUND:
+    severity: error
+    meaning: scs bundle pin names a bundle that the bundle does not import.
+  IMPORT_EXISTS:
+    severity: error
+    meaning: scs bundle add-import names a bundle that is already imported.
+  SCD_NOT_FOUND:
+    severity: error
+    meaning: scs bundle add-scd names an SCD that is not in the workspace.
+  SCD_ALREADY_LISTED:
+    severity: error
+    meaning: scs bundle add-scd names an SCD the bundle already lists.
+  SCD_NOT_LISTED:
+    severity: error
+    meaning: scs bundle remove-scd names an SCD that the bundle (or any bundle) does not list.

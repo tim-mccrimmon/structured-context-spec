@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from jinja2 import Environment
 
@@ -24,10 +24,10 @@ _JINJA_ENV.filters["yaml_dq"] = yaml_dq
 
 
 def create_directory_structure(base_path: Path, project_name: str):
-    """Create the SCS 0.6.0 workspace directory structure"""
+    """Create the SCS 0.7 workspace directory structure"""
     dirs = [
         "bundles/concepts",  # Concept bundles (e.g., architecture, security)
-        "domain",  # Domain Ontology manifest
+        "ontology",  # Domain Ontology manifest (0.6: domain/)
         "context/project",  # Project-tier SCDs
         "docs",  # Documentation
         ".scs",  # Configuration
@@ -52,7 +52,7 @@ def write_file(file_path: Path, content: str):
         f.write(content)
 
 
-def copy_template(template_path: Path, dest_path: Path, variables: Dict[str, Any] = None):
+def copy_template(template_path: Path, dest_path: Path, variables: Optional[Dict[str, Any]] = None):
     """Copy a template file, optionally rendering it with variables"""
     with open(template_path, "r", encoding="utf-8") as f:
         content = f.read()

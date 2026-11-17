@@ -1,0 +1,16 @@
+id: bundle:compliance-governance
+type: concept
+version: "DRAFT"
+title: "Compliance & Governance Concept Bundle"
+description: "Regulatory and QMS governance for a medical-device CDMO: which regulations bind the work, the AI deployment-tier and autonomy rules, electronic-records controls, and hard prohibitions on AI use."
+owner: regulatory
+
+imports: []
+
+scds:
+  - scd:project:regulatory-applicability
+
+provenance:
+  created_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Compliance & Governance concept bundle for MedTech CDMO, from the Medical-Device CDMO ontology"

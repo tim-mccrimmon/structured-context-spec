@@ -1,5 +1,4 @@
 # Skeleton SCD from the Medical-Device CDMO ontology (concept: qms-records).
-# Profile: Project only.
 # Write the rules an AI agent must follow in `directives`; only that list is
 # compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
 id: scd:project:document-control
@@ -9,7 +8,7 @@ version: "DRAFT"
 description: "The document hierarchy and control rules"
 concept: concept:qms-records
 content:
-  summary: "TODO - in a sentence or two, document control at {{ project_name }}"
+  summary: "TODO - in a sentence or two, document control at {{ display_name }}"
   directives: []
   # Examples:
   # - id: DC-001
@@ -18,6 +17,6 @@ content:
   hierarchy: "TODO - the document levels and who approves each"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Document Control skeleton from the Medical-Device CDMO ontology"

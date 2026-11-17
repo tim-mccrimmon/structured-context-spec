@@ -8,7 +8,7 @@ small, validated bundle. Once a person approves a version, it doesn't change. Wh
 vendor or runtime needs (a `CLAUDE.md`, an `AGENTS.md`, a system prompt, a gateway policy) is
 a rendering of that bundle, and can always be traced back to the version it came from.
 
-![Version](https://img.shields.io/badge/version-0.6.0-blue)
+![Version](https://img.shields.io/badge/version-0.7.0-blue)
 ![License](https://img.shields.io/badge/license-Apache_2.0-green)
 ![Status](https://img.shields.io/badge/status-active_development-orange)
 
@@ -65,40 +65,38 @@ what form you render it into, is up to you.
 ## Quick Start
 
 ```bash
-# Python 3.11 or later. Installs the 0.6.0 tools from GitHub (not yet published to PyPI).
-pip install \
-  "scs-validator @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/scd-validator" \
-  "scs-tools @ git+https://github.com/tim-mccrimmon/structured-context-spec.git@v0.6.0#subdirectory=tools/cli"
+# Python 3.11 or later, and git
+pip install "scs-tools==0.7.0"          # installs scs and scs-validate
 
-scs new domain my-org --ontology sdlc     # organization-wide (or personal) context
-cd my-org
-scs bundle validate
-scs compile bundles/domain-bundle.yaml --allow-draft -o global.yaml
+scs new domain acme-health --author "Jane Doe" --email jane@acme-health.org
+cd acme-health-context
+scs new project patient-portal --author "Jane Doe" --email jane@acme-health.org
+scs-validate --strict
+
+# Fill in the SCDs under domain/context/, then preview the compiled context
+cd domain
+scs compile bundles/domain-bundle.yaml --allow-draft
 ```
 
-Fill in the scaffolded SCDs, validate until it's clean, then version it with a named approver
-(`scs bundle version --version 1.0.0 --approved-by you@example.com`) and compile without
-`--allow-draft`. `scs new project my-app` does the same for a Project.
+To release a version, version each concept bundle you use, pin it in the Domain bundle, then
+version the Domain bundle, each with a named approver (`--approved-by "Name <email>"`). The
+[CLI documentation](tools/cli/README.md) walks through it, and the
+[Agent Skills](skills/README.md) let an assistant do it with you.
 
-- [Quick start guide](docs/quick-start-guide.md)
-- [Bundle lifecycle](docs/bundle-lifecycle.md)
 - [CLI documentation](tools/cli/README.md)
-- [Migrating to 0.6.0](docs/MIGRATION-0.6.0.md)
-
-The `scs-tools` package on PyPI is an old 0.1.0 release; don't use it. Publishing 0.7.0 to PyPI
-is planned (see [ROADMAP.md](ROADMAP.md)). Known issues in the 0.6.0 tooling are tracked in
-[ISSUES.md](ISSUES.md).
+- [Migrating to 0.7.0](docs/MIGRATION-0.7.0.md)
+- [Known issues](ISSUES.md)
 
 ---
 
 ## Where SCS Is Heading
 
-SCS 0.6.0 still expects you to learn the format. The next releases aim to remove that
-requirement: you describe your organization or project to an AI assistant, and it builds,
-validates, and versions the bundles with you, asking for your approval at each step.
+SCS 0.7.0 removes the requirement to learn the format: you describe your organization or
+project to an AI assistant, and it builds, validates, and versions the bundles with you, asking
+for your approval at each step.
 
-- **[RFC 0002: Agent-Mediated SCS](rfcs/RFC-0002-agent-mediated-scs.md)** (accepted, planned
-  for 0.7.0). An agent interface to the full lifecycle through Agent Skills and an optional
+- **[RFC 0002: Agent-Mediated SCS](rfcs/RFC-0002-agent-mediated-scs.md)** (implemented in
+  0.7.0). An agent interface to the full lifecycle through Agent Skills and an optional
   MCP server; an adaptive intake for individuals and organizations; one repository per Domain;
   content digests that make versioned bundles verifiably immutable; and an advisory review in
   which the agent raises problems and the human decides.
@@ -112,7 +110,8 @@ Feedback is welcome in Discussions and Issues.
 
 ## Examples
 
-- [`examples/two-tier-governance/`](examples/two-tier-governance/): a Domain and a Project side by side
+- [`examples/medtech-cdmo/`](examples/medtech-cdmo/): a CDMO's Domain repository with one Project, released and compiled
+- [`examples/personal/`](examples/personal/): one person's Domain repository
 - [`examples/medical-device-cdmo/`](examples/medical-device-cdmo/): the `cdmo` ontology applied
 - [`examples/merchant-cash-advance/`](examples/merchant-cash-advance/): the `mca` ontology applied
 
@@ -131,7 +130,7 @@ Feedback is welcome in Discussions and Issues.
 
 ```
 structured-context-spec/
-├── spec/0.6/          # Normative spec (current draft)
+├── spec/0.7/          # Normative spec (current)
 ├── schema/            # JSON Schemas
 ├── meta/              # The published meta bundle (bundle:meta:0.6.0)
 ├── tools/             # scs CLI and scs-validate
@@ -139,23 +138,23 @@ structured-context-spec/
 ├── examples/          # Example bundles
 ├── docs/              # Guides
 ├── rfcs/              # Proposals for spec changes
-└── plugins/           # Claude Code plugins (pre-0.6; see below)
+└── skills/            # Agent Skills for operating SCS (0.7)
 ```
 
 ---
 
-## Claude Code Plugins (pre-0.6)
+## Agent Skills
 
-The `scs-vibe` and `scs-team` plugins in [`plugins/`](plugins/) offered an early
-conversational path into SCS for Claude Code. They're built on the model SCS used before
-0.6.0 (concern bundles) and haven't been updated. They remain available for reference; RFC
-0002 proposes a portable replacement built on Agent Skills.
+The [SCS Agent Skills](skills/README.md) let an AI assistant build, validate, version, and
+compile a Domain repository for you, confirming each change with you first. They replace the
+`scs-vibe` and `scs-team` plugins, which were built on the model SCS used before 0.6.0 and are
+removed in 0.7.
 
 ---
 
 ## Contributing
 
-SCS is at 0.6 (draft), actively evolving, and open to contribution.
+SCS is at 0.7, actively evolving, and open to contribution.
 
 - **Discussions:** use cases, boundary arguments, counterexamples that break the model
 - **Issues:** schema problems, unclear terminology, missing examples

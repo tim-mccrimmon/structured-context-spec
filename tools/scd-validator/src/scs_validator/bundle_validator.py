@@ -2,7 +2,8 @@
 
 from typing import Any, Dict, List
 
-from .resolver import BundleTree
+from .digest import verify_tree
+from .resolver import BundleTree, ResolvedBundle
 from .rules_loader import RulesLoader
 from .utils import ValidationError, ValidationResult, ValidationWarning
 
@@ -46,6 +47,7 @@ class BundleValidator:
                 ValidationError(
                     "Bundle missing required 'type' field",
                     file_path=file_path,
+                    code="BUNDLE_TYPE_MISSING",
                 )
             )
             return result
@@ -56,14 +58,23 @@ class BundleValidator:
             error_msg = self.rules_loader.get_error_message(
                 self.rules, "legacy_concern_type", bundle_id=bundle_id
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_LEGACY_CONCERN_TYPE")
+            )
             return result
 
         if self.rules.get("bundle_types", {}).get(bundle_type, {}).get("deprecated"):
             warning_msg = self.rules_loader.get_error_message(
                 self.rules, "deprecated_standards_bundle", bundle_id=bundle_id
             )
-            result.add_warning(ValidationWarning(warning_msg, level="bundle", file_path=file_path))
+            result.add_warning(
+                ValidationWarning(
+                    warning_msg,
+                    level="bundle",
+                    file_path=file_path,
+                    code="BUNDLE_STANDARDS_DEPRECATED",
+                )
+            )
 
         for ref in bundle.get("scds") or []:
             if str(ref).startswith("scd:standards:") and bundle_type != "standards":
@@ -71,7 +82,12 @@ class BundleValidator:
                     self.rules, "deprecated_standards_scd", ref=ref
                 )
                 result.add_warning(
-                    ValidationWarning(warning_msg, level="bundle", file_path=file_path)
+                    ValidationWarning(
+                        warning_msg,
+                        level="bundle",
+                        file_path=file_path,
+                        code="BUNDLE_STANDARDS_SCD_DEPRECATED",
+                    )
                 )
 
         # Validate XOR constraint
@@ -102,6 +118,7 @@ class BundleValidator:
                         self.rules, "import_cycle", cycle=" -> ".join(cycle)
                     ),
                     file_path=str(tree.root.path),
+                    code="IMPORT_CYCLE",
                 )
             )
 
@@ -120,6 +137,7 @@ class BundleValidator:
                                 self.rules, "unresolved_import", ref=edge.ref, **fmt
                             ),
                             file_path=path,
+                            code="IMPORT_UNRESOLVED",
                         )
                     )
                     continue
@@ -135,6 +153,7 @@ class BundleValidator:
                             ),
                             level="bundle",
                             file_path=path,
+                            code="IMPORT_VERSION_MISMATCH",
                         )
                     )
                 import_type = edge.target.type or "unknown"
@@ -150,6 +169,7 @@ class BundleValidator:
                                 **fmt,
                             ),
                             file_path=path,
+                            code="IMPORT_TYPE_FORBIDDEN",
                         )
                     )
                 elif (
@@ -167,6 +187,7 @@ class BundleValidator:
                                 **fmt,
                             ),
                             file_path=path,
+                            code="IMPORT_TYPE_NOT_ALLOWED",
                         )
                     )
                 if import_type == "meta" and ":" not in edge.ref[len("bundle:") :]:
@@ -177,6 +198,7 @@ class BundleValidator:
                             ),
                             level="bundle",
                             file_path=path,
+                            code="IMPORT_META_UNPINNED",
                         )
                     )
 
@@ -193,6 +215,7 @@ class BundleValidator:
                                 **fmt,
                             ),
                             file_path=path,
+                            code="IMPORT_TYPE_LIMIT_EXCEEDED",
                         )
                     )
 
@@ -211,6 +234,7 @@ class BundleValidator:
                                 ),
                                 level="bundle",
                                 file_path=path,
+                                code="IMPORT_EXPECTED_TYPE_MISSING",
                             )
                         )
 
@@ -224,9 +248,47 @@ class BundleValidator:
                     ),
                     level="bundle",
                     file_path=str(tree.root.path),
+                    code="BUNDLE_SCD_UNRESOLVED",
                 )
             )
 
+        return result
+
+    def validate_digests(self, tree: BundleTree) -> ValidationResult:
+        """Check every versioned bundle in the tree against the content digest in its version
+        manifest (spec/0.7/bundle-format.md §7.6). A mismatch is an error in every mode."""
+        result = ValidationResult("bundle")
+        for check in verify_tree(tree):
+            fmt = dict(
+                bundle_id=check.bundle.id, version=check.bundle.version, manifest=check.manifest
+            )
+            path = str(check.bundle.path)
+            if check.status == "mismatch":
+                changes = ", ".join(check.changes) or "unknown (no content_inputs recorded)"
+                message = self.rules_loader.get_error_message(
+                    self.rules, "content_digest_mismatch", changes=changes, **fmt
+                )
+                order = _version_again(tree, check.bundle)
+                if len(order) > 1:
+                    message += (
+                        " Version again, bottom-up, re-pinning each in the next: "
+                        + ", then ".join(order)
+                        + "."
+                    )
+                result.add_error(
+                    ValidationError(message, file_path=path, code="CONTENT_DIGEST_MISMATCH")
+                )
+            elif check.status == "unrecorded":
+                result.add_warning(
+                    ValidationWarning(
+                        self.rules_loader.get_error_message(
+                            self.rules, "content_digest_unrecorded", **fmt
+                        ),
+                        level="bundle",
+                        file_path=path,
+                        code="CONTENT_DIGEST_UNRECORDED",
+                    )
+                )
         return result
 
     def _validate_xor_constraint(
@@ -271,10 +333,17 @@ class BundleValidator:
             )
 
             if severity == "error":
-                result.add_error(ValidationError(error_msg, file_path=file_path))
+                result.add_error(
+                    ValidationError(error_msg, file_path=file_path, code="BUNDLE_XOR_VIOLATION")
+                )
             else:
                 result.add_warning(
-                    ValidationWarning(error_msg, level="bundle", file_path=file_path)
+                    ValidationWarning(
+                        error_msg,
+                        level="bundle",
+                        file_path=file_path,
+                        code="BUNDLE_XOR_VIOLATION_WARNING",
+                    )
                 )
 
     def _validate_bundle_type_rules(
@@ -303,6 +372,7 @@ class BundleValidator:
                     f"Unknown bundle type '{bundle_type}' - no validation rules found",
                     level="bundle",
                     file_path=file_path,
+                    code="BUNDLE_TYPE_UNKNOWN",
                 )
             )
             return
@@ -364,7 +434,9 @@ class BundleValidator:
                 actual=array_len,
                 required=min_val,
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_TOO_FEW_ITEMS")
+            )
 
         # Check maximum
         max_val = constraints.get("max")
@@ -377,7 +449,9 @@ class BundleValidator:
                 actual=array_len,
                 allowed=max_val,
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_TOO_MANY_ITEMS")
+            )
 
         # Check required (must have at least 1)
         required = constraints.get("required", False)
@@ -388,7 +462,9 @@ class BundleValidator:
                 field=field_name,
                 bundle_type=bundle_type,
             )
-            result.add_error(ValidationError(error_msg, file_path=file_path))
+            result.add_error(
+                ValidationError(error_msg, file_path=file_path, code="BUNDLE_REQUIRED_FIELD_EMPTY")
+            )
 
     def _validate_meta_bundle(
         self,
@@ -424,5 +500,25 @@ class BundleValidator:
                         pattern=version_pattern,
                     )
                     result.add_warning(
-                        ValidationWarning(error_msg, level="bundle", file_path=file_path)
+                        ValidationWarning(
+                            error_msg,
+                            level="bundle",
+                            file_path=file_path,
+                            code="BUNDLE_META_VERSION_INVALID",
+                        )
                     )
+
+
+def _version_again(tree: BundleTree, changed: ResolvedBundle) -> List[str]:
+    """The changed bundle, then every bundle in the tree that imports it, directly or not,
+    nearest first: the order to version them again (D-19)."""
+    order = [changed.id]
+    frontier = [changed]
+    while frontier:
+        importers = []
+        for edge in tree.edges:
+            if any(edge.target is b for b in frontier) and edge.importer.id not in order:
+                order.append(edge.importer.id)
+                importers.append(edge.importer)
+        frontier = importers
+    return order

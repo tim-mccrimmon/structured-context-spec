@@ -11,7 +11,7 @@ domain:
   # taxonomy or relationships yet; add depth incrementally if that changes.
   # These 11 concepts are recommendations, not requirements (see
   # tools/scd-validator/src/scs_validator/rules/v0.5.0/completeness-rules.yaml) - a project in
-  # this domain uses whichever subset fits, as examples/med-adherence does.
+  # this domain uses whichever subset fits.
   ontology:
     concepts:
       - id: concept:business-context

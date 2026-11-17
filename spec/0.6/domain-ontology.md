@@ -33,10 +33,10 @@ needs to be a machine-answerable question, not something answered by reading pro
 **Field evidence.** The original "concerns" list was never domain-neutral — it was one
 ontology (Software Development / SDLC) wearing a generic name; its shape maps directly onto
 a conventional product plan's chapters. Two engagements broke that assumption in different
-ways: a **Medical-Device CDMO** (Nextern) needed risk management, design controls, and
+ways: a **Medical-Device CDMO** needed risk management, design controls, and
 supplier qualification — concepts the SDLC list has no home for — and lost the regulatory
 mapping that mattered most in that market when forced into the SDLC shape. A **Business
-Funding** engagement (Everest) is a third, distinct market with no obvious existing
+Funding** engagement is a third, distinct market with no obvious existing
 framework to align to; it is now modeled as the **MCA** ontology (§4). A single fixed ontology
 cannot serve every business type SCS is used in.
 
@@ -262,9 +262,9 @@ provenance MUST also include:
 
 ```yaml
 provenance:
-  created_by: jane@nextern.com
+  created_by: jane@medtech-cdmo.test
   created_at: "2026-09-20T00:00:00Z"
-  version_approved_by: sam@nextern.com
+  version_approved_by: sam@medtech-cdmo.test
   version_approved_at: "2026-09-21T00:00:00Z"
   rationale: "Added ISO 14971 clause mapping for risk-management concept"
 ```

@@ -13,7 +13,8 @@ This is the **spec repo**, not the product. SCS defines the format (SCDs, bundle
 relationships). SCP (Supervisory Control Plane) is the commercial runtime product built on top
 of SCS — it lives in a separate private repo.
 
-**Current spec version**: 0.6.0 (draft, branch `0.6-dev`)
+**Current spec version**: 0.7.0 (released 2026-11-17): RFC 0002 (agent-mediated SCS). Next: 0.8
+(see `ISSUES.md`).
 **License**: Apache 2.0
 **Website**: https://structuredcontext.dev
 **Registry/product**: SCP (separate repo: `SCP-2`)
@@ -44,14 +45,10 @@ structured-context-spec/
 │   ├── bundles/            # Bundle manifest templates
 │   └── scd/                # SCD templates by tier
 ├── examples/               # Reference implementations
-├── plugins/                # Editor/tool integrations
-│   ├── scs-vibe/           # Cursor/Windsurf plugin
-│   └── scs-team/           # Claude Code multi-agent plugin
+├── skills/                 # Agent Skills (scs-domain, scs-project, ...) for operating SCS
 ├── tools/                  # CLI and validator tools
 │   ├── cli/                # scs CLI
 │   └── scd-validator/      # YAML structure validator
-├── dog-food/               # SCS documenting itself with SCS
-│   └── SCS-MED-CONTEXT/    # Bundles + SCDs for SCS's own context
 ├── context/                # Additional spec context documents
 ├── docs/                   # Non-spec documentation
 └── CONTRIBUTING.md         # Contribution guide
@@ -155,28 +152,17 @@ See `rfcs/README.md` for full process details.
   - Concept bundles are leaf nodes (no imports)
   - Domain bundle = organization / Global: imports `bundle:meta:<version>` + concepts, no direct SCDs
   - Project bundle: concepts (or SCDs) directly; never imports meta, domain, or standards
-  - Domain and Project bundles are independent trees, compiled separately
+  - Domain and Project bundles are compiled separately; at runtime a Project inherits its
+    Domain's rules
 - **Relationships** — Explicit edges between SCDs for graph traversal (`references`, `applies_to`, `governed_by`)
 - **Validation**: Loose (structure only) in Phase 1 / DRAFT; strict in Phase 2 / versioned
 
 ---
 
-## Dogfooding Pattern (`dog-food/`)
+## Agent Skills
 
-The spec documents itself using SCS. This is:
-- Proof that SCS works in practice
-- The reference implementation for what good bundles look like
-- Actual context used when developing the spec
-
-`dog-food/SCS-MED-CONTEXT/` contains the live bundles and SCDs for SCS itself.
-When working on the spec, load this context to see SCS applied to SCS.
-
----
-
-## Plugins
-
-- **scs-vibe** (`plugins/scs-vibe/`) — Cursor and Windsurf integration for design-time context
-- **scs-team** (`plugins/scs-team/`) — Claude Code multi-agent team coordination
+- **`skills/`** — four `scs-*` skills that operate SCS through the engine in machine mode
+  (see `skills/README.md`). They replace the `scs-vibe` and `scs-team` plugins, removed in 0.7.
 
 ---
 
@@ -205,6 +191,6 @@ Don't add SCP product details to spec documents. Don't add SCS spec format detai
 
 ---
 
-**Last Updated**: 2026-10-19
-**Current Version**: SCS 0.6.0 (draft)
+**Last Updated**: 2026-11-17
+**Current Version**: SCS 0.7.0 (released)
 **Global product context**: see `~/.claude/CLAUDE.md`

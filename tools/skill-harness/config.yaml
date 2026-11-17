@@ -1,0 +1,18 @@
+# Skill behaviour harness (D-51). Changes to the pinned models are recorded in README.md.
+models:
+  agent: claude-sonnet-5-5     # the model under test, running the skills
+  user: claude-haiku-5-5       # the simulated user
+  judge: claude-sonnet-5-5     # grades the two assertions that need judgment (e, l)
+runs: 5                        # each scenario runs this many times
+pass:
+  MUST: 5                      # of 5 runs
+  SHOULD: 4
+limits:
+  user_turns: 14               # simulated user messages per conversation
+  agent_turns: 40              # agent tool-use turns per reply
+  budget_usd: 3.00             # per run, agent only (the SDK's own estimate)
+# USD per million tokens, for the simulated user and the judge (the agent's cost is reported
+# by the Agent SDK). Checked 2026-10-28 at platform.claude.com/docs/en/about-claude/pricing.
+prices:
+  claude-sonnet-5-5: {input: 2.00, output: 10.00, cache_write: 2.50, cache_read: 0.10}
+  claude-haiku-5-5: {input: 0.10, output: 0.50, cache_write: 0.125, cache_read: 0.01}

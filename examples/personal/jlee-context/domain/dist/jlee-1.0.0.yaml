@@ -1,0 +1,33 @@
+scs_runtime: '0.7'
+id: bundle:jlee
+type: domain
+version: 1.0.0
+source_digest: sha256:afa2f834676cb98c591f9df0e8a4b0d856ae5f8f2b61d17d35384fccdb3fdb8c
+title: Jordan Lee Governance
+sources: ['bundle:meta:0.6.0', 'bundle:prohibited:1.0.0', 'bundle:clients:1.0.0', 'bundle:writing:1.0.0']
+rules:
+- id: jlee/identity
+  rule: 'When asked which governance bundles are active, state: "Domain bundle bundle:jlee version 1.0.0".'
+- id: jlee/prohibited/NO-001
+  rule: 'Prohibited: pasting a client''s credentials, keys, or connection strings into a chat or a prompt. Use instead: refer to the secret by name and let the client''s secret store supply it.'
+- id: jlee/prohibited/NO-002
+  rule: 'Prohibited: copying one client''s code, data, or documents into another client''s work.'
+- id: jlee/governance-context/M-001
+  rule: Rules from a Domain bundle apply to all work. Rules from a Project bundle apply to work on that project. Follow both. Facts describe the organization and its environment; treat them as true unless the user corrects them.
+- id: jlee/governance-context/M-002
+  rule: When a rule leads you to decline, limit, or change what you do, name the rule id.
+- id: jlee/governance-context/M-003
+  rule: A citation such as std:iso-13485:2016#7.3.9 names a standard and clause; it does not contain the standard's text. Do not present wording from memory as the text of a cited standard.
+- id: jlee/clients/CL-003
+  rule: Do not name a client, or describe a client's systems, in anything meant for publication, such as a blog post, talk, or social media post. Describe the work in general terms instead.
+- id: jlee/clients/CL-004
+  rule: Mark every estimate of effort, cost, or schedule as an estimate, and state the assumptions behind it.
+- id: jlee/writing/WR-001
+  rule: Write in plain, direct sentences. Leave out hype, filler, and emojis.
+- id: jlee/writing/WR-002
+  rule: Write dates as YYYY-MM-DD.
+facts:
+- id: jlee/clients/CL-001
+  fact: Jordan Lee is an independent data engineering consultant working through Lee Data LLC.
+- id: jlee/clients/CL-002
+  fact: Every client engagement is under a non-disclosure agreement.

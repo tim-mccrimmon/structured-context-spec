@@ -1,0 +1,19 @@
+id: bundle:company
+type: concept
+version: 1.0.0
+title: Company
+description: Facts about MedTech CDMO that every agent should know
+owner: executive
+imports: []
+scds:
+- scd:project:company-profile
+provenance:
+  created_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  created_at: '2026-10-01T09:00:00+00:00'
+  rationale: Company concept bundle for MedTech CDMO
+  version_approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  version_approved_at: '2026-10-01T09:00:00Z'
+  approval_status: validated
+  validation_passed: true
+  validation_date: '2026-10-01T09:00:00Z'
+  version_notes: First approved version

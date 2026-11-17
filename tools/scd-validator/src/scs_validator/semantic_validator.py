@@ -49,6 +49,7 @@ class SemanticValidator:
                     level="semantic",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_STANDARDS_TIER_DEPRECATED",
                 )
             )
 
@@ -96,6 +97,7 @@ class SemanticValidator:
                             f"with id '{entry_id}'. These ids must be unique within an SCD.",
                             scd_id=scd_id,
                             file_path=file_path,
+                            code="SCD_DUPLICATE_ENTRY_ID",
                         )
                     )
                 elif entry_id:
@@ -118,6 +120,7 @@ class SemanticValidator:
                         "with no conditions; narrow the subject instead of qualifying it.",
                         scd_id=scd_id,
                         file_path=file_path,
+                        code="SCD_PROHIBITION_NOT_BINARY",
                     )
                 )
 
@@ -140,6 +143,7 @@ class SemanticValidator:
                     "Missing 'type' field",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_TYPE_MISSING",
                 )
             )
             return
@@ -150,6 +154,7 @@ class SemanticValidator:
                     f"Type '{scd_type}' does not match tier '{tier}' in ID '{scd_id}'",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_TYPE_TIER_MISMATCH",
                 )
             )
 
@@ -167,7 +172,11 @@ class SemanticValidator:
                     version=version,
                     pattern=version_pattern,
                 )
-                result.add_error(ValidationError(error_msg, scd_id=scd_id, file_path=file_path))
+                result.add_error(
+                    ValidationError(
+                        error_msg, scd_id=scd_id, file_path=file_path, code="SCD_VERSION_INVALID"
+                    )
+                )
                 return
 
         # If not DRAFT, validate as semver
@@ -180,6 +189,7 @@ class SemanticValidator:
                         f"Version '{version}' is not valid semantic versioning: {e}",
                         scd_id=scd_id,
                         file_path=file_path,
+                        code="SCD_VERSION_INVALID",
                     )
                 )
 
@@ -198,6 +208,7 @@ class SemanticValidator:
                     level="semantic",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_PROVENANCE_EMPTY",
                 )
             )
             return
@@ -210,6 +221,7 @@ class SemanticValidator:
                     "Provenance 'created_by' is required and must not be empty",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_PROVENANCE_CREATED_BY_MISSING",
                 )
             )
 
@@ -232,6 +244,7 @@ class SemanticValidator:
                     level="semantic",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_PROVENANCE_RATIONALE_MISSING",
                 )
             )
 
@@ -252,6 +265,7 @@ class SemanticValidator:
                     f"Provenance '{field_name}' is not valid ISO8601 format: {e}",
                     scd_id=scd_id,
                     file_path=file_path,
+                    code="SCD_PROVENANCE_TIMESTAMP_INVALID",
                 )
             )
 
@@ -272,7 +286,11 @@ class SemanticValidator:
                 scd_id=scd_id,
                 pattern=id_pattern,
             )
-            result.add_error(ValidationError(error_msg, scd_id=scd_id, file_path=file_path))
+            result.add_error(
+                ValidationError(
+                    error_msg, scd_id=scd_id, file_path=file_path, code="SCD_ID_INVALID"
+                )
+            )
 
     def _validate_required_strings(
         self, scd: Dict[str, Any], scd_id: str, result: ValidationResult, file_path: str | None
@@ -289,5 +307,6 @@ class SemanticValidator:
                             f"Field '{field}' must not be empty",
                             scd_id=scd_id,
                             file_path=file_path,
+                            code="SCD_FIELD_EMPTY",
                         )
                     )

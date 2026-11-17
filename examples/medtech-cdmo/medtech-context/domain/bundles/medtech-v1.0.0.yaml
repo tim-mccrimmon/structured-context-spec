@@ -1,0 +1,25 @@
+id: bundle:medtech
+type: domain
+version: 1.0.0
+title: MedTech CDMO Governance
+description: Governance for all of MedTech CDMO's work, organized by the Medical-Device
+  CDMO ontology
+imports:
+- bundle:meta:0.6.0
+- bundle:company:1.0.0
+- bundle:prohibited:1.0.0
+- bundle:compliance-governance:1.0.0
+- bundle:qms-records:1.0.0
+- bundle:data-provenance:1.0.0
+- bundle:ai-accountability:1.0.0
+scds: []
+provenance:
+  created_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  created_at: '2026-10-01T09:00:00+00:00'
+  rationale: Initial Domain bundle for MedTech CDMO
+  version_approved_by: Dana Reyes <dana.reyes@medtech-cdmo.test>
+  version_approved_at: '2026-10-01T09:00:00Z'
+  approval_status: validated
+  validation_passed: true
+  validation_date: '2026-10-01T09:00:00Z'
+  version_notes: First approved version

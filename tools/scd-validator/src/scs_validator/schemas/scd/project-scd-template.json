@@ -291,6 +291,23 @@
                 "type": "string",
                 "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
               }
+            },
+            "derived_from": {
+              "type": "array",
+              "description": "Where this item came from (RFC 0002 section 5): an intake answer or a source document in the workspace's intake.yaml. For reviewers; not compiled",
+              "items": {
+                "type": "object",
+                "oneOf": [
+                  {"required": ["intake"]},
+                  {"required": ["source"]}
+                ],
+                "properties": {
+                  "intake": {"type": "string", "minLength": 1, "description": "An answers[].id"},
+                  "source": {"type": "string", "minLength": 1, "description": "A source_documents[].id"},
+                  "locator": {"type": "string", "minLength": 1, "description": "Where in the source, such as a section"}
+                },
+                "additionalProperties": false
+              }
             }
           },
           "additionalProperties": false
@@ -333,6 +350,23 @@
                 "type": "string",
                 "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
               }
+            },
+            "derived_from": {
+              "type": "array",
+              "description": "Where this item came from (RFC 0002 section 5): an intake answer or a source document in the workspace's intake.yaml. For reviewers; not compiled",
+              "items": {
+                "type": "object",
+                "oneOf": [
+                  {"required": ["intake"]},
+                  {"required": ["source"]}
+                ],
+                "properties": {
+                  "intake": {"type": "string", "minLength": 1, "description": "An answers[].id"},
+                  "source": {"type": "string", "minLength": 1, "description": "A source_documents[].id"},
+                  "locator": {"type": "string", "minLength": 1, "description": "Where in the source, such as a section"}
+                },
+                "additionalProperties": false
+              }
             }
           },
           "additionalProperties": false
@@ -359,6 +393,23 @@
               "items": {
                 "type": "string",
                 "pattern": "^std:[a-z0-9][a-z0-9.-]*(:[A-Za-z0-9.-]+)?(#[A-Za-z0-9.()_-]+)?$"
+              }
+            },
+            "derived_from": {
+              "type": "array",
+              "description": "Where this item came from (RFC 0002 section 5): an intake answer or a source document in the workspace's intake.yaml. For reviewers; not compiled",
+              "items": {
+                "type": "object",
+                "oneOf": [
+                  {"required": ["intake"]},
+                  {"required": ["source"]}
+                ],
+                "properties": {
+                  "intake": {"type": "string", "minLength": 1, "description": "An answers[].id"},
+                  "source": {"type": "string", "minLength": 1, "description": "A source_documents[].id"},
+                  "locator": {"type": "string", "minLength": 1, "description": "Where in the source, such as a section"}
+                },
+                "additionalProperties": false
               }
             }
           },

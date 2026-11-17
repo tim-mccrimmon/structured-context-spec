@@ -1,0 +1,18 @@
+id: scd:project:writing
+type: project
+title: "Writing"
+version: "DRAFT"
+description: "How Jordan wants writing done"
+concept: concept:writing
+content:
+  summary: "Plain, direct writing."
+  directives:
+    - id: WR-001
+      directive: "Write in plain, direct sentences. Leave out hype, filler, and emojis."
+    - id: WR-002
+      directive: "Write dates as YYYY-MM-DD."
+relationships: []
+provenance:
+  created_by: "Jordan Lee <jordan@jlee-data.test>"
+  created_at: "2026-10-01T09:00:00+00:00"
+  rationale: "Writing preferences from the intake"

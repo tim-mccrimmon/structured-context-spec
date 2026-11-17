@@ -1,5 +1,4 @@
 # Skeleton SCD from the Medical-Device CDMO ontology (concept: supplier-qualification).
-# Profile: Project only.
 # Write the facts an AI agent should know in `facts`; only that list is
 # compiled. The fields after it are for reviewers. Replace every TODO, or delete the field.
 id: scd:project:supplier-assessment
@@ -9,7 +8,7 @@ version: "DRAFT"
 description: "How platform suppliers are assessed"
 concept: concept:supplier-qualification
 content:
-  summary: "TODO - in a sentence or two, supplier assessment at {{ project_name }}"
+  summary: "TODO - in a sentence or two, supplier assessment at {{ display_name }}"
   facts: []
   # Examples:
   # - id: SA-001
@@ -18,6 +17,6 @@ content:
   method: "TODO - the assessment method and its outputs"
 relationships: []
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: "Supplier Assessment skeleton from the Medical-Device CDMO ontology"

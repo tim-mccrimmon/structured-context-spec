@@ -1,0 +1,39 @@
+# How examples/build.py makes medtech-context/ with the engine. The SCDs it writes are the
+# ones under medtech-context/*/context/project/; every other template the scaffold supplies is
+# retired. See examples/README.md.
+repository: medtech-context
+date: "2026-10-01T09:00:00Z"
+author: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+
+domain:
+  new: [medtech, --ontology, cdmo, --title, "MedTech CDMO"]
+  intake:
+    audience: organization
+    regulated: true
+    certifications: "[std:iso-13485:2016, std:21-cfr-820]"
+    owners:
+      - "{role: executive, person: Morgan Chen <morgan.chen@medtech-cdmo.test>, title: CEO}"
+      - "{role: ai-governance, person: Dana Reyes <dana.reyes@medtech-cdmo.test>, title: VP Quality}"
+      - "{role: regulatory, person: Sam Okafor <sam.okafor@medtech-cdmo.test>, title: Director of Regulatory Affairs}"
+      - "{role: quality, person: Dana Reyes <dana.reyes@medtech-cdmo.test>, title: VP Quality}"
+      - "{role: it, person: Lee Park <lee.park@medtech-cdmo.test>, title: IT Director}"
+    approvers:
+      - "{person: Dana Reyes <dana.reyes@medtech-cdmo.test>, role: VP Quality}"
+  release:
+    version: 1.0.0
+    approved_by: "Dana Reyes <dana.reyes@medtech-cdmo.test>"
+    notes: "First approved version"
+
+projects:
+  infusion-pump-fw:
+    new: [infusion-pump-fw, --title, "Infusion Pump Firmware"]
+    intake:
+      owners:
+        - "{role: it, person: Lee Park <lee.park@medtech-cdmo.test>, title: IT Director}"
+        - "{role: engineering, person: Ravi Iyer <ravi.iyer@medtech-cdmo.test>, title: Firmware Lead}"
+      approvers:
+        - "{person: Ravi Iyer <ravi.iyer@medtech-cdmo.test>, role: Firmware Lead}"
+    release:
+      version: 1.0.0
+      approved_by: "Ravi Iyer <ravi.iyer@medtech-cdmo.test>"
+      notes: "First approved version"

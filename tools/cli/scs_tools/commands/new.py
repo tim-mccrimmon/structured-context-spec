@@ -1,15 +1,24 @@
 """
-New command - scaffolds a new SCS Domain or Project workspace
+New command - scaffolds a Domain repository (`scs new domain`) and the Project workspaces in it
+(`scs new project`) (RFC 0002 section 9)
 """
 
-import os
-from datetime import datetime, timezone
+import json
+import re
+import shutil
+import tempfile
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as pkg_version
 from pathlib import Path
+from typing import List, Optional
 
 import click
+from scs_validator.envelope import SCS_VERSION, Change, relative
+from scs_validator.names import reserved_bundle_name
+from scs_validator.workspace import CONFIG, read_config
 
+from scs_tools import clock, git, identity
+from scs_tools.machine import EXIT_USAGE, CommandError, Envelope, Output, machine_command
 from scs_tools.utils.files import (
     copy_template,
     create_directory_structure,
@@ -18,20 +27,22 @@ from scs_tools.utils.files import (
 )
 from scs_tools.utils.project_types import (
     ONTOLOGY_MODELS,
-    PROJECT_TYPES,
+    SDLC_INDUSTRY_SCDS,
     get_concept_info,
-    get_concepts_for_project_type,
     get_ontology_model_config,
-    get_project_type_config,
 )
+from scs_tools.workspace import find_domain_repository
 
 # The meta bundle published with the spec (meta/ at the repo root). scs-validator ships a copy,
-# so a Domain bundle's import of it resolves without the bundle being in the workspace.
+# so a Domain bundle's import of it resolves without the bundle being in the workspace. Kept at
+# 0.6.0 for SCS 0.7 (D-21).
 META_BUNDLE_REF = "bundle:meta:0.6.0"
 
 # Concepts every Domain bundle gets, whatever its ontology model: facts about the organization
 # and its binary prohibitions. Concept id -> (name, description, SCD names). Templates live in
-# templates/bundles/concepts/common/ and templates/scds/common/.
+# templates/bundles/concepts/common/ and templates/scds/common/. The personal ontology gets only
+# the prohibited concept (boundaries), in a Domain or a Project (D-62, D-72); identity is
+# provenance, not a concept (D-63).
 DOMAIN_COMMON_CONCEPTS = {
     "company": (
         "Company",
@@ -44,6 +55,10 @@ DOMAIN_COMMON_CONCEPTS = {
         ["prohibited"],
     ),
 }
+PERSONAL_CONCEPTS = ["prohibited"]
+
+# A workspace name becomes a directory, a bundle id (`bundle:<name>`), and a tag prefix.
+NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 def _template_model(concept: str, ontology: str) -> str:
@@ -64,11 +79,12 @@ def _scs_tools_version() -> str:
 @click.group()
 def new():
     """
-    Create new SCS artifacts
+    Create a Domain repository or a Project workspace in one
 
-    `scs new domain` creates an organization's Domain bundle workspace (governance that
-    applies to all work); `scs new project` creates a Project bundle workspace (governance
-    for one project). The two are independent: neither imports the other.
+    `scs new domain` creates an organization's Domain repository, `<name>-context/`, with the
+    Domain workspace (governance that applies to all work) under `domain/`. `scs new project`,
+    run inside that repository, adds a Project workspace under `projects/`. The two bundles are
+    independent: neither imports the other.
     """
     pass
 
@@ -83,26 +99,19 @@ def _workspace_options(f):
 _WORKSPACE_OPTIONS = [
     click.argument("name", required=False),
     click.option(
-        "--type",
-        "project_type",
-        type=click.Choice(list(PROJECT_TYPES.keys())),
-        default=None,
-        help="Concept and SCD set to scaffold (sdlc ontology only - ignored for other "
-        "--ontology values)",
-    ),
-    click.option(
         "--ontology",
         type=click.Choice(list(ONTOLOGY_MODELS.keys())),
-        default="sdlc",
-        help="Ontology model to scaffold against (default: sdlc). Non-sdlc models scaffold "
-        "their full concept set and ignore --type.",
+        default=None,
+        help="Ontology model to scaffold against (a Domain: default sdlc; a Project: default "
+        "its Domain's). Each supplies one template set for a Domain and one for a Project; "
+        "remove what does not apply. personal supplies only boundaries (the prohibited "
+        "concept).",
     ),
     click.option(
-        "--dir",
-        "directory",
-        type=click.Path(),
+        "--title",
         default=None,
-        help="Directory to create the workspace in (default: current directory)",
+        help="Display name, written as people write it (e.g. 'MedTech' for medtech); used in "
+        "titles and descriptions. Default: the name",
     ),
     click.option("--author", default=None, help="Author name for provenance"),
     click.option("--email", default=None, help="Author email for provenance"),
@@ -112,260 +121,434 @@ _WORKSPACE_OPTIONS = [
         is_flag=True,
         help="Disable interactive mode (use defaults/flags only)",
     ),
+    click.option("--dry-run", is_flag=True, help="Report what would be created; write nothing"),
 ]
 
 
 @new.command()
 @_workspace_options
-def domain(name, project_type, ontology, directory, author, email, interactive, no_interactive):
+@click.option(
+    "--dir",
+    "directory",
+    type=click.Path(),
+    default=None,
+    help="Directory to create the repository in (default: current directory)",
+)
+@machine_command("new domain")
+def domain(
+    envelope: Envelope,
+    out: Output,
+    name,
+    ontology,
+    title,
+    author,
+    email,
+    interactive,
+    no_interactive,
+    dry_run,
+    directory,
+):
     """
-    Create a Domain bundle workspace for an organization
+    Create a Domain repository for an organization or a person
 
-    The Domain bundle holds the governance that applies to all of an organization's work
-    (sometimes called its Global or organization bundle). It starts from an industry
-    ontology model, imports the published meta bundle and one concept bundle per concept,
-    and is compiled with `scs compile bundles/domain-bundle.yaml`.
+    Creates `NAME-context/`, a git repository holding the Domain workspace under `domain/` and,
+    later, one workspace per Project under `projects/`. The Domain bundle holds the governance
+    that applies to all of the owner's work. The repository also gets AGENTS.md (with a
+    CLAUDE.md pointer), a CI workflow that runs `scs-validate --strict`, and an initial commit.
 
-    Ontology models: sdlc (default), mca, cdmo.
+    Ontology models: sdlc (default), mca, cdmo, personal. The scaffold supplies the
+    ontology's Domain templates; remove what does not apply. A personal Domain gets only
+    boundaries (the prohibited concept); its other concepts are defined with the user.
 
     \b
     Examples:
         scs new domain acme-health                 # Interactive mode (default)
         scs new domain acme-funding --ontology mca
-        scs new domain acme --author "Jane Doe" --email "jane@example.com" --no-interactive
+        scs new domain jdoe --ontology personal
+        scs new domain acme --author "Jane Doe" --email "jane@acme-health.org" --no-interactive
 
     See also: scs new project
     """
-    _scaffold(
-        "domain",
-        name,
-        project_type,
-        ontology,
-        directory,
-        author,
-        email,
-        interactive,
-        no_interactive,
+    name, title, author, email = _ask(
+        "domain", out, name, title, author, email, interactive, no_interactive
     )
+    _check_name(name, "domain")
+    ontology = ontology or "sdlc"
+    parent = Path(directory) if directory else Path.cwd()
+    repo = parent / f"{name}-context"
+    if repo.exists():
+        raise CommandError("WORKSPACE_EXISTS", f"'{repo}' already exists")
+    if not git.available():
+        raise CommandError("GIT_REQUIRED", "scs new domain needs git, and git was not found")
+    envelope.result = {"repository": str(repo), "workspace": "domain", "bundle": f"bundle:{name}"}
+    if dry_run:
+        with tempfile.TemporaryDirectory(prefix="scs-new-") as tmp:
+            target = Path(tmp) / repo.name
+            _scaffold(
+                Output(True),
+                target,
+                target / "domain",
+                "domain",
+                name,
+                title,
+                ontology,
+                author,
+                email,
+            )
+            _create_repository_files(target, name)
+            shown = [relative(p, target) for p in _files(target)]
+        envelope.changes.extend(Change("create", path=p) for p in shown)
+        envelope.changes.append(Change("git-init", ref="main"))
+        paths = [{"path": p, "status": "A"} for p in sorted(shown)]
+        envelope.changes.append(Change("git-commit", ref="HEAD", paths=paths))
+        out.echo(f"Would create Domain repository {repo} ({len(shown)} files) and commit it")
+        return
+
+    out.echo(f"Creating SCS Domain repository: {repo.name}")
+    out.echo(f"Location: {repo}\n")
+    try:
+        _scaffold(
+            out,
+            repo,
+            repo / "domain",
+            "domain",
+            name,
+            title,
+            ontology,
+            author,
+            email,
+        )
+        _create_repository_files(repo, name)
+        written = _files(repo)
+        git.run(repo, "init", "-q", "--initial-branch=main")
+        git.run(repo, "add", "-A")
+        message = f"Create Domain repository {repo.name} (scs new domain)"
+        git.run(repo, "commit", "-q", "-m", message)
+        committed = git.committed_paths(repo)
+    except git.GitError as e:
+        shutil.rmtree(repo, ignore_errors=True)
+        raise CommandError("GIT_COMMAND_FAILED", str(e))
+    except BaseException:
+        shutil.rmtree(repo, ignore_errors=True)
+        raise
+
+    envelope.changes.extend(Change("create", path=relative(p, repo)) for p in written)
+    envelope.changes.append(Change("git-init", ref="main"))
+    envelope.changes.append(Change("git-commit", ref="HEAD", paths=committed))
+
+    out.echo(f"\n✓ Domain repository '{repo.name}' created, with an initial commit.")
+    out.echo("\nNext steps:")
+    out.echo(f"  cd {repo.name}")
+    out.echo("  # Write directives, prohibitions, and facts in domain/context/project/")
+    out.echo("  scs new project <name>          # add a Project workspace")
+    out.echo("  scs-validate --strict           # validate every workspace")
+    out.echo("  scs compile domain/bundles/domain-bundle.yaml --allow-draft")
 
 
 @new.command()
 @_workspace_options
-def project(name, project_type, ontology, directory, author, email, interactive, no_interactive):
+@click.option(
+    "--dir",
+    "directory",
+    type=click.Path(),
+    default=None,
+    help="The Domain repository to add the Project to (default: the one containing the "
+    "current directory)",
+)
+@machine_command("new project")
+def project(
+    envelope: Envelope,
+    out: Output,
+    name,
+    ontology,
+    title,
+    author,
+    email,
+    interactive,
+    no_interactive,
+    dry_run,
+    directory,
+):
     """
-    Create a Project bundle workspace
+    Create a Project workspace in a Domain repository
 
-    The Project bundle holds the governance for one project. It imports its concept bundles
-    directly and does not import the organization's Domain bundle; a runtime applies the two
-    side by side. Compile it with `scs compile bundles/project-bundle.yaml`.
+    Adds `projects/NAME/` to the Domain repository containing the current directory (or the
+    one given with --dir). The Project bundle holds the governance for one project. It imports
+    its concept bundles directly. The Project inherits its Domain's rules at runtime; the
+    Project bundle does not import the Domain bundle. Create the repository first with
+    `scs new domain`.
 
     By default, prompts for missing required information interactively.
     Use --no-interactive to disable prompts and require all flags.
 
-    Ontology models: sdlc (default), mca, cdmo. Project types (--type, sdlc only): healthcare,
-    fintech, saas, government, minimal, standard
+    Ontology models: sdlc, mca, cdmo, personal; by default, the Domain's. The scaffold
+    supplies the ontology's Project templates; remove what does not apply.
 
     \b
     Examples:
         scs new project                           # Interactive mode (default)
         scs new project medication-adherence      # Interactive for missing fields
-        scs new project my-app --type healthcare  # Specify type (sdlc ontology)
         scs new project my-funder --ontology mca  # Merchant Cash Advance ontology
-        scs new project my-app --type healthcare --author "Jane Doe" \
-            --email "jane@example.com" --no-interactive
+        scs new project my-app --author "Jane Doe" --email "jane@acme-health.org" --no-interactive
 
-    See also: scs new domain, scs init (for adding SCS to existing projects)
+    See also: scs new domain
     """
-    _scaffold(
-        "project",
-        name,
-        project_type,
-        ontology,
-        directory,
-        author,
-        email,
-        interactive,
-        no_interactive,
+    start = (Path(directory) if directory else Path.cwd()).resolve()
+    repo = find_domain_repository(start)
+    if repo is None:
+        raise CommandError(
+            "DOMAIN_WORKSPACE_MISSING",
+            f"No Domain repository at or above {start}. A Project workspace lives in one: "
+            "create it with 'scs new domain NAME', then run 'scs new project' inside it.",
+        )
+    name, title, author, email = _ask(
+        "project", out, name, title, author, email, interactive, no_interactive
+    )
+    _check_name(name, "project")
+    ontology = ontology or _domain_ontology(repo)
+    workspace = repo / "projects" / name
+    if workspace.exists():
+        shown = relative(workspace, repo)
+        raise CommandError("WORKSPACE_EXISTS", f"'{shown}' already exists", path=shown)
+    envelope.result = {"repository": str(repo), "workspace": name, "bundle": f"bundle:{name}"}
+    if dry_run:
+        with tempfile.TemporaryDirectory(prefix="scs-new-") as tmp:
+            target = Path(tmp) / repo.name
+            staged = target / "projects" / name
+            _scaffold(Output(True), target, staged, "project", name, title, ontology, author, email)
+            files = [relative(p, target) for p in _files(staged)]
+        envelope.changes.extend(Change("create", path=p) for p in files)
+        if git.available() and git.head(repo):
+            tracked = sorted(set(files) - set(git.ignored(repo, files)))
+            paths = [{"path": p, "status": "A"} for p in tracked]
+            envelope.changes.append(Change("git-commit", ref="HEAD", paths=paths))
+        out.echo(f"Would create Project {relative(workspace, repo)} ({len(files)} files)")
+        return
+
+    out.echo(f"Creating SCS project: {name}")
+    out.echo(f"Location: {workspace}\n")
+    try:
+        _scaffold(out, repo, workspace, "project", name, title, ontology, author, email)
+        written = _files(workspace)
+        commit = _commit_project(repo, workspace, name)
+    except git.GitError as e:
+        shutil.rmtree(workspace, ignore_errors=True)
+        raise CommandError("GIT_COMMAND_FAILED", f"{e}; the Project was not created")
+    except BaseException:
+        shutil.rmtree(workspace, ignore_errors=True)
+        raise
+
+    envelope.changes.extend(Change("create", path=relative(p, repo)) for p in written)
+    if commit:
+        # ref HEAD, like the Domain's initial commit, so a dry run and a real run report alike
+        envelope.changes.append(
+            Change("git-commit", ref="HEAD", paths=git.committed_paths(repo, commit))
+        )
+
+    out.echo(f"\n✓ Project '{name}' created in {relative(workspace, repo)}.")
+    out.echo("\nNext steps:")
+    out.echo(
+        "  # Write directives, prohibitions, and facts in "
+        f"{relative(workspace, repo)}/context/project/"
+    )
+    out.echo("  scs-validate --strict           # at the repository root")
+    out.echo(f"  scs compile {relative(workspace, repo)}/bundles/project-bundle.yaml --allow-draft")
+
+
+def _commit_project(repo: Path, workspace: Path, name: str) -> Optional[str]:
+    """Commit the new Project workspace, and nothing else, as the engine (D-91), like the
+    Domain's initial commit. None when the repository has no git history to commit onto."""
+    if not git.available() or not git.head(repo):
+        return None
+    pathspec = [relative(workspace, repo)]
+    old = git.head(repo)
+    message = f"Create Project {name} (scs new project)"
+    with tempfile.TemporaryDirectory(prefix="scs-new-") as work:
+        commit = git.commit_paths(repo, pathspec, message, git.ENGINE_IDENTITY, Path(work))
+    git.move_head(repo, commit, old, f"scs new project {name}")
+    git.sync_index(repo, pathspec)
+    return commit
+
+
+def _domain_ontology(repo: Path) -> str:
+    """The Domain workspace's ontology, which a new Project inherits (D-74); sdlc if unset."""
+    try:
+        config = read_config(repo / "domain" / CONFIG)
+    except ValueError:
+        config = {}
+    value = config.get("ontology") or config.get("ontology_model")
+    return value if value in ONTOLOGY_MODELS else "sdlc"
+
+
+def _check_name(name: str, kind: str) -> None:
+    """Refuse a name that cannot be a directory, a bundle id, and a tag prefix, or that is
+    reserved (D-33)."""
+    if not NAME_RE.match(name):
+        raise CommandError(
+            "WORKSPACE_NAME_INVALID",
+            f"'{name}' is not a valid {kind} name: use letters, digits, '.', '_', and '-', "
+            "starting with a letter or digit",
+            exit_code=EXIT_USAGE,
+        )
+    if kind == "project" and name == "domain":
+        raise CommandError(
+            "WORKSPACE_NAME_INVALID",
+            "A Project cannot be named 'domain': that is the Domain workspace's name, and the "
+            "two would share version tags",
+            exit_code=EXIT_USAGE,
+        )
+    concepts = {c for m in ONTOLOGY_MODELS.values() for c in m["concepts"]}
+    if name in DOMAIN_COMMON_CONCEPTS or name in concepts:
+        raise CommandError(
+            "WORKSPACE_NAME_INVALID",
+            f"'{name}' is the name of a concept bundle, so the {kind} bundle's id "
+            f"(bundle:{name}) would collide with it; choose another name",
+            exit_code=EXIT_USAGE,
+        )
+    reserved = reserved_bundle_name(f"bundle:{name}")
+    if reserved:
+        raise CommandError(
+            "RESERVED_BUNDLE_NAME",
+            f"'{reserved}' is reserved for a later SCS release (plan, test-plan, qa); "
+            f"choose another {kind} name",
+        )
+
+
+def _ask(kind, out, name, title, author, email, interactive, no_interactive):
+    """Fill in missing values by prompting in interactive human mode; otherwise they are
+    required (NO_INPUT). Machine mode never prompts. The display name defaults to the name."""
+    label = kind.capitalize()
+    should_prompt = (not no_interactive or interactive) and not out.machine
+    if should_prompt:
+        if not name:
+            click.echo(f"=== SCS {label} Setup ===\n")
+            name = click.prompt(f"{label} name", type=str)
+            if not title:
+                title = click.prompt("Display name (as people write it)", default=name, type=str)
+    elif not name:
+        message = f"{label} name is required in non-interactive mode"
+        raise CommandError("NO_INPUT", message, exit_code=EXIT_USAGE)
+    # Never invented: prompted with git's values as defaults, else required (D-13, D-71)
+    author, email = identity.author(author, email, prompt=should_prompt)
+    if should_prompt:
+        click.echo()
+    return name, _check_title(title or name), author, email
+
+
+def _check_title(title: str) -> str:
+    """A display name goes into double-quoted YAML strings in the templates: one line, no
+    double quote or backslash."""
+    title = " ".join(title.split())
+    if not title or '"' in title or "\\" in title:
+        raise CommandError(
+            "WORKSPACE_TITLE_INVALID",
+            "The display name must be one non-empty line without '\"' or '\\'",
+            exit_code=EXIT_USAGE,
+        )
+    return title
+
+
+def _files(root: Path) -> List[Path]:
+    """Every file under `root`, outside `.git/`, in path order."""
+    return sorted(
+        p for p in root.rglob("*") if p.is_file() and ".git" not in p.relative_to(root).parts
     )
 
 
-def _scaffold(
-    kind, name, project_type, ontology, directory, author, email, interactive, no_interactive
-):
-    """Create a `kind` ("domain" or "project") workspace."""
-    label = kind.capitalize()
-    # Determine if we should be interactive
-    # Interactive by default unless --no-interactive is specified
-    should_prompt = not no_interactive or interactive
+def _create_repository_files(repo: Path, name: str) -> None:
+    """AGENTS.md and its CLAUDE.md pointer (D-31), the CI workflow, .gitignore (D-59),
+    .gitattributes, and projects/."""
+    templates = get_template_path() / "repository"
+    major, minor = SCS_VERSION.split(".")[:2]
+    variables = {
+        "repo_name": repo.name,
+        "domain_name": name,
+        "tools_version": _scs_tools_version(),
+        # Repository mode and the 0.7 checks start with the validator for this spec version.
+        "validator_requirement": f"scs-validator>={SCS_VERSION},<{major}.{int(minor) + 1}",
+    }
+    copy_template(templates / "AGENTS.md", repo / "AGENTS.md", variables)
+    copy_template(templates / "CLAUDE.md", repo / "CLAUDE.md", variables)
+    copy_template(
+        templates / "scs-validate.yml",
+        repo / ".github" / "workflows" / "scs-validate.yml",
+        variables,
+    )
+    copy_template(templates / "gitignore", repo / ".gitignore")
+    copy_template(templates / "gitattributes", repo / ".gitattributes")
+    # git does not track empty directories; keep projects/ in the initial commit
+    write_file(repo / "projects" / ".gitkeep", "")
 
-    # Interactive mode - prompt for missing values
-    if should_prompt:
-        # Show welcome message
-        if not name and not project_type:
-            click.echo(f"=== SCS {label} Setup ===\n")
-            click.echo(f"Let's create your SCS {kind} workspace!\n")
 
-        # Prompt for the name if not provided
-        if not name:
-            name = click.prompt(f"{label} name", type=str)
+def _scaffold(out, repo, base_path, kind, name, title, ontology, author, email):
+    """Create a `kind` ("domain" or "project") workspace at `base_path` in Domain repository
+    `repo`. Its bundle is `bundle:<name>`. The templates depend on the ontology and the
+    workspace kind only (D-64): the ontology's full set for that kind."""
+    out.echo(f"Ontology model: {ontology}")
 
-        # Show project types if not specified - only meaningful for the sdlc ontology.
-        # --ontology itself is flag-only in this pass, not prompted for interactively.
-        if ontology == "sdlc" and not project_type:
-            click.echo("\nAvailable project types:")
-            for idx, (ptype, config) in enumerate(PROJECT_TYPES.items(), 1):
-                click.echo(f"  {idx}. {ptype:15} - {config['description']}")
-
-            click.echo()
-            project_type = click.prompt(
-                "Project type",
-                type=click.Choice(list(PROJECT_TYPES.keys())),
-                default="standard",
-                show_choices=False,
-            )
-
-        # Prompt for author if not provided
-        if not author:
-            default_author = os.getenv("USER", "")
-            author = click.prompt(
-                "Author name",
-                default=default_author,
-                show_default=True,
-            )
-
-        # Prompt for email if not provided
-        if not email:
-            default_email = f"{author}@example.com" if author else ""
-            email = click.prompt(
-                "Author email",
-                default=default_email,
-                show_default=True,
-            )
-
-        # Prompt for directory if not provided
-        if not directory:
-            use_cwd = click.confirm(
-                f"\nCreate {kind} in current directory ({Path.cwd()})?",
-                default=True,
-            )
-            if not use_cwd:
-                directory = click.prompt(
-                    f"{label} directory",
-                    type=click.Path(),
-                    default=str(Path.cwd()),
-                )
-
-        click.echo()  # Empty line before creation starts
-    else:
-        # Non-interactive mode - require all parameters
-        if not name:
-            click.echo(f"Error: {label} name is required in non-interactive mode", err=True)
-            raise click.Abort()
-
-        # Set defaults for optional parameters
-        if not project_type:
-            project_type = "standard"
-        if not author:
-            author = os.getenv("USER", "developer")
-        if not email:
-            email = f"{author}@example.com"
-
-    # Determine project directory
-    if directory:
-        base_path = Path(directory) / name
-    else:
-        base_path = Path.cwd() / name
-
-    # Check if directory already exists
-    if base_path.exists():
-        click.echo(f"Error: Directory '{base_path}' already exists", err=True)
-        raise click.Abort()
-
-    click.echo(f"Creating SCS {kind}: {name}")
-    click.echo(f"Ontology model: {ontology}")
-    if ontology == "sdlc":
-        click.echo(f"Project type: {project_type}")
-    click.echo(f"Location: {base_path}\n")
-
-    # Get project configuration. --type/PROJECT_TYPES only apply to the sdlc ontology -
-    # every other model scaffolds its full, fixed concept set (no --type variants yet).
     model_config = get_ontology_model_config(ontology)
-    if ontology == "sdlc":
-        config = get_project_type_config(project_type)
-        concepts = get_concepts_for_project_type(project_type)
-    else:
-        config = {"exclude_scds": []}
-        concepts = model_config["concepts"]
+    # The user (or the agent with the user) removes what does not apply; only the sdlc
+    # industry layer is left out up front (D-91).
+    config: dict = {"exclude_scds": list(SDLC_INDUSTRY_SCDS) if ontology == "sdlc" else []}
+    concepts = list(model_config["concepts"])
     if kind == "domain" and ontology == "sdlc":
         # The Global profile: only concepts with organization-wide SCDs
         concepts = [c for c in concepts if c in _sdlc_domain_scd_mapping()]
     elif kind == "domain" and "domain_scds" in model_config:
         concepts = [c for c in concepts if c in model_config["domain_scds"]]
     ontology_concepts = list(concepts)
-    if kind == "domain":
+    if ontology == "personal":
+        concepts = list(PERSONAL_CONCEPTS)
+    elif kind == "domain":
         concepts = [*DOMAIN_COMMON_CONCEPTS, *concepts]
 
-    # Create directory structure
-    click.echo("Creating directory structure...")
+    out.echo("Creating directory structure...")
     create_directory_structure(base_path, name)
-
-    # Template variables
-    now = datetime.now(timezone.utc).isoformat()
-    author_info = author or os.getenv("USER", "developer")
-    email_info = email or f"{author_info}@example.com"
 
     variables = {
         "bundle_kind": kind,
         "meta_bundle_ref": META_BUNDLE_REF,
         "project_name": name,
-        "project_type": project_type,
+        # Prose (titles, descriptions, summaries) uses the display name; ids use the name
+        "display_name": title,
         "ontology": ontology,
         "domain_id": model_config["domain"],
         "domain_name": model_config["domain_name"],
-        "author": author_info,
-        "email": email_info,
-        "created_at": now,
+        "repo_name": repo.name,
+        "workspace_dir": relative(base_path, repo),
+        "author": author,
+        "email": email,
+        # Provenance identifies a person as `Name <email>` (D-28, D-63)
+        "created_by": f"{author} <{email}>",
+        "created_at": clock.now().isoformat(),
         "concepts": concepts,
         "config": config,
     }
 
-    # Create bundle files
-    click.echo("Creating bundle files...")
-    _create_bundles(base_path, kind, concepts, variables, ontology)
+    out.echo("Creating bundle files...")
+    _create_bundles(base_path, kind, concepts, variables, ontology, out)
 
-    # Create the Domain Ontology manifest (RFC-0001)
-    click.echo("Creating Domain Ontology manifest...")
+    out.echo("Creating Domain Ontology manifest...")
     _create_domain_manifest(base_path, concepts, variables, model_config)
 
-    # Create SCD files
-    click.echo("Creating SCD files...")
+    out.echo("Creating SCD files...")
     created = _create_scds(base_path, kind, concepts, variables, config, ontology)
     if kind == "domain":
         # Concept bundle templates list the project profile's SCDs; list what was generated
         for concept, scd_names in created.items():
             _set_concept_scds(base_path / "bundles" / "concepts" / f"{concept}.yaml", scd_names)
 
-    # Create concept documentation templates. Not yet built for non-sdlc ontology models -
-    # skip cleanly rather than warn once per concept.
+    # Concept documentation templates are not yet built for non-sdlc ontology models
     if ontology == "sdlc":
-        click.echo("Creating concept documentation templates...")
-        _create_concept_docs(base_path, ontology_concepts, variables)
+        out.echo("Creating concept documentation templates...")
+        _create_concept_docs(base_path, ontology_concepts, variables, out)
 
-    # Create supporting files
-    click.echo("Creating supporting files...")
+    out.echo("Creating supporting files...")
     _create_supporting_files(base_path, variables)
-
-    click.echo(f"\n✓ {label} '{name}' created successfully!")
-    click.echo("\nNext steps:")
-    click.echo(f"  cd {name}")
-    click.echo("  # Write directives, prohibitions, and facts in context/project/")
-    click.echo("  # Review docs/GETTING_STARTED.md")
-    click.echo("  scs bundle validate")
-    click.echo(f"  scs compile bundles/{kind}-bundle.yaml --allow-draft")
 
 
 def _create_domain_manifest(base_path: Path, concepts: list, variables: dict, model_config: dict):
-    """Create domain/domain-manifest.yaml: the Domain Ontology of the generated concepts,
+    """Create ontology/domain-manifest.yaml (D-04): the Domain Ontology of the generated concepts,
     including relationships when the ontology model defines them (e.g. mca; sdlc has none,
     deliberately flat)."""
     manifest_template = get_template_path() / "domain" / "domain-manifest.yaml"
@@ -384,12 +567,14 @@ def _create_domain_manifest(base_path: Path, concepts: list, variables: dict, mo
     )
     copy_template(
         manifest_template,
-        base_path / "domain" / "domain-manifest.yaml",
+        base_path / "ontology" / "domain-manifest.yaml",
         {**variables, "concept_info": concept_info},
     )
 
 
-def _create_bundles(base_path: Path, kind: str, concepts: list, variables: dict, ontology: str):
+def _create_bundles(
+    base_path: Path, kind: str, concepts: list, variables: dict, ontology: str, out: Output
+):
     """Create the root bundle (domain or project) and its concept bundles (SCS 0.6.0).
     The meta bundle is not scaffolded: a Domain bundle imports the published one."""
     template_path = get_template_path() / "bundles"
@@ -412,7 +597,7 @@ def _create_bundles(base_path: Path, kind: str, concepts: list, variables: dict,
                 variables,
             )
         else:
-            click.echo(f"Warning: Template for concept '{concept}' not found, skipping...")
+            out.echo(f"Warning: Template for concept '{concept}' not found, skipping...")
 
 
 def _create_scds(
@@ -478,7 +663,9 @@ def _drop_dangling_relationships(scd_path: Path, generated: set):
     (e.g. hipaa-compliance in a non-healthcare project). Works on the text so the template's
     comments survive; relationship items are `  - type:` lines with 4-space continuations."""
     lines = scd_path.read_text(encoding="utf-8").splitlines(keepends=True)
-    out, item, kept, in_block = [], [], 0, False
+    out: list[str] = []
+    item: list[str] = []
+    kept, in_block = 0, False
 
     def flush():
         nonlocal item, kept
@@ -609,7 +796,7 @@ def _sdlc_domain_scd_mapping() -> dict:
     }
 
 
-def _create_concept_docs(base_path: Path, concepts: list, variables: dict):
+def _create_concept_docs(base_path: Path, concepts: list, variables: dict, out: Output):
     """Create concept documentation markdown templates for users to fill in"""
     import shutil
 
@@ -632,49 +819,36 @@ def _create_concept_docs(base_path: Path, concepts: list, variables: dict):
                 # Copy file directly without Jinja2 rendering (these are user templates)
                 shutil.copy2(template_file, dest_path)
         else:
-            click.echo(f"Warning: Concept docs template for {concept} not found, skipping...")
+            out.echo(f"Warning: Concept docs template for {concept} not found, skipping...")
 
 
 def _create_supporting_files(base_path: Path, variables: dict):
-    """Create README, .gitignore, VERSION, and other supporting files"""
+    """Create README, docs/GETTING_STARTED.md, sources/README.md, and .scs/config.
+    Repository-wide files (.gitignore, .gitattributes) are created once, at the Domain
+    repository root."""
     template_path = get_template_path()
 
-    # Create README.md
-    readme_template = template_path / "project-README.md"
-    if readme_template.exists():
-        copy_template(
-            readme_template,
-            base_path / "README.md",
-            variables,
-        )
+    copy_template(template_path / "project-README.md", base_path / "README.md", variables)
+    # Where the user puts the documents the context is drafted from (D-86); only this README
+    # is tracked (D-59)
+    copy_template(
+        template_path / "sources-README.md", base_path / "sources" / "README.md", variables
+    )
+    copy_template(
+        template_path / "GETTING_STARTED.md",
+        base_path / "docs" / "GETTING_STARTED.md",
+        variables,
+    )
 
-    # Create .gitignore
-    gitignore_template = template_path / "project.gitignore"
-    if gitignore_template.exists():
-        copy_template(
-            gitignore_template,
-            base_path / ".gitignore",
-            variables,
-        )
-
-    # Create VERSION
-    write_file(base_path / "VERSION", "1.0.0\n")
-
-    # Create GETTING_STARTED.md
-    getting_started_template = template_path / "GETTING_STARTED.md"
-    if getting_started_template.exists():
-        copy_template(
-            getting_started_template,
-            base_path / "docs" / "GETTING_STARTED.md",
-            variables,
-        )
-
-    # Create .scs/config
-    scs_config = f"""# SCS Workspace Configuration
-bundle_type: {variables['bundle_kind']}
-project_name: {variables['project_name']}
-project_type: {variables['project_type']}
-ontology_model: {variables['ontology']}
-scs_version: {_scs_tools_version()}
-"""
-    write_file(base_path / ".scs" / "config", scs_config)
+    # .scs/config (D-06): name is the workspace name, `domain` or the Project's directory name
+    # (D-03); scs_version is the spec version.
+    kind = variables["bundle_kind"]
+    lines = [
+        "# SCS Workspace Configuration",
+        f"bundle_type: {kind}",
+        f"name: {'domain' if kind == 'domain' else variables['project_name']}",
+        f"display_name: {json.dumps(variables['display_name'], ensure_ascii=False)}",
+        f"ontology: {variables['ontology']}",
+    ]
+    lines += [f"scs_version: {SCS_VERSION}", f"tools_version: {_scs_tools_version()}"]
+    write_file(base_path / ".scs" / "config", "\n".join(lines) + "\n")

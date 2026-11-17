@@ -4,10 +4,11 @@ version: DRAFT
 title: Capital & Funding Concept Bundle
 description: 'Where the funder''s own money comes from to fund merchants: credit facilities, warehouse
   lines, and Treasury.'
+owner: finance
 imports: []
 scds:
 - scd:project:capital-funding
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
   rationale: 'Concept bundle for the MCA reference ontology: Capital & Funding.'

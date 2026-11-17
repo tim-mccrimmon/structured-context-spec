@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://structuredcontext.dev/schema/version-manifest.schema.json",
+  "title": "SCS Version Manifest",
+  "description": "The record `scs bundle version` writes beside a versioned bundle, named <bundle-name>-v<version>-MANIFEST.yaml (RFC 0002 sections 9 and 11, spec bundle-format.md section 7.6). content_digest and tools_version are optional here so manifests written before 0.7 still validate; a manifest whose version has a workspace-qualified tag must carry both, which is checked against the tags, not by this schema (D-49).",
+  "type": "object",
+  "required": ["version", "bundle", "approval"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "The released version"
+    },
+    "release_date": {"type": "string"},
+    "status": {"type": "string", "enum": ["validated", "approved"]},
+    "project": {"type": "string"},
+    "tools_version": {
+      "type": "string",
+      "description": "Version of scs-tools that wrote the manifest"
+    },
+    "bundle": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^bundle:[a-zA-Z0-9._-]+$"},
+        "type": {"type": "string"},
+        "file": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "size_bytes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "content_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Digest of the bundle's full resolved content (bundle-format.md section 7.6)"
+    },
+    "content_inputs": {
+      "type": "object",
+      "description": "Digest of every bundle manifest and SCD in the tree, used only to name what changed on a mismatch",
+      "properties": {
+        "bundles": {"$ref": "#/$defs/digest_map"},
+        "scds": {"$ref": "#/$defs/digest_map"}
+      }
+    },
+    "validation": {"type": "object"},
+    "components": {"type": "object"},
+    "approval": {
+      "type": "object",
+      "required": ["approved_by"],
+      "properties": {
+        "approved_by": {"$ref": "#/$defs/person"},
+        "approved_at": {"type": "string"},
+        "approval_notes": {"type": ["string", "null"]}
+      }
+    },
+    "phases": {"type": "object"},
+    "release_notes": {"type": ["string", "null"]},
+    "distribution": {"type": "object"}
+  },
+  "$defs": {
+    "person": {
+      "description": "A person identifier, Name <email> (D-28). Role-only attribution (role:<name>) is allowed in intake.yaml only, never for an approver.",
+      "type": "string",
+      "pattern": "^[^<>\\s][^<>]*\\s<[^<>\\s@]+@[^<>\\s@]+>$",
+      "not": {"pattern": "^role:"}
+    },
+    "digest_map": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          {"type": "null"}
+        ]
+      }
+    }
+  }
+}

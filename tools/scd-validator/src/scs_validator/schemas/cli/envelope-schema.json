@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://structuredcontext.dev/schema/cli-envelope.schema.json",
+  "title": "SCS Machine-Mode Envelope",
+  "description": "The single JSON object an `scs` or `scs-validate` command writes to stdout under --json (RFC 0002 section 3). Paths are POSIX, relative to the Domain repository root (D-42). Every diagnostic code is registered in schema/diagnostics/codes.yaml (D-10).",
+  "type": "object",
+  "required": ["scs_version", "tools_version", "command", "ok", "exit_code", "changes", "diagnostics", "result"],
+  "properties": {
+    "scs_version": {"type": "string", "description": "Spec version the tools implement"},
+    "tools_version": {"type": "string", "description": "Version of the package that ran the command"},
+    "command": {"type": "string", "description": "The command, without the program name (e.g. \"bundle version\")"},
+    "ok": {"type": "boolean", "description": "True exactly when exit_code is 0"},
+    "exit_code": {
+      "type": "integer",
+      "enum": [0, 1, 2, 3, 4, 5],
+      "description": "0 ok, 1 errors, 2 warnings under --strict, 3 bad arguments or no input, 4 file error, 5 internal error"
+    },
+    "changes": {
+      "type": "array",
+      "description": "Every effect of the command. On ok: false, what remains after rollback. Under --dry-run, what the real run would do (D-09).",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["action", "path"],
+            "properties": {
+              "action": {"enum": ["create", "modify", "delete"]},
+              "path": {"type": "string"}
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["action", "ref"],
+            "properties": {
+              "action": {"enum": ["git-init", "git-tag"]},
+              "ref": {"type": "string"}
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["action", "ref", "paths"],
+            "properties": {
+              "action": {"const": "git-commit"},
+              "ref": {"type": "string"},
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["path", "status"],
+                  "properties": {
+                    "path": {"type": "string"},
+                    "status": {"enum": ["A", "M", "D"]}
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "code", "message", "path", "suggestion"],
+        "properties": {
+          "severity": {"enum": ["error", "warning", "info"]},
+          "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+          "message": {"type": "string"},
+          "path": {"type": ["string", "null"]},
+          "suggestion": {
+            "type": ["object", "null"],
+            "description": "Values that would fill the missing input, keyed by field; offered, never applied"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "result": {"type": "object", "description": "Command-specific output"}
+  },
+  "additionalProperties": false
+}

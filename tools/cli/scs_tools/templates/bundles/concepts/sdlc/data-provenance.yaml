@@ -2,7 +2,8 @@ id: bundle:data-provenance
 type: concept
 version: "DRAFT"
 title: "Data & Provenance Concept Bundle"
-description: "Data models, lineage tracking, and retention policies for {{ project_name }}"
+description: "Data models, lineage tracking, and retention policies for {{ display_name }}"
+owner: data
 
 imports: []
 
@@ -12,6 +13,6 @@ scds:
   - scd:project:retention-policy
 
 provenance:
-  created_by: "{{ email }}"
+  created_by: "{{ created_by }}"
   created_at: "{{ created_at }}"
-  rationale: "Data & Provenance concept bundle for {{ project_name }}"
+  rationale: "Data & Provenance concept bundle for {{ display_name }}"

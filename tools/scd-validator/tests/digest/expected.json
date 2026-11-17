@@ -1,0 +1,21 @@
+{
+  "documents": {
+    "alpha": "sha256:ae585bed29eb2b3eee84852bac469f039a9a8912a1177d0d73e9c790b9a2d9b3",
+    "alpha-changed": "sha256:b6bf92e533c17d94c22e2f04d6a5a73c05040d8e65177338156c8b78fadca627",
+    "beta": "sha256:9acded4b1aa2b7abe8a7e0bad69fbc2ed1a05e9d9ca52c8da7f3fffa75ed69b7",
+    "gamma": "sha256:4f53ef9e4ed329dfb03191fc20da423fd13ad64f4b5909387cdecda23bb7fa26",
+    "first": "sha256:9ef143991a9cc08fb7813d5a03903ff6cc0b75f75a2798b4f36005ee02b812d7",
+    "second": "sha256:904371b79a03fc194e3034703d9971d103c6e63a11c5158861805d041deee273",
+    "project-bundle": "sha256:9c857c7e40de018c6249fc0f8db718693f35932497f6b7e05af84c1a4978ac91"
+  },
+  "content": {
+    "first": "sha256:16ec789d486a2031bfedf8d2614e50b1db39130c633ead110357e852fc0515fc",
+    "second": "sha256:88897b88e5f8e5262ce34544c35151bde47ef56d10d04bd6132a8d4d8a3dfec2",
+    "project-bundle": "sha256:e085a12485cba51d36d5cb057bdb99cbb26819d866cb4c3d354146059435be8f"
+  },
+  "content_with_alpha_changed": {
+    "first": "sha256:5894dbccff53cd69717dce95b316ccbadb6aeed1122b368cde3e7a3ddd582c7d",
+    "second": "sha256:88897b88e5f8e5262ce34544c35151bde47ef56d10d04bd6132a8d4d8a3dfec2",
+    "project-bundle": "sha256:a72facd290bae809bd9bc2c773ec06a5c1061d9ef9aa4f34d48cba2171adc0bd"
+  }
+}

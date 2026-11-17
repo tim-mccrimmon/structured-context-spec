@@ -1,0 +1,15 @@
+# Same content as workspace/context/project/alpha.yaml: keys reordered, comments added,
+# quoting and layout changed. Its digest must equal alpha's.
+provenance: {rationale: 'test vector', created_at: 2026-10-19T08:30:00Z, created_by: "Jane Doe <jane@example.com>"}
+content:
+  directives:
+    -   directive: "Run the full regression suite before a release."   # trailing comment
+        id: 'A-001'
+  summary: >-
+    Release gates
+
+version: 1.0.0
+type: "project"
+description: Release gates
+title: Alpha
+id: scd:project:alpha

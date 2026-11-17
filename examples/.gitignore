@@ -1,0 +1,2 @@
+# The example repositories commit their compiled artifacts (examples/build.py, ISS-070)
+!**/dist/
